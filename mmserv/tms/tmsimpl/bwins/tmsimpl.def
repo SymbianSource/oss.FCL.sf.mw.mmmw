@@ -1,0 +1,15 @@
+EXPORTS
+	?Delete@TMSGlobalRoutingImpl@TMS@@SAHAAPAVTMSGlobalRouting@2@@Z @ 1 NONAME ; int TMS::TMSGlobalRoutingImpl::Delete(class TMS::TMSGlobalRouting * &)
+	?Create@TMSEffectImpl@TMS@@SAHHAAPAVTMSEffect@2@@Z @ 2 NONAME ; int TMS::TMSEffectImpl::Create(int, class TMS::TMSEffect * &)
+	?Create@TMSSinkImpl@TMS@@SAHHAAPAVTMSSink@2@@Z @ 3 NONAME ; int TMS::TMSSinkImpl::Create(int, class TMS::TMSSink * &)
+	?Create@TMSSourceImpl@TMS@@SAHHAAPAVTMSSource@2@@Z @ 4 NONAME ; int TMS::TMSSourceImpl::Create(int, class TMS::TMSSource * &)
+	?Delete@TMSFormatImpl@TMS@@SAHAAPAVTMSFormat@2@@Z @ 5 NONAME ; int TMS::TMSFormatImpl::Delete(class TMS::TMSFormat * &)
+	?Create@TMSFormatImpl@TMS@@SAHHAAPAVTMSFormat@2@@Z @ 6 NONAME ; int TMS::TMSFormatImpl::Create(int, class TMS::TMSFormat * &)
+	?Delete@TMSSinkImpl@TMS@@SAHAAPAVTMSSink@2@@Z @ 7 NONAME ; int TMS::TMSSinkImpl::Delete(class TMS::TMSSink * &)
+	?Delete@TMSBufferImpl@TMS@@SAHAAPAVTMSBuffer@2@@Z @ 8 NONAME ; int TMS::TMSBufferImpl::Delete(class TMS::TMSBuffer * &)
+	?Delete@TMSSourceImpl@TMS@@SAHAAPAVTMSSource@2@@Z @ 9 NONAME ; int TMS::TMSSourceImpl::Delete(class TMS::TMSSource * &)
+	?Delete@TMSEffectImpl@TMS@@SAHAAPAVTMSEffect@2@@Z @ 10 NONAME ; int TMS::TMSEffectImpl::Delete(class TMS::TMSEffect * &)
+	?Create@TMSGlobalRoutingImpl@TMS@@SAHAAPAVTMSGlobalRouting@2@@Z @ 11 NONAME ; int TMS::TMSGlobalRoutingImpl::Create(class TMS::TMSGlobalRouting * &)
+	?Create@TMSBufferImpl@TMS@@SAHHIAAPAVTMSBuffer@2@@Z @ 12 NONAME ; int TMS::TMSBufferImpl::Create(int, unsigned int, class TMS::TMSBuffer * &)
+	?Create@TMSCallImpl@TMS@@SAHHAAPAVTMSCall@2@I@Z @ 13 NONAME ; int TMS::TMSCallImpl::Create(int, class TMS::TMSCall * &, unsigned int)
+

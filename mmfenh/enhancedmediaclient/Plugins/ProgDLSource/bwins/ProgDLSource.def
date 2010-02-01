@@ -1,0 +1,4 @@
+EXPORTS
+	?ImplementationGroupProxy@@YAPBUTImplementationProxy@@AAH@Z @ 1 NONAME ; struct TImplementationProxy const * ImplementationGroupProxy(int &)
+	?NewL@CProgDLMultimediaSource@@SAPAV1@AAVMDataSource@@@Z @ 2 NONAME ; class CProgDLMultimediaSource * CProgDLMultimediaSource::NewL(class MDataSource &)
+

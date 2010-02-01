@@ -1,0 +1,10 @@
+EXPORTS
+	_ZN27CProgressiveDownloadUtility4NewLEv @ 1 NONAME
+	_ZN27CProgressiveDownloadUtility5OpenLERK5RFileR27MAudioPdPlayUtilityCallback @ 2 NONAME
+	_ZN27CProgressiveDownloadUtility5OpenLERK7TDesC16R27MAudioPdPlayUtilityCallback @ 3 NONAME
+	_ZN27CProgressiveDownloadUtilityD0Ev @ 4 NONAME
+	_ZN27CProgressiveDownloadUtilityD1Ev @ 5 NONAME
+	_ZN27CProgressiveDownloadUtilityD2Ev @ 6 NONAME
+	_ZTI27CProgressiveDownloadUtility @ 7 NONAME ; #<TI>#
+	_ZTV27CProgressiveDownloadUtility @ 8 NONAME ; #<VT>#
+

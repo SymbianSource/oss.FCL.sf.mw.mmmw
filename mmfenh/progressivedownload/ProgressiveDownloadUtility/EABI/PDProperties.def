@@ -1,0 +1,25 @@
+EXPORTS
+	_ZN13CPdProperties4NewLEv @ 1 NONAME
+	_ZN13CPdProperties5NewLCEv @ 2 NONAME
+	_ZN13CPdProperties5OpenLERK5RFileR27MAudioPdPlayUtilityCallback @ 3 NONAME
+	_ZN13CPdProperties5OpenLERK7TDesC16R27MAudioPdPlayUtilityCallback @ 4 NONAME
+	_ZN13CPdPropertiesD0Ev @ 5 NONAME
+	_ZN13CPdPropertiesD1Ev @ 6 NONAME
+	_ZN13CPdPropertiesD2Ev @ 7 NONAME
+	_ZTI13CPdProperties @ 8 NONAME ; #<TI>#
+	_ZTI18CAudioPdProperties @ 9 NONAME ; #<TI>#
+	_ZTI19CAudioPdPlayUtility @ 10 NONAME ; #<TI>#
+	_ZTI26CMMFMdaAudioPlayerCallBack @ 11 NONAME ; #<TI>#
+	_ZTI27CRepeatTrailingSilenceTimer @ 12 NONAME ; #<TI>#
+	_ZTIN10multimedia21CBufferEmptiedEventAOE @ 13 NONAME ; #<TI>#
+	_ZTIN25CMMFFindAndOpenController7CConfigE @ 14 NONAME ; #<TI>#
+	_ZTV13CPdProperties @ 15 NONAME ; #<VT>#
+	_ZTV18CAudioPdProperties @ 16 NONAME ; #<VT>#
+	_ZTV19CAudioPdPlayUtility @ 17 NONAME ; #<VT>#
+	_ZTV26CMMFMdaAudioPlayerCallBack @ 18 NONAME ; #<VT>#
+	_ZTV27CRepeatTrailingSilenceTimer @ 19 NONAME ; #<VT>#
+	_ZTVN10multimedia21CBufferEmptiedEventAOE @ 20 NONAME ; #<VT>#
+	_ZTVN25CMMFFindAndOpenController7CConfigE @ 21 NONAME ; #<VT>#
+	_ZTI12CContentFile @ 22 NONAME ; #<TI>#
+	_ZTV12CContentFile @ 23 NONAME ; #<VT>#
+

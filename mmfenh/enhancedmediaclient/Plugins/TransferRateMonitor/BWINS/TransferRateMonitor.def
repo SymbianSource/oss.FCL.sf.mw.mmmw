@@ -1,0 +1,9 @@
+EXPORTS
+	??1CTransferRateMonitor@@UAE@XZ @ 1 NONAME ; CTransferRateMonitor::~CTransferRateMonitor(void)
+	?NewL@CTransferRateMonitor@@SAPAV1@AAVMTransferRateObserver@@II@Z @ 2 NONAME ; class CTransferRateMonitor * CTransferRateMonitor::NewL(class MTransferRateObserver &, unsigned int, unsigned int)
+	?Reset@CTransferRateMonitor@@QAEHXZ @ 3 NONAME ; int CTransferRateMonitor::Reset(void)
+	?Start@CTransferRateMonitor@@QAEHXZ @ 4 NONAME ; int CTransferRateMonitor::Start(void)
+	?Stop@CTransferRateMonitor@@QAEXXZ @ 5 NONAME ; void CTransferRateMonitor::Stop(void)
+	?Tick@CTransferRateMonitor@@CAHPAX@Z @ 6 NONAME ; int CTransferRateMonitor::Tick(void *)
+	?TransferRate@CTransferRateMonitor@@QAEIXZ @ 7 NONAME ; unsigned int CTransferRateMonitor::TransferRate(void)
+

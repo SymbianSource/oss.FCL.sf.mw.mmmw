@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<api id="5d5c3be5a52c2e8adda2712f28a986d6" dataversion="2.0">
+<name>Audio Output Control Utility API</name>
+<description>Audio Output Control Utility</description>
+<type>c++</type>
+<collection>audioenhancements</collection>
+<libs><lib name="AudioOutputControlUtility.lib"/>
+</libs>
+<release category="platform" sinceversion="0"/>
+<attributes>
+<htmldocprovided>no</htmldocprovided>
+<adaptation>no</adaptation>
+</attributes>
+</api>

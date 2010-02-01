@@ -1,0 +1,3 @@
+del TmsAudioServicesTestClass.sis*
+makesis TmsAudioServicesTestClass.pkg TmsAudioServicesTestClass.sis
+signsis TmsAudioServicesTestClass.sis TmsAudioServicesTestClass.sisx rd.crt rd.key

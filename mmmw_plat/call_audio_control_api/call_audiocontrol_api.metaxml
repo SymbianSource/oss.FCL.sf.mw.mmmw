@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<api id="64481ad6d77f2f35acf280ac96e35472" dataversion="2.0">
+<name>Call AudioControl API</name>
+<description>Call Audio Control API</description>
+<type>c++</type>
+<collection>audioenhancements</collection>
+<libs><lib name="CallAudioControl.lib"/>
+</libs>
+<release category="platform" sinceversion="0"/>
+<attributes>
+<htmldocprovided>no</htmldocprovided>
+<adaptation>no</adaptation>
+</attributes>
+</api>

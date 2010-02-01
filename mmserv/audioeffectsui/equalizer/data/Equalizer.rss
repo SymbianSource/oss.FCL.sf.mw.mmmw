@@ -1,0 +1,447 @@
+/*
+* Copyright (c) 2005 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:    RSS for Equalizer
+*
+*/
+
+
+
+//  RESOURCE IDENTIFIER
+NAME    EQUI // 4 letter ID
+
+//  INCLUDES
+#include <eikon.rh>
+#include <avkon.rh>
+#include <avkon.loc>
+#include <avkon.rsg>
+#include <avkon.mbg>
+
+#include "Equalizer.rh"
+#include "Equalizer.hrh"
+#include <equalizer.loc>
+
+
+//  CONSTANTS  
+// EqualizerEngine has a limit of 32 characters for the preset name
+#define KMaxPresetNameLength 32 
+//  MACROS  
+
+//  RESOURCE DEFINITIONS 
+
+RESOURCE RSS_SIGNATURE { }
+
+RESOURCE TBUF { buf=""; }
+
+RESOURCE CBA r_equalizer_softkeys_options_back__select
+    {
+    buttons = 
+        {
+        CBA_BUTTON {id=EAknSoftkeyOptions; txt = text_softkey_option;},
+        CBA_BUTTON {id=EAknSoftkeyBack; txt = text_softkey_back; },
+        CBA_BUTTON {id=EAknSoftkeySelect;  txt=qtn_msk_eq_activate;}
+        };
+    }
+    
+RESOURCE CBA r_equalizer_softkeys_options_back__contextoptions
+    {
+    buttons =
+        {
+        CBA_BUTTON {id=EAknSoftkeyOptions; txt = text_softkey_option;},
+        CBA_BUTTON {id=EAknSoftkeyBack; txt = text_softkey_back; },
+        CBA_BUTTON {id=EAknSoftkeyContextOptions; txt = text_softkey_option;}
+        };
+    }
+
+RESOURCE EIK_APP_INFO
+    {
+    menubar=r_equalizer_container_menubar;
+    cba=R_AVKON_SOFTKEYS_OPTIONS_BACK;     
+    }
+
+//----------------------------------------------------
+//   
+//    r_equalizer_container_menubar
+//    This resource is used to create the Equalizer 
+//    listbox view  menubar
+//
+//----------------------------------------------------
+//
+RESOURCE MENU_BAR r_equalizer_container_menubar
+    {
+    titles= 
+        {
+        MENU_TITLE { menu_pane=r_equalizer_container_menu; txt=""; }
+        };
+    }
+
+//----------------------------------------------------
+//   
+//    r_equalizer_container_menu
+//    This resource is used to create the equalizer 
+//    menu items
+//
+//----------------------------------------------------
+//
+RESOURCE MENU_PANE r_equalizer_container_menu
+    {
+    items=
+        {
+        MENU_ITEM { command=EEqualizerCmdActivate;  
+        txt=qtn_eq_options_activate;
+#ifdef SINGLE_CLICK_INCLUDED
+        flags = EEikMenuItemAction;
+#endif
+        },
+        MENU_ITEM { command=EEqualizerCmdEdit;  txt=qtn_eq_options_edit;
+#ifdef SINGLE_CLICK_INCLUDED
+        flags = EEikMenuItemSpecific;
+#endif
+        },
+        MENU_ITEM { command=EEqualizerCmdCreateNew; 
+        txt=qtn_eq_options_create_new;},
+        MENU_ITEM { command=EEqualizerCmdDelete;  txt=qtn_eq_options_delete;},
+        MENU_ITEM { command=EEqualizerCmdRename;  txt=qtn_eq_options_rename;},
+        MENU_ITEM {command = EEqualizerCmdHelp; txt=qtn_options_help;},
+        MENU_ITEM { command = EAknCmdExit ;  txt=qtn_options_exit;}
+        };
+    }
+
+//----------------------------------------------------
+//   
+//    r_equalizer_settings_menubar
+//    This resource is used to create the Equalizer
+//    frequency bands view menubar
+//
+//----------------------------------------------------
+//
+RESOURCE MENU_BAR r_equalizer_settings_menubar
+    {
+    titles=
+        {
+        MENU_TITLE { menu_pane=r_equalizer_settings_menu; txt=""; }
+        };
+    }
+
+//----------------------------------------------------
+//   
+//    r_equalizer_settings_menu
+//    This resource is used to create the equalizer
+//    frequency bands view menu items
+//
+//----------------------------------------------------
+//
+RESOURCE MENU_PANE r_equalizer_settings_menu
+    {
+    items=
+        {
+        MENU_ITEM { command=EEqualizerCmdReset;  txt=qtn_eq_options_reset;},
+        MENU_ITEM {command = EEqualizerCmdHelp; txt=qtn_options_help;},
+        MENU_ITEM { command = EAknCmdExit ;  txt=qtn_options_exit;}
+        };
+    }
+
+// ---------------------------------------------------------
+//   
+//   r_equalizer_editing_dialog
+//   Dialog used for the equalizer editing view
+//
+// ---------------------------------------------------------
+//
+RESOURCE DIALOG r_equalizer_editing_dialog
+    {
+    flags = EEikDialogFlagNoDrag | EEikDialogFlagCbaButtons |
+             EEikDialogFlagWait| EEikDialogFlagFillAppClientRect; 
+     
+    buttons = r_equalizer_softkeys_options_back__contextoptions;  
+
+    items =
+        {
+        DLG_LINE
+            {
+            id = EEqualizerCustomCtrlDlgCIdCustomControl;
+            type = EEqualizerCustomCtrlDlgCtCustomControl; 
+            control=EQUALIZER_CONTROL
+                {
+                };
+            }            
+        };
+    }
+
+// ---------------------------------------------------------
+//   
+//   r_equalizer_dialog
+//   Dialog used for the equalizer preset view
+//
+// ---------------------------------------------------------
+//
+RESOURCE DIALOG r_equalizer_dialog
+    {
+    flags = EEikDialogFlagNoDrag | EEikDialogFlagCbaButtons |
+              EEikDialogFlagWait| EEikDialogFlagFillAppClientRect | EEikDialogFlagNotifyEsc; 
+    title = qtn_eq_title_equalizer;
+    buttons = r_equalizer_softkeys_options_back__select;
+
+    items =
+        {
+        DLG_LINE
+            {
+            type = EAknCtSingleGraphicListBox;
+            id = ESelectionListControl; 
+            control = LISTBOX
+                {
+                flags = EAknListBoxSelectionList;
+                };
+            }
+        };
+    }
+ 
+// ---------------------------------------------------------
+//   
+//   r_dialog_text_rename_item_name
+//   Dialog for the name of a to be renamed item
+//
+// ---------------------------------------------------------
+//
+RESOURCE DIALOG r_dialog_text_rename_item_name
+    {
+    flags = EGeneralQueryFlags;
+    buttons = R_AVKON_SOFTKEYS_OK_CANCEL;
+    items =
+        {
+        DLG_LINE
+            {
+            type = EAknCtQuery;
+            id = EGeneralQuery;
+            control = AVKON_DATA_QUERY
+                {
+                layout = EDataLayout;
+                label = qtn_fldr_item_name_prmpt;
+                control = EDWIN
+                    {
+          flags = EEikEdwinNoLineOrParaBreaks; 
+                    maxlength = KMaxPresetNameLength;
+                    };
+                };
+            }
+        };
+    }
+
+// ---------------------------------------------------------
+//   
+//   r_dialog_text_new_item_name
+//   Dialog for the name of a new item
+//
+// ---------------------------------------------------------
+//
+RESOURCE DIALOG r_dialog_text_new_item_name
+    {
+    flags = EGeneralQueryFlags;
+    buttons = R_AVKON_SOFTKEYS_OK_CANCEL;
+    items =
+        {
+        DLG_LINE
+            {
+            type = EAknCtQuery;
+            id = EGeneralQuery;
+            control = AVKON_DATA_QUERY
+                {
+                layout = EDataLayout;
+                label = qtn_eq_title_preset_name;
+                control = EDWIN
+                    {
+                    flags = EEikEdwinNoLineOrParaBreaks; 
+                    maxlength = KMaxPresetNameLength;
+                    };
+                };
+            }
+        };
+    }
+
+// ---------------------------------------------------------
+//   
+//   r_equalizer_confirmation_query
+//   For delete confirmation
+//
+// ---------------------------------------------------------
+//
+RESOURCE DIALOG r_equalizer_confirmation_query
+    {
+    flags = EGeneralQueryFlags;
+    buttons = R_AVKON_SOFTKEYS_YES_NO;
+    items =
+        {
+        DLG_LINE
+            {
+            type = EAknCtQuery;
+            id = EGeneralQuery;
+            control = AVKON_CONFIRMATION_QUERY 
+                { 
+                layout = EConfirmationLayout;
+                };
+            }
+        };
+    }
+
+// ---------------------------------------------------
+//
+//    r_qtn_equalizer_title_text
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_equalizer_title_text
+    {
+    buf = qtn_eq_title_equalizer;
+    }
+
+// ---------------------------------------------------
+//
+//    r_qtn_eq_preset_default_name
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_eq_preset_default_name
+    {
+    buf = qtn_eq_preset_default_name;
+    }
+
+// ---------------------------------------------------
+//
+//    r_eq_note_info_preset_activated
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_eq_note_info_preset_activated
+    {
+    buf = qtn_eq_note_info_preset_activated;
+    }
+
+// ---------------------------------------------------
+//
+//    r_qtn_eq_note_err_preset_in_use_no_rename
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_eq_note_err_preset_in_use_no_rename
+    {
+    buf = qtn_eq_note_err_preset_in_use_no_rename;
+    }
+
+// ---------------------------------------------------
+//
+//    r_eq_note_err_preset_in_use
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_eq_note_err_preset_in_use
+    {
+    buf = qtn_eq_note_err_preset_in_use;
+    }
+
+// ---------------------------------------------------
+//
+//    r_qtn_query_common_conf_delete
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_query_common_conf_delete
+    {
+    buf = qtn_query_common_conf_delete;
+    }
+
+// ---------------------------------------------------
+//
+//    r_qtn_fldr_illegal_characters
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_fldr_illegal_characters
+    {
+    buf = qtn_fldr_illegal_characters;
+    }
+
+// ---------------------------------------------------
+//
+//    r_qtn_fldr_name_already_used
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_fldr_name_already_used
+    {
+    buf = qtn_fldr_name_already_used;
+    }  
+    
+// ---------------------------------------------------
+//
+//    r_qtn_equalizer_preset_none
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_equalizer_preset_none
+    {
+    buf = qtn_eq_preset_none;
+    }
+
+// ---------------------------------------------------
+//
+//    r_qtn_memlo_not_enough_memory
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_memlo_not_enough_memory
+    {
+    buf = qtn_memlo_not_enough_memory;
+    }
+
+// ---------------------------------------------------
+//
+//    r_qtn_eq_preset_frequency_hz
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_eq_preset_frequency_hz	
+	{ 
+		buf= qtn_eq_preset_frequency_hz; 
+	}
+		
+// ---------------------------------------------------
+//
+//    r_qtn_eq_preset_frequency_khz
+//
+// ---------------------------------------------------
+//
+RESOURCE TBUF r_qtn_eq_preset_frequency_khz	
+	{ 
+		buf= qtn_eq_preset_frequency_khz; 
+	}
+    
+// ---------------------------------------------------------
+//   
+//   r_equalizer_predefined_presets
+//   Predefined preset names with localised names
+//
+// ---------------------------------------------------------
+//
+RESOURCE ARRAY r_equalizer_predefined_presets		
+	{
+	items=
+		{
+		LBUF { txt = "Rock""\t"qtn_eq_preset_rock; },
+		LBUF { txt = "Pop""\t"qtn_eq_preset_pop; },
+		LBUF { txt = "Jazz""\t"qtn_eq_preset_jazz; },
+		LBUF { txt = "Classic""\t"qtn_eq_preset_classic; },
+		LBUF { txt = "Bass Booster""\t"qtn_eq_preset_bassboost; }
+		};
+	}
+
+// End of File

@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: Telephony Multimedia Service
+ *
+ */
+
+#include <tms.h>
+#include "tmsstreambodyimpl.h"
+#include "tmsstreamimpl.h"
+
+using namespace TMS;
+
+TMSStreamImpl::TMSStreamImpl()
+    {
+    }
+
+TMSStreamImpl::~TMSStreamImpl()
+    {
+    }
+
+gint TMSStreamImpl::PostConstruct(TMSCallType callType, TMSStreamType stype,
+        TMSCallProxy* proxy)
+    {
+    gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
+    TMSStreamBody* tmsstreamimplbody(NULL);
+    ret = TMSStreamBodyImpl::Create(callType, stype, proxy, *this,
+            tmsstreamimplbody);
+
+    if (ret == TMS_RESULT_SUCCESS)
+        {
+        this->iBody = tmsstreamimplbody;
+        }
+    return ret;
+    }
+
+gint TMSStreamImpl::Create(TMSCallType callType, TMSStreamType stype,
+        TMSCallProxy* proxy, TMSStream*& strm)
+    {
+    gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
+    TMSStreamImpl *self = new TMSStreamImpl;
+
+    if (self)
+        {
+        ret = self->PostConstruct(callType, stype, proxy);
+        if (ret != TMS_RESULT_SUCCESS)
+            {
+            delete self;
+            self = NULL;
+            }
+        }
+    strm = self;
+    return ret;
+    }
+
+// End of file
