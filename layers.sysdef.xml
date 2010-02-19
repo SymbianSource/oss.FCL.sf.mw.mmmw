@@ -13,9 +13,6 @@
 			<module name="">
 				<unit unitID="mmmw_3GPExtParserLib" mrp="" bldFile="&layer_real_source_path;/mmserv/metadatautility/3GPExtParserLib/group" filter="!sf_build" name="mmmw_3GPExtParserLib" />
 			</module>
-			<module name="">
-				<unit unitID="mtp" mrp="" bldFile="&layer_real_source_path;/mtp/group" filter="!sf_build" name="mtp" />
-			</module>
     </layer>
     
   	<layer name="api_test_layer">
@@ -48,9 +45,6 @@
 			</module>
 			<module name="">
 				<unit unitID="mmmw_3GPExtParserLib_group" mrp="" bldFile="&layer_real_source_path;/mmserv/metadatautility/3GPExtParserLib/group" filter="!sf_build" name="mmmw_3GPExtParserLib_group" />
-			</module>
-			<module name="">
-				<unit unitID="mtp_group" mrp="" bldFile="&layer_real_source_path;/mtp/group" filter="!sf_build" name="mtp_group" />
 			</module>
     </layer>
 

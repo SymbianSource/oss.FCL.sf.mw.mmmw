@@ -27,13 +27,13 @@ namespace TMS {
  *  Provides uplink functionality.
  *
  */
-NONSHARABLE_CLASS(CSUplink) : public CSPDevSound
+NONSHARABLE_CLASS(TMSCSUplink) : public TMSCSPDevSound
     {
 public:
 
-    static CSUplink* NewL(MCSPDevSoundObserver& aObserver);
+    static TMSCSUplink* NewL(TMSCSPDevSoundObserver& aObserver);
 
-    virtual ~CSUplink();
+    virtual ~TMSCSUplink();
 
     /**
      * Determines mic mute state.
@@ -95,7 +95,7 @@ private:
 
 protected:
 
-    CSUplink(MCSPDevSoundObserver& aObserver);
+    TMSCSUplink(TMSCSPDevSoundObserver& aObserver);
     void ConstructL();
     };
 

@@ -26,18 +26,18 @@
 namespace TMS {
 
 // CLASS DECLARATION
-class CTarEventHandler : public CActive
+class TMSTarEventHandler : public CActive
     {
 public:
     /**
      * Two-phased constructor.
      */
-    static CTarEventHandler* NewL(TMSServer* aServer);
+    static TMSTarEventHandler* NewL(TMSServer* aServer);
 
     /**
      * Destructor.
      */
-    virtual ~CTarEventHandler();
+    virtual ~TMSTarEventHandler();
 
 private:
     /**
@@ -58,7 +58,7 @@ private:
     /**
      * C++ default constructor.
      */
-    CTarEventHandler(TMSServer* aServer);
+    TMSTarEventHandler(TMSServer* aServer);
 
     /**
      * By default Symbian 2nd phase constructor is private.

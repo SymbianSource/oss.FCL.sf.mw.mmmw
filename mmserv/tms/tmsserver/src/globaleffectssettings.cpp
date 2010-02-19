@@ -31,12 +31,12 @@ const TUint32 KTmsEarPieceVolume = 0x00000001;
 const TUint32 KTmsLoudSpkrVolume = 0x00000002;
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::GlobalEffectsSettings
+// TMSGlobalEffectsSettings::TMSGlobalEffectsSettings
 // C++ default constructor can NOT contain any code, that
 // might leave.
 // -----------------------------------------------------------------------------
 //
-GlobalEffectsSettings::GlobalEffectsSettings() :
+TMSGlobalEffectsSettings::TMSGlobalEffectsSettings() :
     iGain(KDefaultGain),
     iMaxVolume(KDefaultMaxVolume),
     iMaxGain(KDefaultMaxGain),
@@ -46,11 +46,11 @@ GlobalEffectsSettings::GlobalEffectsSettings() :
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::ConstructL
+// TMSGlobalEffectsSettings::ConstructL
 // Symbian 2nd phase constructor can leave.
 // -----------------------------------------------------------------------------
 //
-void GlobalEffectsSettings::ConstructL()
+void TMSGlobalEffectsSettings::ConstructL()
     {
     // Create repository instance
     iRepository = CRepository::NewL(KCRUidTmseffects);
@@ -62,13 +62,13 @@ void GlobalEffectsSettings::ConstructL()
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::NewL
+// TMSGlobalEffectsSettings::NewL
 // Two-phased constructor.
 // -----------------------------------------------------------------------------
 //
-GlobalEffectsSettings* GlobalEffectsSettings::NewL()
+TMSGlobalEffectsSettings* TMSGlobalEffectsSettings::NewL()
     {
-    GlobalEffectsSettings* self = new (ELeave) GlobalEffectsSettings();
+    TMSGlobalEffectsSettings* self = new (ELeave) TMSGlobalEffectsSettings();
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -76,16 +76,16 @@ GlobalEffectsSettings* GlobalEffectsSettings::NewL()
     }
 
 // Destructor
-GlobalEffectsSettings::~GlobalEffectsSettings()
+TMSGlobalEffectsSettings::~TMSGlobalEffectsSettings()
     {
     delete iRepository;
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::SetLoudSpkrVolume
+// TMSGlobalEffectsSettings::SetLoudSpkrVolume
 // -----------------------------------------------------------------------------
 //
-void GlobalEffectsSettings::SetLoudSpkrVolume(TInt aVolume)
+void TMSGlobalEffectsSettings::SetLoudSpkrVolume(TInt aVolume)
     {
     TInt status(KErrNone);
     if (iRepository)
@@ -99,10 +99,10 @@ void GlobalEffectsSettings::SetLoudSpkrVolume(TInt aVolume)
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::SetEarPieceVolume
+// TMSGlobalEffectsSettings::SetEarPieceVolume
 // -----------------------------------------------------------------------------
 //
-void GlobalEffectsSettings::SetEarPieceVolume(TInt aVolume)
+void TMSGlobalEffectsSettings::SetEarPieceVolume(TInt aVolume)
     {
     TInt status(KErrNone);
     if (iRepository)
@@ -116,55 +116,55 @@ void GlobalEffectsSettings::SetEarPieceVolume(TInt aVolume)
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::GetLoudSpkrVolume
+// TMSGlobalEffectsSettings::GetLoudSpkrVolume
 // -----------------------------------------------------------------------------
 //
-void GlobalEffectsSettings::GetLoudSpkrVolume(TInt& aVolume)
+void TMSGlobalEffectsSettings::GetLoudSpkrVolume(TInt& aVolume)
     {
     aVolume = iLoudSpkrVolume;
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::GetEarPieceVolume
+// TMSGlobalEffectsSettings::GetEarPieceVolume
 // -----------------------------------------------------------------------------
 //
-void GlobalEffectsSettings::GetEarPieceVolume(TInt& aVolume)
+void TMSGlobalEffectsSettings::GetEarPieceVolume(TInt& aVolume)
     {
     aVolume = iEarVolume;
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::MaxVolume
+// TMSGlobalEffectsSettings::MaxVolume
 // -----------------------------------------------------------------------------
 //
-TInt GlobalEffectsSettings::MaxVolume() const
+TInt TMSGlobalEffectsSettings::MaxVolume() const
     {
     return iMaxVolume;
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::SetGain
+// TMSGlobalEffectsSettings::SetGain
 // -----------------------------------------------------------------------------
 //
-void GlobalEffectsSettings::SetGain(TInt aGain)
+void TMSGlobalEffectsSettings::SetGain(TInt aGain)
     {
     iGain = aGain;
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::Gain
+// TMSGlobalEffectsSettings::Gain
 // -----------------------------------------------------------------------------
 //
-TInt GlobalEffectsSettings::Gain() const
+TInt TMSGlobalEffectsSettings::Gain() const
     {
     return iGain;
     }
 
 // -----------------------------------------------------------------------------
-// GlobalEffectsSettings::MaxGain
+// TMSGlobalEffectsSettings::MaxGain
 // -----------------------------------------------------------------------------
 //
-TInt GlobalEffectsSettings::MaxGain() const
+TInt TMSGlobalEffectsSettings::MaxGain() const
     {
     return iMaxGain;
     }

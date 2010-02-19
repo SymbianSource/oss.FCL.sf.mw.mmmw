@@ -23,40 +23,41 @@
 using namespace TMS;
 
 // -----------------------------------------------------------------------------
-// CTarEventHandler::CTarEventHandler
+// TMSTarEventHandler::TMSTarEventHandler
 // C++ default constructor can NOT contain any code, that
 // might leave.
 // -----------------------------------------------------------------------------
 //
-CTarEventHandler::CTarEventHandler(TMSServer* aServer) :
+TMSTarEventHandler::TMSTarEventHandler(TMSServer* aServer) :
     CActive(EPriorityStandard),
     iTMSSer(aServer)
     {
     }
 
 // -----------------------------------------------------------------------------
-// CTarEventHandler::ConstructL
+// TMSTarEventHandler::ConstructL
 // Symbian 2nd phase constructor can leave.
 // -----------------------------------------------------------------------------
 //
-void CTarEventHandler::ConstructL()
+void TMSTarEventHandler::ConstructL()
     {
     TRACE_PRN_FN_ENT;
     CActiveScheduler::Add(this);
     User::LeaveIfError(iProperty.Attach(KTMSPropertyCategory, ERoutingPs));
+    iStatus = KRequestPending;
     iProperty.Subscribe(iStatus);
     SetActive();
     TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
-// CTarEventHandler::NewL
+// TMSTarEventHandler::NewL
 // Two-phased constructor.
 // -----------------------------------------------------------------------------
 //
-CTarEventHandler* CTarEventHandler::NewL(TMSServer* aServer)
+TMSTarEventHandler* TMSTarEventHandler::NewL(TMSServer* aServer)
     {
-    CTarEventHandler* self = new (ELeave) CTarEventHandler(aServer);
+    TMSTarEventHandler* self = new (ELeave) TMSTarEventHandler(aServer);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -64,7 +65,7 @@ CTarEventHandler* CTarEventHandler::NewL(TMSServer* aServer)
     }
 
 // Destructor
-CTarEventHandler::~CTarEventHandler()
+TMSTarEventHandler::~TMSTarEventHandler()
     {
     TRACE_PRN_FN_ENT;
     if (IsActive())
@@ -76,10 +77,10 @@ CTarEventHandler::~CTarEventHandler()
     }
 
 // -----------------------------------------------------------------------------
-// CTarEventHandler::DoCancel
+// TMSTarEventHandler::DoCancel
 // -----------------------------------------------------------------------------
 //
-void CTarEventHandler::DoCancel()
+void TMSTarEventHandler::DoCancel()
     {
     TRACE_PRN_FN_ENT;
     iProperty.Cancel();
@@ -87,16 +88,17 @@ void CTarEventHandler::DoCancel()
     }
 
 // -----------------------------------------------------------------------------
-// CTarEventHandler::RunL
+// TMSTarEventHandler::RunL
 // -----------------------------------------------------------------------------
 //
-void CTarEventHandler::RunL()
+void TMSTarEventHandler::RunL()
     {
     TRACE_PRN_FN_ENT;
     // Subscribe immediately before analyzing the notification to ensure that we
     // don't miss further updates.
     if (iStatus.Int() == KErrNone)
         {
+        iStatus = KRequestPending;
         iProperty.Subscribe(iStatus);
         SetActive();
         TRoutingMsgBufPckg routingpckg;

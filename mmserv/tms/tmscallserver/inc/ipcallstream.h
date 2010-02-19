@@ -39,8 +39,8 @@
 #include "gstg729decoderinterface.h"
 #else //__USE_GSTREAMER__
 #include <sounddevice.h>
-#include <VoIPDownlinkStream.h>
-#include <VoIPUplinkStream.h>
+#include <voipdownlinkstream.h>
+#include <voipuplinkstream.h>
 
 // FORWARD DECLARATIONS
 class CAudioOutput;
@@ -57,13 +57,13 @@ class CIlbcEncoderIntfc;
 namespace TMS {
 
 // -----------------------------------------------------------------------------
-//  Class Name:  IPCallStreamBase
+//  Class Name:  TMSIPCallStreamBase
 //
 //  Base abstract class for creating VoIP uplink and downlink streams.
 // -----------------------------------------------------------------------------
-class IPCallStreamBase : public CBase
+class TMSIPCallStreamBase : public CBase
 #ifndef __USE_GSTREAMER__
-                       , public MDevSoundObserver
+                          , public MDevSoundObserver
 #endif //__USE_GSTREAMER__
     {
 public:
@@ -76,7 +76,7 @@ public:
         };
 
 public:
-    virtual ~IPCallStreamBase();
+    virtual ~TMSIPCallStreamBase();
 
     virtual void Start() = 0;
     virtual void Stop() = 0;
@@ -132,22 +132,22 @@ protected:
     };
 
 // -----------------------------------------------------------------------------
-//  Class Name:  TMSVoIPDownlink
+//  Class Name:  TMSIPDownlink
 //
 //  Class handling VoIP downlink stream object.
 // -----------------------------------------------------------------------------
-class TMSVoIPDownlink : public IPCallStreamBase
+class TMSIPDownlink : public TMSIPCallStreamBase
     {
 public:
-    virtual ~TMSVoIPDownlink();
+    virtual ~TMSIPDownlink();
 
 #ifdef __USE_GSTREAMER__
     static void cb_raw_playback_handoff(GstElement* appsrc, guint size);
     static gboolean bus_call(GstBus* bus, GstMessage* msg, gpointer data);
 #endif //__USE_GSTREAMER__
-    static TMSVoIPDownlink* NewL(const guint32 codecID,
+    static TMSIPDownlink* NewL(const guint32 codecID,
             const TMMFPrioritySettings priority);
-    TMSVoIPDownlink();
+    TMSIPDownlink();
     void ConstructL(const guint32 codecID,
             const TMMFPrioritySettings priority);
 
@@ -229,22 +229,22 @@ private:
     };
 
 // -----------------------------------------------------------------------------
-//  Class Name:  TMSVoIPUplink
+//  Class Name:  TMSIPUplink
 //
 //  Class handling VoIP uplink stream.
 // -----------------------------------------------------------------------------
-class TMSVoIPUplink : public IPCallStreamBase
+class TMSIPUplink : public TMSIPCallStreamBase
     {
 public:
-    virtual ~TMSVoIPUplink();
+    virtual ~TMSIPUplink();
 
 #ifdef __USE_GSTREAMER__
     static void cb_record_raw_handoff(GstElement *sink);
     static gboolean bus_call(GstBus* bus, GstMessage* msg, gpointer data);
 #endif //__USE_GSTREAMER__
-    static TMSVoIPUplink* NewL(const guint32 codecID,
+    static TMSIPUplink* NewL(const guint32 codecID,
             const TMMFPrioritySettings priority);
-    TMSVoIPUplink();
+    TMSIPUplink();
     void ConstructL(const guint32 codecID,
             const TMMFPrioritySettings priority);
 

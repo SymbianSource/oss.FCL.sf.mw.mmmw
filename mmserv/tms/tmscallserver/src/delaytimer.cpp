@@ -87,6 +87,7 @@ void TMSCallDelayTimer::SetDelay(TTimeIntervalMicroSeconds32 aDelay)
     TRACE_PRN_FN_ENT;
     if (!IsActive())
         {
+        iStatus = KRequestPending;
         SetActive();
         iShutDownTimer.After(iStatus, aDelay);
         }

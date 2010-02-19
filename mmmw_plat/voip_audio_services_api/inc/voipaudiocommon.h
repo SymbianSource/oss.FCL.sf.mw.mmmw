@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines set of common constants and enumerated lists.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines set of common constants and enumerated lists.
+ *
+ */
 
 #ifndef __VOIPAUDIOCOMMON_H
 #define __VOIPAUDIOCOMMON_H
@@ -26,7 +25,7 @@
 /**
  *  TVoIPCodecFormat
  *  ?description
- *  @since S60 v5.0
+ *
  */
 enum TVoIPCodecFormat
     {
@@ -40,6 +39,5 @@ enum TVoIPCodecFormat
     };
 
 #endif //__VOIPAUDIOCOMMON_H
-
 
 // End of file

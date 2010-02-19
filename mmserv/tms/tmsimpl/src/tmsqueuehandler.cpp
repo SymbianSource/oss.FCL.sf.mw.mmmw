@@ -26,36 +26,36 @@
 
 using namespace TMS;
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::NewL
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::NewL
 // Symbian constructor
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-CQueueHandler* CQueueHandler::NewL(RMsgQueue<TmsMsgBuf>* aMsgQueue,
+TMSQueueHandler* TMSQueueHandler::NewL(RMsgQueue<TmsMsgBuf>* aMsgQueue,
         TMSGlobalContext* glblCtx)
     {
-    CQueueHandler* self = new (ELeave) CQueueHandler(aMsgQueue, glblCtx);
+    TMSQueueHandler* self = new (ELeave) TMSQueueHandler(aMsgQueue, glblCtx);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
     return self;
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::ConstructL
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::ConstructL
 // Second phase constructor.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CQueueHandler::ConstructL()
+void TMSQueueHandler::ConstructL()
     {
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::~CQueueHandler
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::~TMSQueueHandler
 // Destructor.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-CQueueHandler::~CQueueHandler()
+TMSQueueHandler::~TMSQueueHandler()
     {
     Cancel();
     iObserversList.Reset();
@@ -64,12 +64,12 @@ CQueueHandler::~CQueueHandler()
     delete iBuffer;
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::CQueueHandler
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::TMSQueueHandler
 // Constructor.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-CQueueHandler::CQueueHandler(RMsgQueue<TmsMsgBuf>* aMsgQueue,
+TMSQueueHandler::TMSQueueHandler(RMsgQueue<TmsMsgBuf>* aMsgQueue,
         TMSGlobalContext* glblCtx) :
     CActive(CActive::EPriorityStandard),
     iMsgQueue(aMsgQueue),
@@ -79,25 +79,31 @@ CQueueHandler::CQueueHandler(RMsgQueue<TmsMsgBuf>* aMsgQueue,
     iTMSGlobalContext = glblCtx;
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::Start
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::Start
 // Start listening for events on queue 0.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CQueueHandler::Start()
+void TMSQueueHandler::Start()
     {
     if (!IsActive() && iMsgQueue)
         {
+        iStatus = KRequestPending;
         iMsgQueue->NotifyDataAvailable(iStatus);
         SetActive();
         }
     }
 
-TInt CQueueHandler::AddObserver(MQueueHandlerObserver& aObserver,
-        TInt aClientId)
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::AddObserver
+//
+// -----------------------------------------------------------------------------
+//
+gint TMSQueueHandler::AddObserver(MQueueHandlerObserver& aObserver,
+        gint aClientId)
     {
     // Add to list if observer is not already added
-    TInt status = iObserversList.Find(&aObserver);
+    gint status = iObserversList.Find(&aObserver);
     if (status == KErrNotFound)
         {
         status = iObserversList.Append(&aObserver);
@@ -105,37 +111,41 @@ TInt CQueueHandler::AddObserver(MQueueHandlerObserver& aObserver,
         }
     else
         {
-        status = KErrAlreadyExists;
+        status = TMS_RESULT_ALREADY_EXIST;
         }
     return status;
     }
 
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::RemoveObserver
 // Marks observer as inactive in the list
-TInt CQueueHandler::RemoveObserver(MQueueHandlerObserver& aObserver)
+// -----------------------------------------------------------------------------
+//
+gint TMSQueueHandler::RemoveObserver(MQueueHandlerObserver& aObserver)
     {
-    TInt status(KErrNone);
-    TInt index = iObserversList.Find(&aObserver);
+    gint status(TMS_RESULT_SUCCESS);
+    gint index = iObserversList.Find(&aObserver);
     // If found status has index to observer in the array
     // else it would contain KErrNotFound
     if (index >= 0)
         {
         iObserversList.Remove(index);
         iClientList.Remove(index);
-        status = KErrNone;
+        status = TMS_RESULT_SUCCESS;
         }
     else
         {
-        status = KErrNotFound;
+        status = TMS_RESULT_DOES_NOT_EXIST;
         }
     return status;
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::DoCancel
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::DoCancel
 // Cancel outstanding request
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CQueueHandler::DoCancel()
+void TMSQueueHandler::DoCancel()
     {
     if (iMsgQueue)
         {
@@ -143,15 +153,15 @@ void CQueueHandler::DoCancel()
         }
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::RunL
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::RunL
 // Process requests.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CQueueHandler::RunL()
+void TMSQueueHandler::RunL()
     {
     TmsMsgBuf msgBuf;
-    TInt err = KErrNone;
+    gint err = TMS_RESULT_SUCCESS;
 
     if (iMsgQueue)
         {
@@ -159,14 +169,14 @@ void CQueueHandler::RunL()
         }
     else
         {
-        err = KErrGeneral;
+        err = TMS_RESULT_INVALID_STATE;
         }
 
-    // Start monitoring for more events before calling the observer as client
-    // may decide to destroy us before this RunL completes executing.
+    // Start monitoring for more events before calling the observer in case
+    // client decides to destroy us before this RunL completes executing.
     Start();
 
-    if (err == KErrNone)
+    if (err == TMS_RESULT_SUCCESS)
         {
         switch (msgBuf.iRequest)
             {
@@ -179,7 +189,7 @@ void CQueueHandler::RunL()
             case ECmdDownlinkPaused:
             case ECmdUplinkPaused:
                 {
-                TInt index = FindStreamInList();
+                gint index = FindStreamInList();
                 if (index != KErrNotFound)
                     {
                     TMSStreamState streamstate = ConvertToStreamState(
@@ -190,7 +200,7 @@ void CQueueHandler::RunL()
                 else
                     {
                     // This should never happen
-                    err = KErrNotFound;
+                    err = TMS_RESULT_DOES_NOT_EXIST;
                     }
                 break;
                 }
@@ -226,21 +236,22 @@ void CQueueHandler::RunL()
                 }
             case ECmdSetGain:
                 {
-                TInt index = FindGainEffectInList();
+                gint index = FindGainEffectInList();
                 if (index != KErrNotFound)
                     {
-                    iObserversList[index]->QueueEvent(TMS_EVENT_EFFECT_GAIN_CHANGED,
-                            msgBuf.iStatus, NULL);
+                    iObserversList[index]->QueueEvent(
+                            TMS_EVENT_EFFECT_GAIN_CHANGED, msgBuf.iStatus,
+                            NULL);
                     }
                 }
                 break;
             case ECmdSetVolume:
                 {
-                TInt index = FindVolEffectInList();
+                gint index = FindVolEffectInList();
                 if (index != KErrNotFound)
                     {
-                    iObserversList[index]->QueueEvent(TMS_EVENT_EFFECT_VOL_CHANGED,
-                            msgBuf.iStatus, NULL);
+                    iObserversList[index]->QueueEvent(
+                            TMS_EVENT_EFFECT_VOL_CHANGED, msgBuf.iStatus, NULL);
                     }
                 }
                 break;
@@ -250,15 +261,15 @@ void CQueueHandler::RunL()
         }
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::DoFillBuffer
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::DoFillBuffer
 //
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CQueueHandler::DoFillBuffer(TInt aBufLen, TInt aStatus,
-        TBool aOpenChunk, TUint32 key)
+void TMSQueueHandler::DoFillBuffer(gint aBufLen, gint aStatus,
+        gboolean aOpenChunk, guint32 key)
     {
-    TInt err = KErrNone;
+    gint err = TMS_RESULT_SUCCESS;
 
     // See if chunk needs to be opened
     if (aOpenChunk)
@@ -271,8 +282,8 @@ void CQueueHandler::DoFillBuffer(TInt aBufLen, TInt aStatus,
         iBuffer = NULL;
 
         // Get handle to chunk from proxy
-        TInt hndl(0);
-        err = KErrNotReady;
+        gint hndl(0);
+        err = TMS_RESULT_NULL_ARGUMENT;
         if (iTMSGlobalContext->CallProxy)
             {
             hndl = (iTMSGlobalContext->CallProxy)->GetDataXferChunkHandle(
@@ -284,7 +295,7 @@ void CQueueHandler::DoFillBuffer(TInt aBufLen, TInt aStatus,
             }
         }
 
-    if (err == KErrNone)
+    if (err == TMS_RESULT_SUCCESS)
         {
         iChunkDataPtr.Set(iChunk.Base(), 0, aBufLen);
         if (!iBuffer)
@@ -294,7 +305,7 @@ void CQueueHandler::DoFillBuffer(TInt aBufLen, TInt aStatus,
             }
         iBuffer->SetDataSize(aBufLen);
 
-        TInt index = iClientList.Find(TMS_SOURCE_CLIENT);
+        gint index = iClientList.Find(TMS_SOURCE_CLIENT);
         if (index != KErrNotFound)
             {
             iObserversList[index]->QueueEvent(
@@ -302,7 +313,7 @@ void CQueueHandler::DoFillBuffer(TInt aBufLen, TInt aStatus,
             }
         else
             {
-            err = KErrNotFound;
+            err = TMS_RESULT_DOES_NOT_EXIST;
             }
         }
     else
@@ -311,15 +322,15 @@ void CQueueHandler::DoFillBuffer(TInt aBufLen, TInt aStatus,
         }
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::DoEmptyBuffer
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::DoEmptyBuffer
 //
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CQueueHandler::DoEmptyBuffer(TInt aBufLen, TInt aStatus,
-        TBool aOpenChunk, TUint32 key)
+void TMSQueueHandler::DoEmptyBuffer(gint aBufLen, gint aStatus,
+        gboolean aOpenChunk, guint32 key)
     {
-    TInt err(KErrNone);
+    gint err(TMS_RESULT_SUCCESS);
 
     // See if chunk needs to be opened
     if (aOpenChunk)
@@ -330,8 +341,8 @@ void CQueueHandler::DoEmptyBuffer(TInt aBufLen, TInt aStatus,
             }
 
         // Get handle to chunk from proxy
-        TInt hndl(0);
-        err = KErrNotReady;
+        gint hndl(0);
+        err = TMS_RESULT_NULL_ARGUMENT;
         if (iTMSGlobalContext->CallProxy)
             {
             hndl = (iTMSGlobalContext->CallProxy)->GetDataXferChunkHandle(
@@ -346,7 +357,7 @@ void CQueueHandler::DoEmptyBuffer(TInt aBufLen, TInt aStatus,
         iBuffer = NULL;
         }
 
-    if (err == KErrNone)
+    if (err == TMS_RESULT_SUCCESS)
         {
         iChunkDataPtr.Set(iChunk.Base(), aBufLen, aBufLen);
         if (!iBuffer)
@@ -355,7 +366,7 @@ void CQueueHandler::DoEmptyBuffer(TInt aBufLen, TInt aStatus,
                     const_cast<guint8*> (iChunkDataPtr.Ptr()), iBuffer);
             }
         iBuffer->SetDataSize(aBufLen);
-        TInt index = iClientList.Find(TMS_SINK_CLIENT);
+        gint index = iClientList.Find(TMS_SINK_CLIENT);
         if (index != KErrNotFound)
             {
             iObserversList[index]->QueueEvent(
@@ -363,7 +374,7 @@ void CQueueHandler::DoEmptyBuffer(TInt aBufLen, TInt aStatus,
             }
         else
             {
-            err = KErrNotFound;
+            err = TMS_RESULT_DOES_NOT_EXIST;
             }
         }
     else
@@ -372,12 +383,12 @@ void CQueueHandler::DoEmptyBuffer(TInt aBufLen, TInt aStatus,
         }
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::ConvertToStreamState
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::ConvertToStreamState
 //
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-TMSStreamState CQueueHandler::ConvertToStreamState(TInt request)
+TMSStreamState TMSQueueHandler::ConvertToStreamState(gint request)
     {
     TMSStreamState state = TMS_STREAM_UNINITIALIZED;
     switch (request)
@@ -404,62 +415,61 @@ TMSStreamState CQueueHandler::ConvertToStreamState(TInt request)
     return state;
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::RunError
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::RunError
 // Process requests.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-TInt CQueueHandler::RunError(TInt /*aError*/)
+TInt TMSQueueHandler::RunError(TInt /*aError*/)
     {
     // Current implementation of RunL does not leave
-    return 0;
+    return TMS_RESULT_SUCCESS;
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::Status
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::Status
 // Return request status.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-TRequestStatus* CQueueHandler::Status()
+TRequestStatus* TMSQueueHandler::Status()
     {
     return &iStatus;
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::FindStreamInList
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::FindStreamInList
 // Return stream index.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-TInt CQueueHandler::FindStreamInList()
+gint TMSQueueHandler::FindStreamInList()
     {
     gint index(-1);
     index = iClientList.Find(TMS_STREAM_UPLINK);
     if (index == KErrNotFound)
         {
         index = iClientList.Find(TMS_STREAM_DOWNLINK);
-        return index;
         }
     return index;
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::FindGainEffectInList
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::FindGainEffectInList
 // Return effect index.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-TInt CQueueHandler::FindGainEffectInList()
+gint TMSQueueHandler::FindGainEffectInList()
     {
     gint index(-1);
     index = iClientList.Find(TMS_EFFECT_GAIN);
     return index;
     }
 
-// ----------------------------------------------------------------------------
-// CQueueHandler::FindVolEffectInList
+// -----------------------------------------------------------------------------
+// TMSQueueHandler::FindVolEffectInList
 // Return effect index.
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-TInt CQueueHandler::FindVolEffectInList()
+gint TMSQueueHandler::FindVolEffectInList()
     {
     gint index(-1);
     index = iClientList.Find(TMS_EFFECT_VOLUME);

@@ -28,12 +28,12 @@ namespace TMS {
 
 // FORWARD DECLARATIONS
 class TMSServerShutDown;
-class CStartAndMonitorTMSCallThread;
+class TMSStartAndMonitorTMSCallThread;
 class TMSCallProxyLocal;
-class GlobalEffectsSettings;
-class CTarEventHandler;
-class CSPCenRepListener;
-class CSPAudioHandler;
+class TMSGlobalEffectsSettings;
+class TMSTarEventHandler;
+class TMSCSPCenRepListener;
+class TMSCenRepAudioHandler;
 
 // -----------------------------------------------------------------------------
 // TMSServer class
@@ -96,10 +96,10 @@ private:
     TBool iDnlinkSession;
     TBool iUplinkSession;
 
-    mutable RPointerArray<CStartAndMonitorTMSCallThread> iTMSCallServList;
-    GlobalEffectsSettings* iEffectSettings;
-    CTarEventHandler* iTarHandler;
-    CSPAudioHandler* iAudioCenRepHandler;
+    mutable RPointerArray<TMSStartAndMonitorTMSCallThread> iTMSCallServList;
+    TMSGlobalEffectsSettings* iEffectSettings;
+    TMSTarEventHandler* iTarHandler;
+    TMSCenRepAudioHandler* iAudioCenRepHandler;
     TMSAudioOutput iCurrentRouting;
 
     RArray<TFourCC> iDnlCodecs;
@@ -107,7 +107,7 @@ private:
     };
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread class
+// TMSStartAndMonitorTMSCallThread class
 // -----------------------------------------------------------------------------
 //
 class TMSCallProxyLocal : public RSessionBase
@@ -121,19 +121,19 @@ public:
     };
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread class
+// TMSStartAndMonitorTMSCallThread class
 // -----------------------------------------------------------------------------
 //
-class CStartAndMonitorTMSCallThread : public CActive
+class TMSStartAndMonitorTMSCallThread : public CActive
     {
 public:
-    static CStartAndMonitorTMSCallThread* NewL(TMSServer* aServer);
-    ~CStartAndMonitorTMSCallThread();
+    static TMSStartAndMonitorTMSCallThread* NewL(TMSServer* aServer);
+    ~TMSStartAndMonitorTMSCallThread();
     TInt StartTMSCallServer(TMSCallProxyLocal& aHandle);
 
 private:
     // Construct
-    CStartAndMonitorTMSCallThread(TMSServer* aServer);
+    TMSStartAndMonitorTMSCallThread(TMSServer* aServer);
     void ConstructL();
 
     // From CActive

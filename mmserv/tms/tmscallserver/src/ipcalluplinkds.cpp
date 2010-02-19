@@ -27,20 +27,20 @@
 using namespace TMS;
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::TMSVoIPUplink
+// TMSIPUplink::TMSIPUplink
 // Standard Constructor
 // -----------------------------------------------------------------------------
 //
-TMSVoIPUplink::TMSVoIPUplink()
+TMSIPUplink::TMSIPUplink()
     {
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::~TMSVoIPUplink
+// TMSIPUplink::~TMSIPUplink
 // Standard Constructor
 // -----------------------------------------------------------------------------
 //
-TMSVoIPUplink::~TMSVoIPUplink()
+TMSIPUplink::~TMSIPUplink()
     {
     TRACE_PRN_FN_ENT;
 
@@ -55,14 +55,14 @@ TMSVoIPUplink::~TMSVoIPUplink()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::NewL
+// TMSIPUplink::NewL
 // Symbian two-phase constructor
 // -----------------------------------------------------------------------------
 //
-TMSVoIPUplink* TMSVoIPUplink::NewL(const guint32 codecID,
+TMSIPUplink* TMSIPUplink::NewL(const guint32 codecID,
         const TMMFPrioritySettings priority)
     {
-    TMSVoIPUplink* self = new (ELeave) TMSVoIPUplink();
+    TMSIPUplink* self = new (ELeave) TMSIPUplink();
     CleanupStack::PushL(self);
     self->ConstructL(codecID, priority);
     CleanupStack::Pop(self);
@@ -70,11 +70,11 @@ TMSVoIPUplink* TMSVoIPUplink::NewL(const guint32 codecID,
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::ConstructL
+// TMSIPUplink::ConstructL
 // Part two of Symbian two phase construction
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPUplink::ConstructL(const guint32 codecID,
+void TMSIPUplink::ConstructL(const guint32 codecID,
         const TMMFPrioritySettings priority)
     {
     TRACE_PRN_FN_ENT;
@@ -98,11 +98,11 @@ void TMSVoIPUplink::ConstructL(const guint32 codecID,
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::Start
+// TMSIPUplink::Start
 //
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPUplink::Start()
+void TMSIPUplink::Start()
     {
     TRACE_PRN_FN_ENT;
 
@@ -131,11 +131,11 @@ void TMSVoIPUplink::Start()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::Stop
+// TMSIPUplink::Stop
 //
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPUplink::Stop()
+void TMSIPUplink::Stop()
     {
     TRACE_PRN_FN_ENT;
 
@@ -152,11 +152,11 @@ void TMSVoIPUplink::Stop()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::BufferToBeEmptied
+// TMSIPUplink::BufferToBeEmptied
 // From MDevSoundObserver
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPUplink::BufferToBeEmptied(CMMFBuffer* aBuffer)
+void TMSIPUplink::BufferToBeEmptied(CMMFBuffer* aBuffer)
     {
     iDevSoundBufPtr = static_cast<CMMFDataBuffer*> (aBuffer);
     TDes8& data = iDevSoundBufPtr->Data();
@@ -201,11 +201,11 @@ void TMSVoIPUplink::BufferToBeEmptied(CMMFBuffer* aBuffer)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::BufferEmptied
+// TMSIPUplink::BufferEmptied
 //
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPUplink::BufferEmptied()
+void TMSIPUplink::BufferEmptied()
     {
     //TRACE_PRN_N(_L("TMS->UPL->BE"));
     if (iDevSound)
@@ -215,22 +215,22 @@ void TMSVoIPUplink::BufferEmptied()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::SetCodecCi
+// TMSIPUplink::SetCodecCi
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::SetCodecCi()
+gint TMSIPUplink::SetCodecCi()
     {
     TRAPD(err, SetCodecCiL());
     return err;
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::SetCodecCiL
+// TMSIPUplink::SetCodecCiL
 //
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPUplink::SetCodecCiL()
+void TMSIPUplink::SetCodecCiL()
     {
     TRACE_PRN_FN_ENT;
 
@@ -281,11 +281,11 @@ void TMSVoIPUplink::SetCodecCiL()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::SetGain
+// TMSIPUplink::SetGain
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::SetGain(const guint gain)
+gint TMSIPUplink::SetGain(const guint gain)
     {
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (iDevSound)
@@ -298,11 +298,11 @@ gint TMSVoIPUplink::SetGain(const guint gain)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::GetGain
+// TMSIPUplink::GetGain
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::GetGain(guint& gain)
+gint TMSIPUplink::GetGain(guint& gain)
     {
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (iDevSound)
@@ -315,11 +315,11 @@ gint TMSVoIPUplink::GetGain(guint& gain)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::GetMaxGain
+// TMSIPUplink::GetMaxGain
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::GetMaxGain(guint& gain)
+gint TMSIPUplink::GetMaxGain(guint& gain)
     {
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (iDevSound)
@@ -332,11 +332,11 @@ gint TMSVoIPUplink::GetMaxGain(guint& gain)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::GetDataXferChunkHndl
+// TMSIPUplink::GetDataXferChunkHndl
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::GetDataXferChunkHndl(const TUint32 key, RChunk& chunk)
+gint TMSIPUplink::GetDataXferChunkHndl(const TUint32 key, RChunk& chunk)
     {
     gint status = TMS_RESULT_SUCCESS;
 
@@ -358,11 +358,11 @@ gint TMSVoIPUplink::GetDataXferChunkHndl(const TUint32 key, RChunk& chunk)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::SetIlbcCodecMode
+// TMSIPUplink::SetIlbcCodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::SetIlbcCodecMode(const gint mode)
+gint TMSIPUplink::SetIlbcCodecMode(const gint mode)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -392,11 +392,11 @@ gint TMSVoIPUplink::SetIlbcCodecMode(const gint mode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::GetIlbcCodecMode
+// TMSIPUplink::GetIlbcCodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::GetIlbcCodecMode(gint& mode)
+gint TMSIPUplink::GetIlbcCodecMode(gint& mode)
     {
     // not available through CIs -> return cached value
     mode = iILBCEncodeMode;
@@ -405,11 +405,11 @@ gint TMSVoIPUplink::GetIlbcCodecMode(gint& mode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::SetG711CodecMode
+// TMSIPUplink::SetG711CodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::SetG711CodecMode(const gint mode)
+gint TMSIPUplink::SetG711CodecMode(const gint mode)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -439,11 +439,11 @@ gint TMSVoIPUplink::SetG711CodecMode(const gint mode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::GetG711CodecMode
+// TMSIPUplink::GetG711CodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::GetG711CodecMode(gint& mode)
+gint TMSIPUplink::GetG711CodecMode(gint& mode)
     {
     // not available through CIs -> return cached value
     mode = iG711EncodeMode;
@@ -452,11 +452,11 @@ gint TMSVoIPUplink::GetG711CodecMode(gint& mode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::GetSupportedBitrates
+// TMSIPUplink::GetSupportedBitrates
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::GetSupportedBitrates(RArray<guint>& bitrates)
+gint TMSIPUplink::GetSupportedBitrates(RArray<guint>& bitrates)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
     bitrates.Reset();
@@ -471,11 +471,11 @@ gint TMSVoIPUplink::GetSupportedBitrates(RArray<guint>& bitrates)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::SetBitrate
+// TMSIPUplink::SetBitrate
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::SetBitrate(guint bitrate)
+gint TMSIPUplink::SetBitrate(guint bitrate)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -490,11 +490,11 @@ gint TMSVoIPUplink::SetBitrate(guint bitrate)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::GetBitrate
+// TMSIPUplink::GetBitrate
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::GetBitrate(guint& bitrate)
+gint TMSIPUplink::GetBitrate(guint& bitrate)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -509,11 +509,11 @@ gint TMSVoIPUplink::GetBitrate(guint& bitrate)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::SetVad
+// TMSIPUplink::SetVad
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::SetVad(const TMSFormatType fmttype, const gboolean vad)
+gint TMSIPUplink::SetVad(const TMSFormatType fmttype, const gboolean vad)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -566,11 +566,11 @@ gint TMSVoIPUplink::SetVad(const TMSFormatType fmttype, const gboolean vad)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::GetVad
+// TMSIPUplink::GetVad
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPUplink::GetVad(const TMSFormatType fmttype, gboolean& vad)
+gint TMSIPUplink::GetVad(const TMSFormatType fmttype, gboolean& vad)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -623,14 +623,14 @@ gint TMSVoIPUplink::GetVad(const TMSFormatType fmttype, gboolean& vad)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::InitializeComplete
+// TMSIPUplink::InitializeComplete
 // A callback from the DevSound indicating completion of the initialization.
 // It will send config data to the D/S and configure the encoder via CI.
 // If everything goes well, the state of the thread is set EReady.
 // The initialization completion message is sent back to the main thread.
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPUplink::InitializeComplete(TInt aError)
+void TMSIPUplink::InitializeComplete(TInt aError)
     {
     TRACE_PRN_FN_ENT;
 
@@ -668,13 +668,13 @@ void TMSVoIPUplink::InitializeComplete(TInt aError)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPUplink::RecordError
+// TMSIPUplink::RecordError
 // From MDevSoundObserver
 // Recording error is send to the main thread.
 // The state of recorder is rolled back to EReady.
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPUplink::RecordError(TInt /*aError*/)
+void TMSIPUplink::RecordError(TInt /*aError*/)
     {
     //TRACE_PRN_IF_ERR(aError);
 

@@ -1,0 +1,3 @@
+del VoIPAudioServicesTestClass.sis*
+makesis VoIPAudioServicesTestClass.pkg VoIPAudioServicesTestClass.sis
+signsis VoIPAudioServicesTestClass.sis VoIPAudioServicesTestClass.sisx rd.crt rd.key

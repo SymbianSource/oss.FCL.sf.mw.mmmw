@@ -150,7 +150,7 @@ void TMSVolumeEffectBodyImpl::SetProxy(TMSCallProxy* aProxy,
     iProxy = aProxy;
     if (queuehandler)
         {
-        ((CQueueHandler*) queuehandler)->AddObserver(*this, TMS_EFFECT_VOLUME);
+        ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_EFFECT_VOLUME);
         }
     }
 

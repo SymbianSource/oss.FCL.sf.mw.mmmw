@@ -244,7 +244,7 @@ void TMSCallSession::HandleCreateCallL(const RMessage2& aMessage)
         {
         // Get Call type
         gint callType = aMessage.Int0();
-        status = CallAdpt::CreateCallL(callType, iCallAdpt);
+        status = TMSCallAdpt::CreateCallL(callType, iCallAdpt);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;

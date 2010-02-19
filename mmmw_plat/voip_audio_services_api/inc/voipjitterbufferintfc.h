@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines APIs common to all supported codecs.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines APIs common to all supported codecs.
+ *
+ */
 
 #ifndef __VOIPJITTERBUFFERINTFC_H
 #define __VOIPJITTERBUFFERINTFC_H
@@ -23,16 +22,14 @@
 #include <e32base.h>
 #include <voipaudiocommon.h>
 
-
 // FORWARD DECLARATIONS
 class CVoIPJitterBufferIntfc;
 class CVoIPJitterBufferIntfcImpl;
 
-
 /**
  *  TVoIPJBConfig
  *  ?description
- *  @since S60 v5.0
+ *
  */
 class TVoIPJBConfig
     {
@@ -62,14 +59,13 @@ public:
     TUint iJBPlayToneDuration;
     };
 
-
 /**
  *  MVoIPJitterBufferObserver class
  *
  *  description
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class MVoIPJitterBufferObserver
     {
@@ -87,9 +83,8 @@ public:
      * @return void
      */
     virtual void Event(const CVoIPJitterBufferIntfc& aSrc,
-                       TInt aEventType) = 0;
+            TInt aEventType) = 0;
     };
-
 
 /**
  *  CVoIPFormatIntfc class
@@ -97,7 +92,7 @@ public:
  *  Base class for codec format configuration
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CVoIPJitterBufferIntfc
     {
@@ -119,7 +114,6 @@ public:
      * @return TInt
      */
     IMPORT_C TInt SetObserver(MVoIPJitterBufferObserver& aObserver);
-
 
     /**
      * ConfigureJitterBuffer
@@ -162,7 +156,7 @@ protected:
      * @param none
      * @return none
      */
-      CVoIPJitterBufferIntfc();
+    CVoIPJitterBufferIntfc();
 
     /**
      * 2-nd phase constructor
@@ -179,6 +173,5 @@ protected:
     };
 
 #endif  //__VOIPJITTERBUFFERINTFC_H
-
 
 // End of File

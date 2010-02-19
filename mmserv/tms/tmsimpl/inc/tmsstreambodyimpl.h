@@ -83,7 +83,7 @@ private:
 
     gint CreateQueue(const gint aNumSlots);
     void ReceiveMsgQHandlerEventsL();
-    
+
     gint ValidateStream();
     gint ValidateSource(TMSSource* source);
     gint ValidateSink(TMSSink* sink);
@@ -102,7 +102,7 @@ private:
 
     // Message queue and the handler
     RMsgQueue<TmsMsgBuf> iMsgQueue;
-    CQueueHandler* iMsgQHandler;
+    TMSQueueHandler* iMsgQHandler;
 
     // Need to make this a list
     TMSStreamObserver* iObserver;

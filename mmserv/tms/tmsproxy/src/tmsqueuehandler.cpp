@@ -27,14 +27,14 @@
 using namespace TMS;
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::NewL
+// TMSQueueHandler::NewL
 // Symbian constructor
 // ----------------------------------------------------------------------------
 //
-CQueueHandler* CQueueHandler::NewL(RMsgQueue<TmsMsgBuf>* aMsgQueue,
+TMSQueueHandler* TMSQueueHandler::NewL(RMsgQueue<TmsMsgBuf>* aMsgQueue,
         TMSGlobalContext* glblCtx)
     {
-    CQueueHandler* self = new (ELeave) CQueueHandler(aMsgQueue, glblCtx);
+    TMSQueueHandler* self = new (ELeave) TMSQueueHandler(aMsgQueue, glblCtx);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -42,21 +42,21 @@ CQueueHandler* CQueueHandler::NewL(RMsgQueue<TmsMsgBuf>* aMsgQueue,
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::ConstructL
+// TMSQueueHandler::ConstructL
 // Second phase constructor.
 // ----------------------------------------------------------------------------
 //
-void CQueueHandler::ConstructL()
+void TMSQueueHandler::ConstructL()
     {
     iObserver = NULL;
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::~CQueueHandler
+// TMSQueueHandler::~TMSQueueHandler
 // Destructor.
 // ----------------------------------------------------------------------------
 //
-CQueueHandler::~CQueueHandler()
+TMSQueueHandler::~TMSQueueHandler()
     {
     Cancel();
     if (iMsgQueue->Handle() > 0)
@@ -71,11 +71,11 @@ CQueueHandler::~CQueueHandler()
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::CQueueHandler
+// TMSQueueHandler::TMSQueueHandler
 // Constructor.
 // ----------------------------------------------------------------------------
 //
-CQueueHandler::CQueueHandler(RMsgQueue<TmsMsgBuf>* aMsgQueue,
+TMSQueueHandler::TMSQueueHandler(RMsgQueue<TmsMsgBuf>* aMsgQueue,
         TMSGlobalContext* glblCtx) :
     CActive(CActive::EPriorityStandard),
     iMsgQueue(aMsgQueue),
@@ -86,28 +86,29 @@ CQueueHandler::CQueueHandler(RMsgQueue<TmsMsgBuf>* aMsgQueue,
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::Start
+// TMSQueueHandler::Start
 // Start listening for events on queue 0.
 // ----------------------------------------------------------------------------
 //
-void CQueueHandler::Start()
+void TMSQueueHandler::Start()
     {
-    if (!IsActive())
+    if (!IsActive() && iMsgQueue)
         {
+        iStatus = KRequestPending;
         iMsgQueue->NotifyDataAvailable(iStatus);
         SetActive();
         }
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::AddObserver
+// TMSQueueHandler::AddObserver
 //
 // ----------------------------------------------------------------------------
 //
-TInt CQueueHandler::AddObserver(MQueueHandlerObserver& aObserver,
-        TInt /*aClientId*/)
+gint TMSQueueHandler::AddObserver(MQueueHandlerObserver& aObserver,
+        gint /*aClientId*/)
     {
-    TInt status = KErrNone;
+    gint status = TMS_RESULT_SUCCESS;
 
     if (iObserver == NULL)
         {
@@ -115,42 +116,54 @@ TInt CQueueHandler::AddObserver(MQueueHandlerObserver& aObserver,
         }
     else
         {
-        status = KErrAlreadyExists;
+        status = TMS_RESULT_ALREADY_EXIST;
         }
     return status;
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::AddObserver
+// TMSQueueHandler::RemoveObserver
 // Marks observer as inactive in the list
 // ----------------------------------------------------------------------------
 //
-TInt CQueueHandler::RemoveObserver(MQueueHandlerObserver& /*aObserver*/)
+gint TMSQueueHandler::RemoveObserver(MQueueHandlerObserver& /*aObserver*/)
     {
     iObserver = NULL;
-    return KErrNone;
+    return TMS_RESULT_SUCCESS;
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::DoCancel
+// TMSQueueHandler::DoCancel
 // Cancel outstanding request
 // ----------------------------------------------------------------------------
 //
-void CQueueHandler::DoCancel()
+void TMSQueueHandler::DoCancel()
     {
-    iMsgQueue->CancelDataAvailable();
+    if (iMsgQueue)
+        {
+        iMsgQueue->CancelDataAvailable();
+        }
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::RunL
+// TMSQueueHandler::RunL
 // Process requests.
 // ----------------------------------------------------------------------------
 //
-void CQueueHandler::RunL()
+void TMSQueueHandler::RunL()
     {
     TmsMsgBuf msgBuf;
-    TInt err = iMsgQueue->Receive(msgBuf);
+    gint err = TMS_RESULT_SUCCESS;
 
+    if (iMsgQueue)
+        {
+        iMsgQueue->Receive(msgBuf);
+        }
+    else
+        {
+        err = TMS_RESULT_INVALID_STATE;
+        }
+        
     // Start monitoring for more events before calling the observer in case
     // client decides to destroy us before this RunL completes executing.
     Start();
@@ -160,7 +173,7 @@ void CQueueHandler::RunL()
         return;
         }
 
-    if (err == KErrNone)
+    if (err == TMS_RESULT_SUCCESS)
         {
         switch (msgBuf.iRequest)
             {
@@ -179,15 +192,6 @@ void CQueueHandler::RunL()
                 iObserver->QueueEvent(msgBuf.iInt, msgBuf.iStatus,
                         &msgBuf.iUint);
                 break;
-            case ECmdDTMFOpenDnlinkComplete:
-            case ECmdDTMFOpenUplinkComplete:
-                iObserver->QueueEvent(TMS_EVENT_DTMF_TONE_STARTED,
-                        msgBuf.iStatus, NULL);
-                break;
-            case ECmdDTMFTonePlayFinished:
-                iObserver->QueueEvent(TMS_EVENT_DTMF_TONE_STOPPED,
-                        msgBuf.iStatus, NULL);
-                break;
             default:
                 break;
             }
@@ -195,22 +199,22 @@ void CQueueHandler::RunL()
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::RunError
+// TMSQueueHandler::RunError
 // Process requests.
 // ----------------------------------------------------------------------------
 //
-TInt CQueueHandler::RunError(TInt /*aError*/)
+TInt TMSQueueHandler::RunError(TInt /*aError*/)
     {
     // Current implementation of RunL does not leave
-    return 0;
+    return TMS_RESULT_SUCCESS;
     }
 
 // ----------------------------------------------------------------------------
-// CQueueHandler::Status
+// TMSQueueHandler::Status
 // Return request status.
 // ----------------------------------------------------------------------------
 //
-TRequestStatus* CQueueHandler::Status()
+TRequestStatus* TMSQueueHandler::Status()
     {
     return &iStatus;
     }

@@ -118,7 +118,7 @@ private:
 
     // Message queue and the handler
     RMsgQueue<TmsMsgBuf> iMsgQueue;
-    CQueueHandler* iMsgQHandler;
+    TMSQueueHandler* iMsgQHandler;
     };
 
 } //namespace TMS

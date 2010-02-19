@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines APIs specific to G.729 decoder.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines APIs specific to G.729 decoder.
+ *
+ */
 
 #ifndef __VOIPG729DECFORMATINTFC_H
 #define __VOIPG729DECFORMATINTFC_H
@@ -22,10 +21,8 @@
 #include <voipaudiocommon.h>
 #include <voipformatintfc.h>
 
-
 // FORWARD DECLARATIONS
 class CVoIPG729DecoderIntfcImpl;
-
 
 /**
  *  CVoIPG729DecoderIntfc class
@@ -33,7 +30,7 @@ class CVoIPG729DecoderIntfcImpl;
  *  G.729 decoder configuration class
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CVoIPG729DecoderIntfc : public CVoIPFormatIntfc
     {
@@ -79,7 +76,6 @@ protected:
     CVoIPG729DecoderIntfcImpl* iFormatIntfcImpl;
 
     };
-
 
 #endif //__VOIPG729DECFORMATINTFC_H
 

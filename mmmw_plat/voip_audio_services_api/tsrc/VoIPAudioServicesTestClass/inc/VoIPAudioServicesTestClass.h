@@ -106,9 +106,9 @@ _LIT16(KTestFile2, "\\testing\\data\\alarm.aac");
 _LIT16(KTestFile3, "\\testing\\data\\test_8khz.wav");
 #else
 _LIT( KVoIPAudioServicesTestClassLogPath, "e:\\testing\\Log\\" );
-_LIT16(KTestFile1, "e:\\testing\\data\\alarm 1.aac");
-_LIT16(KTestFile2, "e:\\testing\\data\\alarm.aac");
-_LIT16(KTestFile3, "e:\\testing\\data\\test_8khz.wav");
+_LIT16(KTestFile1, "c:\\testing\\data\\alarm 1.aac");
+_LIT16(KTestFile2, "c:\\testing\\data\\alarm.aac");
+_LIT16(KTestFile3, "c:\\testing\\data\\test_8khz.wav");
 #endif
 
 // Log file

@@ -24,42 +24,42 @@
 using namespace TMS;
 
 // -----------------------------------------------------------------------------
-// CallAdpt::CallAdpt
+// TMSCallAdpt::TMSCallAdpt
 //
 // -----------------------------------------------------------------------------
 //
-CallAdpt::CallAdpt()
+TMSCallAdpt::TMSCallAdpt()
     {
     TRACE_PRN_FN_ENT;
     TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
-// CallAdpt::~CallAdpt
+// TMSCallAdpt::~TMSCallAdpt
 //
 // -----------------------------------------------------------------------------
 //
-CallAdpt::~CallAdpt()
+TMSCallAdpt::~TMSCallAdpt()
     {
     TRACE_PRN_FN_ENT;
     TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
-// CallAdpt::CreateCallL
+// TMSCallAdpt::CreateCallL
 //
 // -----------------------------------------------------------------------------
 //
-gint CallAdpt::CreateCallL(gint callType, CallAdpt*& callAdpt)
+gint TMSCallAdpt::CreateCallL(gint callType, TMSCallAdpt*& callAdpt)
     {
     TRACE_PRN_FN_ENT;
-    CallAdpt* self(NULL);
+    TMSCallAdpt* self(NULL);
     gint retVal(TMS_RESULT_SUCCESS);
     switch (callType)
         {
         case TMS_CALL_IP:
             retVal = TMS_RESULT_INSUFFICIENT_MEMORY;
-            self = CallIPAdpt::NewL();
+            self = TMSCallIPAdpt::NewL();
             if (self)
                 {
                 retVal = self->PostConstruct();
@@ -73,7 +73,7 @@ gint CallAdpt::CreateCallL(gint callType, CallAdpt*& callAdpt)
 
         case TMS_CALL_CS:
             retVal = TMS_RESULT_INSUFFICIENT_MEMORY;
-            self = new CallCSAdpt();
+            self = new TMSCallCSAdpt();
             if (self)
                 {
                 retVal = self->PostConstruct();
@@ -94,14 +94,12 @@ gint CallAdpt::CreateCallL(gint callType, CallAdpt*& callAdpt)
     }
 
 // -----------------------------------------------------------------------------
-// CallAdpt::PostConstruct
+// TMSCallAdpt::PostConstruct
 //
 // -----------------------------------------------------------------------------
 //
-gint CallAdpt::PostConstruct()
+gint TMSCallAdpt::PostConstruct()
     {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
     return TMS_RESULT_SUCCESS;
     }
 

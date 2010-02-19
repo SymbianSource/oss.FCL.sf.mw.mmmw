@@ -315,13 +315,6 @@ void TMSServerSession::GetCodecsCountL(const RMessage2& aMessage,
                 err = KErrNotSupported;
                 }
 
-#ifdef __WINSCW__
-            // Support for adaptation stubs
-            codecs->Append(KMccFourCCIdG711);
-            codecs->Append(KMccFourCCIdG729);
-            codecs->Append(KMccFourCCIdILBC);
-            codecs->Append(KMccFourCCIdAMRNB);
-#endif
             codecsCount = codecs->Count();
             }
 

@@ -24,19 +24,19 @@
 namespace TMS {
 
 //
-class MCSPDevSoundObserver;
+class TMSCSPDevSoundObserver;
 
 /**
  *  Provides Downlink functionality.
  *
  */
-NONSHARABLE_CLASS(CSDownlink) : public CSPDevSound
+NONSHARABLE_CLASS(TMSCSDownlink) : public TMSCSPDevSound
     {
 public:
 
-    static CSDownlink* NewL(MCSPDevSoundObserver& aObserver);
+    static TMSCSDownlink* NewL(TMSCSPDevSoundObserver& aObserver);
 
-    virtual ~CSDownlink();
+    virtual ~TMSCSDownlink();
 
     /**
      * Sets volume.
@@ -82,7 +82,7 @@ private:
 
 protected:
 
-    CSDownlink(MCSPDevSoundObserver& aObserver);
+    TMSCSDownlink(TMSCSPDevSoundObserver& aObserver);
 
     void ConstructL();
     };

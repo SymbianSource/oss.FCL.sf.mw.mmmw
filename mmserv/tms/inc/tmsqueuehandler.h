@@ -37,13 +37,13 @@ class TMSGlobalContext;
 class MQueueHandlerObserver
     {
 public:
-    virtual void QueueEvent(TInt aEventType, TInt aError, void* user_data) = 0;
+    virtual void QueueEvent(gint aEventType, gint aError, void* user_data) = 0;
     };
 
 /**
- *  CQueueHandler class
+ *  TMSQueueHandler class
  */
-NONSHARABLE_CLASS(CQueueHandler) : public CActive
+NONSHARABLE_CLASS(TMSQueueHandler) : public CActive
     {
 public:
 
@@ -52,13 +52,13 @@ public:
      * Contructor
      *
      */
-    static CQueueHandler* NewL(RMsgQueue<TmsMsgBuf>* aMsgQueue,
+    static TMSQueueHandler* NewL(RMsgQueue<TmsMsgBuf>* aMsgQueue,
             TMSGlobalContext* glblCtx);
 
     /**
      * destructor
      */
-    virtual ~CQueueHandler();
+    virtual ~TMSQueueHandler();
 
     /**
      * Start
@@ -72,15 +72,15 @@ public:
      */
     TRequestStatus* Status();
 
-    TInt AddObserver(MQueueHandlerObserver& obsvr, TInt aClientId);
-    TInt RemoveObserver(MQueueHandlerObserver& obsvr);
+    gint AddObserver(MQueueHandlerObserver& obsvr, gint aClientId);
+    gint RemoveObserver(MQueueHandlerObserver& obsvr);
 
 private:
 
     /**
      * constructor
      */
-    CQueueHandler(RMsgQueue<TmsMsgBuf>* aMsgQueue,
+    TMSQueueHandler(RMsgQueue<TmsMsgBuf>* aMsgQueue,
             TMSGlobalContext* glblCtx);
 
     void ConstructL();
@@ -89,19 +89,20 @@ private:
     void DoCancel();
     void RunL();
     TInt RunError(TInt aError);
-    void DoFillBuffer(TInt aBufLen, TInt aStatus, TBool flag, TUint32 key);
-    void DoEmptyBuffer(TInt aBufLen, TInt aStatus, TBool flag, TUint32 key);
-    TInt FindStreamInList();
-    TInt FindGainEffectInList();
-    TInt FindVolEffectInList();
-    TMSStreamState ConvertToStreamState(TInt request);
+
+    void DoFillBuffer(gint aBufLen, gint aStatus, gboolean flag, guint32 key);
+    void DoEmptyBuffer(gint aBufLen, gint aStatus, gboolean flag, guint32 key);
+    gint FindStreamInList();
+    gint FindGainEffectInList();
+    gint FindVolEffectInList();
+    TMSStreamState ConvertToStreamState(gint request);
 
 private:
     // data
 
     RPointerArray<MQueueHandlerObserver> iObserversList; // (not owned)
     MQueueHandlerObserver* iObserver; //not owned
-    RArray<TInt> iClientList;
+    RArray<gint> iClientList;
     RMsgQueue<TmsMsgBuf>* iMsgQueue;
 
     RChunk iChunk;

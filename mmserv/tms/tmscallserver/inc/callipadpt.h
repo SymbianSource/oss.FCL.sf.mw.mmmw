@@ -28,17 +28,17 @@
 namespace TMS {
 
 // FORWARD DECLARATIONS
-class TMSVoIPDownlink;
-class TMSVoIPUplink;
+class TMSIPDownlink;
+class TMSIPUplink;
 
-// CallIPAdpt class
-class CallIPAdpt : public CallAdpt
+// TMSCallIPAdpt class
+class TMSCallIPAdpt : public TMSCallAdpt
     {
 public:
     // Constractor
-    static CallIPAdpt* NewL();
+    static TMSCallIPAdpt* NewL();
 
-    virtual ~CallIPAdpt();
+    virtual ~TMSCallIPAdpt();
     virtual gint PostConstruct();
 
     virtual gint CreateStream(TMSCallType callType, TMSStreamType strmType,
@@ -117,7 +117,7 @@ public:
 
 private:
     void ConstructL();
-    CallIPAdpt();
+    TMSCallIPAdpt();
 
     void NotifyClient(const gint strmId, const TInt aCommand,
             const TInt aStatus = KErrNone, const TInt64 aInt64 = TInt64(0));
@@ -131,8 +131,8 @@ private:
     gboolean iDnlinkInitialized;
     gint iDnlinkStreamId;
 
-    TMSVoIPDownlink* iVoIPDownlink;
-    TMSVoIPUplink* iVoIPUplink;
+    TMSIPDownlink* iIPDownlink;
+    TMSIPUplink* iIPUplink;
 
     // Message queues for communication and data transfer back to the client
     RMsgQueue<TmsMsgBuf> iMsgQueueUp;

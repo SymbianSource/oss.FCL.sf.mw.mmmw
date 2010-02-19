@@ -82,6 +82,7 @@ void TMSServerShutDown::SetDelay(TTimeIntervalMicroSeconds32 aDelay)
 
     if (!IsActive())
         {
+        iStatus = KRequestPending;
         iShutDownTimer.After(iStatus, aDelay);
         }
 

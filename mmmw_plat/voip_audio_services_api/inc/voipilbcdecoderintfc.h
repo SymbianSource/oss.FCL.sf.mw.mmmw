@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines APIs specific to iLBC decoder.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines APIs specific to iLBC decoder.
+ *
+ */
 
 #ifndef __VOIPILBCDECFORMATINTFC_H
 #define __VOIPILBCDECFORMATINTFC_H
@@ -22,10 +21,8 @@
 #include <voipaudiocommon.h>
 #include <voipformatintfc.h>
 
-
 // FORWARD DECLARATIONS
 class CVoIPILBCDecoderIntfcImpl;
-
 
 /**
  *  CVoIPILBCDecoderIntfc class
@@ -33,7 +30,7 @@ class CVoIPILBCDecoderIntfcImpl;
  *  iLBC decoder configuration class
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CVoIPILBCDecoderIntfc : public CVoIPFormatIntfc
     {
@@ -106,7 +103,6 @@ protected:
     CVoIPILBCDecoderIntfcImpl* iFormatIntfcImpl;
 
     };
-
 
 #endif //__VOIPILBCDECFORMATINTFC_H
 

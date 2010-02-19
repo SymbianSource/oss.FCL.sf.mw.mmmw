@@ -23,12 +23,12 @@
 
 namespace TMS {
 
-// CallAdpt class
-class CallAdpt
+// TMSCallAdpt class
+class TMSCallAdpt
     {
 public:
-    static gint CreateCallL(gint callType, CallAdpt*& callAdpt);
-    virtual ~CallAdpt();
+    static gint CreateCallL(gint callType, TMSCallAdpt*& callAdpt);
+    virtual ~TMSCallAdpt();
     virtual gint CreateStream(TMSCallType callType,
             TMSStreamType strmType, gint& outStrmId) = 0;
     virtual gint InitStreamL(TMSCallType callType,
@@ -86,7 +86,7 @@ public:
             CBufFlat*& outputsbuffer) = 0;
 
 protected:
-    CallAdpt();
+    TMSCallAdpt();
     virtual gint PostConstruct();
 
 protected:

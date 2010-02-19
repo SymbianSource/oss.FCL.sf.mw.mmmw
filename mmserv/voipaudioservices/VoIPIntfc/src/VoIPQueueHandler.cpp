@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services  CMsgQueueHandler class implementation.
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services  CMsgQueueHandler class implementation.
+ *
+ */
 
 #include <voipaudiocommon.h>
 #include <voipuplinkstream.h>
@@ -26,15 +25,13 @@
 #include "VoIPDataBufferImpl.h"
 #include "VoIPQueueHandler.h"
 
-
 // ----------------------------------------------------------------------------
 // CQueueHandler::NewL
 // Symbian constructor
 // ----------------------------------------------------------------------------
 //
 CQueueHandler* CQueueHandler::NewL(MQueueHandlerObserver* aObserver,
-                                   RMsgQueue<TVoIPMsgBuf>* aMsgQueue,
-                                   TInt aBufferLen)
+        RMsgQueue<TVoIPMsgBuf>* aMsgQueue, TInt aBufferLen)
     {
     CQueueHandler* self = new (ELeave) CQueueHandler(aMsgQueue);
     CleanupStack::PushL(self);
@@ -49,7 +46,7 @@ CQueueHandler* CQueueHandler::NewL(MQueueHandlerObserver* aObserver,
 // ----------------------------------------------------------------------------
 //
 void CQueueHandler::ConstructL(MQueueHandlerObserver* aObserver,
-                               TInt aBufferLen)
+        TInt aBufferLen)
     {
     iObserver = aObserver;
 
@@ -79,9 +76,8 @@ CQueueHandler::~CQueueHandler()
 //
 CQueueHandler::CQueueHandler(RMsgQueue<TVoIPMsgBuf>* aMsgQueue) :
     CActive(CActive::EPriorityStandard),
-//  CActive(CActive::EPriorityHigh),
     iMsgQueue(aMsgQueue),
-    iChunkDataPtr(0,0,0)
+    iChunkDataPtr(0, 0, 0)
     {
     CActiveScheduler::Add(this);
     }
@@ -95,6 +91,7 @@ void CQueueHandler::Start()
     {
     if (!IsActive())
         {
+        iStatus = KRequestPending;
         iMsgQueue->NotifyDataAvailable(iStatus);
         SetActive();
         }
@@ -131,13 +128,13 @@ void CQueueHandler::RunL()
             case ECmdDownlinkInitComplete:
                 {
                 iObserver->Event(MVoIPDownlinkObserver::KOpenComplete,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdUplinkInitComplete:
                 {
                 iObserver->Event(MVoIPUplinkObserver::KOpenComplete,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdFillBuffer:
@@ -154,51 +151,51 @@ void CQueueHandler::RunL()
                 {
                 iChunk.Close();
                 iObserver->Event(MVoIPDownlinkObserver::KDownlinkClosed,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdUplinkThreadClosed:
                 {
                 iChunk.Close();
                 iObserver->Event(MVoIPUplinkObserver::KUplinkClosed,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdRingToneOpenComplete:
                 {
                 iObserver->Event(MRingToneObserver::KOpenComplete,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdRingTonePlayComplete:
                 {
                 iObserver->Event(MRingToneObserver::KPlaybackComplete,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdDnLinkError:
             case ECmdDnLinkJBError:
                 {
                 iObserver->Event(MVoIPDownlinkObserver::KDownlinkError,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdUpLinkError:
                 {
                 iObserver->Event(MVoIPUplinkObserver::KUplinkError,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdDTMFOpenDnlinkComplete:
                 {
                 iObserver->Event(MDTMFToneObserver::KOpenCompleteDNL,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdDTMFOpenUplinkComplete:
                 {
                 iObserver->Event(MDTMFToneObserver::KOpenCompleteUPL,
-                                 msgBuf.iStatus);
+                        msgBuf.iStatus);
                 break;
                 }
             case ECmdDTMFTonePlayFinished:
@@ -287,6 +284,5 @@ TRequestStatus* CQueueHandler::Status()
     {
     return &iStatus;
     }
-
 
 // End of File

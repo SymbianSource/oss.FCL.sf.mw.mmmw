@@ -24,32 +24,32 @@ using namespace TMS;
 // Mute value
 const gint KSetMuteToDevSound = 0;
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Static constructor.
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-CSUplink* CSUplink::NewL(MCSPDevSoundObserver& aObserver)
+TMSCSUplink* TMSCSUplink::NewL(TMSCSPDevSoundObserver& aObserver)
     {
-    CSUplink* self = new (ELeave) CSUplink(aObserver);
+    TMSCSUplink* self = new (ELeave) TMSCSUplink(aObserver);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
     return self;
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Destructor
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-CSUplink::~CSUplink()
+TMSCSUplink::~TMSCSUplink()
     {
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Gives mic mute state
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-TBool CSUplink::IsMuted()
+TBool TMSCSUplink::IsMuted()
     {
     TBool isMuted = EFalse;
     gint gain = 0;
@@ -62,15 +62,15 @@ TBool CSUplink::IsMuted()
         // Mute is on
         isMuted = ETrue;
         }
-    //   CSPLOGSTRING( CSPINT, "CSUplink::IsMuted" );
+    //   CSPLOGSTRING( CSPINT, "TMSCSUplink::IsMuted" );
     return isMuted;
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Set mic muted.
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CSUplink::SetMuted()
+void TMSCSUplink::SetMuted()
     {
     if (iDevSound)
         {
@@ -78,11 +78,11 @@ void CSUplink::SetMuted()
         }
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Set mic unmuted
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CSUplink::SetUnmuted()
+void TMSCSUplink::SetUnmuted()
     {
     if (iDevSound)
         {
@@ -90,11 +90,11 @@ void CSUplink::SetUnmuted()
         }
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Sets gain
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CSUplink::SetGain(gint aGain)
+void TMSCSUplink::SetGain(gint aGain)
     {
     if (iDevSound)
         {
@@ -102,11 +102,11 @@ void CSUplink::SetGain(gint aGain)
         }
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Gives volume
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-gint CSUplink::Gain()
+gint TMSCSUplink::Gain()
     {
     gint gain = 0;
     if (iDevSound)
@@ -116,11 +116,11 @@ gint CSUplink::Gain()
     return gain;
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Gives max gain
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-gint CSUplink::MaxGain()
+gint TMSCSUplink::MaxGain()
     {
     gint gain = 0;
     if (iDevSound)
@@ -130,14 +130,14 @@ gint CSUplink::MaxGain()
     return gain;
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // From class MDevSoundObserver
 // Activation was successfull.
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CSUplink::BufferToBeEmptied(CMMFBuffer* /*aBuffer*/)
+void TMSCSUplink::BufferToBeEmptied(CMMFBuffer* /*aBuffer*/)
     {
-    //  CSPLOGSTRING( CSPINT, "CSUplink::BufferToBeEmptied" );
+    //  CSPLOGSTRING( CSPINT, "TMSCSUplink::BufferToBeEmptied" );
 
     // We dont react to devsound messages unless we are activating.
     if (IsActivationOngoing())
@@ -148,14 +148,14 @@ void CSUplink::BufferToBeEmptied(CMMFBuffer* /*aBuffer*/)
         }
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // From class MDevSoundObserver
 // Activation feiled
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CSUplink::RecordError(TInt aError)
+void TMSCSUplink::RecordError(TInt aError)
     {
-    //  CSPLOGSTRING( CSPINT, "CSUplink::RecordError" );
+    //  CSPLOGSTRING( CSPINT, "TMSCSUplink::RecordError" );
 
     // We dont react to devsound messages unless we are activating.
     if (IsActivationOngoing())
@@ -168,13 +168,13 @@ void CSUplink::RecordError(TInt aError)
         }
     }
 
-// ---------------------------------------------------------------------------
-// From class CSPDevSound
+// -----------------------------------------------------------------------------
+// From class TMSCSPDevSound
 // Tries to activate mic stream. Stream becomes active when BufferToBeFilled
 // gets called.
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CSUplink::DoActivateL()
+void TMSCSUplink::DoActivateL()
     {
     if (iDevSound)
         {
@@ -182,22 +182,22 @@ void CSUplink::DoActivateL()
         }
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Constructor
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-CSUplink::CSUplink(MCSPDevSoundObserver& aObserver) :
-    CSPDevSound(aObserver)
+TMSCSUplink::TMSCSUplink(TMSCSPDevSoundObserver& aObserver) :
+    TMSCSPDevSound(aObserver)
     {
     }
 
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Second phase constructor
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-void CSUplink::ConstructL()
+void TMSCSUplink::ConstructL()
     {
-    CSPDevSound::ConstructL(EMMFStateRecording, KAudioPrefCSCallUplink,
+    TMSCSPDevSound::ConstructL(EMMFStateRecording, KAudioPrefCSCallUplink,
             KAudioPriorityCSCallUplink);
     }
 

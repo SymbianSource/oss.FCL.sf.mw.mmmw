@@ -11,7 +11,7 @@
  *
  * Contributors:
  *
- * Description:  Implements the class CSPAudioHandler
+ * Description:  Implements the class TMSCenRepAudioHandler
  *
  */
 
@@ -33,13 +33,13 @@ const TUint32 KTelIncallLoudspeakerVolume  = 0x00000002;
 
 using namespace TMS;
 // ---------------------------------------------------------------------------
-// CSPAudioHandler::NewL.
+// TMSCenRepAudioHandler::NewL.
 // ---------------------------------------------------------------------------
 //
-CSPAudioHandler* CSPAudioHandler::NewL(TMSServer* aServer)
+TMSCenRepAudioHandler* TMSCenRepAudioHandler::NewL(TMSServer* aServer)
     {
     TRACE_PRN_FN_ENT;
-    CSPAudioHandler* self = new (ELeave) CSPAudioHandler(aServer);
+    TMSCenRepAudioHandler* self = new (ELeave) TMSCenRepAudioHandler(aServer);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -51,7 +51,7 @@ CSPAudioHandler* CSPAudioHandler::NewL(TMSServer* aServer)
 // Destructs the object by canceling first ongoing monitoring.
 // ---------------------------------------------------------------------------
 //
-CSPAudioHandler::~CSPAudioHandler()
+TMSCenRepAudioHandler::~TMSCenRepAudioHandler()
     {
     TRACE_PRN_FN_ENT;
     delete iIncallLoudspeakerVolumeListener;
@@ -60,10 +60,10 @@ CSPAudioHandler::~CSPAudioHandler()
     }
 
 // ---------------------------------------------------------------------------
-// CSPAudioHandler::SetLoudSpeakerVol
+// TMSCenRepAudioHandler::SetLoudSpeakerVol
 // ---------------------------------------------------------------------------
 //
-void CSPAudioHandler::SetLoudSpeakerVol(TInt vol)
+void TMSCenRepAudioHandler::SetLoudSpeakerVol(TInt vol)
     {
     if (iIncallLoudspeakerVolumeListener)
         {
@@ -72,10 +72,10 @@ void CSPAudioHandler::SetLoudSpeakerVol(TInt vol)
     }
 
 // ---------------------------------------------------------------------------
-// CSPAudioHandler::SetEarPieceVol
+// TMSCenRepAudioHandler::SetEarPieceVol
 // ---------------------------------------------------------------------------
 //
-void CSPAudioHandler::SetEarPieceVol(TInt vol)
+void TMSCenRepAudioHandler::SetEarPieceVol(TInt vol)
     {
     if (iIncallEarVolumeListener)
         {
@@ -85,10 +85,10 @@ void CSPAudioHandler::SetEarPieceVol(TInt vol)
 
 // ---------------------------------------------------------------------------
 // From MCSPCenRepObserver
-// CSPAudioHandler::HandleNotifyCenRepL
+// TMSCenRepAudioHandler::HandleNotifyCenRepL
 // ---------------------------------------------------------------------------
 //
-void CSPAudioHandler::HandleNotifyCenRepL(const TUid /*aUid*/,
+void TMSCenRepAudioHandler::HandleNotifyCenRepL(const TUid /*aUid*/,
         const TUint32 aKey, TInt aVal)
     {
     TRACE_PRN_FN_ENT;
@@ -107,7 +107,7 @@ void CSPAudioHandler::HandleNotifyCenRepL(const TUid /*aUid*/,
 // Constructs the monitor.
 // ---------------------------------------------------------------------------
 //
-CSPAudioHandler::CSPAudioHandler(TMSServer* aServer) :
+TMSCenRepAudioHandler::TMSCenRepAudioHandler(TMSServer* aServer) :
     iTMSSer(aServer)
     {
     TRACE_PRN_FN_ENT;
@@ -119,14 +119,14 @@ CSPAudioHandler::CSPAudioHandler(TMSServer* aServer) :
 // Second phase construction.
 // ---------------------------------------------------------------------------
 //
-void CSPAudioHandler::ConstructL()
+void TMSCenRepAudioHandler::ConstructL()
     {
     TRACE_PRN_FN_ENT;
 
-    iIncallLoudspeakerVolumeListener = CSPCenRepListener::NewL(
+    iIncallLoudspeakerVolumeListener = TMSCenRepListener::NewL(
             KCRUidInCallVolume, KTelIncallLoudspeakerVolume, this);
 
-    iIncallEarVolumeListener = CSPCenRepListener::NewL(KCRUidInCallVolume,
+    iIncallEarVolumeListener = TMSCenRepListener::NewL(KCRUidInCallVolume,
             KTelIncallEarVolume, this);
 
     // Initialize audio volumes
