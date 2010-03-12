@@ -28,4 +28,5 @@ EXPORTS
 	?SourceThreadLogoff@CDataSourceAdapter@@UAEXXZ @ 27 NONAME ; void CDataSourceAdapter::SourceThreadLogoff(void)
 	?SourceThreadLogon@CDataSourceAdapter@@UAEHAAVMAsyncEventHandler@@@Z @ 28 NONAME ; int CDataSourceAdapter::SourceThreadLogon(class MAsyncEventHandler &)
 	?SetAudioOutputControlUtil@CDataSourceAdapter@@QAEHPAVCAudioOutputControlUtility@@@Z @ 29 NONAME ; int CDataSourceAdapter::SetAudioOutputControlUtil(class CAudioOutputControlUtility *)
+	?IsLocalPlayback@CDataSourceAdapter@@UAEHXZ @ 30 NONAME ; int CDataSourceAdapter::IsLocalPlayback(void)
 

@@ -176,7 +176,7 @@ void CAudioLoadingProgress::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrev
 
 		TInt percentage;
 		TRAPD(err, recorder->GetAudioLoadingProgressL(percentage));
-		if (err != KErrNone)
+		if (err != KErrNotSupported)
 			{
 				logger->Log(_L("Error %d for GetAudioLoadingProgressL %d "),KErrProgressPect, percentage  );
 				callbackErr = KErrProgressPect;

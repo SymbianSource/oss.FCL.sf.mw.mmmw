@@ -692,7 +692,11 @@ void CSimpleSoundPlayer::GetLoad_Percentage()
 	{
 	TInt percentage;
 	iLogger.Log(_L("Trying to GetLoad_Percentage\n ") );
-	iMdaPlayer->GetAudioLoadingProgressL(percentage);
+	TRAPD(err,iMdaPlayer->GetAudioLoadingProgressL(percentage)); //Controller doesnt support GetAudioLoadingProgressL.
+	if( err == KErrNotSupported )
+	    {
+	    iFinalError = 0;
+	    }
 	iLogger.Log(_L("GetAudioLoadingProgressL (%d)") , percentage);
 	}
 
@@ -791,9 +795,9 @@ void CSimpleSoundPlayer::CancelNotification()
 
 void CSimpleSoundPlayer::CtrImpInfo()
 	{
-	iLogger.Log(_L("Trying to GetLoad_Percentage\n ") );
-	const CMMFControllerImplementationInformation& info = iMdaPlayer->ControllerImplementationInformationL();
-	iLogger.Log(_L("GetDRMCustomCommand() finished") );
+	iLogger.Log(_L("Trying to CtrImpInfo\n ") );
+    const CMMFControllerImplementationInformation& info = iMdaPlayer->ControllerImplementationInformationL();
+	iLogger.Log(_L("CtrImpInfo finished") );
 	}
 
 void CSimpleSoundPlayer::Set_Priority()

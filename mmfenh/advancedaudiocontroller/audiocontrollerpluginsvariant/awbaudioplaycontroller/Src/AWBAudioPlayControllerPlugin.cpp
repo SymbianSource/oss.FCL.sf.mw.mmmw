@@ -55,7 +55,7 @@ void CAWBAudioPlayControllerPlugin::ConstructL()
     iSharedBufferMaxNum = aapProperties.iSharedBufferMaxNum;
     iSharedBufferMaxSize = aapProperties.iSharedBufferMaxSize;
     iMetaDataSupport = aapProperties.iMetaDataSupport;
-
+    iSharedBufferMaxSizeForNonSeekableSrc = aapProperties.iSharedBufferMaxSizeForNonSeekableSrc;
 	iAudioUtility = CAWBAudioControllerUtility::NewL();
 	iDecoderBuilder = CAWBAudioPlayControllerDecoderBuilder::NewL();
     }

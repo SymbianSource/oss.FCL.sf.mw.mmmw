@@ -53,7 +53,7 @@ void CMP3AudioPlayControllerPlugin::ConstructL()
     iSharedBufferMaxNum = aapProperties.iSharedBufferMaxNum;
     iSharedBufferMaxSize = aapProperties.iSharedBufferMaxSize;
     iMetaDataSupport = aapProperties.iMetaDataSupport;
-
+    iSharedBufferMaxSizeForNonSeekableSrc = aapProperties.iSharedBufferMaxSizeForNonSeekableSrc;
 	iAudioUtility = CMP3AudioControllerUtility::NewL();
 	iDecoderBuilder = CMP3AudioPlayControllerDecoderBuilder::NewL();
     }

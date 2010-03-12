@@ -56,7 +56,7 @@ void CAMRAudioPlayControllerPlugin::ConstructL()
     iSharedBufferMaxNum = aapProperties.iSharedBufferMaxNum;
     iSharedBufferMaxSize = aapProperties.iSharedBufferMaxSize;
     iMetaDataSupport = aapProperties.iMetaDataSupport;
-
+    iSharedBufferMaxSizeForNonSeekableSrc = aapProperties.iSharedBufferMaxSizeForNonSeekableSrc;
 	iAudioUtility = CAMRAudioControllerUtility::NewL();
 	iDecoderBuilder = CAMRAudioPlayControllerDecoderBuilder::NewL();
     }

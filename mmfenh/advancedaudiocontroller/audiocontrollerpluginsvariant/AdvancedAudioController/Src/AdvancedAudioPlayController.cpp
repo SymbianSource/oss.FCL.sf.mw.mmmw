@@ -783,6 +783,7 @@ EXPORT_C void CAdvancedAudioPlayController::AddDataSourceL(
     MDataSource& aSource)
     {
     DP1(_L("CAdvancedAudioPlayController::AddDataSourceL this[%x]"), this);
+    DP2(_L("CAdvancedAudioController::AddDataSourceL iSharedBufferMaxNum[%d] iSharedBufferMaxSize[%d]"), iSharedBufferMaxNum, iSharedBufferMaxSize);    
     iSourceUnreadable = EFalse;
     iEnablePrimedStateChangedEvent = EFalse;
     // source type is intended to not be needed by controllers
@@ -797,10 +798,6 @@ EXPORT_C void CAdvancedAudioPlayController::AddDataSourceL(
     if (iDataSourceAdapter)
 		{
         User::Leave(KErrAlreadyExists);
-        }
-    if (iSharedBufferMaxNum <= 2)
-        {
-        iSharedBufferMaxNum = 3;
         }
 
 
@@ -843,6 +840,17 @@ EXPORT_C void CAdvancedAudioPlayController::AddDataSourceL(
 
     // we need to block this until duration is calculated if using mmfplayutility
     iBlockDuration = EFalse;
+// ou1cimx1#205863
+    if (!iDataSourceAdapter->IsLocalPlayback()) 
+    	{
+	    DP0(_L("CAdvancedAudioPlayController::AddDataSourceL not file source"));        
+	    if (iSharedBufferMaxNum <= 2)
+	        {
+	        	iSharedBufferMaxNum = 3;
+	        }
+		 iSharedBufferMaxSize = iSharedBufferMaxSizeForNonSeekableSrc;
+	    DP2(_L("CAdvancedAudioPlayController::AddDataSourceL new iSharedBufferMaxNum[%d] iSharedBufferMaxSize[%d]"), iSharedBufferMaxNum, iSharedBufferMaxSize);
+    	}
     
     if ((!iEventsEnabled) && (!iDataSourceAdapter->OnlyHeaderPresent()))
         {
@@ -2240,11 +2248,17 @@ EXPORT_C void CAdvancedAudioPlayController::DoInitializeSinkL()
 	RArray<TInt>& codecConfigData = const_cast<RArray<TInt>&>(iAudioResource->CodecConfigParametersL());
 	// Override default values with values found from header, if available
 	GetCodecConfigData(codecConfigData);
-	iAudioOutput->ConfigureL(iSampleRate, iSinkNumChannels, iDataType, codecConfigData);
-    DP0(_L("CAdvancedAudioPlayController::DoInitializeSinkL, output configured"));
-	iAudioOutput->PrimeL();
-    DP0(_L("CAdvancedAudioPlayController::DoInitializeSinkL, output primed"));
-			    
+         if (!iAudioOutput)
+	   {		
+		User::Leave(KErrNotReady);
+           }  
+        else
+           {
+	       iAudioOutput->ConfigureL(iSampleRate, iSinkNumChannels, iDataType, codecConfigData);
+               DP0(_L("CAdvancedAudioPlayController::DoInitializeSinkL, output configured"));
+	       iAudioOutput->PrimeL();
+               DP0(_L("CAdvancedAudioPlayController::DoInitializeSinkL, output primed"));
+	   }		    
 	// we would use this code when we have a NULL sink
 /*	if (iDuration > 0)
 		{

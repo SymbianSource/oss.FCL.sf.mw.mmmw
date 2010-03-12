@@ -24,15 +24,15 @@ EXPORTS
 	_ZTIN21C3gpDataSourceAdapter21CAsyncProxyFillBufferE @ 23 NONAME
 	_ZTV21C3gpDataSourceAdapter @ 24 NONAME
 	_ZTVN21C3gpDataSourceAdapter21CAsyncProxyFillBufferE @ 25 NONAME
-	_ZThn60_N21C3gpDataSourceAdapter12EmptyBufferLEP10CMMFBufferP11MDataSource8TMediaId @ 26 NONAME
-	_ZThn60_N21C3gpDataSourceAdapter13BufferFilledLEP10CMMFBuffer @ 27 NONAME
-	_ZThn60_N21C3gpDataSourceAdapter14ConstructSinkLERK6TDesC8 @ 28 NONAME
-	_ZThn60_N21C3gpDataSourceAdapter16SinkDataTypeCodeE8TMediaId @ 29 NONAME
-	_ZThn60_N21C3gpDataSourceAdapter17CreateSinkBufferLE8TMediaIdRi @ 30 NONAME
-	_ZThn60_N21C3gpDataSourceAdapter19CanCreateSinkBufferEv @ 31 NONAME
-	_ZThn60_N21C3gpDataSourceAdapterD0Ev @ 32 NONAME
-	_ZThn60_N21C3gpDataSourceAdapterD1Ev @ 33 NONAME
-	_ZThn76_N21C3gpDataSourceAdapter10GetBitRateERj @ 34 NONAME
-	_ZThn76_N21C3gpDataSourceAdapter12BufferFilledEP10CMMFBuffer @ 35 NONAME
-	_ZThn76_N21C3gpDataSourceAdapter5EventE4TUid @ 36 NONAME
+	_ZThn64_N21C3gpDataSourceAdapter12EmptyBufferLEP10CMMFBufferP11MDataSource8TMediaId @ 26 NONAME
+	_ZThn64_N21C3gpDataSourceAdapter13BufferFilledLEP10CMMFBuffer @ 27 NONAME
+	_ZThn64_N21C3gpDataSourceAdapter14ConstructSinkLERK6TDesC8 @ 28 NONAME
+	_ZThn64_N21C3gpDataSourceAdapter16SinkDataTypeCodeE8TMediaId @ 29 NONAME
+	_ZThn64_N21C3gpDataSourceAdapter17CreateSinkBufferLE8TMediaIdRi @ 30 NONAME
+	_ZThn64_N21C3gpDataSourceAdapter19CanCreateSinkBufferEv @ 31 NONAME
+	_ZThn64_N21C3gpDataSourceAdapterD0Ev @ 32 NONAME
+	_ZThn64_N21C3gpDataSourceAdapterD1Ev @ 33 NONAME
+	_ZThn80_N21C3gpDataSourceAdapter10GetBitRateERj @ 34 NONAME
+	_ZThn80_N21C3gpDataSourceAdapter12BufferFilledEP10CMMFBuffer @ 35 NONAME
+	_ZThn80_N21C3gpDataSourceAdapter5EventE4TUid @ 36 NONAME
 

@@ -180,14 +180,6 @@ void TMSQueueHandler::RunL()
             case ECmdGlobalEffectChange:
                 iObserver->QueueEvent(msgBuf.iInt, msgBuf.iStatus, NULL);
                 break;
-            case ECmdRingToneOpenComplete:
-                iObserver->QueueEvent(TMS_EVENT_RINGTONE_OPEN_COMPLETE,
-                        msgBuf.iStatus, &msgBuf.iInt64);
-                break;
-            case ECmdRingTonePlayComplete:
-                iObserver->QueueEvent(TMS_EVENT_RINGTONE_PLAY_COMPLETE,
-                        msgBuf.iStatus, NULL);
-                break;
             case ECmdGlobalRoutingChange:
                 iObserver->QueueEvent(msgBuf.iInt, msgBuf.iStatus,
                         &msgBuf.iUint);

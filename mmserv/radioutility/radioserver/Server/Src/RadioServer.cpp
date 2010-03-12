@@ -70,7 +70,8 @@ CRadioServer::CRadioServer()
         iMaxSigStrength(0),
         iEnableTunerInOffline(EFalse),
         iSquelch(EFalse),
-        iPreEmpted(EFalse)
+        iPreEmpted(EFalse),
+        iSchedulerWait( NULL )
     {
     }
 
@@ -127,6 +128,8 @@ void CRadioServer::ConstructL()
     iMapper = CTspClientMapper::NewL();
     iTspState = CTspClientMapper::ERegisteredClients;
 #endif // RD_TSP_CLIENT_MAPPER
+    
+    iSchedulerWait  = new (ELeave) CActiveSchedulerWait;
 
     RADIO_RDEBUG(_L("[RADIO-SVR] ConstructL() - End"));
     }
@@ -166,6 +169,7 @@ CRadioServer::~CRadioServer()
     delete iTunerControl;
     delete iTunerControlObserver;
     delete iAsyncRequest;
+    delete iSchedulerWait;
 
     ClearQueue();
     iRdsNotifyClientIdArray.Close();
@@ -619,6 +623,11 @@ void CRadioServer::TunerOffComplete(
                 }
             break;
         case EStateTunerOff:
+            if( iSchedulerWait->IsStarted() )
+                {
+                // let the PlayError() continue after this callback
+                iSchedulerWait->AsyncStop();
+                }
             if ( iAsyncRequest && iAsyncRequest->iType == ERadioServSetFrequencyRange )
                 {
                 if ( aError == KErrNone )
@@ -637,6 +646,14 @@ void CRadioServer::TunerOffComplete(
                 else
                     {
                     CompleteAsyncRequest(aError);
+                    }
+                }
+            else
+                {
+                if( aError == KRadioServErrDuplicateRequest )
+                    {
+                    // tuner off and duplicate request going on, trace it out
+                    RADIO_RDEBUG(_L("[RADIO-SVR] TunerOffComplete() - EStateTunerOff - KRadioServErrDuplicateRequest"));
                     }
                 }
             break;
@@ -1387,7 +1404,7 @@ void CRadioServer::PlayError(
                 iDevSound->SetVolume(iSettings->Volume());
                 iSquelch = EFalse;
                 }
-            CompleteAsyncRequest(KRadioServErrTuning);
+            // do not yet complete async request with KRadioServErrTuning
             }
 
         // We are being pre-empted by another application with higher priority.
@@ -1395,8 +1412,18 @@ void CRadioServer::PlayError(
         iState = EStateTunerOff;
         iPreEmpted = ETrue;
         iSettings->SetRadioOff(aError);
-        iTunerControl->TunerOff();
+        iTunerControl->TunerOff();		//The adaptation is expected to call TunerOffComplete() upon completion
+        // wait for TunerOffComplete callback
+        iSchedulerWait->Start();
         SetTspTargetClient( ERsPlayerIdle );
+        
+        if ( iAsyncRequest && ( (iAsyncRequest->iType == ERadioServStationSeek) ||
+                                (iAsyncRequest->iType == ERadioServStationSeekByPTY) ||
+                                (iAsyncRequest->iType == ERadioServStationSeekByTA) ||
+                                (iAsyncRequest->iType == ERadioServStationSeekByTP) ) )
+            {
+            CompleteAsyncRequest(KRadioServErrTuning);
+            }
         }
     }
 

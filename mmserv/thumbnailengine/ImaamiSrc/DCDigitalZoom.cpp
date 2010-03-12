@@ -207,6 +207,16 @@ void CDCDigitalZoom::DecimateL(const CFbsBitmap* aOriPtr, CFbsBitmap* aOutPtr,
 									 TInt allShiftX, TInt allShiftY,
 									 TInt newShiftX, TInt newShiftY)
 {
+	// We don't waste time if request ZOOM 1x without Pan
+    if(aZoomX==1 && aZoomY==1)
+    {
+		if(allShiftX==0 && allShiftY==0 && newShiftX ==0 && newShiftX == 0)
+  	  	{
+  	  		TInt handle = aOriPtr->Handle();
+  	  	        aOutPtr->Duplicate(handle);
+  	  	        return;
+  	  	}
+  	}
 	TInt32
 		divider,
 		xPos, yPos, tmpline,
@@ -571,7 +581,7 @@ void CDCDigitalZoom::DecimateL(const CFbsBitmap* aOriPtr, CFbsBitmap* aOutPtr,
 			yEndRem = (TUint32)(tmpEnd & REMAINDER);
 
 			//Read a new line from the source image if needed
-			while (yEndInt > LastLine && LastLine < aOriSizeY-1)
+			while (yEndInt > LastLine && LastLine < aOriSizeY)
 			{
 				LastLine++;
 				tmpline = lines[0];
@@ -696,7 +706,7 @@ void CDCDigitalZoom::DecimateL(const CFbsBitmap* aOriPtr, CFbsBitmap* aOutPtr,
 				{
 					// Line number
 					if(yStaInt < 0)		   		 outFlag = 1;
-					else if(yStaInt >= aOriSizeY) outFlag = 1;
+					else if(yStaInt > aOriSizeY) outFlag = 1;
 					else
 					{
 						// Initialise line result
@@ -735,11 +745,10 @@ void CDCDigitalZoom::DecimateL(const CFbsBitmap* aOriPtr, CFbsBitmap* aOutPtr,
 						}
 
 						// Last pixel in first line
-						if(xEndWei != 0)
+						if(xEndWei != 0 && xEndInt < aOriSizeX)
 						{
 							// Column number
 							if(xEndInt < 0)				 outFlag = 1;
-							else if(xEndInt >= aOriSizeX) outFlag = 1;
 							else
 							{
 								// Pixel weighting to line result
@@ -762,7 +771,7 @@ void CDCDigitalZoom::DecimateL(const CFbsBitmap* aOriPtr, CFbsBitmap* aOutPtr,
 				{
 					// Line number 
 					if(j < 0)			   outFlag = 1;
-					else if(j >= aOriSizeY) outFlag = 1;
+					else if(j > aOriSizeY) outFlag = 1;
 					else
 					{
 						// Initialise line result
@@ -801,11 +810,10 @@ void CDCDigitalZoom::DecimateL(const CFbsBitmap* aOriPtr, CFbsBitmap* aOutPtr,
 						}
 
 						// Last pixel in middle lines
-						if(xEndWei != 0)
+						if(xEndWei != 0 && xEndInt < aOriSizeX)
 						{
 							// Column number
 							if(xEndInt < 0)				 outFlag = 1;
-							else if(xEndInt >= aOriSizeX) outFlag = 1;
 							else
 							{
 								// Pixel weighting to line result
@@ -829,7 +837,7 @@ void CDCDigitalZoom::DecimateL(const CFbsBitmap* aOriPtr, CFbsBitmap* aOutPtr,
 				{
 					// Line number 
 					if(yEndInt < 0)				 outFlag = 1;
-					else if(yEndInt >= aOriSizeY) outFlag = 1;
+					else if(yEndInt > aOriSizeY) outFlag = 1;
 					else
 					{
 						// Initialise line result
@@ -866,11 +874,10 @@ void CDCDigitalZoom::DecimateL(const CFbsBitmap* aOriPtr, CFbsBitmap* aOutPtr,
 						}
 
 						// Last pixel in last line
-						if(xEndWei != 0)
+						if(xEndWei != 0 && xEndInt < aOriSizeX)
 						{
 							// Column number
 							if(xEndInt < 0)				 outFlag = 1;
-							else if(xEndInt >= aOriSizeX) outFlag = 1;
 							else
 							{
 								tmpB = (TInt)(tmpB + (*(linePtrs[lines[LineNum]] + 3 * xEndInt    )) * xEndWei);

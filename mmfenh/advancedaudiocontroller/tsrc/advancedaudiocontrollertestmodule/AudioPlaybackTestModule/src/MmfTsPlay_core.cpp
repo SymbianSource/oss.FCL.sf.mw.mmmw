@@ -18,7 +18,7 @@
 // INCLUDE FILES
 #include <StifTestInterface.h>
 #include "MmfTsPlay.h"
-#include <mmcaf.h>
+#include <mmf/common/mmcaf.h>
 
 // Constants
 const TInt CMmfTsPlay::MAX_TESTCASE_ID = 160;
@@ -560,13 +560,11 @@ TInt CMmfTsPlay::TestCaseCtrImpInfoL(CStifSectionParser *section , TTestResult &
 		iLogger->Log(_L("Creating simple player with file [%S]"), &FileNamePtr);
 		CSimpleSoundPlayer *sndPlayer = CSimpleSoundPlayer::NewL( FileName, TestModuleIf() , *iLogger);
 
-		sndPlayer -> CtrImpInfo();
-
-
 		CleanupStack::PushL(sndPlayer);
 		iLogger->Log(_L("Starting scheduler"));
 
 		CActiveScheduler::Start();
+        sndPlayer -> CtrImpInfo();
 
 
 		iLogger->Log(_L("Returned from player, errorcode: %d"), sndPlayer->iFinalError );
@@ -951,7 +949,6 @@ TInt CMmfTsPlay::TestCasePlayFileWithPositionL(CStifSectionParser *section, TTes
 TInt CMmfTsPlay::TestCaseGetLoadPercentageL(CStifSectionParser *section, TTestResult & aResult)
 	{
 	TPtrC FileNamePtr;
-	TTimeIntervalMicroSeconds Position = KDefaultPosition;
 
 	if ( !section->GetLine(KTagSoundFile, FileNamePtr, ENoTag) )
 		{
@@ -960,55 +957,22 @@ TInt CMmfTsPlay::TestCaseGetLoadPercentageL(CStifSectionParser *section, TTestRe
 		CSimpleSoundPlayer *sndPlayer = CSimpleSoundPlayer::NewL( FileName, TestModuleIf() , *iLogger);
 		CleanupStack::PushL(sndPlayer);
 
-		TBool UsingDefault;
-		Position = GetTimeIntervalL(section, KTagPosition, UsingDefault, KDefaultPosition);
-
-		iLogger->Log(_L("Seting position to: %d"), Position.Int64());
-		if (UsingDefault) {iLogger->Log(_L("Using default position duration of: (%d)") , KDefaultPosition.Int64());}
-		sndPlayer->iPosition = Position;
-
-		TTimeIntervalMicroSeconds ErrorRange = GetTimeIntervalL(section, KTagErrorRange, UsingDefault, KDefaultErrorRange);
-		if (UsingDefault) {iLogger->Log(_L("Using default error range"));}
-		// * **************************************************************
-
-        sndPlayer -> GetLoad_Percentage();
-		iLogger->Log(_L("Starting scheduler"));
-		TTime StartTime,EndTime;
-		StartTime.HomeTime();
-		CActiveScheduler::Start();
-		EndTime.HomeTime();
-
-
-
-		TTimeIntervalMicroSeconds PerceivedDuration = EndTime.MicroSecondsFrom( StartTime );
-
+	    CActiveScheduler::Start();
+ 		sndPlayer -> GetLoad_Percentage();
+		
 		iLogger->Log(_L("Returned from player, errorcode: %d"), sndPlayer->iFinalError );
-		iLogger->Log(_L("Perceived duration: %d") , PerceivedDuration.Int64() );
-
-
-		TTimeIntervalMicroSeconds ExpectedDuration = TTimeIntervalMicroSeconds(I64INT(sndPlayer->GetDuration().Int64()) - I64INT(Position.Int64()));
-		iLogger->Log(_L("ExpectedDuration: %d") ,ExpectedDuration.Int64() );
-
-		if (  Abs(ExpectedDuration.Int64() - PerceivedDuration.Int64()) > ErrorRange.Int64() )
-			{	//Durations too different
-			iLogger->Log(_L("The clips duration is too different from the actual duration + position") );
-			aResult.iResult = KErrExpectedValueDifferent;
-			aResult.iResultDes.Copy(KTestCaseResultFailExpectedValueDifferent());
+    	aResult.iResult = sndPlayer->iFinalError;
+		if (aResult.iResult)
+	    	{
+		    iLogger->Log(_L("Test failed, error code %d"), aResult.iResult);
+			aResult.iResultDes.Copy(KTestCaseResultFail());
 			}
 		else
 			{
-			aResult.iResult = sndPlayer->iFinalError;
-			if (aResult.iResult)
-				{
-				iLogger->Log(_L("Test failed, error code %d"), aResult.iResult);
-				aResult.iResultDes.Copy(KTestCaseResultFail());
-				}
-			else
-				{
-				iLogger->Log(_L("Test was successful"));
-				aResult.iResultDes.Copy(KTestCaseResultSuccess());
-				}
+			iLogger->Log(_L("Test was successful"));
+			aResult.iResultDes.Copy(KTestCaseResultSuccess());
 			}
+			
 		CleanupStack::PopAndDestroy(sndPlayer);
 		return KErrExecuted;
 		}

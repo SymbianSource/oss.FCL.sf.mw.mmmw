@@ -52,7 +52,7 @@ void CAMRAudioRecordControllerPlugin::ConstructL()
     TAapProperties aapProperties = iAudioResource->PropertiesL();
     iSharedBufferMaxNum = aapProperties.iSharedBufferMaxNum;
     iSharedBufferMaxSize = aapProperties.iSharedBufferMaxSize;
-
+    iSharedBufferMaxSizeForNonSeekableSrc = aapProperties.iSharedBufferMaxSizeForNonSeekableSrc;
 	iAudioUtility = CAMRAudioControllerUtility::NewL();
     }
 

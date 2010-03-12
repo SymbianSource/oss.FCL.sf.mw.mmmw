@@ -27,29 +27,28 @@
 #include <e32base.h>
 #include <e32cons.h>
 #include <tms.h>
-#include <TmsFactory.h>
-#include <TmsCall.h>
-#include <TmsStream.h>
-#include <TmsFormat.h>
-#include <TmsDtmf.h>
-#include <TmsClientSink.h>
-#include <TmsClientSource.h>
-#include <TmsClientSourceObsrvr.h>
-#include <TmsClientSinkObsrvr.h>
-#include <TmsVolumeEffect.h>
-#include <TmSGlobalVolEffect.h>
-#include <TmsGainEffect.h>
-#include <TmSGlobalGainEffect.h>
-#include <TmsEffectObsrvr.h>
-#include <TmsStreamObsrvr.h>
-#include <TmsBuffer.h>
-#include <TmsGlobalRouting.h>
-#include <TmsGlobalRoutingObsrvr.h>
-#include <TMSG711Format.h>
-#include <TMSG729Format.h>
-#include <TMSiLBCFormat.h>
-#include <TMSPCMFormat.h>
-#include <TMSAMRFormat.h>
+#include <tmsfactory.h>
+#include <tmscall.h>
+#include <tmsstream.h>
+#include <tmsformat.h>
+#include <tmsclientsink.h>
+#include <tmsclientsource.h>
+#include <tmsclientsourceobsrvr.h>
+#include <tmsclientsinkobsrvr.h>
+#include <tmsvolumeeffect.h>
+#include <tmsglobalvoleffect.h>
+#include <tmsgaineffect.h>
+#include <tmsglobalgaineffect.h>
+#include <tmseffectobsrvr.h>
+#include <tmsstreamobsrvr.h>
+#include <tmsbuffer.h>
+#include <tmsglobalrouting.h>
+#include <tmsglobalroutingobsrvr.h>
+#include <tmsg711format.h>
+#include <tmsg729format.h>
+#include <tmsilbcformat.h>
+#include <tmspcmformat.h>
+#include <tmsamrformat.h>
 
 #include "TimeoutController.h"
 
@@ -332,12 +331,8 @@ private:
     TInt GetDownlinkVersion(CStifItemParser& aItem);
     TInt CreateUplinkStream(CStifItemParser& aItem);
     TInt GetUplinkVersion(CStifItemParser& aItem);
-    TInt CreateDTMFTonePlayer(CStifItemParser& aItem);
-    TInt DeleteDTMFTonePlayer(CStifItemParser& aItem);
-    TInt CreateRingTonePlayer(CStifItemParser& aItem);
     TInt GetSupportedFormats(CStifItemParser& aItem);
     TInt IsCallTypeSupported(CStifItemParser& aItem);
-    //  TInt GetSupportedUplinkFormats( CStifItemParser& aItem );
     TInt SetDownlinkFormat(CStifItemParser& aItem);
     TInt SetUplinkFormat(CStifItemParser& aItem);
     TInt ReSetDownlinkFormat(CStifItemParser& aItem);
@@ -351,11 +346,6 @@ private:
     TInt Close(CStifItemParser& aItem);
     TInt Gain(CStifItemParser& aItem);
     TInt Volume(CStifItemParser& aItem);
-
-    TInt InitDTMFTonePlayer(CStifItemParser& aItem);
-    TInt DTMFTonePlay(CStifItemParser& aItem);
-    TInt CloseDTMFPlayer(CStifItemParser& aItem);
-    TInt StopDTMFTonePlayer(CStifItemParser& aItem);
 
     TInt GetBufferType(CStifItemParser& aItem);
 
@@ -430,8 +420,6 @@ private:
     TMSStream* iTmsDnlink;
     TMSCall* iTmsCall;
     TMSStream* iTmsUplink;
-    TMSDTMF* iDTMFTonePlayerDn;
-    TMSDTMF* iDTMFTonePlayerUp;
     TMSAudioOutput iDevice;
 
     // Codec format APIs
@@ -466,22 +454,15 @@ private:
     TBool iPlc;
     TBool iCng;
     TBool iVad;
-    //  TBool iFrameMode;
-    //  TBool iFrameModeReqEC;
-    //  TBool iSpkr;
     guint iMaxGain;
     guint iGain;
     guint iMaxVolume;
     guint iVolume;
     TUint currentBitrate;
-    //  RArray<TUint> iBitratesArray;
 
     // For streaming buffer control
     TMSBuffer* iPlayBuf;
     TMSBuffer* iRecBuf;
-    // TPtr8               iPlayBufPtr;
-    // TPtr8               iRecBufPtr;
-
     TBool iPlayBufReady;
     TBool iRecBufReady;
 

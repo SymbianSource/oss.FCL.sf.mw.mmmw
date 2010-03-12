@@ -331,12 +331,14 @@ const TDesC& aPreset)
     // Set the active preset in the equalizer item array
     iItemArray->SetCurrentActivePreset(aPreset);
     
-    // Display Confirmation note                   
-    HBufC* activateNoteText = StringLoader::LoadLC(
+    // Display Confirmation note        
+    // As per 9.2 Spec, No activation note should be shown
+               
+    /*HBufC* activateNoteText = StringLoader::LoadLC(
     R_QTN_EQ_NOTE_INFO_PRESET_ACTIVATED, aPreset);
     CAknConfirmationNote* dialog = new(ELeave)CAknConfirmationNote();
     dialog->ExecuteLD(*activateNoteText);
-    CleanupStack::PopAndDestroy(activateNoteText); 
+    CleanupStack::PopAndDestroy(activateNoteText); */
     
     // Inform the engine
     if (aPreset.Compare(*iPresetNoneText) == 0)            
@@ -1092,6 +1094,8 @@ void CEqualizerPresetsDialog::DynInitMenuPaneL(
                 }
             iContextSensitiveMenu = EFalse; 
             }
+        aMenuPane->SetItemDimmed(EEqualizerCmdCreateNew, ETrue );
+        aMenuPane->SetItemDimmed(EEqualizerCmdEdit, ETrue);
         }
    }
 

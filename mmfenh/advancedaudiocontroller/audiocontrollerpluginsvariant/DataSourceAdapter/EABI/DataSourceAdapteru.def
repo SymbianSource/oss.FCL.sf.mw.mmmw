@@ -15,24 +15,25 @@ EXPORTS
 	_ZN18CDataSourceAdapter14IsTimeSeekableEv @ 14 NONAME
 	_ZN18CDataSourceAdapter14SeekToPositionEj @ 15 NONAME
 	_ZN18CDataSourceAdapter14SetDataSourceLEP11MDataSourceP29MMultimediaDataSourceObserverP18MAsyncEventHandler @ 16 NONAME
-	_ZN18CDataSourceAdapter16SetAgentPropertyEN13ContentAccess14TAgentPropertyEi @ 17 NONAME
-	_ZN18CDataSourceAdapter17IsPositonSeekableEv @ 18 NONAME
-	_ZN18CDataSourceAdapter17OnlyHeaderPresentEv @ 19 NONAME
-	_ZN18CDataSourceAdapter17SourceThreadLogonER18MAsyncEventHandler @ 20 NONAME
-	_ZN18CDataSourceAdapter18SourceThreadLogoffEv @ 21 NONAME
-	_ZN18CDataSourceAdapter19CreateSourceBufferLE8TMediaIdRi @ 22 NONAME
-	_ZN18CDataSourceAdapter21CanCreateSourceBufferEv @ 23 NONAME
-	_ZN18CDataSourceAdapter25SetSourcePrioritySettingsERK20TMMFPrioritySettings @ 24 NONAME
-	_ZN18CDataSourceAdapter4NewLEv @ 25 NONAME
-	_ZN18CDataSourceAdapter5EventE4TUid @ 26 NONAME
-	_ZN18CDataSourceAdapterC1Ev @ 27 NONAME
-	_ZN18CDataSourceAdapterC2Ev @ 28 NONAME
-	_ZN18CDataSourceAdapterD0Ev @ 29 NONAME
-	_ZN18CDataSourceAdapterD1Ev @ 30 NONAME
-	_ZN18CDataSourceAdapterD2Ev @ 31 NONAME
-	_ZTI18CDataSourceAdapter @ 32 NONAME ; #<TI>#
-	_ZTIN18CDataSourceAdapter21CAsyncProxyFillBufferE @ 33 NONAME ; #<TI>#
-	_ZTV18CDataSourceAdapter @ 34 NONAME ; #<VT>#
-	_ZTVN18CDataSourceAdapter21CAsyncProxyFillBufferE @ 35 NONAME ; #<VT>#
-	_ZN18CDataSourceAdapter25SetAudioOutputControlUtilEP26CAudioOutputControlUtility @ 36 NONAME
+	_ZN18CDataSourceAdapter15IsLocalPlaybackEv @ 17 NONAME
+	_ZN18CDataSourceAdapter16SetAgentPropertyEN13ContentAccess14TAgentPropertyEi @ 18 NONAME
+	_ZN18CDataSourceAdapter17IsPositonSeekableEv @ 19 NONAME
+	_ZN18CDataSourceAdapter17OnlyHeaderPresentEv @ 20 NONAME
+	_ZN18CDataSourceAdapter17SourceThreadLogonER18MAsyncEventHandler @ 21 NONAME
+	_ZN18CDataSourceAdapter18SourceThreadLogoffEv @ 22 NONAME
+	_ZN18CDataSourceAdapter19CreateSourceBufferLE8TMediaIdRi @ 23 NONAME
+	_ZN18CDataSourceAdapter21CanCreateSourceBufferEv @ 24 NONAME
+	_ZN18CDataSourceAdapter25SetAudioOutputControlUtilEP26CAudioOutputControlUtility @ 25 NONAME
+	_ZN18CDataSourceAdapter25SetSourcePrioritySettingsERK20TMMFPrioritySettings @ 26 NONAME
+	_ZN18CDataSourceAdapter4NewLEv @ 27 NONAME
+	_ZN18CDataSourceAdapter5EventE4TUid @ 28 NONAME
+	_ZN18CDataSourceAdapterC1Ev @ 29 NONAME
+	_ZN18CDataSourceAdapterC2Ev @ 30 NONAME
+	_ZN18CDataSourceAdapterD0Ev @ 31 NONAME
+	_ZN18CDataSourceAdapterD1Ev @ 32 NONAME
+	_ZN18CDataSourceAdapterD2Ev @ 33 NONAME
+	_ZTI18CDataSourceAdapter @ 34 NONAME
+	_ZTIN18CDataSourceAdapter21CAsyncProxyFillBufferE @ 35 NONAME
+	_ZTV18CDataSourceAdapter @ 36 NONAME
+	_ZTVN18CDataSourceAdapter21CAsyncProxyFillBufferE @ 37 NONAME
 

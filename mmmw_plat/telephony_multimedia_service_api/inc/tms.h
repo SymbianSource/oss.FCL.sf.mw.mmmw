@@ -77,10 +77,6 @@ class TMSFormat;
 #define TMS_EVENT_ROUTING_AVAIL_OUTPUTS_CHANGED ((gint)0x00000006)
 #define TMS_EVENT_ROUTING_OUTPUT_CHANGED        ((gint)0x00000007)
 #define TMS_EVENT_ROUTING_SET_OUTPUT_COMPLETE   ((gint)0x00000008)
-#define TMS_EVENT_RINGTONE_OPEN_COMPLETE        ((gint)0x00000009)
-#define TMS_EVENT_RINGTONE_PLAY_COMPLETE        ((gint)0x0000000A)
-#define TMS_EVENT_DTMF_TONE_STARTED             ((gint)0x0000000B)
-#define TMS_EVENT_DTMF_TONE_STOPPED             ((gint)0x0000000C)
 
 // Stream states
 typedef gint TMSStreamState;
@@ -147,7 +143,7 @@ typedef gint TMSILBCCodecMode;
 #define TMS_ILBC_CODEC_MODE_20MS_FRAME          ((gint)0)
 #define TMS_ILBC_CODEC_MODE_30MS_FRAME          ((gint)1)
 
-// Oudio output types
+// Audio output types
 typedef gint TMSAudioOutput;
 #define TMS_AUDIO_OUTPUT_NONE                   ((gint)0)
 #define TMS_AUDIO_OUTPUT_PUBLIC                 ((gint)1)

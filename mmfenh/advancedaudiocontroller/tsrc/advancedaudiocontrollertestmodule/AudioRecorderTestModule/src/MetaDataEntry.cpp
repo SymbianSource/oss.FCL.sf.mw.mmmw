@@ -167,7 +167,7 @@ void CMetaDataEntry::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 		TInt NumMetaDatas =0;
 		err = recorder->GetNumberOfMetaDataEntries(NumMetaDatas);
 
-		if ( err )
+		if ( err !=KErrNotSupported )
 		{	//Error getting meta data info
 			logger->Log(_L("Error getting meta data info %d"),err);
 			callbackErr = err;
@@ -186,7 +186,7 @@ void CMetaDataEntry::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 
 		CMMFMetaDataEntry *myMetaData = CMMFMetaDataEntry::NewL(myName, myValue);
 		TRAPD(err, recorder->AddMetaDataEntryL(*myMetaData));
-		if (err != KErrNone)
+		if (err != KErrNotSupported)
 		{
 			logger->Log(_L("Error %d for AddMetaDataEntryL"),err);
 			callbackErr = err;
@@ -197,7 +197,7 @@ void CMetaDataEntry::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 		CMMFMetaDataEntry *currentMetaData;
 		TRAPD(err1, (currentMetaData = recorder->GetMetaDataEntryL(0)));
 
-		if (err1 != KErrNone)
+		if (err1 != KErrNotSupported)
 			{
 				logger->Log(_L("Error %d for GetMetaDataEntryL"),err1);
 				callbackErr = err1;
@@ -212,13 +212,17 @@ void CMetaDataEntry::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 		    logger->Log(_L("getting meta data info %d"),currMetaDataIndex);
 		    CMMFMetaDataEntry *currMetaData;
 		    TRAPD(err2, (currMetaData = recorder->GetMetaDataEntryL(currMetaDataIndex)));
-		    if (err2 != KErrNone)
+		    if (err2 != KErrNotSupported)
 			{
 				logger->Log(_L("Error %d for GetMetaDataEntryL"),err2);
 				//delete currMetaData;
 				callbackErr = err2;
 				break;
 			}
+		    if( err2 != KErrNone)
+		        {
+		         break;
+		        }
 			if (currMetaData != NULL )
 			{
 				// check for jpeg image
@@ -233,7 +237,7 @@ void CMetaDataEntry::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 
 
 		TRAPD(err3, recorder->ReplaceMetaDataEntryL(0, *myMetaData););
-		if (err3 != KErrNone)
+		if (err3 != KErrNotSupported)
 		{
 			logger->Log(_L("Error %d for ReplaceMetaDataEntryL"),err3);
 			callbackErr = err3;
@@ -242,7 +246,7 @@ void CMetaDataEntry::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 		logger->Log(_L("ReplaceMetaDataEntryL CMMFMetaDataEntry."));
 
 		TRAPD(err4, recorder->RemoveMetaDataEntry(0));
-		if (err4 != KErrNone)
+		if (err4 != KErrNotSupported)
 		{
 			logger->Log(_L("Error %d for RemoveMetaDataEntry"),err4);
 			callbackErr = err4;

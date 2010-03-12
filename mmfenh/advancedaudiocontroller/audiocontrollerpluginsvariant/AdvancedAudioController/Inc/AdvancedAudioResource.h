@@ -46,6 +46,7 @@ class TAapProperties
 	public:
 		TInt iSharedBufferMaxNum;		// Max number of shared buffer
 		TInt iSharedBufferMaxSize;		// Max buffer size
+		TInt iSharedBufferMaxSizeForNonSeekableSrc; // Max buffer size for Non Seekable source like prog download
 		TInt iSamplingRate;				// Default sampling rate
 		TInt iStereoSupport;			// Default channel number
 		TBool iMetaDataSupport;			// Meta Data support indicator

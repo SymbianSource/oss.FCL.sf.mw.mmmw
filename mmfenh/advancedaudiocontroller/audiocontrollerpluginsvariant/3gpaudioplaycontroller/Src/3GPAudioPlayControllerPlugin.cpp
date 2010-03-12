@@ -267,6 +267,7 @@ void C3GPAudioPlayControllerPlugin::DoReadHeaderL(CMMFDataBuffer* aBuffer)
     TAapProperties aapProperties = iAudioResource->PropertiesL();
     iSharedBufferMaxNum = aapProperties.iSharedBufferMaxNum;
     iSharedBufferMaxSize = aapProperties.iSharedBufferMaxSize;
+    iSharedBufferMaxSizeForNonSeekableSrc = aapProperties.iSharedBufferMaxSizeForNonSeekableSrc;
     iMetaDataSupport = aapProperties.iMetaDataSupport;
 	iChannels = (aapProperties.iStereoSupport < 2) ? 1 : 2;
 	iSinkNumChannels = iChannels; // Default same as source

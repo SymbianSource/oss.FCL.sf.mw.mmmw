@@ -26,7 +26,7 @@
 #include <MdaAudioSampleEditor.h>
 #include "TestCaseBase.h"
 #include "MediaEvent.h"
-
+#include <f32file.h>
 class CRecordingBase;
 
 typedef CRecordingBase* recPtr;
@@ -75,6 +75,13 @@ public:
 	bool isWav;
 	bool isAmr;
 	bool isBitRateTest;
+
+	RFs iFs;
+
+	        /**
+	        * Pointer to a file manager object. Owned.
+	        */
+  CFileMan* iFileMan;
 
 	//To create an object of the derived class
 	static CRecordingBase* CreateObjectL(CTestModuleIf *aConsole, CStifLogger *aLogger);

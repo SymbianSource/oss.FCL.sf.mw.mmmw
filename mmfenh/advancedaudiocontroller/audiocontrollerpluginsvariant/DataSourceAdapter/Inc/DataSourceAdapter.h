@@ -106,6 +106,7 @@ class CDataSourceAdapter : public CBase
 		
 		//sets the AudioOutputControlUtitlity reference and sets Datasource to AudioOutputContolUtility
 		IMPORT_C TInt SetAudioOutputControlUtil(CAudioOutputControlUtility* aAudioOutputControlUtility);
+		IMPORT_C virtual TBool IsLocalPlayback();
 	protected:
 
         /**
@@ -159,6 +160,7 @@ class CDataSourceAdapter : public CBase
 		CMMFClip*		iClip;
 		CAsyncProxyFillBuffer*	iAsyncProxyFillBuffer;
 		TBool			iHeaderOnly;
+		TBool			iIsLocalPlayback;
 		CAudioOutputControlUtility* iAudioOutputControlUtility;  
     };
 

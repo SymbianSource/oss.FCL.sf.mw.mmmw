@@ -116,9 +116,6 @@ void CTmsAudioServicesTestClass::Delete()
     iLog->Log(_L(""));
     iLog->Log(_L(""));
 
-    delete iDTMFTonePlayerDn;
-    delete iDTMFTonePlayerUp;
-
     // delete iPlayBuf;
 
     if (iTmsDnlink)
@@ -174,8 +171,6 @@ TInt CTmsAudioServicesTestClass::RunMethodL(CStifItemParser& aItem)
         ENTRY( "GetEffectType", CTmsAudioServicesTestClass::GetEffectType ),
         ENTRY( "CreateDownlinkStream", CTmsAudioServicesTestClass::CreateDownlinkStream ),
         ENTRY( "CreateUplinkStream", CTmsAudioServicesTestClass::CreateUplinkStream ),
-        ENTRY( "CreateDTMFTonePlayer", CTmsAudioServicesTestClass::CreateDTMFTonePlayer ),
-        ENTRY( "DeleteDTMFTonePlayer", CTmsAudioServicesTestClass::DeleteDTMFTonePlayer ),
         ENTRY( "GetSupportedFormats", CTmsAudioServicesTestClass::GetSupportedFormats ),
         ENTRY( "IsCallTypeSupported", CTmsAudioServicesTestClass::IsCallTypeSupported ),
         ENTRY( "SetDownlinkFormat", CTmsAudioServicesTestClass::SetDownlinkFormat ),
@@ -198,10 +193,6 @@ TInt CTmsAudioServicesTestClass::RunMethodL(CStifItemParser& aItem)
         ENTRY( "GetBitRateList", CTmsAudioServicesTestClass::GetBitRateList ),
         ENTRY( "SetBitrates", CTmsAudioServicesTestClass::SetBitrates ),
         ENTRY( "GetBitrates", CTmsAudioServicesTestClass::GetBitrates ),
-        ENTRY( "InitDTMFTonePlayer", CTmsAudioServicesTestClass::InitDTMFTonePlayer ),
-        ENTRY( "DTMFTonePlay", CTmsAudioServicesTestClass::DTMFTonePlay ),
-        ENTRY( "CloseDTMFPlayer", CTmsAudioServicesTestClass::CloseDTMFPlayer ),
-        ENTRY( "StopDTMFPlayer", CTmsAudioServicesTestClass::StopDTMFTonePlayer ),
         ENTRY( "GetDownlinkVersion", CTmsAudioServicesTestClass::GetDownlinkVersion ),
         ENTRY( "GetUplinkVersion", CTmsAudioServicesTestClass::GetUplinkVersion ),
         ENTRY( "GetType", CTmsAudioServicesTestClass::GetType ),
@@ -1121,75 +1112,6 @@ TInt CTmsAudioServicesTestClass::GetUplinkVersion(CStifItemParser& /*aItem */)
     TInt error = KErrNone;
     TVersion ver(0, 0, 0);
     //error = iTmsUplink->GetVersion(ver);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::CreateDTMFTonePlayer(CStifItemParser& aItem)
-    {
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateDTMFTonePlayer"));
-    TInt error = KErrNone;
-    TPtrC StreamType;
-    error = aItem.GetNextString(StreamType);
-
-    if (error == KErrNone)
-        {
-        if (StreamType == KTagDnlink)
-            {
-            if (iTmsCall)
-                {
-                error = iFactory->CreateDTMF(0, iDTMFTonePlayerDn);
-                FTRACE(FPrint(_L("CreateDTMF Error [%d]"),error));
-                }
-            }
-        else if (StreamType == KTagUplink)
-            {
-            if (iTmsCall)
-                {
-                error = iFactory->CreateDTMF(0, iDTMFTonePlayerUp);
-                }
-            }
-        else
-            {
-            iLog->Log(KMsgBadTestParameters);
-            error = KErrBadTestParameter;}
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateDTMFTonePlayer Error [%d]"),
-            error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::DeleteDTMFTonePlayer(CStifItemParser& aItem)
-    {
-    iLog->Log(_L("CTmsAudioServicesTestClass::DeleteDTMFTonePlayer"));
-    TInt error = KErrNone;
-    TPtrC StreamType;
-    error = aItem.GetNextString(StreamType);
-
-    if (error == KErrNone)
-        {
-        if (StreamType == KTagDnlink)
-            {
-            if (iTmsCall && iDTMFTonePlayerDn)
-                {
-                error = iFactory->DeleteDTMF(iDTMFTonePlayerDn);
-                FTRACE(FPrint(_L("DeleteDTMF Error [%d]"),error));
-                }
-            }
-        else if (StreamType == KTagUplink)
-            {
-            if (iTmsCall && iDTMFTonePlayerUp)
-                {
-                error = iFactory->DeleteDTMF(iDTMFTonePlayerUp);
-                }
-            }
-        else
-            {
-            iLog->Log(KMsgBadTestParameters);
-            error = KErrBadTestParameter;
-            }
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::DeleteDTMFTonePlayer Error [%d]"),
-            error);
     return error;
     }
 
@@ -2329,38 +2251,6 @@ TInt CTmsAudioServicesTestClass::GetAvailableOutputs(CStifItemParser& /*aItem */
         error = KErrNotReady;
         }
 
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::InitDTMFTonePlayer(CStifItemParser& /*aItem */)
-    {
-    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::InitDTMFTonePlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::InitDTMFTonePlayer"));
-    TInt error = KErrNone;
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::DTMFTonePlay(CStifItemParser& /*aItem */)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::DTMFTonePlay")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::DTMFTonePlay"));
-    TInt error = KErrNone;
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::CloseDTMFPlayer(CStifItemParser& /*aItem */)
-    {
-    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::CloseDTMFPlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::CloseDTMFPlayer"));
-    TInt error = KErrNone;
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::StopDTMFTonePlayer(CStifItemParser& /*aItem */)
-    {
-    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::StopDTMFTonePlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::StopDTMFTonePlay"));
-    TInt error = KErrNone;
     return error;
     }
 
