@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -234,7 +234,7 @@ EXPORT_C TInt CVoIPJitterBuffer::FillBuffer(CMMFBuffer* aBuffer)
         TRACE_PRN_N(_L("CVoIPJitterBuffer::FillBufferL NORMAL"));
 
         TUint32 emptyBufferDelay = 0;
-        
+
         if (iCodec != KMccFourCCIdG729)
             {
             // This can cause JB overflow on G729 (it does in the loopback)
@@ -385,6 +385,7 @@ void CVoIPJitterBuffer::TransitionState(TJBTransitionState aTransitionState,
 
     if (aStateChangeDelay)
         {
+        iStatus = KRequestPending;
         iTimer.After(iStatus, TTimeIntervalMicroSeconds32(aStateChangeDelay));
         }
     else

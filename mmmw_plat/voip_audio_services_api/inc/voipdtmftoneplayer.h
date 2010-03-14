@@ -1,24 +1,22 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines VoIP DTMF tone player APIs.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines VoIP DTMF tone player APIs.
+ *
+ */
 
 #ifndef __VOIPDTMFTONEPLAYER_H
 #define __VOIPDTMFTONEPLAYER_H
-
 
 // FORWARD DECLARATIONS
 class CVoIPAudioUplinkStream;
@@ -26,14 +24,13 @@ class CVoIPAudioDownlinkStream;
 class CDTMFTonePlayer;
 class CDTMFTonePlayerImpl;
 
-
 /**
  *  MDTMFToneObserver class
  *
  *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class MDTMFToneObserver
     {
@@ -51,11 +48,9 @@ public:
      * @param TInt - Status
      * @return void
      */
-    virtual void Event(const CDTMFTonePlayer& aPlayer,
-                       TInt aEventType,
-                       TInt aError) = 0;
+    virtual void Event(const CDTMFTonePlayer& aPlayer, TInt aEventType,
+            TInt aError) = 0;
     };
-
 
 /**
  *  CDTMFTonePlayer class
@@ -63,7 +58,7 @@ public:
  *  DTMF Tone Player class
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CDTMFTonePlayer
     {
@@ -149,7 +144,7 @@ public:
      * @return TInt
      */
     IMPORT_C TInt RemoveVoIPAudioDownlinkStream(
-                  CVoIPAudioDownlinkStream& aStream);
+            CVoIPAudioDownlinkStream& aStream);
 
 protected:
 
@@ -178,6 +173,5 @@ private:
     };
 
 #endif //__VOIPDTMFTONEPLAYER_H
-
 
 // End of file

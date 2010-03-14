@@ -11,30 +11,29 @@
  *
  * Contributors:
  *
- * Description:  Declarations for class CSPAudioHandler
+ * Description:  Declarations for class TMSCenRepAudioHandler
  *
  */
 
 #ifndef CSPAUDIOHANDLER_H
 #define CSPAUDIOHANDLER_H
 
-#include <e32base.h>
 #include <sounddevice.h>
 
 #include "mcspcenrepobserver.h"
 #include "tmsserver.h"
 
 namespace TMS {
-class CSPPubSubListener;
-class CSPCenRepListener;
-class CSPAudioStreams;
+
+class TMSCSPPubSubListener;
+class TMSCenRepListener;
+class TMSCSPAudioStreams;
 
 /**
  * Handles call adding from calls not done by the plugin.
  *
  */
-class CSPAudioHandler : public CBase,
-                        public MCSPCenRepObserver
+class TMSCenRepAudioHandler : public MCSPCenRepObserver
     {
 public:
     //Constructors and descructor
@@ -46,12 +45,12 @@ public:
      * @param aLine the line to monitor
      * @param aLineId line identifier
      */
-    static CSPAudioHandler* NewL(TMSServer* aServer);
+    static TMSCenRepAudioHandler* NewL(TMSServer* aServer);
 
     /**
      * C++ default destructor
      */
-    virtual ~CSPAudioHandler();
+    virtual ~TMSCenRepAudioHandler();
 
     void SetLoudSpeakerVol(TInt vol);
     void SetEarPieceVol(TInt vol);
@@ -72,7 +71,7 @@ public:
      * @param aUid uid of setting
      * @param aVal value
      */
-    virtual void CSPAudioHandler::HandleNotifyCenRepL(const TUid aUid,
+    virtual void TMSCenRepAudioHandler::HandleNotifyCenRepL(const TUid aUid,
             const TUint32 aKey, TInt aVal);
 
     // from base class MDevSoundObserver
@@ -109,7 +108,7 @@ private:
      * @param aLine the line associated with the call
      * @param aLineId line identifier
      */
-    CSPAudioHandler(TMSServer* aServer);
+    TMSCenRepAudioHandler(TMSServer* aServer);
 
     /**
      * Constructs the monitor in the second phase.
@@ -122,17 +121,17 @@ private:
     /**
      * Mute listening from Publish&Subscribe.
      */
-    CSPPubSubListener* iMuteListener;
+    TMSCSPPubSubListener* iMuteListener;
 
     /**
      * Incall loudspeaker listening from Central Repository.
      */
-    CSPCenRepListener* iIncallLoudspeakerVolumeListener;
+    TMSCenRepListener* iIncallLoudspeakerVolumeListener;
 
     /**
      * Incall ear volume listening from Central Repository.
      */
-    CSPCenRepListener* iIncallEarVolumeListener;
+    TMSCenRepListener* iIncallEarVolumeListener;
 
     /**
      * Audio streams handler.

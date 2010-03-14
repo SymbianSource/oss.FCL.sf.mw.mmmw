@@ -1,21 +1,20 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines factory object for creating VoIP downlink and uplink
-*                streams as well as DTMF tone player.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines factory object for creating VoIP downlink and uplink
+ *                streams as well as DTMF tone player.
+ *
+ */
 
 #ifndef __VOIPUTILITYFACTORY_H
 #define __VOIPUTILITYFACTORY_H
@@ -30,14 +29,13 @@ class CVoIPAudioUplinkStream;
 class CDTMFTonePlayer;
 class CVoIPJitterBufferIntfc;
 
-
 /**
  *  CVoIPUtilityFactory class
  *
  *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CVoIPUtilityFactory
     {
@@ -45,7 +43,7 @@ public:
     /**
      *  TVoIPCallType
      *  ?description
-     *  @since S60 v5.0
+ *
      */
     enum TVoIPCallType
         {
@@ -83,8 +81,7 @@ public:
      * @return TInt
      */
     IMPORT_C TInt CreateDownlinkStream(const TVersion aVersion,
-                                       const TVoIPCallType aCallType,
-                                       CVoIPAudioDownlinkStream*& aDnLink);
+            const TVoIPCallType aCallType, CVoIPAudioDownlinkStream*& aDnLink);
 
     /**
      * ?description
@@ -96,8 +93,8 @@ public:
      * @return TInt
      */
     IMPORT_C TInt CreateDownlinkStream(const TVersion aVersion,
-                                       CVoIPJitterBufferIntfc*& aJBIntfc,
-                                       CVoIPAudioDownlinkStream*& aDnLink);
+            CVoIPJitterBufferIntfc*& aJBIntfc,
+            CVoIPAudioDownlinkStream*& aDnLink);
 
     /**
      * ?description
@@ -109,8 +106,7 @@ public:
      * @return TInt
      */
     IMPORT_C TInt CreateUplinkStream(const TVersion aVersion,
-                                     const TVoIPCallType aCallType,
-                                     CVoIPAudioUplinkStream*& aUpLink);
+            const TVoIPCallType aCallType, CVoIPAudioUplinkStream*& aUpLink);
 
     /**
      * ?description
@@ -132,8 +128,8 @@ public:
      * @return TInt
      */
     IMPORT_C TInt CreateBuffer(CVoIPDataBuffer*& aBuffer,
-		           			   const CVoIPDataBuffer::TVoIPBufferType aType,
-        		   			   const TVoIPCodecFormat aCodecFormat = EG711);
+            const CVoIPDataBuffer::TVoIPBufferType aType,
+            const TVoIPCodecFormat aCodecFormat = EG711);
 
     /**
      * ?description
@@ -143,7 +139,7 @@ public:
      * @return TInt -
      */
     IMPORT_C TInt GetSupportedDownlinkFormats(
-                  RArray<TVoIPCodecFormat>& aFormats);
+            RArray<TVoIPCodecFormat>& aFormats);
 
     /**
      * ?description
@@ -153,7 +149,7 @@ public:
      * @return TInt -
      */
     IMPORT_C TInt GetSupportedUplinkFormats(
-                  RArray<TVoIPCodecFormat>& aFormats);
+            RArray<TVoIPCodecFormat>& aFormats);
 
 private:
 

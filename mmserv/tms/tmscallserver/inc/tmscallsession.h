@@ -26,7 +26,7 @@ namespace TMS {
 
 // FORWARD DECLARATIONS
 class TMSCallServer;
-class CallAdpt;
+class TMSCallAdpt;
 
 /*
  * Class Name:  TMSCallSession
@@ -90,7 +90,7 @@ private:
 
 private:
     TMSCallServer& iTMSCallServer;
-    CallAdpt* iCallAdpt;
+    TMSCallAdpt* iCallAdpt;
     gint iGlobalVol;
     gint iGlobalGain;
     };

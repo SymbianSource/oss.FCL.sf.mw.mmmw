@@ -705,7 +705,7 @@ void TMSStreamBodyImpl::ReceiveMsgQHandlerEventsL()
         }
     else
         {
-        iMsgQHandler = CQueueHandler::NewL(&iMsgQueue, &iContext);
+        iMsgQHandler = TMSQueueHandler::NewL(&iMsgQueue, &iContext);
         iMsgQHandler->AddObserver(*this, iContext.StreamType);
         }
 

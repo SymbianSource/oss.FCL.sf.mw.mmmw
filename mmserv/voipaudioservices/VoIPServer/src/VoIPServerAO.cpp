@@ -57,8 +57,8 @@ void CVoIPServerAO::Request()
     {
     if (!IsActive())
         {
-        SetActive();
         iStatus = KRequestPending;
+        SetActive();
         }
     }
 

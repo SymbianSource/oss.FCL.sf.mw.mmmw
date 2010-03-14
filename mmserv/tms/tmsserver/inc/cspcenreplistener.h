@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
  * All rights reserved.
  * This component and the accompanying materials are made available
  * under the terms of "Eclipse Public License v1.0"
@@ -19,102 +19,97 @@
 #define CSPCENREPLISTENER_H
 
 // INCLUDE FILES
+#include <glib.h>
 #include <e32base.h>
 #include <centralrepository.h>
 
 namespace TMS {
 
 // Forward declarations
-//class CRepository;
-class MCSPCenRepObserver;    
-   
-    // BASE CLASS
+class MCSPCenRepObserver;
 
-    // CLASS DECLARATION
+/**
+ *   TMSCenRepListener manages getting notification on CenRep key changes.
+ */
+class TMSCenRepListener : public CActive
+    {
+public:
 
     /**
-     *   CSPCenRepListener manages getting notification on CenRep key changes.
+     * Two-phased construction.
+     *
+     * @param aUid cenrep Uid
+     * @param aKey key to be listened
+     * @param aObserver observer for key change.
+     * @return instance of the class
      */
-class CSPCenRepListener : public CActive
-        {
-    public:
+    static TMSCenRepListener* NewL(TUid aUid, TUint32 aKey,
+            MCSPCenRepObserver* aObserver);
 
-        /**
-         * Two-phased construction.
-         *
-         * @param aUid cenrep Uid
-         * @param aKey key to be listened
-         * @param aObserver observer for key change.
-         * @return instance of the class
-         */
-        static CSPCenRepListener* NewL(TUid aUid, TUint32 aKey,
-                MCSPCenRepObserver* aObserver);
+    /**
+     * Destructor.
+     */
+    virtual ~TMSCenRepListener();
 
-        /**
-         * Destructor.
-         */
-        virtual ~CSPCenRepListener();
+public:
 
-    public:
+    /**
+     * Gets the current value of the monitored setting
+     * @param aValue the current value of the monitored setting
+     * @return gint Symbian OS error code from central repository
+     */
+    gint Get(gint& aValue);
 
-        /**
-         * Gets the current value of the monitored setting
-         * @param aValue the current value of the monitored setting
-         * @return TInt Symbian OS error code from central repository
-         */
-        TInt Get(TInt& aValue);
-        
-        TInt Set( TInt aValue );
+    gint Set(gint aValue);
 
-    protected:
-        // From CActive
+protected:
+    // From CActive
+    void DoCancel();
+    gint RunError(TInt aError);
+    void RunL();
 
-        void DoCancel();
-        TInt RunError(TInt aError);
-        void RunL();
+private:
 
-    private:
+    /**
+     * Constructor
+     * @param aUid cenrep Uid
+     * @param aKey key to be listened
+     * @param aObserver observer for key change.
+     */
+    TMSCenRepListener(TUid aUid, TUint32 aKey, MCSPCenRepObserver* aObserver);
 
-        /**
-         * Constructor
-         * @param aUid cenrep Uid
-         * @param aKey key to be listened
-         * @param aObserver observer for key change.
-         */
-        CSPCenRepListener(TUid aUid, TUint32 aKey,
-                MCSPCenRepObserver* aObserver);
+    /**
+     * Private constructing.
+     */
+    void ConstructL();
 
-        /**
-         * Private constructing.
-         */
-        void ConstructL();
+    /**
+     * Submits a notification request
+     */
+    void SubmitNotifyRequestL();
 
-        /**
-         * Submits a notification request
-         */
-        void SubmitNotifyRequestL();
+private:
+    // Owned by this object
 
-    private:
-        // Owned by this object
+    /**
+     * UID of CR key.
+     */
+    TUid iUid;
 
-        /**
-         * UID of CR key.
-         */
-        TUid iUid;
+    /**
+     * Repository access.
+     * Own.
+     */
+    CRepository* iRepository;
 
-        /**
-         * Repository access.
-         * Own.
-         */
-        CRepository* iRepository;
+    /**
+     * Identification number of the monitored setting.
+     */
+    TUint32 iMonitorSetting;
 
-        /**
-         * Identification number of the monitored setting.
-         */
-        TUint32 iMonitorSetting;
-
-        MCSPCenRepObserver* iObserver;
-        };
+    MCSPCenRepObserver* iObserver;
+    };
 
 } //namespace TMS
+
 #endif // CSPCENREPLISTENER_H

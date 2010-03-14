@@ -165,8 +165,8 @@ EXPORT_C gint TMSProxy::Connect()
 //
 EXPORT_C TVersion TMSProxy::Version() const
     {
-    return (TVersion(KTMSServMajorVersionNumber,
-            KTMSServMinorVersionNumber, KTMSServBuildVersionNumber));
+    return (TVersion(KTMSServMajorVersionNumber, KTMSServMinorVersionNumber,
+            KTMSServBuildVersionNumber));
     }
 
 // -----------------------------------------------------------------------------
@@ -442,11 +442,11 @@ EXPORT_C gint TMSProxy::SetMsgQueueNotifier(TMSMsgQueueNotifierType type,
         case EMsgQueueGlobalVolumeType:
         case EMsgQueueGlobalGainType:
             status = AddGlobalEffectObserver((*(TMSEffectObserver*) obsrv),
-                    (*(TMSEffect*)parent), clientid);
+                    (*(TMSEffect*) parent), clientid);
             break;
         case EMsgQueueGlobalRoutingType:
             status = AddRoutingObserver((*(TMSGlobalRoutingObserver*) obsrv),
-                    (*(TMSGlobalRouting*)parent), clientid);
+                    (*(TMSGlobalRouting*) parent), clientid);
             break;
         default:
             status = TMS_RESULT_INVALID_ARGUMENT;
@@ -612,7 +612,7 @@ void TMSProxy::ReceiveMsgQHandlerEventsL()
         }
     else
         {
-        iMsgQHandler = CQueueHandler::NewL(&iMsgQueue, NULL);
+        iMsgQHandler = TMSQueueHandler::NewL(&iMsgQueue, NULL);
         iMsgQHandler->AddObserver(*this, -1);
         }
     iMsgQHandler->Start();
@@ -653,8 +653,8 @@ void TMSProxy::QueueEvent(gint aEventType, gint aError, void* user_data)
                 }
             for (gint i = 0; i < iRoutingObsrvrList.Count(); i++)
                 {
-                iRoutingObsrvrList[i]->GlobalRoutingEvent(iRoutingParentList[i],
-                        event, output);
+                iRoutingObsrvrList[i]->GlobalRoutingEvent(
+                        iRoutingParentList[i], event, output);
                 }
             break;
             }

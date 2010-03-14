@@ -134,7 +134,7 @@ void TMSILBCFormatBodyImpl::SetProxy(TMSGlobalContext* context,
         iProxy = context->CallProxy;
         iStreamType = context->StreamType;
         TMSFormatBodyImpl::SetProxy(iProxy, queuehandler);
-        ((CQueueHandler*) queuehandler)->AddObserver(*this, TMS_FORMAT_ILBC);
+        ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_FORMAT_ILBC);
         }
     }
 

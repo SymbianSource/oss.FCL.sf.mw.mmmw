@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines APIs specific to G.711 encoder.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines APIs specific to G.711 encoder.
+ *
+ */
 
 #ifndef __VOIPG711ENCFORMATINTFC_H
 #define __VOIPG711ENCFORMATINTFC_H
@@ -22,10 +21,8 @@
 #include <voipaudiocommon.h>
 #include <voipformatintfc.h>
 
-
 // FORWARD DECLARATIONS
 class CVoIPG711EncoderIntfcImpl;
-
 
 /**
  *  CVoIPG711EncoderIntfc class
@@ -33,7 +30,7 @@ class CVoIPG711EncoderIntfcImpl;
  *  G.711 encoder configuration class
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CVoIPG711EncoderIntfc : public CVoIPFormatIntfc
     {
@@ -88,7 +85,6 @@ protected:
     CVoIPG711EncoderIntfcImpl* iFormatIntfcImpl;
 
     };
-
 
 #endif //__VOIPG711ENCFORMATINTFC_H
 

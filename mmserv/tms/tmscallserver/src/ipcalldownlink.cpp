@@ -28,7 +28,7 @@
 
 using namespace TMS;
 
-static TMSVoIPDownlink* iSelfDn;
+static TMSIPDownlink* iSelfDn;
 #ifdef _DEBUG
 static TInt iHeap;
 #endif //_DEBUG
@@ -41,10 +41,10 @@ _LIT16(KTestFile1, "c:\\data\\sounds\\digital\\sample1.wav");
 #endif
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::cb_raw_playback_handoff
+// TMSIPDownlink::cb_raw_playback_handoff
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPDownlink::cb_raw_playback_handoff(GstElement* /*appsrc*/,
+void TMSIPDownlink::cb_raw_playback_handoff(GstElement* /*appsrc*/,
         guint size)
     {
     TRACE_PRN_N(_L("TMS->DNL: cb_raw_playback_handoff"));
@@ -63,10 +63,10 @@ void TMSVoIPDownlink::cb_raw_playback_handoff(GstElement* /*appsrc*/,
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::bus_call
+// TMSIPDownlink::bus_call
 // -----------------------------------------------------------------------------
 //
-gboolean TMSVoIPDownlink::bus_call(GstBus* /*bus*/, GstMessage* msg,
+gboolean TMSIPDownlink::bus_call(GstBus* /*bus*/, GstMessage* msg,
         gpointer /*data*/)
     {
     switch (GST_MESSAGE_TYPE(msg))
@@ -97,10 +97,10 @@ gboolean TMSVoIPDownlink::bus_call(GstBus* /*bus*/, GstMessage* msg,
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::gst_initialize_play
+// TMSIPDownlink::gst_initialize_play
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::gst_initialize_play()
+gint TMSIPDownlink::gst_initialize_play()
     {
     TRACE_PRN_FN_ENT;
 
@@ -119,7 +119,7 @@ gint TMSVoIPDownlink::gst_initialize_play()
         }
 
     iBusPlay = gst_pipeline_get_bus(GST_PIPELINE(iPipelinePlay));
-    gst_bus_add_watch(iBusPlay, TMSVoIPDownlink::bus_call, NULL);
+    gst_bus_add_watch(iBusPlay, TMSIPDownlink::bus_call, NULL);
     gst_object_unref(iBusPlay);
 
     iMaxBufLen = ConfigureMedia(iCodecID);
@@ -160,10 +160,10 @@ gint TMSVoIPDownlink::gst_initialize_play()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::gst_play_raw
+// TMSIPDownlink::gst_play_raw
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::gst_play_raw()
+gint TMSIPDownlink::gst_play_raw()
     {
     TRACE_PRN_FN_ENT;
 
@@ -179,21 +179,21 @@ gint TMSVoIPDownlink::gst_play_raw()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::TMSVoIPDownlink
+// TMSIPDownlink::TMSIPDownlink
 // Standard Constructor
 // -----------------------------------------------------------------------------
 //
-TMSVoIPDownlink::TMSVoIPDownlink()
+TMSIPDownlink::TMSIPDownlink()
     {
     iSelfDn = this;
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::~TMSVoIPDownlink
+// TMSIPDownlink::~TMSIPDownlink
 // Standard Constructor
 // -----------------------------------------------------------------------------
 //
-TMSVoIPDownlink::~TMSVoIPDownlink()
+TMSIPDownlink::~TMSIPDownlink()
     {
     TRACE_PRN_FN_ENT;
 
@@ -216,14 +216,14 @@ TMSVoIPDownlink::~TMSVoIPDownlink()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::NewL
+// TMSIPDownlink::NewL
 // Symbian two-phase constructor
 // -----------------------------------------------------------------------------
 //
-TMSVoIPDownlink* TMSVoIPDownlink::NewL(const guint32 codecID,
+TMSIPDownlink* TMSIPDownlink::NewL(const guint32 codecID,
         const TMMFPrioritySettings priority)
     {
-    TMSVoIPDownlink* self = new (ELeave) TMSVoIPDownlink();
+    TMSIPDownlink* self = new (ELeave) TMSIPDownlink();
     CleanupStack::PushL(self);
     self->ConstructL(codecID, priority);
     CleanupStack::Pop(self);
@@ -231,11 +231,11 @@ TMSVoIPDownlink* TMSVoIPDownlink::NewL(const guint32 codecID,
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::ConstructL
+// TMSIPDownlink::ConstructL
 // Part two of Symbian two phase construction
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPDownlink::ConstructL(const guint32 codecID,
+void TMSIPDownlink::ConstructL(const guint32 codecID,
         const TMMFPrioritySettings priority)
     {
     TRACE_PRN_FN_ENT;
@@ -279,11 +279,11 @@ void TMSVoIPDownlink::ConstructL(const guint32 codecID,
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::Start
+// TMSIPDownlink::Start
 //
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPDownlink::Start()
+void TMSIPDownlink::Start()
     {
     TRACE_PRN_FN_ENT;
 
@@ -294,11 +294,11 @@ void TMSVoIPDownlink::Start()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::Stop
+// TMSIPDownlink::Stop
 //
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPDownlink::Stop()
+void TMSIPDownlink::Stop()
     {
     TRACE_PRN_FN_ENT;
 
@@ -322,10 +322,10 @@ void TMSVoIPDownlink::Stop()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::BufferToBeFilled
+// TMSIPDownlink::BufferToBeFilled
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPDownlink::BufferToBeFilled()
+void TMSIPDownlink::BufferToBeFilled()
     {
     TRACE_PRN_N1(_L("TMS->DNL->BTBF: requestBufLen[%d]"), requestBufLen);
 
@@ -366,11 +366,11 @@ void TMSVoIPDownlink::BufferToBeFilled()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::BufferFilled
+// TMSIPDownlink::BufferFilled
 //
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPDownlink::BufferFilled(const guint buflen)
+void TMSIPDownlink::BufferFilled(const guint buflen)
     {
 #ifndef __PLAY_WAV_FROM_FILE__
     gstDnlBuffer = gst_buffer_new();
@@ -418,22 +418,22 @@ void TMSVoIPDownlink::BufferFilled(const guint buflen)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::SetCodecCi
+// TMSIPDownlink::SetCodecCi
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::SetCodecCi()
+gint TMSIPDownlink::SetCodecCi()
     {
     TRAPD(err, SetCodecCiL());
     return err;
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::SetCodecCiL
+// TMSIPDownlink::SetCodecCiL
 //
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPDownlink::SetCodecCiL()
+void TMSIPDownlink::SetCodecCiL()
     {
     TRACE_PRN_FN_ENT;
 
@@ -489,11 +489,11 @@ void TMSVoIPDownlink::SetCodecCiL()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::SetVolume
+// TMSIPDownlink::SetVolume
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::SetVolume(const guint volume)
+gint TMSIPDownlink::SetVolume(const guint volume)
     {
     g_object_set(G_OBJECT(iSink), "volume", volume, NULL);
     TRACE_PRN_N1(_L("TMS->DNL: SetVolume [%d]"), volume);
@@ -501,11 +501,11 @@ gint TMSVoIPDownlink::SetVolume(const guint volume)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::GetVolume
+// TMSIPDownlink::GetVolume
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::GetVolume(guint& volume)
+gint TMSIPDownlink::GetVolume(guint& volume)
     {
     g_object_get(G_OBJECT(iSink), "volume", &volume, NULL);
     TRACE_PRN_N1(_L("TMS->DNL: GetVolume [%d]"), volume);
@@ -513,11 +513,11 @@ gint TMSVoIPDownlink::GetVolume(guint& volume)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::GetMaxVolume
+// TMSIPDownlink::GetMaxVolume
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::GetMaxVolume(guint& volume)
+gint TMSIPDownlink::GetMaxVolume(guint& volume)
     {
     g_object_get(G_OBJECT(iSink), "maxvolume", &volume, NULL);
     TRACE_PRN_N1(_L("TMS->DNL: MaxVolume [%d]"), volume);
@@ -525,11 +525,11 @@ gint TMSVoIPDownlink::GetMaxVolume(guint& volume)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::GetDataXferChunkHndl
+// TMSIPDownlink::GetDataXferChunkHndl
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::GetDataXferChunkHndl(const TUint32 key, RChunk& chunk)
+gint TMSIPDownlink::GetDataXferChunkHndl(const TUint32 key, RChunk& chunk)
     {
     gint status = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -553,11 +553,11 @@ gint TMSVoIPDownlink::GetDataXferChunkHndl(const TUint32 key, RChunk& chunk)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::SetIlbcCodecMode
+// TMSIPDownlink::SetIlbcCodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::SetIlbcCodecMode(gint mode)
+gint TMSIPDownlink::SetIlbcCodecMode(gint mode)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -585,11 +585,11 @@ gint TMSVoIPDownlink::SetIlbcCodecMode(gint mode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::GetIlbcCodecMode
+// TMSIPDownlink::GetIlbcCodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::GetIlbcCodecMode(gint& mode)
+gint TMSIPDownlink::GetIlbcCodecMode(gint& mode)
     {
     // not available through CIs -> return cashed value
     mode = iILBCDecodeMode;
@@ -598,11 +598,11 @@ gint TMSVoIPDownlink::GetIlbcCodecMode(gint& mode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::SetG711CodecMode
+// TMSIPDownlink::SetG711CodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::SetG711CodecMode(gint mode)
+gint TMSIPDownlink::SetG711CodecMode(gint mode)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -630,11 +630,11 @@ gint TMSVoIPDownlink::SetG711CodecMode(gint mode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::GetG711CodecMode
+// TMSIPDownlink::GetG711CodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::GetG711CodecMode(gint& mode)
+gint TMSIPDownlink::GetG711CodecMode(gint& mode)
     {
     // not available through CIs -> return cached value
     mode = iG711DecodeMode;
@@ -643,11 +643,11 @@ gint TMSVoIPDownlink::GetG711CodecMode(gint& mode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::FrameModeRqrdForEC
+// TMSIPDownlink::FrameModeRqrdForEC
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::FrameModeRqrdForEC(gboolean& frmodereq)
+gint TMSIPDownlink::FrameModeRqrdForEC(gboolean& frmodereq)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -665,11 +665,11 @@ gint TMSVoIPDownlink::FrameModeRqrdForEC(gboolean& frmodereq)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::SetFrameMode
+// TMSIPDownlink::SetFrameMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::SetFrameMode(const gboolean frmode)
+gint TMSIPDownlink::SetFrameMode(const gboolean frmode)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -689,11 +689,11 @@ gint TMSVoIPDownlink::SetFrameMode(const gboolean frmode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::GetFrameMode
+// TMSIPDownlink::GetFrameMode
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::GetFrameMode(gboolean& frmode)
+gint TMSIPDownlink::GetFrameMode(gboolean& frmode)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -710,11 +710,11 @@ gint TMSVoIPDownlink::GetFrameMode(gboolean& frmode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::ConcealErrorForNextBuffer
+// TMSIPDownlink::ConcealErrorForNextBuffer
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::ConcealErrorForNextBuffer()
+gint TMSIPDownlink::ConcealErrorForNextBuffer()
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -729,11 +729,11 @@ gint TMSVoIPDownlink::ConcealErrorForNextBuffer()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::SetCng
+// TMSIPDownlink::SetCng
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::SetCng(const TMSFormatType fmttype, const gboolean cng)
+gint TMSIPDownlink::SetCng(const TMSFormatType fmttype, const gboolean cng)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -756,11 +756,11 @@ gint TMSVoIPDownlink::SetCng(const TMSFormatType fmttype, const gboolean cng)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::GetCng
+// TMSIPDownlink::GetCng
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::GetCng(const TMSFormatType fmttype, gboolean& cng)
+gint TMSIPDownlink::GetCng(const TMSFormatType fmttype, gboolean& cng)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -783,11 +783,11 @@ gint TMSVoIPDownlink::GetCng(const TMSFormatType fmttype, gboolean& cng)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::SetPlc
+// TMSIPDownlink::SetPlc
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::SetPlc(const TMSFormatType fmttype, const gboolean plc)
+gint TMSIPDownlink::SetPlc(const TMSFormatType fmttype, const gboolean plc)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -806,11 +806,11 @@ gint TMSVoIPDownlink::SetPlc(const TMSFormatType fmttype, const gboolean plc)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::GetPlc
+// TMSIPDownlink::GetPlc
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::GetPlc(const TMSFormatType fmttype, gboolean& plc)
+gint TMSIPDownlink::GetPlc(const TMSFormatType fmttype, gboolean& plc)
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -827,11 +827,11 @@ gint TMSVoIPDownlink::GetPlc(const TMSFormatType fmttype, gboolean& plc)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::BadLsfNextBuffer
+// TMSIPDownlink::BadLsfNextBuffer
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSVoIPDownlink::BadLsfNextBuffer()
+gint TMSIPDownlink::BadLsfNextBuffer()
     {
     gint err = TMS_RESULT_DOES_NOT_EXIST;
 
@@ -849,10 +849,10 @@ gint TMSVoIPDownlink::BadLsfNextBuffer()
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::SetAudioDeviceL
+// TMSIPDownlink::SetAudioDeviceL
 //
 // -----------------------------------------------------------------------------
-void TMSVoIPDownlink::SetAudioDeviceL(TMSAudioOutput output)
+void TMSIPDownlink::SetAudioDeviceL(TMSAudioOutput output)
     {
     gint outputDev;
 
@@ -877,11 +877,11 @@ void TMSVoIPDownlink::SetAudioDeviceL(TMSAudioOutput output)
     }
 
 // -----------------------------------------------------------------------------
-// TMSVoIPDownlink::GetAudioDeviceL
+// TMSIPDownlink::GetAudioDeviceL
 //
 // -----------------------------------------------------------------------------
 //
-void TMSVoIPDownlink::GetAudioDeviceL(TMSAudioOutput& output)
+void TMSIPDownlink::GetAudioDeviceL(TMSAudioOutput& output)
     {
     TRACE_PRN_FN_ENT;
 

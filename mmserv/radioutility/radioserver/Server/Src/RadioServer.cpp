@@ -1901,6 +1901,7 @@ void CRadioServer::ProcessStop(
             {
             // Client has requested stop only if the requesting client is the only primary client.
             // There are other clients, so don't stop the audio in this case.
+            CompleteAsyncRequest(KErrNone);         //the request needs to be completed though 
             return;
             }
         iState = EStateTunerOn;

@@ -19,7 +19,6 @@
 #define GLOBALEFFECTSSETTINGS_H
 
 //  INCLUDES
-#include <e32base.h>
 #include <e32property.h>
 #include <sounddevice.h>
 #include <centralrepository.h>
@@ -27,18 +26,18 @@
 namespace TMS {
 
 // CLASS DECLARATION
-class GlobalEffectsSettings : public CBase
+class TMSGlobalEffectsSettings
     {
 public:
     /**
      * Two-phased constructor.
      */
-    static GlobalEffectsSettings* NewL();
+    static TMSGlobalEffectsSettings* NewL();
 
     /**
      * Destructor.
      */
-    virtual ~GlobalEffectsSettings();
+    virtual ~TMSGlobalEffectsSettings();
 
 public:
     /**
@@ -96,7 +95,7 @@ private:
     /**
      * C++ default constructor.
      */
-    GlobalEffectsSettings();
+    TMSGlobalEffectsSettings();
 
     /**
      * By default Symbian 2nd phase constructor is private.

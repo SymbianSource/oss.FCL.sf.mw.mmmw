@@ -31,6 +31,7 @@
 #include <TmsCall.h>
 #include <TmsStream.h>
 #include <TmsFormat.h>
+#include <TmsDtmf.h>
 #include <TmsClientSink.h>
 #include <TmsClientSource.h>
 #include <TmsClientSourceObsrvr.h>
@@ -331,6 +332,9 @@ private:
     TInt GetDownlinkVersion(CStifItemParser& aItem);
     TInt CreateUplinkStream(CStifItemParser& aItem);
     TInt GetUplinkVersion(CStifItemParser& aItem);
+    TInt CreateDTMFTonePlayer(CStifItemParser& aItem);
+    TInt DeleteDTMFTonePlayer(CStifItemParser& aItem);
+    TInt CreateRingTonePlayer(CStifItemParser& aItem);
     TInt GetSupportedFormats(CStifItemParser& aItem);
     TInt IsCallTypeSupported(CStifItemParser& aItem);
     //  TInt GetSupportedUplinkFormats( CStifItemParser& aItem );
@@ -347,6 +351,11 @@ private:
     TInt Close(CStifItemParser& aItem);
     TInt Gain(CStifItemParser& aItem);
     TInt Volume(CStifItemParser& aItem);
+
+    TInt InitDTMFTonePlayer(CStifItemParser& aItem);
+    TInt DTMFTonePlay(CStifItemParser& aItem);
+    TInt CloseDTMFPlayer(CStifItemParser& aItem);
+    TInt StopDTMFTonePlayer(CStifItemParser& aItem);
 
     TInt GetBufferType(CStifItemParser& aItem);
 
@@ -417,12 +426,13 @@ private:
     // reference to TestModuleIf
     CTestModuleIf& iTestModuleIf;
 
-    // Dn/Uplink
     TMSFactory* iFactory;
     TMSStream* iTmsDnlink;
     TMSCall* iTmsCall;
     TMSStream* iTmsUplink;
-    TMSAudioOutput device;
+    TMSDTMF* iDTMFTonePlayerDn;
+    TMSDTMF* iDTMFTonePlayerUp;
+    TMSAudioOutput iDevice;
 
     // Codec format APIs
     TMSBuffer* iTmsBuffer;

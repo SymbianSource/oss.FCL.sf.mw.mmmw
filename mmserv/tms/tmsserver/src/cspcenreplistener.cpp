@@ -23,16 +23,16 @@
 using namespace TMS;
 
 // -----------------------------------------------------------------------------
-// CSPCenRepListener::CSPCenRepListener
+// TMSCenRepListener::TMSCenRepListener
 // C++ default constructor can NOT contain any code, that
 // might leave.
 // -----------------------------------------------------------------------------
 //
-CSPCenRepListener* CSPCenRepListener::NewL(TUid aUid,
+TMSCenRepListener* TMSCenRepListener::NewL(TUid aUid,
         TUint32 aMonitorSetting, MCSPCenRepObserver* aObserver)
     {
     TRACE_PRN_FN_ENT;
-    CSPCenRepListener* self = new (ELeave) CSPCenRepListener(aUid,
+    TMSCenRepListener* self = new (ELeave) TMSCenRepListener(aUid,
             aMonitorSetting, aObserver);
     CleanupStack::PushL(self);
     self->ConstructL();
@@ -42,7 +42,7 @@ CSPCenRepListener* CSPCenRepListener::NewL(TUid aUid,
     }
 
 // Destructor
-CSPCenRepListener::~CSPCenRepListener()
+TMSCenRepListener::~TMSCenRepListener()
     {
     TRACE_PRN_FN_ENT;
     Cancel();
@@ -51,33 +51,34 @@ CSPCenRepListener::~CSPCenRepListener()
     }
 
 // -----------------------------------------------------------------------------
-// CSPCenRepListener::Get
+// TMSCenRepListener::Get
 // -----------------------------------------------------------------------------
 //
-TInt CSPCenRepListener::Get(TInt& aValue)
+gint TMSCenRepListener::Get(gint& aValue)
     {
     TRACE_PRN_FN_ENT;
+    gint status = iRepository->Get(iMonitorSetting, aValue);
     TRACE_PRN_FN_EXT;
-    return (iRepository->Get(iMonitorSetting, aValue));
-
+    return status;
     }
 
 // -----------------------------------------------------------------------------
-// CSPCenRepListener::Set
+// TMSCenRepListener::Set
 // -----------------------------------------------------------------------------
 //
-TInt CSPCenRepListener::Set(TInt aValue)
+gint TMSCenRepListener::Set(gint aValue)
     {
     TRACE_PRN_FN_ENT;
+    gint status = iRepository->Set(iMonitorSetting, aValue);
     TRACE_PRN_FN_EXT;
-    return (iRepository->Set(iMonitorSetting, aValue));
+    return status;
 
     }
 // -----------------------------------------------------------------------------
-// CSPCenRepListener::DoCancel
+// TMSCenRepListener::DoCancel
 // -----------------------------------------------------------------------------
 //
-void CSPCenRepListener::DoCancel()
+void TMSCenRepListener::DoCancel()
     {
     TRACE_PRN_FN_ENT;
     iRepository->NotifyCancel(iMonitorSetting);
@@ -85,10 +86,10 @@ void CSPCenRepListener::DoCancel()
     }
 
 // -----------------------------------------------------------------------------
-// CSPCenRepListener::RunError
+// TMSCenRepListener::RunError
 // -----------------------------------------------------------------------------
 //
-TInt CSPCenRepListener::RunError(
+gint TMSCenRepListener::RunError(
 #ifdef _DEBUG
         TInt aError // Log the leavecode from RunL
 #else
@@ -101,36 +102,37 @@ TInt CSPCenRepListener::RunError(
     TRACE_PRN_IF_ERR(aError);
 #endif
     TRACE_PRN_FN_EXT;
-    return ( KErrNone );
+    return KErrNone;
     }
 
 // -----------------------------------------------------------------------------
-// CSPCenRepListener::RunL
+// TMSCenRepListener::RunL
 // -----------------------------------------------------------------------------
 //
-void CSPCenRepListener::RunL()
+void TMSCenRepListener::RunL()
     {
     TRACE_PRN_FN_ENT;
     // Don't resubmit the request on error
     // Central repositry completes notifications with id of setting
     // so check only that value of iStatus is negative
-    User::LeaveIfError(iStatus.Int() < KErrNone);
-    SubmitNotifyRequestL();
+    if (iStatus.Int() == KErrNone)
+        {
+        SubmitNotifyRequestL();
+        }
 
-    TInt volume;
     // The loudspeaker volume has changed in repository.
     // Retrieve the current volume from repository.
-    User::LeaveIfError(Get(volume));
-
+    gint volume;
+    Get(volume);
     iObserver->HandleNotifyCenRepL(iUid, iMonitorSetting, volume);
     TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
-// CSPCenRepListener::CSPCenRepListener
+// TMSCenRepListener::TMSCenRepListener
 // -----------------------------------------------------------------------------
 //
-CSPCenRepListener::CSPCenRepListener(TUid aUid, TUint32 aMonitorSetting,
+TMSCenRepListener::TMSCenRepListener(TUid aUid, TUint32 aMonitorSetting,
         MCSPCenRepObserver* aObserver) :
     CActive(EPriorityStandard),
     iUid(aUid),
@@ -143,10 +145,10 @@ CSPCenRepListener::CSPCenRepListener(TUid aUid, TUint32 aMonitorSetting,
     }
 
 // -----------------------------------------------------------------------------
-// CSPCenRepListener::ConstructL
+// TMSCenRepListener::ConstructL
 // -----------------------------------------------------------------------------
 //
-void CSPCenRepListener::ConstructL()
+void TMSCenRepListener::ConstructL()
     {
     TRACE_PRN_FN_ENT;
     // Create repository instance
@@ -157,12 +159,13 @@ void CSPCenRepListener::ConstructL()
     }
 
 // -----------------------------------------------------------------------------
-// CSPCenRepListener::SubmitNotifyRequestL
+// TMSCenRepListener::SubmitNotifyRequestL
 // -----------------------------------------------------------------------------
 //
-void CSPCenRepListener::SubmitNotifyRequestL()
+void TMSCenRepListener::SubmitNotifyRequestL()
     {
     TRACE_PRN_FN_ENT;
+    iStatus = KRequestPending;
     iRepository->NotifyRequest(iMonitorSetting, iStatus);
     SetActive();
     TRACE_PRN_FN_EXT;

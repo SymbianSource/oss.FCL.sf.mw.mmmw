@@ -30,11 +30,11 @@
 using namespace TMS;
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::CallCSAdpt
+// TMSCallCSAdpt::TMSCallCSAdpt
 //
 // -----------------------------------------------------------------------------
 //
-CallCSAdpt::CallCSAdpt()
+TMSCallCSAdpt::TMSCallCSAdpt()
     {
     TRACE_PRN_FN_ENT;
 
@@ -46,11 +46,11 @@ CallCSAdpt::CallCSAdpt()
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::~CallCSAdpt
+// TMSCallCSAdpt::~TMSCallCSAdpt
 //
 // -----------------------------------------------------------------------------
 //
-CallCSAdpt::~CallCSAdpt()
+TMSCallCSAdpt::~TMSCallCSAdpt()
     {
     TRACE_PRN_FN_ENT;
     delete iCSDownlink;
@@ -72,11 +72,11 @@ CallCSAdpt::~CallCSAdpt()
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::PostConstruct
+// TMSCallCSAdpt::PostConstruct
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::PostConstruct()
+gint TMSCallCSAdpt::PostConstruct()
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -89,11 +89,11 @@ gint CallCSAdpt::PostConstruct()
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::CreateStream
+// TMSCallCSAdpt::CreateStream
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::CreateStream(TMSCallType /*callType*/,
+gint TMSCallCSAdpt::CreateStream(TMSCallType /*callType*/,
         TMSStreamType strmType, gint& outStrmId)
     {
     TRACE_PRN_FN_ENT;
@@ -133,11 +133,11 @@ gint CallCSAdpt::CreateStream(TMSCallType /*callType*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::InitStream
+// TMSCallCSAdpt::InitStream
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::InitStreamL(TMSCallType /*callType*/,
+gint TMSCallCSAdpt::InitStreamL(TMSCallType /*callType*/,
         TMSStreamType strmType, gint strmId, TMSFormatType /*frmtType*/,
         const RMessage2& aMessage)
     {
@@ -157,7 +157,7 @@ gint CallCSAdpt::InitStreamL(TMSCallType /*callType*/,
                     }
                 if (status == TMS_RESULT_SUCCESS)
                     {
-                    TRAP(status, iCSUplink = CSUplink::NewL(*this));
+                    TRAP(status, iCSUplink = TMSCSUplink::NewL(*this));
                     }
                 iStrmtype = TMS_STREAM_UPLINK;
                 }
@@ -177,14 +177,14 @@ gint CallCSAdpt::InitStreamL(TMSCallType /*callType*/,
                     }
                 if (status == TMS_RESULT_SUCCESS)
                     {
-                    TRAP(status, iCSDownlink = CSDownlink::NewL(*this));
+                    TRAP(status, iCSDownlink = TMSCSDownlink::NewL(*this));
                     if (status == TMS_RESULT_SUCCESS)
                         {
                         TRAP(status, iRouting =
                              CTelephonyAudioRouting::NewL(*this));
                         if (status == TMS_RESULT_SUCCESS)
                             {
-                            iTarSettings = TarSettings::NewL();
+                            iTarSettings = TMSTarSettings::NewL();
                             }
                         }
                     }
@@ -206,11 +206,11 @@ gint CallCSAdpt::InitStreamL(TMSCallType /*callType*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::StartStream
+// TMSCallCSAdpt::StartStream
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::StartStream(TMSCallType /*callType*/,
+gint TMSCallCSAdpt::StartStream(TMSCallType /*callType*/,
         TMSStreamType strmType, gint strmId)
     {
     TRACE_PRN_FN_ENT;
@@ -238,11 +238,11 @@ gint CallCSAdpt::StartStream(TMSCallType /*callType*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::PauseStream
+// TMSCallCSAdpt::PauseStream
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::PauseStream(TMSCallType /*callType*/,
+gint TMSCallCSAdpt::PauseStream(TMSCallType /*callType*/,
         TMSStreamType /*strmType*/, gint /*strmId*/)
     {
     TRACE_PRN_FN_ENT;
@@ -252,11 +252,11 @@ gint CallCSAdpt::PauseStream(TMSCallType /*callType*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::StopStream
+// TMSCallCSAdpt::StopStream
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::StopStream(TMSCallType /*callType*/, TMSStreamType strmType,
+gint TMSCallCSAdpt::StopStream(TMSCallType /*callType*/, TMSStreamType strmType,
         gint strmId)
     {
     TRACE_PRN_FN_ENT;
@@ -288,11 +288,11 @@ gint CallCSAdpt::StopStream(TMSCallType /*callType*/, TMSStreamType strmType,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::DeinitStream
+// TMSCallCSAdpt::DeinitStream
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::DeinitStream(TMSCallType /*callType*/,
+gint TMSCallCSAdpt::DeinitStream(TMSCallType /*callType*/,
         TMSStreamType strmType, gint strmId)
     {
     TRACE_PRN_FN_ENT;
@@ -326,11 +326,11 @@ gint CallCSAdpt::DeinitStream(TMSCallType /*callType*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::DeleteStream
+// TMSCallCSAdpt::DeleteStream
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::DeleteStream(TMSCallType /*callType*/,
+gint TMSCallCSAdpt::DeleteStream(TMSCallType /*callType*/,
         TMSStreamType strmType, gint strmId)
     {
     TRACE_PRN_FN_ENT;
@@ -360,11 +360,11 @@ gint CallCSAdpt::DeleteStream(TMSCallType /*callType*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::DataXferBufferEmptied
+// TMSCallCSAdpt::DataXferBufferEmptied
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::DataXferBufferEmptied(TMSCallType /*callType*/,
+gint TMSCallCSAdpt::DataXferBufferEmptied(TMSCallType /*callType*/,
         TMSStreamType /*strmType*/, gint /*strmId*/)
     {
     TRACE_PRN_FN_ENT;
@@ -374,11 +374,11 @@ gint CallCSAdpt::DataXferBufferEmptied(TMSCallType /*callType*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::DataXferBufferFilled
+// TMSCallCSAdpt::DataXferBufferFilled
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::DataXferBufferFilled(TMSCallType /*callType*/,
+gint TMSCallCSAdpt::DataXferBufferFilled(TMSCallType /*callType*/,
         TMSStreamType /*strmType*/, gint /*strmId*/, guint /*datasize*/)
     {
     TRACE_PRN_FN_ENT;
@@ -388,11 +388,11 @@ gint CallCSAdpt::DataXferBufferFilled(TMSCallType /*callType*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetDataXferBufferHndl
+// TMSCallCSAdpt::GetDataXferBufferHndl
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetDataXferBufferHndl(const TMSCallType /*callType*/,
+gint TMSCallCSAdpt::GetDataXferBufferHndl(const TMSCallType /*callType*/,
         const TMSStreamType /*strmType*/, const gint /*strmId*/,
         const guint32 /*key*/, RChunk& /*chunk*/)
     {
@@ -403,11 +403,11 @@ gint CallCSAdpt::GetDataXferBufferHndl(const TMSCallType /*callType*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetMaxVolume
+// TMSCallCSAdpt::GetMaxVolume
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetMaxVolume(guint& volume)
+gint TMSCallCSAdpt::GetMaxVolume(guint& volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -421,11 +421,11 @@ gint CallCSAdpt::GetMaxVolume(guint& volume)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetVolume
+// TMSCallCSAdpt::SetVolume
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetVolume(const guint volume)
+gint TMSCallCSAdpt::SetVolume(const guint volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -440,11 +440,11 @@ gint CallCSAdpt::SetVolume(const guint volume)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetVolume
+// TMSCallCSAdpt::GetVolume
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetVolume(guint& volume)
+gint TMSCallCSAdpt::GetVolume(guint& volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -459,11 +459,11 @@ gint CallCSAdpt::GetVolume(guint& volume)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetMaxGain
+// TMSCallCSAdpt::GetMaxGain
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetMaxGain(guint& gain)
+gint TMSCallCSAdpt::GetMaxGain(guint& gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -477,11 +477,11 @@ gint CallCSAdpt::GetMaxGain(guint& gain)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetGain
+// TMSCallCSAdpt::SetGain
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetGain(const guint gain)
+gint TMSCallCSAdpt::SetGain(const guint gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -496,11 +496,11 @@ gint CallCSAdpt::SetGain(const guint gain)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetGain
+// TMSCallCSAdpt::GetGain
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetGain(guint& gain)
+gint TMSCallCSAdpt::GetGain(guint& gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -514,11 +514,11 @@ gint CallCSAdpt::GetGain(guint& gain)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetGlobalMaxVolume
+// TMSCallCSAdpt::GetGlobalMaxVolume
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetGlobalMaxVolume(guint& volume)
+gint TMSCallCSAdpt::GetGlobalMaxVolume(guint& volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -532,11 +532,11 @@ gint CallCSAdpt::GetGlobalMaxVolume(guint& volume)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetGlobalVolume
+// TMSCallCSAdpt::SetGlobalVolume
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetGlobalVolume(const guint volume)
+gint TMSCallCSAdpt::SetGlobalVolume(const guint volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -552,11 +552,11 @@ gint CallCSAdpt::SetGlobalVolume(const guint volume)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetGlobalVolume
+// TMSCallCSAdpt::GetGlobalVolume
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetGlobalVolume(guint& volume)
+gint TMSCallCSAdpt::GetGlobalVolume(guint& volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -571,11 +571,11 @@ gint CallCSAdpt::GetGlobalVolume(guint& volume)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetMaxGain
+// TMSCallCSAdpt::GetMaxGain
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetGlobalMaxGain(guint& gain)
+gint TMSCallCSAdpt::GetGlobalMaxGain(guint& gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -589,11 +589,11 @@ gint CallCSAdpt::GetGlobalMaxGain(guint& gain)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetGain
+// TMSCallCSAdpt::SetGain
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetGlobalGain(const guint gain)
+gint TMSCallCSAdpt::SetGlobalGain(const guint gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -609,11 +609,11 @@ gint CallCSAdpt::SetGlobalGain(const guint gain)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetGlobalGain
+// TMSCallCSAdpt::GetGlobalGain
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetGlobalGain(guint& gain)
+gint TMSCallCSAdpt::GetGlobalGain(guint& gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_ILLEGAL_OPERATION);
@@ -627,11 +627,11 @@ gint CallCSAdpt::GetGlobalGain(guint& gain)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetCodecMode
+// TMSCallCSAdpt::GetCodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetCodecMode(const TMSFormatType /*fmttype*/,
+gint TMSCallCSAdpt::GetCodecMode(const TMSFormatType /*fmttype*/,
         const TMSStreamType /*strmtype*/, gint& /*mode*/)
     {
     TRACE_PRN_FN_ENT;
@@ -641,11 +641,11 @@ gint CallCSAdpt::GetCodecMode(const TMSFormatType /*fmttype*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetCodecMode
+// TMSCallCSAdpt::SetCodecMode
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetCodecMode(const TMSFormatType /*fmttype*/,
+gint TMSCallCSAdpt::SetCodecMode(const TMSFormatType /*fmttype*/,
         const TMSStreamType /*strmtype*/, const gint /*mode*/)
     {
     TRACE_PRN_FN_ENT;
@@ -655,11 +655,11 @@ gint CallCSAdpt::SetCodecMode(const TMSFormatType /*fmttype*/,
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetSupportedBitRatesCount
+// TMSCallCSAdpt::GetSupportedBitRatesCount
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetSupportedBitRatesCount(guint& /*count*/)
+gint TMSCallCSAdpt::GetSupportedBitRatesCount(guint& /*count*/)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_FEATURE_NOT_SUPPORTED);
@@ -668,11 +668,11 @@ gint CallCSAdpt::GetSupportedBitRatesCount(guint& /*count*/)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetSupportedBitRates
+// TMSCallCSAdpt::GetSupportedBitRates
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetSupportedBitRates(CBufFlat*& brbuffer)
+gint TMSCallCSAdpt::GetSupportedBitRates(CBufFlat*& brbuffer)
     {
     TRACE_PRN_FN_ENT;
     TRAPD(status, GetSupportedBitRatesL(brbuffer));
@@ -681,22 +681,22 @@ gint CallCSAdpt::GetSupportedBitRates(CBufFlat*& brbuffer)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetSupportedBitRatesL
+// TMSCallCSAdpt::GetSupportedBitRatesL
 //
 // GetSupportedBitRates implementation which can leave.
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::GetSupportedBitRatesL(CBufFlat*& /*brbuffer*/)
+void TMSCallCSAdpt::GetSupportedBitRatesL(CBufFlat*& /*brbuffer*/)
     {
     User::Leave(TMS_RESULT_FEATURE_NOT_SUPPORTED);
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetBitRate
+// TMSCallCSAdpt::GetBitRate
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetBitRate(guint& /*bitrate*/)
+gint TMSCallCSAdpt::GetBitRate(guint& /*bitrate*/)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_FEATURE_NOT_SUPPORTED);
@@ -705,11 +705,11 @@ gint CallCSAdpt::GetBitRate(guint& /*bitrate*/)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetBitRate
+// TMSCallCSAdpt::SetBitRate
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetBitRate(const guint /*bitrate*/)
+gint TMSCallCSAdpt::SetBitRate(const guint /*bitrate*/)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_FEATURE_NOT_SUPPORTED);
@@ -718,11 +718,11 @@ gint CallCSAdpt::SetBitRate(const guint /*bitrate*/)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetVAD
+// TMSCallCSAdpt::GetVAD
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetVAD(const TMSFormatType /*fmttype*/, gboolean& /*vad*/)
+gint TMSCallCSAdpt::GetVAD(const TMSFormatType /*fmttype*/, gboolean& /*vad*/)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_FEATURE_NOT_SUPPORTED);
@@ -731,11 +731,11 @@ gint CallCSAdpt::GetVAD(const TMSFormatType /*fmttype*/, gboolean& /*vad*/)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetVAD
+// TMSCallCSAdpt::SetVAD
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetVAD(const TMSFormatType /*fmttype*/, const gboolean /*vad*/)
+gint TMSCallCSAdpt::SetVAD(const TMSFormatType /*fmttype*/, const gboolean /*vad*/)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_FEATURE_NOT_SUPPORTED);
@@ -744,11 +744,11 @@ gint CallCSAdpt::SetVAD(const TMSFormatType /*fmttype*/, const gboolean /*vad*/)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetCNG
+// TMSCallCSAdpt::GetCNG
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetCNG(const TMSFormatType /*fmttype*/, gboolean& /*cng*/)
+gint TMSCallCSAdpt::GetCNG(const TMSFormatType /*fmttype*/, gboolean& /*cng*/)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_FEATURE_NOT_SUPPORTED);
@@ -757,11 +757,12 @@ gint CallCSAdpt::GetCNG(const TMSFormatType /*fmttype*/, gboolean& /*cng*/)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetCNG
+// TMSCallCSAdpt::SetCNG
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetCNG(const TMSFormatType /*fmttype*/, const gboolean /*cng*/)
+gint TMSCallCSAdpt::SetCNG(const TMSFormatType /*fmttype*/,
+        const gboolean /*cng*/)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_FEATURE_NOT_SUPPORTED);
@@ -770,11 +771,11 @@ gint CallCSAdpt::SetCNG(const TMSFormatType /*fmttype*/, const gboolean /*cng*/)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetPlc
+// TMSCallCSAdpt::GetPlc
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetPlc(const TMSFormatType /*fmttype*/, gboolean& /*plc*/)
+gint TMSCallCSAdpt::GetPlc(const TMSFormatType /*fmttype*/, gboolean& /*plc*/)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_FEATURE_NOT_SUPPORTED);
@@ -783,11 +784,12 @@ gint CallCSAdpt::GetPlc(const TMSFormatType /*fmttype*/, gboolean& /*plc*/)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetPlc
+// TMSCallCSAdpt::SetPlc
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetPlc(const TMSFormatType /*fmttype*/, const gboolean /*plc*/)
+gint TMSCallCSAdpt::SetPlc(const TMSFormatType /*fmttype*/,
+        const gboolean /*plc*/)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_FEATURE_NOT_SUPPORTED);
@@ -796,11 +798,11 @@ gint CallCSAdpt::SetPlc(const TMSFormatType /*fmttype*/, const gboolean /*plc*/)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetOutput
+// TMSCallCSAdpt::SetOutput
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::SetOutput(TMSAudioOutput output)
+gint TMSCallCSAdpt::SetOutput(TMSAudioOutput output)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
@@ -824,11 +826,11 @@ gint CallCSAdpt::SetOutput(TMSAudioOutput output)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetOutput
+// TMSCallCSAdpt::GetOutput
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetOutput(TMSAudioOutput& output)
+gint TMSCallCSAdpt::GetOutput(TMSAudioOutput& output)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
@@ -846,11 +848,11 @@ gint CallCSAdpt::GetOutput(TMSAudioOutput& output)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetPreviousOutput
+// TMSCallCSAdpt::GetPreviousOutput
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetPreviousOutput(TMSAudioOutput& output)
+gint TMSCallCSAdpt::GetPreviousOutput(TMSAudioOutput& output)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
@@ -867,11 +869,11 @@ gint CallCSAdpt::GetPreviousOutput(TMSAudioOutput& output)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::GetAvailableOutputsL
+// TMSCallCSAdpt::GetAvailableOutputsL
 //
 // -----------------------------------------------------------------------------
 //
-gint CallCSAdpt::GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer)
+gint TMSCallCSAdpt::GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
@@ -904,14 +906,14 @@ gint CallCSAdpt::GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer)
     }
 
 
-// From MCSPDevSoundObserver
+// From TMSCSPDevSoundObserver
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::DownlinkInitCompleted
+// TMSCallCSAdpt::DownlinkInitCompleted
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::DownlinkInitCompleted(TInt status)
+void TMSCallCSAdpt::DownlinkInitCompleted(TInt status)
     {
     TRACE_PRN_FN_ENT;
     NotifyClient(iDnlinkStreamId, ECmdDownlinkInitComplete, status, 0);
@@ -919,11 +921,11 @@ void CallCSAdpt::DownlinkInitCompleted(TInt status)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::UplinkInitCompleted
+// TMSCallCSAdpt::UplinkInitCompleted
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::UplinkInitCompleted(TInt status)
+void TMSCallCSAdpt::UplinkInitCompleted(TInt status)
     {
     TRACE_PRN_FN_ENT;
     NotifyClient(iUplinkStreamId, ECmdUplinkInitComplete, status, 0);
@@ -931,11 +933,11 @@ void CallCSAdpt::UplinkInitCompleted(TInt status)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::UplinkActivatedSuccessfully
+// TMSCallCSAdpt::UplinkActivatedSuccessfully
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::UplinkActivatedSuccessfully()
+void TMSCallCSAdpt::UplinkActivatedSuccessfully()
     {
     TRACE_PRN_FN_ENT;
     NotifyClient(iUplinkStreamId, ECmdUplinkStarted, KErrNone, 0);
@@ -943,11 +945,11 @@ void CallCSAdpt::UplinkActivatedSuccessfully()
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::DownlinkActivatedSuccessfully
+// TMSCallCSAdpt::DownlinkActivatedSuccessfully
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::DownlinkActivatedSuccessfully()
+void TMSCallCSAdpt::DownlinkActivatedSuccessfully()
     {
     TRACE_PRN_FN_ENT;
     NotifyClient(iDnlinkStreamId, ECmdDownlinkStarted, KErrNone, 0);
@@ -955,11 +957,11 @@ void CallCSAdpt::DownlinkActivatedSuccessfully()
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::UplinkActivationFailed
+// TMSCallCSAdpt::UplinkActivationFailed
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::UplinkActivationFailed()
+void TMSCallCSAdpt::UplinkActivationFailed()
     {
     TRACE_PRN_FN_ENT;
     NotifyClient(iUplinkStreamId, ECmdUplinkStarted, TMS_RESULT_FATAL_ERROR, 0);
@@ -967,11 +969,11 @@ void CallCSAdpt::UplinkActivationFailed()
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::DownlinkActivationFailed
+// TMSCallCSAdpt::DownlinkActivationFailed
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::DownlinkActivationFailed()
+void TMSCallCSAdpt::DownlinkActivationFailed()
     {
     TRACE_PRN_FN_ENT;
     NotifyClient(iDnlinkStreamId, ECmdDownlinkStarted,
@@ -980,11 +982,11 @@ void CallCSAdpt::DownlinkActivationFailed()
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::AvailableOutputsChanged
+// TMSCallCSAdpt::AvailableOutputsChanged
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::AvailableOutputsChanged(
+void TMSCallCSAdpt::AvailableOutputsChanged(
         CTelephonyAudioRouting& /*aTelephonyAudioRouting*/)
     {
     TRACE_PRN_FN_ENT;
@@ -995,11 +997,12 @@ void CallCSAdpt::AvailableOutputsChanged(
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::OutputChanged
+// TMSCallCSAdpt::OutputChanged
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::OutputChanged(CTelephonyAudioRouting& aTelephonyAudioRouting)
+void TMSCallCSAdpt::OutputChanged(
+        CTelephonyAudioRouting& aTelephonyAudioRouting)
     {
     TRACE_PRN_FN_ENT;
     TRoutingMsgBufPckg pckg;
@@ -1010,11 +1013,11 @@ void CallCSAdpt::OutputChanged(CTelephonyAudioRouting& aTelephonyAudioRouting)
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::SetOutputComplete
+// TMSCallCSAdpt::SetOutputComplete
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::SetOutputComplete(
+void TMSCallCSAdpt::SetOutputComplete(
         CTelephonyAudioRouting& aTelephonyAudioRouting, gint /*aError*/)
     {
     TRACE_PRN_FN_ENT;
@@ -1030,11 +1033,11 @@ void CallCSAdpt::SetOutputComplete(
     }
 
 // -----------------------------------------------------------------------------
-// CallCSAdpt::NotifyClient
+// TMSCallCSAdpt::NotifyClient
 //
 // -----------------------------------------------------------------------------
 //
-void CallCSAdpt::NotifyClient(const gint strmId, const gint aCommand,
+void TMSCallCSAdpt::NotifyClient(const gint strmId, const gint aCommand,
         const gint aStatus, const gint64 /*aInt64*/)
     {
     iMsgBuffer.iRequest = aCommand;

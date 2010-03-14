@@ -62,7 +62,6 @@ CQueueHandlerSrv::~CQueueHandlerSrv()
 //
 CQueueHandlerSrv::CQueueHandlerSrv(RMsgQueue<TVoIPMsgBuf>* aMsgQueue) :
     CActive(CActive::EPriorityStandard),
-    //  CActive(CActive::EPriorityHigh),
     iMsgQueue(aMsgQueue)
     {
     CActiveScheduler::Add(this);
@@ -77,6 +76,7 @@ void CQueueHandlerSrv::Start()
     {
     if (!IsActive())
         {
+        iStatus = KRequestPending;
         iMsgQueue->NotifyDataAvailable(iStatus);
         SetActive();
         }
@@ -118,7 +118,7 @@ void CQueueHandlerSrv::RunL()
 TInt CQueueHandlerSrv::RunError(TInt aError)
     {
     // RunL can actually leave if any iObserver->Event leave is not trapped
-    //    iObserver->Event(ECmdGeneralError, aError);
+    // iObserver->Event(ECmdGeneralError, aError);
     return aError;
     }
 

@@ -42,6 +42,7 @@ USERINCLUDE     ../inc
 USERINCLUDE     ../../inc
 
 MW_LAYER_SYSTEMINCLUDE
+APP_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE   /epoc32/include/mmf/server
 SYSTEMINCLUDE   /epoc32/include/mda/common
 SYSTEMINCLUDE   /epoc32/include/mmf/common

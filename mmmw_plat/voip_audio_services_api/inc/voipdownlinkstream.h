@@ -1,27 +1,25 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines VoIP downlink stream APIs.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines VoIP downlink stream APIs.
+ *
+ */
 
 #ifndef __VOIPDOWNLINKSTREAM_H
 #define __VOIPDOWNLINKSTREAM_H
 
 #include <voipaudiocommon.h>
 #include <voipdtmftoneplayer.h>
-
 
 // FORWARD DECLARATIONS
 class CVoIPAudioDownlinkStream;
@@ -35,14 +33,14 @@ class CVoIPFormatIntfc;
  *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class MVoIPDownlinkObserver
     {
 public:
-    static const TUint KOpenComplete       = 1;
-    static const TUint KDownlinkError      = 2;
-    static const TUint KDownlinkClosed     = 3;
+    static const TUint KOpenComplete = 1;
+    static const TUint KDownlinkError = 2;
+    static const TUint KDownlinkClosed = 3;
     static const TUint KAudioDeviceChanged = 4;
 
 public:
@@ -55,7 +53,7 @@ public:
      * @return void
      */
     virtual void FillBuffer(const CVoIPAudioDownlinkStream& aSrc,
-                            CVoIPDataBuffer* aBuffer) = 0;
+            CVoIPDataBuffer* aBuffer) = 0;
     /**
      * ?description
      *
@@ -65,11 +63,9 @@ public:
      * @param TInt - Status
      * @return void
      */
-    virtual void Event(const CVoIPAudioDownlinkStream& aSrc,
-                       TInt aEventType,
-                       TInt aError) = 0;
+    virtual void Event(const CVoIPAudioDownlinkStream& aSrc, TInt aEventType,
+            TInt aError) = 0;
     };
-
 
 /**
  *  CVoIPAudioDownlinkStream class
@@ -77,7 +73,7 @@ public:
  *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CVoIPAudioDownlinkStream
     {
@@ -85,7 +81,7 @@ public:
     /**
      *  TVoIPOutputDevice
      *  ?description
-     *  @since S60 v5.0
+ *
      */
     enum TVoIPOutputDevice
         {
@@ -158,7 +154,7 @@ public:
      * @return TInt
      */
     IMPORT_C TInt SetFormat(TVoIPCodecFormat aFormat,
-                            CVoIPFormatIntfc*& aIntfc);
+            CVoIPFormatIntfc*& aIntfc);
 
     /**
      * ?description
@@ -232,8 +228,8 @@ protected:
      * @param none
      * @return TInt
      */
-     void ConstructL(
-          CVoIPAudioDownlinkStreamImpl* aVoIPAudioDownlinkStreamImpl);
+    void ConstructL(
+            CVoIPAudioDownlinkStreamImpl* aVoIPAudioDownlinkStreamImpl);
 
 private:
     /**
@@ -248,6 +244,5 @@ private:
     };
 
 #endif //__VOIPDOWNLINKSTREAM_H
-
 
 // End of file

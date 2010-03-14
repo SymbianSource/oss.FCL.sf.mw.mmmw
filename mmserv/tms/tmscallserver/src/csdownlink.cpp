@@ -28,9 +28,9 @@ const gint KDefaultMaxVolume = 10;
 // Static constructor
 // -----------------------------------------------------------------------------
 //
-CSDownlink* CSDownlink::NewL(MCSPDevSoundObserver& aObserver)
+TMSCSDownlink* TMSCSDownlink::NewL(TMSCSPDevSoundObserver& aObserver)
     {
-    CSDownlink* self = new (ELeave) CSDownlink(aObserver);
+    TMSCSDownlink* self = new (ELeave) TMSCSDownlink(aObserver);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -41,7 +41,7 @@ CSDownlink* CSDownlink::NewL(MCSPDevSoundObserver& aObserver)
 // Destructor.
 // -----------------------------------------------------------------------------
 //
-CSDownlink::~CSDownlink()
+TMSCSDownlink::~TMSCSDownlink()
     {
     }
 
@@ -49,7 +49,7 @@ CSDownlink::~CSDownlink()
 // Sets volume
 // -----------------------------------------------------------------------------
 //
-void CSDownlink::SetVolume(gint aVolume)
+void TMSCSDownlink::SetVolume(gint aVolume)
     {
     if (iDevSound)
         {
@@ -64,7 +64,7 @@ void CSDownlink::SetVolume(gint aVolume)
 // Gives volume
 // -----------------------------------------------------------------------------
 //
-gint CSDownlink::Volume()
+gint TMSCSDownlink::Volume()
     {
     gint vol = 0;
     if (iDevSound)
@@ -78,7 +78,7 @@ gint CSDownlink::Volume()
 // Gives max volume
 // -----------------------------------------------------------------------------
 //
-gint CSDownlink::MaxVolume()
+gint TMSCSDownlink::MaxVolume()
     {
     gint vol = 0;
     if (iDevSound)
@@ -93,9 +93,9 @@ gint CSDownlink::MaxVolume()
 // Downlink stream has been activated successfully.
 // -----------------------------------------------------------------------------
 //
-void CSDownlink::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
+void TMSCSDownlink::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
     {
-    //CSPLOGSTRING( CSPINT, "CSDownlink:: activated" );
+    //CSPLOGSTRING( CSPINT, "TMSCSDownlink:: activated" );
     // We dont react to devsound messages unless we are activating.
     if (IsActivationOngoing())
         {
@@ -110,14 +110,14 @@ void CSDownlink::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
 // Downlink stream activation failed
 // -----------------------------------------------------------------------------
 //
-void CSDownlink::PlayError(TInt aError)
+void TMSCSDownlink::PlayError(TInt aError)
     {
-    //CSPLOGSTRING( CSPINT, "CSDownlink::PlayError" );
+    //CSPLOGSTRING( CSPINT, "TMSCSDownlink::PlayError" );
 
     // We dont react to devsound messages unless we are activating.
     if (IsActivationOngoing())
         {
-        //CSPLOGSTRING( CSPINT, "CSDownlink::PlayError activation failed" );
+        //CSPLOGSTRING( CSPINT, "TMSCSDownlink::PlayError activation failed" );
         if (aError == KErrAccessDenied)
             {
             iActivationOngoing = EFalse;
@@ -131,7 +131,7 @@ void CSDownlink::PlayError(TInt aError)
 // Tries to activate Downlink stream.
 // -----------------------------------------------------------------------------
 //
-void CSDownlink::DoActivateL()
+void TMSCSDownlink::DoActivateL()
     {
     if (iDevSound)
         {
@@ -143,8 +143,8 @@ void CSDownlink::DoActivateL()
 // Constructor
 // -----------------------------------------------------------------------------
 //
-CSDownlink::CSDownlink(MCSPDevSoundObserver& aObserver) :
-    CSPDevSound(aObserver)
+TMSCSDownlink::TMSCSDownlink(TMSCSPDevSoundObserver& aObserver) :
+    TMSCSPDevSound(aObserver)
     {
     }
 
@@ -152,9 +152,9 @@ CSDownlink::CSDownlink(MCSPDevSoundObserver& aObserver) :
 // Second phase constructor
 // -----------------------------------------------------------------------------
 //
-void CSDownlink::ConstructL()
+void TMSCSDownlink::ConstructL()
     {
-    CSPDevSound::ConstructL(EMMFStatePlaying, KAudioPrefCSCallDownlink,
+    TMSCSPDevSound::ConstructL(EMMFStatePlaying, KAudioPrefCSCallDownlink,
             KAudioPriorityCSCallDownlink);
 
     if (iDevSound)

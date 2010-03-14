@@ -28,21 +28,20 @@
 namespace TMS {
 
 // FORWARD DECLARATIONS
-class CSUplink;
-class CSDownlink;
-class TarSettings;
+class TMSCSUplink;
+class TMSCSDownlink;
+class TMSTarSettings;
 
 /*
  * CallCSAdapt class
  */
-class CallCSAdpt : public CBase,
-                   public CallAdpt,
-                   public MCSPDevSoundObserver,
-                   public MTelephonyAudioRoutingObserver
+class TMSCallCSAdpt : public TMSCallAdpt,
+                      public TMSCSPDevSoundObserver,
+                      public MTelephonyAudioRoutingObserver
     {
 public:
-    CallCSAdpt();
-    virtual ~CallCSAdpt();
+    TMSCallCSAdpt();
+    virtual ~TMSCallCSAdpt();
     virtual gint PostConstruct();
 
     virtual gint CreateStream(TMSCallType callType, TMSStreamType strmType,
@@ -102,7 +101,7 @@ public:
     void NotifyClient(const gint strmId, const gint aCommand,
             const gint aStatus = KErrNone, const gint64 aInt64 = TInt64(0));
 
-    //From MCSPDevSoundObserver
+    //From TMSCSPDevSoundObserver
     void DownlinkInitCompleted(TInt status);
     void UplinkInitCompleted(TInt status);
     void UplinkActivatedSuccessfully();
@@ -121,10 +120,10 @@ protected:
 private:
     gint iNextStreamId;
 
-    CSUplink* iCSUplink;
-    CSDownlink* iCSDownlink;
+    TMSCSUplink* iCSUplink;
+    TMSCSDownlink* iCSDownlink;
     CTelephonyAudioRouting* iRouting;
-    TarSettings* iTarSettings;
+    TMSTarSettings* iTarSettings;
     TMSStreamType iStrmtype;
 
     RMsgQueue<TmsMsgBuf> iMsgQueueUp;

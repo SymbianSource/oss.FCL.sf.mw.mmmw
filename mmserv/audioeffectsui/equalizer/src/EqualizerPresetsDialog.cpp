@@ -1018,6 +1018,13 @@ TKeyResponse CEqualizerPresetsDialog::OfferKeyEventL(
                 }
             return EKeyWasConsumed;
             }
+        else if ( aKeyEvent.iCode == EKeyEnter )
+            {
+            const TInt index = iListBox->CurrentItemIndex();
+            TPresetName preset = GetHighlightedPresetInListBox();
+            ActivateEqrPresetL(index, preset);
+            return EKeyWasConsumed;
+            }
         }
     return CAknDialog::OfferKeyEventL( aKeyEvent, aType ); 
     }

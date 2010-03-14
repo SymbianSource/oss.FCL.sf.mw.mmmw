@@ -1,30 +1,27 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines APIs for VoIP ring tone player.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines APIs for VoIP ring tone player.
+ *
+ */
 
 #ifndef __RINGTONEPLAYER_H
 #define __RINGTONEPLAYER_H
-
 
 // FORWARD DECLARATIONS
 class RFile;
 class CRingTonePlayer;
 class CRingTonePlayerImpl;
-
 
 /**
  *  MRingToneObserver class
@@ -32,12 +29,12 @@ class CRingTonePlayerImpl;
  *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class MRingToneObserver
     {
 public:
-    static const TUint KOpenComplete     = 1;
+    static const TUint KOpenComplete = 1;
     static const TUint KPlaybackComplete = 2;
 
 public:
@@ -50,11 +47,9 @@ public:
      * @param TInt - Status
      * @return void
      */
-    virtual void Event(const CRingTonePlayer& aSrc,
-                       TInt aEventType,
-                       TInt aError) = 0;
+    virtual void Event(const CRingTonePlayer& aSrc, TInt aEventType,
+            TInt aError) = 0;
     };
-
 
 /**
  *  CRingTonePlayer class
@@ -62,7 +57,7 @@ public:
  *  Ring Tone Player class
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CRingTonePlayer
     {
@@ -94,8 +89,7 @@ public:
      * @param TPtr
      * @return TInt
      */
-    IMPORT_C TInt Open(MRingToneObserver& aObserver,
-                       TPtr aFileName);
+    IMPORT_C TInt Open(MRingToneObserver& aObserver, TPtr aFileName);
 
     /**
      * ?description
@@ -105,8 +99,7 @@ public:
      * @param RFile&
      * @return TInt
      */
-    IMPORT_C TInt Open(MRingToneObserver& aObserver,
-                       RFile& aFileHandle);
+    IMPORT_C TInt Open(MRingToneObserver& aObserver, RFile& aFileHandle);
 
     /**
      * ?description
@@ -117,9 +110,8 @@ public:
      * @param TPtr8
      * @return TInt
      */
-    IMPORT_C TInt Open(MRingToneObserver& aObserver,
-                       TPtr8 aDesTone,
-                       TPtr8 aMimeType);
+    IMPORT_C TInt Open(MRingToneObserver& aObserver, TPtr8 aDesTone,
+            TPtr8 aMimeType);
 
     /**
      * ?description

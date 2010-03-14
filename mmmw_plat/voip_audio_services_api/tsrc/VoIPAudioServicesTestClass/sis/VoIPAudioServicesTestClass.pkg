@@ -11,7 +11,7 @@
 ;
 ; Contributors:
 ;
-; Description: voip audio service - Test App
+; Description: VoIP Audio Service - STIF Test
 ;
 
 ;languages
@@ -24,15 +24,14 @@
 %{"VoIPAudioServicesTestClass"}
 
 ;Unique Vendor name
-:"Vendor"
+:"Nokia"
 
 ;Files to install
 
-"\epoc32\release\armv5\urel\VoIPAudioServicesTestClass.dll"-"c:\Sys\Bin\VoIPAudioServicesTestClass.dll"
-"..\..\init\TestFramework.ini"-"c:\Testframework\TestFramework.ini"
-"..\..\conf\VoIPAudioServicesTestClass.cfg"-"c:\Testframework\VoIPAudioServicesTestClass.cfg"
+"/epoc32/release/armv5/urel/VoIPAudioServicesTestClass.dll"-"c:/Sys/Bin/VoIPAudioServicesTestClass.dll"
+;"../../init/TestFramework.ini"-"c:/Testframework/TestFramework.ini"
+"../../conf/VoIPAudioServicesTestClass.cfg"-"c:/Testframework/VoIPAudioServicesTestClass.cfg"
 
-
-"..\..\data\mmc\alarm 1.aac"-"e:\testing\data\alarm 1.aac"
-"..\..\data\mmc\alarm.aac"-"e:\testing\data\alarm.aac"
-"..\..\data\mmc\test_8khz.wav"-"e:\testing\data\test_8khz.wav"
+;"../../data/mmc/alarm 1.aac"-"e:/testing/data/alarm 1.aac"
+;"../../data/mmc/alarm.aac"-"e:/testing/data/alarm.aac"
+"../../data/mmc/test_8khz.wav"-"c:/testing/data/test_8khz.wav"

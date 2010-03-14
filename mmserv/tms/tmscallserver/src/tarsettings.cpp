@@ -27,21 +27,21 @@ _LIT_SECURITY_POLICY_PASS(KTMSServerReadPolicy);
 _LIT_SECURITY_POLICY_C1(KTMSServerWritePolicy, ECapabilityWriteUserData);
 
 // -----------------------------------------------------------------------------
-// TarSettings::TarSettings
+// TMSTarSettings::TMSTarSettings
 // C++ default constructor can NOT contain any code, that
 // might leave.
 // -----------------------------------------------------------------------------
 //
-TarSettings::TarSettings()
+TMSTarSettings::TMSTarSettings()
     {
     }
 
 // -----------------------------------------------------------------------------
-// TarSettings::ConstructL
+// TMSTarSettings::ConstructL
 // Symbian 2nd phase constructor can leave.
 // -----------------------------------------------------------------------------
 //
-void TarSettings::ConstructL()
+void TMSTarSettings::ConstructL()
     {
     TRACE_PRN_FN_ENT;
     TInt err = RProperty::Define(ERoutingPs, RProperty::EByteArray,
@@ -56,13 +56,13 @@ void TarSettings::ConstructL()
     }
 
 // -----------------------------------------------------------------------------
-// TarSettings::NewL
+// TMSTarSettings::NewL
 // Two-phased constructor.
 // -----------------------------------------------------------------------------
 //
-TarSettings* TarSettings::NewL()
+TMSTarSettings* TMSTarSettings::NewL()
     {
-    TarSettings* self = new (ELeave) TarSettings();
+    TMSTarSettings* self = new (ELeave) TMSTarSettings();
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -70,19 +70,19 @@ TarSettings* TarSettings::NewL()
     }
 
 // Destructor
-TarSettings::~TarSettings()
+TMSTarSettings::~TMSTarSettings()
     {
     TRACE_PRN_FN_ENT;
     TInt err = RProperty::Delete(KTMSPropertyCategory, ERoutingPs);
-    TRACE_PRN_N1(_L("TarSetting::~TarSettings err:%d"),err);
+    TRACE_PRN_N1(_L("TarSetting::~TMSTarSettings err:%d"),err);
     TRACE_PRN_FN_ENT;
     }
 
 // -----------------------------------------------------------------------------
-// TarSettings::SetVolume
+// TMSTarSettings::SetVolume
 // -----------------------------------------------------------------------------
 //
-void TarSettings::SetTar(TRoutingMsgBufPckg rountingpckg, TBool aPublish)
+void TMSTarSettings::SetTar(TRoutingMsgBufPckg rountingpckg, TBool aPublish)
     {
     TRACE_PRN_FN_ENT;
     //    TInt err(KErrNone);

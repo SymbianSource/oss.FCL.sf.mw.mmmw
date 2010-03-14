@@ -100,8 +100,7 @@ CSession2* TMSServer::NewSessionL(const TVersion& aVersion,
         }
 
     const TVersion version(KTMSServMajorVersionNumber,
-                           KTMSServMinorVersionNumber,
-                           KTMSServBuildVersionNumber);
+            KTMSServMinorVersionNumber, KTMSServBuildVersionNumber);
 
     if (!User::QueryVersionSupported(version, aVersion))
         {
@@ -126,7 +125,7 @@ void TMSServer::ConstructL()
     iShutdownTimer = TMSServerShutDown::NewL();
     StartL(KTMSServerName);
     RThread().SetPriority(EPriorityRealTime);
-    iEffectSettings = GlobalEffectsSettings::NewL();
+    iEffectSettings = TMSGlobalEffectsSettings::NewL();
     iTarHandler = NULL;
     iAudioCenRepHandler = NULL;
     iCurrentRouting = TMS_AUDIO_OUTPUT_NONE;
@@ -229,7 +228,7 @@ void TMSServer::GetNewTMSCallSessionHandleL(RHandleBase& aHandle)
     TInt i = 0;
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
         if (!callThread->IsActive())
             {
             iTMSCallServList.Remove(i);
@@ -258,9 +257,9 @@ TInt TMSServer::StartTMSCallServer(TMSCallProxyLocal& aHandle)
     TRACE_PRN_FN_ENT;
     TInt status = KErrNone;
 
-    CStartAndMonitorTMSCallThread* callServerThread = NULL;
-    TRAP(status, callServerThread =
-    CStartAndMonitorTMSCallThread::NewL(const_cast<TMSServer*>(this)));
+    TMSStartAndMonitorTMSCallThread* callServerThread = NULL;
+    TRAP(status, callServerThread =TMSStartAndMonitorTMSCallThread::NewL(
+            const_cast<TMSServer*>(this)));
     if (status != KErrNone)
         {
         delete callServerThread;
@@ -315,7 +314,7 @@ void TMSServer::StartRoutingNotifierL()
     {
     if (!iTarHandler)
         {
-        iTarHandler = CTarEventHandler::NewL((const_cast<TMSServer*> (this)));
+        iTarHandler = TMSTarEventHandler::NewL((const_cast<TMSServer*> (this)));
         }
     }
 
@@ -392,7 +391,7 @@ TInt TMSServer::GetOutput(const RMessage2& aMessage)
     TInt status(KErrNone);
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
@@ -425,7 +424,7 @@ TInt TMSServer::GetPreviousOutput(const RMessage2& aMessage)
     TInt status(KErrNone);
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
@@ -478,7 +477,7 @@ void TMSServer::GetAvailableOutputsL(const RMessage2& aMessage)
 
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
@@ -723,7 +722,7 @@ TInt TMSServer::SendMessageToCallServ(TInt func, TInt value)
     TInt i = 0;
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
@@ -758,7 +757,7 @@ TInt TMSServer::SendMessageToCallServ(TInt func, TIpcArgs args)
     TInt i = 0;
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
@@ -834,11 +833,11 @@ static void RunServerL()
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::CStartAndMonitorTMSCallThread
+// TMSStartAndMonitorTMSCallThread::TMSStartAndMonitorTMSCallThread
 // Perhaps we need to move this to a .cpp?
 // -----------------------------------------------------------------------------
 //
-CStartAndMonitorTMSCallThread::CStartAndMonitorTMSCallThread(
+TMSStartAndMonitorTMSCallThread::TMSStartAndMonitorTMSCallThread(
         TMSServer* aServer) :
     CActive(EPriorityStandard),
     iTMSServer(aServer)
@@ -849,11 +848,11 @@ CStartAndMonitorTMSCallThread::CStartAndMonitorTMSCallThread(
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::~CStartAndMonitorTMSCallThread
+// TMSStartAndMonitorTMSCallThread::~TMSStartAndMonitorTMSCallThread
 //
 // -----------------------------------------------------------------------------
 //
-CStartAndMonitorTMSCallThread::~CStartAndMonitorTMSCallThread()
+TMSStartAndMonitorTMSCallThread::~TMSStartAndMonitorTMSCallThread()
     {
     TRACE_PRN_FN_ENT;
     Cancel();
@@ -861,16 +860,16 @@ CStartAndMonitorTMSCallThread::~CStartAndMonitorTMSCallThread()
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::NewL
+// TMSStartAndMonitorTMSCallThread::NewL
 //
 // -----------------------------------------------------------------------------
 //
-CStartAndMonitorTMSCallThread* CStartAndMonitorTMSCallThread::NewL(
+TMSStartAndMonitorTMSCallThread* TMSStartAndMonitorTMSCallThread::NewL(
         TMSServer* aServer)
     {
     TRACE_PRN_FN_ENT;
-    CStartAndMonitorTMSCallThread* self =
-            new (ELeave) CStartAndMonitorTMSCallThread(aServer);
+    TMSStartAndMonitorTMSCallThread* self =
+            new (ELeave) TMSStartAndMonitorTMSCallThread(aServer);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -879,22 +878,23 @@ CStartAndMonitorTMSCallThread* CStartAndMonitorTMSCallThread::NewL(
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::ConstructL
+// TMSStartAndMonitorTMSCallThread::ConstructL
 //
 // -----------------------------------------------------------------------------
 //
-void CStartAndMonitorTMSCallThread::ConstructL()
+void TMSStartAndMonitorTMSCallThread::ConstructL()
     {
     TRACE_PRN_FN_ENT;
     TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::StartTMSCallServer
+// TMSStartAndMonitorTMSCallThread::StartTMSCallServer
 //
 // -----------------------------------------------------------------------------
 //
-TInt CStartAndMonitorTMSCallThread::StartTMSCallServer(TMSCallProxyLocal& aHndl)
+TInt TMSStartAndMonitorTMSCallThread::StartTMSCallServer(
+        TMSCallProxyLocal& aHndl)
     {
     TRACE_PRN_FN_ENT;
 
@@ -950,6 +950,7 @@ TInt CStartAndMonitorTMSCallThread::StartTMSCallServer(TMSCallProxyLocal& aHndl)
         return status;
         }
     aHndl.ShareProtected();
+    iStatus = KRequestPending;
     iServerThread.Logon(iStatus);
     SetActive();
 
@@ -958,28 +959,32 @@ TInt CStartAndMonitorTMSCallThread::StartTMSCallServer(TMSCallProxyLocal& aHndl)
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::RunL
+// TMSStartAndMonitorTMSCallThread::RunL
 // From CActive
 // -----------------------------------------------------------------------------
 //
-void CStartAndMonitorTMSCallThread::RunL()
+void TMSStartAndMonitorTMSCallThread::RunL()
     {
     TRACE_PRN_FN_ENT;
     iServerThread.Close();
-    //NOTE: This is causing a panic when closing down tms server.
+    //NOTE: This is causing a panic when closing down TMS server.
     //iCallSrvrHndl.Close();
     TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::DoCancel
+// TMSStartAndMonitorTMSCallThread::DoCancel
 // From CActive
 // -----------------------------------------------------------------------------
 //
-void CStartAndMonitorTMSCallThread::DoCancel()
+void TMSStartAndMonitorTMSCallThread::DoCancel()
     {
     TRACE_PRN_FN_ENT;
-    iServerThread.LogonCancel(iStatus);
+    if (iServerThread.Handle())
+        {
+        iServerThread.LogonCancel(iStatus);
+        User::WaitForRequest(iStatus);
+        }
     TRACE_PRN_FN_EXT;
     }
 

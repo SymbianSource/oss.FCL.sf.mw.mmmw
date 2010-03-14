@@ -163,7 +163,7 @@ void TMSGainEffectBodyImpl::SetProxy(TMSCallProxy* aProxy,
         gpointer queuehandler)
     {
     iProxy = aProxy;
-    ((CQueueHandler*) queuehandler)->AddObserver(*this, TMS_EFFECT_GAIN);
+    ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_EFFECT_GAIN);
     }
 
 void TMSGainEffectBodyImpl::QueueEvent(TInt aEventType, TInt aError,
