@@ -23,7 +23,7 @@
 
 #include <e32base.h>
 #include <StreamControl.h>
-#include <mcustominterface.h>
+#include <MCustomInterface.h>
 #include <mmf/common/mmfcontroller.h>
 #include "ClientUtility.h"
 #include <Events.h>

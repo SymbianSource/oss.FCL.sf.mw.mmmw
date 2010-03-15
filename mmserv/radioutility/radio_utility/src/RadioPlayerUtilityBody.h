@@ -21,7 +21,7 @@
 #define C_RADIOPLAYERUTILITYBODY_H
 
 #include <RadioPlayerUtility.h>
-#include <mcustominterface.h>
+#include <MCustomInterface.h>
 
 class RRadioSession;
 

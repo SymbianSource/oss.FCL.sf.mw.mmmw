@@ -18,7 +18,7 @@
 // INCLUDE FILES
 #include <ctsydomainpskeys.h>
 #include "debugtracemacros.h"
-#include "voipecalleventhandler.h"
+#include "VoIPECallEventHandler.h"
 
 // -----------------------------------------------------------------------------
 // CVoIPECallEventHandler::CVoIPECallEventHandler

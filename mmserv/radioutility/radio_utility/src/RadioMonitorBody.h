@@ -23,7 +23,7 @@
 
 #include <e32base.h>
 #include <e32property.h>
-#include <radiomonitor.h>
+#include <RadioMonitor.h>
 
 /**
  *  This class encapsulates the implementation body of CRadioMonitor interface.

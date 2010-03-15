@@ -26,7 +26,7 @@
 //  INCLUDES
 #include <mmf/common/mmfbase.h>
 #include <mmf/common/mmfcontrollerframework.h>
-#include <mcustomcommand.h>
+#include <MCustomCommand.h>
 
 #include "RadioServerData.h"
 

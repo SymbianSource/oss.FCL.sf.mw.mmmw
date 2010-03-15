@@ -20,14 +20,14 @@
 // INCLUDE FILES
 #include    <mmf/common/mmfstandardcustomcommands.h>
 #include    <centralrepository.h>
-#include    <coreapplicationuissdkcrkeys.h>
-#include    <audiopreference.h>
+#include    <CoreApplicationUIsSDKCRKeys.h>
+#include    <AudioPreference.h>
 
 #include    "RadioServer.h"
 #include    "RadioServerSession.h"
 #include    "RadioServerShutdown.h"
 #include    "RadioServerSettings.h"
-#include    "RadioServerFmTuner.h"
+#include    "RadioServerFMTuner.h"
 #include    "RadioDebug.h"
 
 // CONSTANTS

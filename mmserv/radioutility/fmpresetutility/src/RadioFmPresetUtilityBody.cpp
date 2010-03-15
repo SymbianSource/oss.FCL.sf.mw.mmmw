@@ -23,7 +23,7 @@
 #include "RadioFmPresetRadioSettings.h"
 #include "RadioFmPresetCentralRepositoryHandler.h"
 #include "RadioFmPresetCRKeys.h"
-#include <e32Property.h>
+#include <e32property.h>
 
 
 

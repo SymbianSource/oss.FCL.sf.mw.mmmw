@@ -31,7 +31,7 @@ PRJ_EXPORTS
 //
 //  Export stub sis file to eclipse files in the rom image
 //
-../data/vtne_stub.sis      /epoc32/data/z/system/install/vtne_stub.sis
+../data/vtne_stub.SIS     /epoc32/data/z/system/install/vtne_stub.sis
 
 #define HELIX_TNE_ENGINE 1
 

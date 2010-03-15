@@ -21,7 +21,7 @@
 
 #include <e32base.h>
 #include <ProgDLSource.h>
-#include <DownloadMgrClient.h>
+#include <downloadmgrclient.h>
 #include <mmfcontrollerframework.h>
 #include <MultimediaDataSource.h>
 

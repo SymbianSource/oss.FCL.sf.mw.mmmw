@@ -122,7 +122,7 @@ EXPORT_C void CAdvancedAudioDecoder::SetConfigL(
 
 	QueueThisBuffer(aIndex); // will set iNextBuffer (current buffer) and update iSharedBufferIndex (to next buffer)
 
-   	if(aSourceSampleRate != aSWConvertSampleRate)  // Sampling Rate Conversion is needed
+   	if(aSourceSampleRate != aSWConvertSampleRate && !IsHwAccelerated())  // Sampling Rate Conversion is needed
    		{
 	    if (!iChannelAndSampleRateConverterFactory)
 			{

@@ -32,7 +32,7 @@
 #endif // RD_TSP_CLIENT_MAPPER
 #include "RadioServerData.h"
 #include "RadioClientServer.h"
-#include "RadioServerFmTuner.h"
+#include "RadioServerFMTuner.h"
 
 // DATA TYPES
 struct TRadioMessageRequestData

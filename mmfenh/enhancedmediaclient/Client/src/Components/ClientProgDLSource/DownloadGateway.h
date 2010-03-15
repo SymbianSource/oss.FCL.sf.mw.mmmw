@@ -20,7 +20,7 @@
 #define DOWNLOADGATEWAY_H
 
 #include <e32base.h>
-#include <DownloadMgrClientApiExt.h>
+#include <downloadmgrclientapiext.h>
 #include <ProgDLSource.h>
 
 namespace multimedia

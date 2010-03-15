@@ -21,7 +21,7 @@
 //  INCLUDES
 #include <e32base.h>
 #include <e32property.h>
-#include "voipserver.h"
+#include "VoIPServer.h"
 
 // CLASS DECLARATION
 class CVoIPECallEventHandler : public CActive

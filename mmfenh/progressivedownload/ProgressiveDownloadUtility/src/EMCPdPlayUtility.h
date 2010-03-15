@@ -32,7 +32,7 @@
 
 #include <mmf/common/mmcaf.h>
 
-#include <DownloadMgrClient.h>
+#include <downloadmgrclient.h>
 #include "MAudioPdPlayUtility.h"
 #include "MProgressiveDownloadUtility.h"
 
