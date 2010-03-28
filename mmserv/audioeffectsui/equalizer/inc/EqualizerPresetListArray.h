@@ -70,8 +70,7 @@ NONSHARABLE_CLASS(CEqualizerPresetListArray) : public CBase,
 		/** 
          * Returns the currently actibe preset
          */        
-		void CEqualizerPresetListArray::GetCurrentActivePreset(TPresetName&
-                                       aActivePreset);
+		void GetCurrentActivePreset(TPresetName& aActivePreset);
 		/** 
          * Updates the sorted array with the changed user-defined presets
          */
@@ -108,7 +107,7 @@ NONSHARABLE_CLASS(CEqualizerPresetListArray) : public CBase,
         * @since 3.0
         * @returns Length of the prefix
         */
-        TInt CEqualizerPresetListArray::GetPrefixLength();
+        TInt GetPrefixLength();
         
     public: // Functions from base classes
 
