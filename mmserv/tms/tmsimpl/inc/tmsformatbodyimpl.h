@@ -32,7 +32,7 @@ class TMSCallProxy;
 class TMSFormatBodyImpl : public TMSFormatBody
     {
 public:
-    ~TMSFormatBodyImpl();
+    virtual ~TMSFormatBodyImpl();
 
     gint GetSupportedBitRates(BitRateVector& aVector);
     gint SetBitRate(const guint aBitrate);

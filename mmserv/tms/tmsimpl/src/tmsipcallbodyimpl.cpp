@@ -125,7 +125,7 @@ gint TMSIPCallBodyImpl::CreateStream(TMSStreamType type, TMSStream*& strm)
             if (ret == TMS_RESULT_SUCCESS)
                 {
                 ret = AddStreamToList(strm);
-                }           
+                }
             //TODO:Need longer term fix to not destory everything
             //if more the one stream is trying to be created.
             else if (ret == TMS_RESULT_ALREADY_EXIST)
@@ -194,10 +194,9 @@ gint TMSIPCallBodyImpl::RemStreamFromList(TMSStream*& strm)
     if (itStrm)
         {
         iStreamsVector.erase(itStrm); // Remove from array
-        // Don't delete itStrm as it is now pointing to the next item on the list
-        delete strm; // Free memory
-        strm = NULL;
-        ret = TMS_RESULT_SUCCESS;
+        // Don't delete itStrm as the iterator advanced to the next 
+        // item on the list
+        ret = TMSStreamImpl::Delete(strm);
         }
     TRACE_PRN_FN_EXT;
     return ret;

@@ -26,7 +26,7 @@
 using namespace TMS;
 
 // CONSTANTS
-const TUint KServerConnectRetries = 2;
+const TUint KTMSServerConnectRetries = 2;
 const TUint KSessionMessageSlots = 10;
 
 // -----------------------------------------------------------------------------
@@ -76,10 +76,7 @@ static gint StartServer()
 //
 EXPORT_C TMSProxy::TMSProxy()
     {
-    iEffectsObsrvrList.Reset();
-    iEffectsParentList.Reset();
-    iRoutingObsrvrList.Reset();
-    iRoutingParentList.Reset();
+    ResetObjectLists();
     iMsgQHandler = NULL;
     }
 
@@ -89,10 +86,7 @@ EXPORT_C TMSProxy::TMSProxy()
 //
 EXPORT_C TMSProxy::~TMSProxy()
     {
-    iEffectsObsrvrList.Reset();
-    iEffectsParentList.Reset();
-    iRoutingObsrvrList.Reset();
-    iRoutingParentList.Reset();
+    ResetObjectLists();
 
     if (iMsgQHandler)
         {
@@ -118,7 +112,7 @@ EXPORT_C gint TMSProxy::Connect()
     {
     TRACE_PRN_FN_ENT;
 
-    gint retry = KServerConnectRetries;
+    gint retry = KTMSServerConnectRetries;
     gint err(TMS_RESULT_GENERAL_ERROR);
     gint numMessageSlots = KSessionMessageSlots;
 
@@ -471,7 +465,8 @@ EXPORT_C gint TMSProxy::RemoveMsgQueueNotifier(TMSMsgQueueNotifierType type,
             status = RemoveGlobalEffectObserver((*(TMSEffectObserver*) obsrv));
             break;
         case EMsgQueueGlobalRoutingType:
-            status = RemoveRoutingObserver((*(TMSGlobalRoutingObserver*) obsrv));
+            status = RemoveRoutingObserver((*(TMSGlobalRoutingObserver*)
+                    obsrv));
             break;
         default:
             status = TMS_RESULT_INVALID_ARGUMENT;
@@ -512,7 +507,6 @@ gint TMSProxy::AddGlobalEffectObserver(TMSEffectObserver& obsrv,
         {
         status = iEffectsObsrvrList.Append(&obsrv);
         status = iEffectsParentList.Append(&parent);
-        //status = iClientList.Append(clientid);
         }
     else
         {
@@ -529,7 +523,6 @@ gint TMSProxy::RemoveGlobalEffectObserver(TMSEffectObserver& obsrv)
         {
         iEffectsObsrvrList.Remove(index);
         iEffectsParentList.Remove(index);
-        //iClientList.Remove(index);
         }
     else
         {
@@ -546,7 +539,6 @@ gint TMSProxy::AddRoutingObserver(TMSGlobalRoutingObserver& obsrv,
         {
         status = iRoutingObsrvrList.Append(&obsrv);
         status = iRoutingParentList.Append(&parent);
-        //status = iClientList.Append(clientid);
         }
     else
         {
@@ -563,7 +555,6 @@ gint TMSProxy::RemoveRoutingObserver(TMSGlobalRoutingObserver& obsrv)
         {
         iRoutingObsrvrList.Remove(index);
         iRoutingParentList.Remove(index);
-        //iClientList.Remove(index);
         }
     else
         {
@@ -661,6 +652,19 @@ void TMSProxy::QueueEvent(gint aEventType, gint aError, void* user_data)
         default:
             break;
         }
+    }
+
+// ---------------------------------------------------------------------------
+// TMSProxy::ResetObjectLists
+// ---------------------------------------------------------------------------
+//
+void TMSProxy::ResetObjectLists()
+    {
+    iEffectsObsrvrList.Reset();
+    iRoutingObsrvrList.Reset();
+
+    iEffectsParentList.Reset();
+    iRoutingParentList.Reset();
     }
 
 // End of file

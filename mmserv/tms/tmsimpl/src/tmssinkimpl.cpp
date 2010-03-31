@@ -15,14 +15,25 @@
  *
  */
 
-#include <tms.h>
-#include "tmsclientsinkimpl.h"
 #include "tmsutility.h"
-#include "tmssinkimpl.h"
+#include "tmsclientsinkimpl.h"
 #include "tmsmodemsinkimpl.h"
 #include "tmsspeakersinkimpl.h"
+#include "tmssinkimpl.h"
 
 using namespace TMS;
+
+TMSSinkImpl::TMSSinkImpl()
+    {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
+    }
+
+TMSSinkImpl::~TMSSinkImpl()
+    {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
+    }
 
 EXPORT_C gint TMSSinkImpl::Create(TMSSinkType sinktype, TMSSink*& tmssink)
     {

@@ -30,7 +30,7 @@ class TMSCallProxy;
 class TMSSpeakerSinkImpl : public TMSSpeakerSink
     {
 public:
-    ~TMSSpeakerSinkImpl();
+    virtual ~TMSSpeakerSinkImpl();
     static gint Create(TMSSink*& tmssink);
     gint SetProxy(TMSCallProxy* aProxy, gpointer queuehandler);
 

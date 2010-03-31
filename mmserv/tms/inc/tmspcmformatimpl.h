@@ -23,15 +23,11 @@
 
 namespace TMS {
 
-// FORWARD DECLARATIONS
-class TMSCallProxy;
-
 // TMSPCMFormatImpl class
 class TMSPCMFormatImpl : public TMSPCMFormat
     {
 public:
-
-    ~TMSPCMFormatImpl();
+    virtual ~TMSPCMFormatImpl();
     static gint Create(TMSFormat*& tmsfmt);
     gint SetProxy(TMSGlobalContext* context, gpointer queuehandler);
 

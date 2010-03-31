@@ -30,9 +30,10 @@ class TMSCallProxy;
 class TMSStreamImpl : public TMSStream
     {
 public:
-    ~TMSStreamImpl();
+    virtual ~TMSStreamImpl();
     static gint Create(TMSCallType callType, TMSStreamType ctype,
             TMSCallProxy* proxy, TMSStream*& tmsstream);
+    static gint Delete(TMSStream*& tmsrt);
 
 private:
     TMSStreamImpl();

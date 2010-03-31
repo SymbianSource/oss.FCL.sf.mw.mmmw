@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef CSPCENREPLISTENER_H
-#define CSPCENREPLISTENER_H
+#ifndef TMSCENREPLISTENER_H
+#define TMSCENREPLISTENER_H
 
 // INCLUDE FILES
 #include <glib.h>
@@ -26,7 +26,7 @@
 namespace TMS {
 
 // Forward declarations
-class MCSPCenRepObserver;
+class TMSCenRepObserver;
 
 /**
  *   TMSCenRepListener manages getting notification on CenRep key changes.
@@ -44,7 +44,7 @@ public:
      * @return instance of the class
      */
     static TMSCenRepListener* NewL(TUid aUid, TUint32 aKey,
-            MCSPCenRepObserver* aObserver);
+            TMSCenRepObserver* aObserver);
 
     /**
      * Destructor.
@@ -76,7 +76,7 @@ private:
      * @param aKey key to be listened
      * @param aObserver observer for key change.
      */
-    TMSCenRepListener(TUid aUid, TUint32 aKey, MCSPCenRepObserver* aObserver);
+    TMSCenRepListener(TUid aUid, TUint32 aKey, TMSCenRepObserver* aObserver);
 
     /**
      * Private constructing.
@@ -107,9 +107,9 @@ private:
      */
     TUint32 iMonitorSetting;
 
-    MCSPCenRepObserver* iObserver;
+    TMSCenRepObserver* iObserver;
     };
 
 } //namespace TMS
 
-#endif // CSPCENREPLISTENER_H
+#endif // TMSCENREPLISTENER_H

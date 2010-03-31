@@ -684,6 +684,7 @@ EXPORT_C void CAdvancedAudioPlayController::HandlePreemptionEvent(TInt aError)
     TRAP(err, DoPauseL(ETrue)); // this is a preemption pause
 	// In case of pre-emption we should only Pause ... but not Stop.
     SendEventToClient(TMMFEvent(KMMFEventCategoryPlaybackComplete, aError));
+    SendEventToClient(TMMFEvent(KStreamControlEventStateChangedPaused, aError));
     }
 
 // -----------------------------------------------------------------------------
@@ -1654,7 +1655,7 @@ EXPORT_C TTimeIntervalMicroSeconds CAdvancedAudioPlayController::PositionL() con
 
 	TTimeIntervalMicroSeconds positionMicroSeconds(0);
 
-    if (iState == EPlaying)
+    if (iState == EPlaying || iState == EAutoPaused)
     	{
     	DP1 (_L("CAdvancedAudioPlayController::PositionL iTimePositionInMicroSecs [%d] msec"), iTimePositionInMicroSecs);
         // adjust the position here since devsound returns the incremented postion value during loopplay

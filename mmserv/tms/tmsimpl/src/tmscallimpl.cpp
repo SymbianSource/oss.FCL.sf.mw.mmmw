@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmsipcallbodyimpl.h"
 #include "tmscscallbodyimpl.h"
@@ -63,7 +62,6 @@ gint TMSCallImpl::PostConstruct(TMSCallType ctype, guint /*ctxid*/)
     return ret;
     }
 
-// TO DO stop exporting this function
 EXPORT_C gint TMSCallImpl::Create(TMSCallType ctype, TMSCall*& tmscall,
         guint ctxid)
     {
@@ -85,4 +83,13 @@ EXPORT_C gint TMSCallImpl::Create(TMSCallType ctype, TMSCall*& tmscall,
     return ret;
     }
 
-// End of file
+EXPORT_C gint TMSCallImpl::Delete(TMSCall*& tmscall)
+    {
+    TRACE_PRN_FN_ENT;
+    gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
+    delete (TMSCallImpl*) (tmscall);
+    tmscall = NULL;
+    TRACE_PRN_FN_EXT;    
+    return ret;
+    }
+

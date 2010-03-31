@@ -99,7 +99,7 @@ void TMSServerSession::ServiceL(const RMessage2& aMessage)
     {
     TRAPD(err, DispatchMessageL(aMessage));
 
-    if (err != KErrNone)
+    if (err != TMS_RESULT_SUCCESS)
         {
         aMessage.Complete(err);
         }
@@ -143,19 +143,19 @@ void TMSServerSession::DispatchMessageL(const RMessage2& aMessage)
             break;
         case ETMSStartRoutingNotifier:
             iServer.StartRoutingNotifierL();
-            aMessage.Complete(KErrNone);
+            aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
         case ETMSCancelRoutingNotifier:
             iServer.CancelRoutingNotifier();
-            aMessage.Complete(KErrNone);
+            aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
         case ETMSStartGlobalEffectNotifier:
             iServer.StartCenRepHandlerL();
-            aMessage.Complete(KErrNone);
+            aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
         case ETMSCancelGlobalEffectNotifier:
             iServer.CancelCenRepHandler();
-            aMessage.Complete(KErrNone);
+            aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
         case ETMSSetMsgQueueHandle:
             SetMessageQueueHandleL(aMessage);
@@ -192,16 +192,16 @@ void TMSServerSession::DispatchMessageL(const RMessage2& aMessage)
 //
 void TMSServerSession::SetMessageQueueHandleL(const RMessage2& aMessage)
     {
-    gint status = KErrNone;
+    gint status = TMS_RESULT_SUCCESS;
     if (iMsgQueue.Handle() <= 0)
         {
         status = iMsgQueue.Open(aMessage, 0);
         }
-    if (status != KErrNone)
+    if (status != TMS_RESULT_SUCCESS)
         {
         User::Leave(KErrArgument);
         }
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
@@ -212,7 +212,7 @@ void TMSServerSession::SetVolLevel(const RMessage2& aMessage)
     {
     TInt level = aMessage.Int0();
     iServer.SetLevel(this, TRUE, level);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
@@ -223,7 +223,7 @@ void TMSServerSession::SetMicGain(const RMessage2& aMessage)
     {
     TInt gain = aMessage.Int0();
     iServer.SetGain(this, gain);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
@@ -233,10 +233,8 @@ void TMSServerSession::SetMicGain(const RMessage2& aMessage)
 void TMSServerSession::HandleGlobalEffectChange(TInt globalevent)
     {
     TRACE_PRN_FN_ENT;
-    iMsgBuffer.iRequest = ECmdGlobalEffectChange;
-    iMsgBuffer.iStatus = KErrNone;
     iMsgBuffer.iInt = globalevent;
-    NotifyClient();
+    NotifyClient(ECmdGlobalEffectChange);
     TRACE_PRN_FN_EXT;
     }
 
@@ -247,11 +245,9 @@ void TMSServerSession::HandleGlobalEffectChange(TInt globalevent)
 void TMSServerSession::HandleRoutingChange(TRoutingMsgBufPckg routinginfo)
     {
     TRACE_PRN_FN_ENT;
-    iMsgBuffer.iRequest = ECmdGlobalRoutingChange;
-    iMsgBuffer.iStatus = KErrNone;
     iMsgBuffer.iInt = routinginfo().iEvent;
     iMsgBuffer.iUint = routinginfo().iOutput;
-    NotifyClient();
+    NotifyClient(ECmdGlobalRoutingChange);
     TRACE_PRN_FN_EXT;
     }
 
@@ -280,7 +276,7 @@ void TMSServerSession::GetTMSCallSessionHandleL(const RMessage2& aMessage)
 void TMSServerSession::GetCodecsCountL(const RMessage2& aMessage,
         TMSStreamType strmType)
     {
-    TInt err = KErrNone;
+    TInt err = TMS_RESULT_SUCCESS;
     TInt codecsCount = 0;
 
     RArray<TFourCC>* codecs;
@@ -332,7 +328,7 @@ void TMSServerSession::GetCodecsCountL(const RMessage2& aMessage,
 #endif //__WINSCW__
     p().iStatus = err;
     aMessage.WriteL(0, p);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
@@ -366,7 +362,7 @@ void TMSServerSession::GetSupportedCodecsL(const RMessage2& aMessage,
     aMessage.WriteL(0, dataCopyBuffer->Ptr(0));
     CleanupStack::PopAndDestroy(&stream);
     CleanupStack::PopAndDestroy(dataCopyBuffer);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
 
     TRACE_PRN_FN_EXT;
     }
@@ -379,15 +375,17 @@ void TMSServerSession::SetOutput(const RMessage2& aMessage)
     {
     TInt output = aMessage.Int0();
     iServer.SetOutput(this, output);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
 // TMSServerSession::NotifyClient
 // -----------------------------------------------------------------------------
 //
-void TMSServerSession::NotifyClient()
+void TMSServerSession::NotifyClient(const TInt aCommand, const TInt aStatus)
     {
+    iMsgBuffer.iRequest = aCommand;
+    iMsgBuffer.iStatus = aStatus;
     if (iMsgQueue.Handle() > 0)
         {
         iMsgQueue.Send(iMsgBuffer);

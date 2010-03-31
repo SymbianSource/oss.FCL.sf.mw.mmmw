@@ -65,8 +65,7 @@ RESOURCE CBA r_equalizer_softkeys_options_back__contextoptions
 
 RESOURCE EIK_APP_INFO
     {
-    menubar=r_equalizer_container_menubar;
-    cba=R_AVKON_SOFTKEYS_OPTIONS_BACK;     
+    cba=R_AVKON_SOFTKEYS_BACK;
     }
 
 //----------------------------------------------------
@@ -190,7 +189,7 @@ RESOURCE DIALOG r_equalizer_dialog
     flags = EEikDialogFlagNoDrag | EEikDialogFlagCbaButtons |
               EEikDialogFlagWait| EEikDialogFlagFillAppClientRect | EEikDialogFlagNotifyEsc; 
     title = qtn_eq_title_equalizer;
-    buttons = r_equalizer_softkeys_options_back__select;
+    buttons = R_AVKON_SOFTKEYS_BACK; 
 
     items =
         {

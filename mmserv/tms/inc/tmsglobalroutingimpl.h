@@ -23,25 +23,21 @@
 
 namespace TMS {
 
-// FORWARD DECLARATIONS
-class TMSProxy;
-
 // TMSGlobalRoutingImpl class
 class TMSGlobalRoutingImpl : public TMSGlobalRouting
     {
 public:
-    ~TMSGlobalRoutingImpl();
-
+    virtual ~TMSGlobalRoutingImpl();
     IMPORT_C static gint Create(TMSGlobalRouting*& globrouting);
     IMPORT_C static gint Delete(TMSGlobalRouting*& globrouting);
 
 private:
     TMSGlobalRoutingImpl();
     gint PostConstruct();
+    gint SetParent(TMSGlobalRouting*& parent);
     };
 
 } //namespace TMS
 
 #endif // TMS_GLOBAL_ROUTING_IMPL_H
 
-// End of file

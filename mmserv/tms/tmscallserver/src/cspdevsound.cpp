@@ -77,8 +77,7 @@ void TMSCSPDevSound::Activate()
     if (!IsActive() && !IsActivationOngoing())
         {
         iActivationOngoing = ETrue;
-        gint err = KErrNone;
-        TRAP(err, DoActivateL());
+        TRAP_IGNORE(DoActivateL());
         }
     }
 

@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmspcmbodyimpl.h"
 #include "tmspcmformatimpl.h"
@@ -24,10 +23,14 @@ using namespace TMS;
 
 TMSPCMFormatImpl::TMSPCMFormatImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 TMSPCMFormatImpl::~TMSPCMFormatImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSPCMFormatImpl::PostConstruct()

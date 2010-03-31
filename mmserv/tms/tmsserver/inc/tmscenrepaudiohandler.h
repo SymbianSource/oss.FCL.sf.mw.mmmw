@@ -15,25 +15,24 @@
  *
  */
 
-#ifndef CSPAUDIOHANDLER_H
-#define CSPAUDIOHANDLER_H
+#ifndef TMSCENREPAUDIOHANDLER_H
+#define TMSCENREPAUDIOHANDLER_H
 
-#include <sounddevice.h>
-
-#include "mcspcenrepobserver.h"
+#include "tmspubsubobserver.h"
+#include "tmscenrepobserver.h"
 #include "tmsserver.h"
 
 namespace TMS {
 
-class TMSCSPPubSubListener;
+class TMSPubSubListener;
 class TMSCenRepListener;
-class TMSCSPAudioStreams;
 
 /**
  * Handles call adding from calls not done by the plugin.
  *
  */
-class TMSCenRepAudioHandler : public MCSPCenRepObserver
+class TMSCenRepAudioHandler : public TMSPubSubObserver,
+                              public TMSCenRepObserver
     {
 public:
     //Constructors and descructor
@@ -55,29 +54,24 @@ public:
     void SetLoudSpeakerVol(TInt vol);
     void SetEarPieceVol(TInt vol);
 
-    // from base class MCSPPubSubObserver
+    // from base class TMSPubSubObserver
     /**
      * Handler for changed event.
      * @param aUid uid of setting
      * @param aKey id of setting
      * @param aStatus status of completed AO operation
      */
-    //virtual void HandleNotifyPSL( const TUid aUid, const TInt& aKey,
-    //    const TRequestStatus& aStatus );
+    virtual void HandleNotifyPSL(const TUid aUid, const TInt& aKey,
+            const TRequestStatus& aStatus);
 
-    // from base class MCSPCenRepObserver
+    // from base class TMSCenRepObserver
     /**
      * Handler for changed event.
      * @param aUid uid of setting
      * @param aVal value
      */
-    virtual void TMSCenRepAudioHandler::HandleNotifyCenRepL(const TUid aUid,
-            const TUint32 aKey, TInt aVal);
-
-    // from base class MDevSoundObserver
-protected:
-    //From DevSound
-
+    virtual void HandleNotifyCenRepL(const TUid aUid, const TUint32 aKey,
+            TInt aVal);
 
 protected:
     // From CActive
@@ -121,7 +115,7 @@ private:
     /**
      * Mute listening from Publish&Subscribe.
      */
-    TMSCSPPubSubListener* iMuteListener;
+    TMSPubSubListener* iMuteListener;
 
     /**
      * Incall loudspeaker listening from Central Repository.
@@ -147,4 +141,4 @@ private:
 
 } //namespace TMS
 
-#endif // CSPAUDIOHANDLER_H
+#endif // TMSCENREPAUDIOHANDLER_H

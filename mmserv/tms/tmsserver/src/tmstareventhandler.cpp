@@ -16,7 +16,7 @@
  */
 
 // INCLUDE FILES
-#include "tareventhandler.h"
+#include "tmstareventhandler.h"
 #include "tmsclientserver.h"
 #include "tmsutility.h"
 
@@ -96,7 +96,7 @@ void TMSTarEventHandler::RunL()
     TRACE_PRN_FN_ENT;
     // Subscribe immediately before analyzing the notification to ensure that we
     // don't miss further updates.
-    if (iStatus.Int() == KErrNone)
+    if (iStatus.Int() == TMS_RESULT_SUCCESS)
         {
         iStatus = KRequestPending;
         iProperty.Subscribe(iStatus);

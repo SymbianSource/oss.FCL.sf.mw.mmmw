@@ -17,6 +17,7 @@
 
 #include <tms.h>
 #include <tmseffectobsrvr.h>
+#include "tmsutility.h"
 #include "tmscallproxy.h"
 #include "tmsqueuehandler.h"
 #include "tmsgaineffectbodyimpl.h"
@@ -26,12 +27,14 @@ using namespace TMS;
 TMSGainEffectBodyImpl::TMSGainEffectBodyImpl() :
     iObserver(NULL),
     iProxy(NULL),
-    iParentEffect(NULL)
+    iParent(NULL)
     {
     }
 
 TMSGainEffectBodyImpl::~TMSGainEffectBodyImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSGainEffectBodyImpl::Create(TMSGainEffectBody*& bodyimpl)
@@ -73,21 +76,6 @@ gint TMSGainEffectBodyImpl::AddObserver(TMSEffectObserver& obsrvr,
     return ret;
     }
 
-/**
- * Remove a stream observer from this stream.
- *
- * This function can be called at any time. It is recommended to remove
- * observer after calling Deinit() on stream. Else observer may receive
- * a callback that is alread dispatched.
- *
- * @param  obsrvr
- *      The listener to remove.
- *
- * @return
- *      TMS_RESULT_SUCCESS if the obsrvr is removed successfully from list.
- *      TMS_RESULT_DOES_NOT_EXIST if obsrvr is not already in the list.
- *
- */
 gint TMSGainEffectBodyImpl::RemoveObserver(TMSEffectObserver& obsrvr)
     {
     gint ret(TMS_RESULT_SUCCESS);
@@ -151,26 +139,25 @@ gint TMSGainEffectBodyImpl::GetType(TMSEffectType& effecttype)
     return ret;
     }
 
-gint TMSGainEffectBodyImpl::SetParentEffect(TMSEffect*& parenteffect)
+void TMSGainEffectBodyImpl::SetParent(TMSEffect*& parent)
     {
-    gint ret(TMS_RESULT_SUCCESS);
-    iParentEffect = NULL;
-    iParentEffect = parenteffect;
-    return ret;
+    iParent = parent;
     }
 
 void TMSGainEffectBodyImpl::SetProxy(TMSCallProxy* aProxy,
         gpointer queuehandler)
     {
     iProxy = aProxy;
-    ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_EFFECT_GAIN);
+    if (queuehandler)
+        {
+        ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_EFFECT_GAIN);
+        }
     }
 
 void TMSGainEffectBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         void* /*user_data*/)
     {
     TMSSignalEvent event;
-
     event.type = TMS_EVENT_EFFECT_GAIN_CHANGED;
     event.reason = aError;
 
@@ -178,9 +165,9 @@ void TMSGainEffectBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         {
         case TMS_EVENT_EFFECT_GAIN_CHANGED:
             {
-            if (iObserver && iParentEffect)
+            if (iObserver && iParent)
                 {
-                iObserver->EffectsEvent(iParentEffect, event);
+                iObserver->EffectsEvent(iParent, event);
                 }
             }
             break;
@@ -189,4 +176,3 @@ void TMSGainEffectBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         }
     }
 
-// End of file

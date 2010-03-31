@@ -163,7 +163,7 @@ void TMSQueueHandler::RunL()
         {
         err = TMS_RESULT_INVALID_STATE;
         }
-        
+
     // Start monitoring for more events before calling the observer in case
     // client decides to destroy us before this RunL completes executing.
     Start();

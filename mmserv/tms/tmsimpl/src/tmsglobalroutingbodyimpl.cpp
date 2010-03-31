@@ -25,7 +25,8 @@ using namespace TMS;
 
 TMSGlobalRoutingBodyImpl::TMSGlobalRoutingBodyImpl() :
     iObserver(NULL),
-    iProxy(NULL)
+    iProxy(NULL),
+    iParent(NULL)
     {
     }
 
@@ -38,6 +39,7 @@ TMSGlobalRoutingBodyImpl::~TMSGlobalRoutingBodyImpl()
         iProxy = NULL;
         }
     iObserver = NULL;
+    iParent = NULL;
     iUserData = NULL;
     }
 
@@ -63,38 +65,38 @@ gint TMSGlobalRoutingBodyImpl::PostConstruct()
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
     iProxy = new TMSProxy;
-    if (iProxy)
+    if (!iProxy)
         {
-        if (iProxy->Connect() != TMS_RESULT_SUCCESS)
-            {
-            delete iProxy;
-            iProxy = NULL;
-            ret = TMS_RESULT_FATAL_ERROR;
-            }
-        else
-            {
-            ret = iProxy->StartRoutingNotifier(); //starts TAR
-            }
+        ret = TMS_RESULT_INSUFFICIENT_MEMORY;
+        }
+    RET_REASON_IF_ERR(ret);
+
+    if (iProxy->Connect() != TMS_RESULT_SUCCESS)
+        {
+        delete iProxy;
+        iProxy = NULL;
+        ret = TMS_RESULT_FATAL_ERROR;
         }
     else
         {
-        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
+        ret = iProxy->StartRoutingNotifier(); //starts TAR
         }
+    RET_REASON_IF_ERR(ret);
     return ret;
     }
 
 gint TMSGlobalRoutingBodyImpl::AddObserver(TMSGlobalRoutingObserver& obsrvr,
-        gpointer /*user_data*/)
+        gpointer user_data)
     {
     gint ret(TMS_RESULT_SUCCESS);
     if (!iObserver)
         {
         iObserver = &obsrvr;
-        //iUserData = user_data;
+        iUserData = user_data;
         if (iProxy)
             {
             ret = iProxy->SetMsgQueueNotifier(EMsgQueueGlobalRoutingType,
-                    iObserver, NULL, iClientId);
+                    iObserver, iParent, iClientId);
             }
         else
             {
@@ -113,9 +115,10 @@ gint TMSGlobalRoutingBodyImpl::RemoveObserver(TMSGlobalRoutingObserver& obsrvr)
     gint ret(TMS_RESULT_SUCCESS);
     if (iProxy && (&obsrvr == iObserver))
         {
-        iProxy->RemoveMsgQueueNotifier(EMsgQueueGlobalRoutingType, iObserver);
-        ret = iProxy->CancelRoutingNotifier();
+        ret = iProxy->RemoveMsgQueueNotifier(EMsgQueueGlobalRoutingType,
+                iObserver);
         iObserver = NULL;
+        ret = iProxy->CancelRoutingNotifier();
         }
     else
         {
@@ -180,4 +183,8 @@ gint TMSGlobalRoutingBodyImpl::GetAvailableOutputs(OutputVector& outputs)
     return ret;
     }
 
-// End of file
+void TMSGlobalRoutingBodyImpl::SetParent(TMSGlobalRouting*& parent)
+    {
+    iParent = parent;
+    }
+

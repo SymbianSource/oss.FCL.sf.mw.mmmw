@@ -216,16 +216,9 @@ void TMSIPDownlink::BufferFilled(const guint buflen)
         {
         // Fill D/S buffer and send it for playback
         iDevSoundBufPtr->Data() = dataPtr;
-        TRAPD(ignore, iDevSoundBufPtr->SetRequestSizeL(buflen));
-        if (ignore) //makes compiler happy
-            {
-            //try playing anyway
-            iDevSound->PlayData();
-            }
-        else
-            {
-            iDevSound->PlayData();
-            }
+        TRAP_IGNORE(iDevSoundBufPtr->SetRequestSizeL(buflen));
+        //try playing anyway
+        iDevSound->PlayData();
         }
     }
 

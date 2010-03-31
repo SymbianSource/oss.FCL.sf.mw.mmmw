@@ -23,25 +23,20 @@
 
 namespace TMS {
 
-// FORWARD DECLARATIONS
-class TMSProxy;
-
 // TMSGlobalGainEffectImpl class
 class TMSGlobalGainEffectImpl : public TMSGlobalGainEffect
     {
 public:
-    ~TMSGlobalGainEffectImpl();
-
+    virtual ~TMSGlobalGainEffectImpl();
     static gint Create(TMSEffect*& tmseffect);
-    gint SetParentEffect(TMSEffect*& parenteffect);
 
 private:
     TMSGlobalGainEffectImpl();
     gint PostConstruct();
+    gint SetParent(TMSEffect*& parent);
     };
 
 } //namespace TMS
 
 #endif // TMS_GLOBAL_GAIN_EFFECT_IMPL_H
 
-// End of file

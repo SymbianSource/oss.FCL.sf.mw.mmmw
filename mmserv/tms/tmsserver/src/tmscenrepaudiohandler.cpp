@@ -16,6 +16,7 @@
  */
 
 #include <e32base.h>
+#include <e32property.h>
 #include "tmstelephonycenrep.h"
 
 #ifdef _USE_TELEPHONY_CENREP_
@@ -23,15 +24,19 @@
 #include <telincallvolcntrlcrkeys.h>
 #else
 const TUid KCRUidInCallVolume = {0x102828B1};
-const TUint32 KTelIncallEarVolume  = 0x00000001;
-const TUint32 KTelIncallLoudspeakerVolume  = 0x00000002;
+const TUint32 KTelIncallEarVolume = 0x00000001;
+const TUint32 KTelIncallLoudspeakerVolume = 0x00000002;
 #endif
 
-#include "cspaudiohandler.h"
-#include "cspcenreplistener.h"
+#include "tmscenrepaudiohandler.h"
+#include "tmscenreplistener.h"
+#include "tmspubsublistener.h"
 #include "tmsutility.h"
 
+const TInt KDefaultMaxGain = 64;
+
 using namespace TMS;
+
 // ---------------------------------------------------------------------------
 // TMSCenRepAudioHandler::NewL.
 // ---------------------------------------------------------------------------
@@ -54,9 +59,35 @@ TMSCenRepAudioHandler* TMSCenRepAudioHandler::NewL(TMSServer* aServer)
 TMSCenRepAudioHandler::~TMSCenRepAudioHandler()
     {
     TRACE_PRN_FN_ENT;
+    delete iMuteListener;
     delete iIncallLoudspeakerVolumeListener;
     delete iIncallEarVolumeListener;
     TRACE_PRN_FN_EXT;
+    }
+
+void TMSCenRepAudioHandler::HandleNotifyPSL(const TUid /*aUid*/,
+        const TInt& /*aKey*/, const TRequestStatus& /*aStatus*/)
+    {
+    TInt muteVal;
+    TInt err = KErrNotFound;
+
+    if (iMuteListener)
+        {
+        err = iMuteListener->Get(muteVal);
+        }
+    if (iTMSSer && err == KErrNone && muteVal == EPSTelMicMuteOn)
+        {
+#if !defined(__WINSCW__)
+        iTMSSer->SetGain(NULL, 0);
+#endif //__WINSCW__
+        }
+    else if (err == KErrNone)
+        {
+#if !defined(__WINSCW__)
+        // Change when gain is really changed
+        iTMSSer->SetGain(NULL, KDefaultMaxGain);
+#endif //__WINSCW__
+        }
     }
 
 // ---------------------------------------------------------------------------
@@ -84,7 +115,7 @@ void TMSCenRepAudioHandler::SetEarPieceVol(TInt vol)
     }
 
 // ---------------------------------------------------------------------------
-// From MCSPCenRepObserver
+// From TMSCenRepObserver
 // TMSCenRepAudioHandler::HandleNotifyCenRepL
 // ---------------------------------------------------------------------------
 //
@@ -92,13 +123,13 @@ void TMSCenRepAudioHandler::HandleNotifyCenRepL(const TUid /*aUid*/,
         const TUint32 aKey, TInt aVal)
     {
     TRACE_PRN_FN_ENT;
-    if (aKey == KTelIncallLoudspeakerVolume)
+    if (iTMSSer && aKey == KTelIncallLoudspeakerVolume)
         {
-        iTMSSer->SetLevel(NULL,FALSE, aVal);
+        iTMSSer->SetLevel(NULL, FALSE, aVal);
         }
-    else if (aKey == KTelIncallEarVolume)
+    else if (iTMSSer && aKey == KTelIncallEarVolume)
         {
-        iTMSSer->SetLevel(NULL,FALSE, aVal);
+        iTMSSer->SetLevel(NULL, FALSE, aVal);
         }
     TRACE_PRN_FN_EXT;
     }
@@ -123,6 +154,16 @@ void TMSCenRepAudioHandler::ConstructL()
     {
     TRACE_PRN_FN_ENT;
 
+    RProperty::TType type(RProperty::EInt);
+    TSecurityPolicy readPolicy(ECapability_None);
+    TSecurityPolicy writePolicy(ECapabilityWriteDeviceData);
+
+    RProperty::Define(KPSUidTelMicrophoneMuteStatus, KTelMicrophoneMuteState,
+            type, readPolicy, writePolicy);
+
+    iMuteListener = TMSPubSubListener::NewL(KPSUidTelMicrophoneMuteStatus,
+            KTelMicrophoneMuteState, this);
+
     iIncallLoudspeakerVolumeListener = TMSCenRepListener::NewL(
             KCRUidInCallVolume, KTelIncallLoudspeakerVolume, this);
 
@@ -133,8 +174,14 @@ void TMSCenRepAudioHandler::ConstructL()
     TInt volEar;
     TInt volLoud;
 
-    TInt volGetRes = iIncallEarVolumeListener->Get(volEar);
-    volGetRes = iIncallLoudspeakerVolumeListener->Get(volLoud);
+    if (iIncallEarVolumeListener)
+        {
+        /*TInt volGetRes =*/ iIncallEarVolumeListener->Get(volEar);
+        }
+    if (iIncallLoudspeakerVolumeListener)
+        {
+        /*volGetRes =*/ iIncallLoudspeakerVolumeListener->Get(volLoud);
+        }
 
     TRACE_PRN_FN_EXT;
     }

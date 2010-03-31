@@ -15,9 +15,8 @@
  *
  */
 
-#include <tms.h>
-#include "tmsgaineffectbodyimpl.h"
 #include "tmsutility.h"
+#include "tmsgaineffectbodyimpl.h"
 #include "tmsgaineffectimpl.h"
 
 using namespace TMS;
@@ -64,27 +63,12 @@ gint TMSGainEffectImpl::Create(TMSEffect*& tmseffect)
             self = NULL;
             }
         }
-
     if (self && ret == TMS_RESULT_SUCCESS)
         {
         tmseffect = self;
-        ret = self->SetParentEffect(tmseffect);
+        ret = self->SetParent(tmseffect);
         }
     TRACE_PRN_FN_EXT;
-    return ret;
-    }
-
-gint TMSGainEffectImpl::SetParentEffect(TMSEffect*& parenteffect)
-    {
-    gint  ret(TMS_RESULT_SUCCESS);
-    if (this->iBody)
-        {
-        ((TMSGainEffectBodyImpl*) this->iBody)->SetParentEffect(parenteffect);
-        }
-    else
-        {
-        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
-        }
     return ret;
     }
 
@@ -102,4 +86,17 @@ gint TMSGainEffectImpl::SetProxy(TMSCallProxy* aProxy, gpointer queuehandler)
     return ret;
     }
 
-// End of file
+gint TMSGainEffectImpl::SetParent(TMSEffect*& parent)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    if (this->iBody)
+        {
+        ((TMSGainEffectBodyImpl*) this->iBody)->SetParent(parent);
+        }
+    else
+        {
+        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
+        }
+    return ret;
+    }
+

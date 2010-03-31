@@ -21,7 +21,7 @@
 #define __MPROGRESSIVEDOWNLOADUTILITY_H__
 
 
-#include <BrCtlDownloadObserver.h>
+#include <brctldownloadobserver.h>
 
 
 class MProgessiveDownloadUtility//:public MBrCtlDownloadObserver

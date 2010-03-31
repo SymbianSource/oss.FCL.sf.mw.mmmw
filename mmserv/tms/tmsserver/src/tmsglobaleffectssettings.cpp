@@ -16,7 +16,7 @@
  */
 
 // INCLUDE FILES
-#include "globaleffectssettings.h"
+#include "tmsglobaleffectssettings.h"
 #include "tmsclientserver.h"
 
 using namespace TMS;

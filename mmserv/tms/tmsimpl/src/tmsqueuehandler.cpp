@@ -251,7 +251,8 @@ void TMSQueueHandler::RunL()
                 if (index != KErrNotFound)
                     {
                     iObserversList[index]->QueueEvent(
-                            TMS_EVENT_EFFECT_VOL_CHANGED, msgBuf.iStatus, NULL);
+                            TMS_EVENT_EFFECT_VOL_CHANGED, msgBuf.iStatus,
+                            NULL);
                     }
                 }
                 break;
@@ -289,8 +290,7 @@ void TMSQueueHandler::DoFillBuffer(gint aBufLen, gint aStatus,
             hndl = (iTMSGlobalContext->CallProxy)->GetDataXferChunkHandle(
                     iTMSGlobalContext->CallType,
                     iTMSGlobalContext->StreamType,
-                    iTMSGlobalContext->StreamId,
-                    key);
+                    iTMSGlobalContext->StreamId, key);
             err = iChunk.SetReturnedHandle(hndl);
             }
         }
@@ -308,8 +308,8 @@ void TMSQueueHandler::DoFillBuffer(gint aBufLen, gint aStatus,
         gint index = iClientList.Find(TMS_SOURCE_CLIENT);
         if (index != KErrNotFound)
             {
-            iObserversList[index]->QueueEvent(
-                    TMS_EVENT_SOURCE_FILL_BUFFER, aStatus, iBuffer);
+            iObserversList[index]->QueueEvent(TMS_EVENT_SOURCE_FILL_BUFFER,
+                    aStatus, iBuffer);
             }
         else
             {
@@ -348,8 +348,7 @@ void TMSQueueHandler::DoEmptyBuffer(gint aBufLen, gint aStatus,
             hndl = (iTMSGlobalContext->CallProxy)->GetDataXferChunkHandle(
                     iTMSGlobalContext->CallType,
                     iTMSGlobalContext->StreamType,
-                    iTMSGlobalContext->StreamId,
-                    key);
+                    iTMSGlobalContext->StreamId, key);
             err = iChunk.SetReturnedHandle(hndl);
             }
         // TODO handle error here
@@ -369,8 +368,8 @@ void TMSQueueHandler::DoEmptyBuffer(gint aBufLen, gint aStatus,
         gint index = iClientList.Find(TMS_SINK_CLIENT);
         if (index != KErrNotFound)
             {
-            iObserversList[index]->QueueEvent(
-                    TMS_EVENT_SINK_PROCESS_BUFFER, aStatus, iBuffer);
+            iObserversList[index]->QueueEvent(TMS_EVENT_SINK_PROCESS_BUFFER,
+                    aStatus, iBuffer);
             }
         else
             {

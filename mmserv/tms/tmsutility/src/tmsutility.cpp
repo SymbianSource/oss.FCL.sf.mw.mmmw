@@ -18,7 +18,7 @@
 #include <e32cmn.h>
 #include <mmffourcc.h>
 #include <mmcccodecinformation.h>
-//#include <tms.h>
+#include <etel.h>
 #include "tmsutility.h"
 
 using namespace TMS;
@@ -116,6 +116,59 @@ EXPORT_C gint TMSUtility::TMSResult(const gint aError)
             result = TMS_RESULT_GENERAL_ERROR;
             break;
         }
+    return result;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSUtility::EtelToTMSResult
+//
+// -----------------------------------------------------------------------------
+//
+EXPORT_C gint TMSUtility::EtelToTMSResult(const gint aError)
+    {
+    gint result(TMS_RESULT_SUCCESS);
+
+    if (aError >= TMS_RESULT_SUCCESS)
+        {
+        return aError; //return TMS error
+        }
+
+    switch(aError)
+        {
+        case KErrArgument: //-6
+            result = TMS_RESULT_INVALID_ARGUMENT;
+            break;
+        case KErrEtelCallNotActive: //-2007
+            result = TMS_REASON_CALL_NOT_ACTIVE;//add TMS_RESULT_CALL_NOT_ACTIVE
+            break;
+        /**********************************/
+        //case KErrEtelCoreBase: //-2000
+        case KErrEtelNotCallOwner: //-2000
+        case KErrEtelDuplicatePhoneName: //-2001
+        case KErrEtelAlreadyCallOwner://-2002
+        case KErrEtelNoCarrier://-2003
+        case KErrEtelBusyDetected://-2004
+        case KErrEtelNoClientInterestedInThisCall://-2005
+        case KErrEtelInitialisationFailure://-2006
+        //case KErrEtelCallNotActive: //-2007
+        case KErrEtelNoAnswer://-2008
+        case KErrEtelNoDialTone://-2009
+        case KErrEtelConfigPortFailure://-2010
+        case KErrEtelFaxChunkNotCreated://-2011
+        case KErrEtelNotFaxOwner://-2012
+        case KErrEtelPortNotLoanedToClient://-2013
+        case KErrEtelWrongModemType://-2014
+        case KErrEtelUnknownModemCapability://-2015
+        case KErrEtelAnswerAlreadyOutstanding://-2016
+        case KErrEtelModemNotDetected://-2017
+        case KErrEtelModemSettingsCorrupt://-2018
+        case KErrEtelPortAlreadyLoaned://-2019
+        case KErrEtelCallAlreadyActive: //-2020
+        default:
+            result = TMS_RESULT_GENERAL_ERROR; //add TMS_DTMF_GENERAL_ERROR/FAILED
+            break;
+        }
+
     return result;
     }
 

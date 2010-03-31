@@ -35,9 +35,9 @@ class TMSGainEffectBodyImpl : public TMSGainEffectBody,
     {
 public:
     static gint Create(TMSGainEffectBody*& bodyimpl);
+    virtual ~TMSGainEffectBodyImpl();
 
     // From TMSGainEffectBody
-    virtual ~TMSGainEffectBodyImpl();
     virtual gint AddObserver(TMSEffectObserver& obsrvr, gpointer user_data);
     virtual gint RemoveObserver(TMSEffectObserver& obsrvr);
     virtual gint SetLevel(const guint level);
@@ -48,7 +48,7 @@ public:
     // From MQueueHandlerObserver
     virtual void QueueEvent(TInt aEventType, TInt aError, void* user_data);
 
-    gint SetParentEffect(TMSEffect*& parenteffect);
+    void SetParent(TMSEffect*& parent);
     void SetProxy(TMSCallProxy* aProxy, gpointer queuehandler);
 
 private:
@@ -59,11 +59,10 @@ private:
     TMSEffectObserver* iObserver;
     gpointer iUserData;
     TMSCallProxy* iProxy;
-    TMSEffect* iParentEffect;
+    TMSEffect* iParent;
     };
 
 } //namespace TMS
 
 #endif // TMS_GAIN_EFFECT_BODY_IMPL_H
 
-// End of file

@@ -49,8 +49,7 @@ class TMSStreamBodyImpl : public TMSStreamBody,
 
 public:
     static gint Create(TMSCallType callType, TMSStreamType stype,
-            TMSCallProxy* proxy, TMSStream& parent,
-            TMSStreamBody*& bodyimpl);
+            TMSCallProxy* proxy, TMSStream& parent, TMSStreamBody*& bodyimpl);
     virtual ~TMSStreamBodyImpl();
 
     // From TMSStreamBody

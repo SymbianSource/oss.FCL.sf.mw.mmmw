@@ -26,7 +26,7 @@ using namespace TMS;
 TMSGlobalGainEffectBodyImpl::TMSGlobalGainEffectBodyImpl() :
     iObserver(NULL),
     iProxy(NULL),
-    iGlobalEffect(NULL)
+    iParent(NULL)
     {
     }
 
@@ -39,7 +39,7 @@ TMSGlobalGainEffectBodyImpl::~TMSGlobalGainEffectBodyImpl()
         iProxy = NULL;
         }
     iObserver = NULL;
-    iGlobalEffect = NULL;
+    iParent = NULL;
     iUserData = NULL;
     }
 
@@ -65,35 +65,43 @@ gint TMSGlobalGainEffectBodyImpl::PostConstruct()
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
     iProxy = new TMSProxy;
-
-    if (iProxy)
-        {
-        if (iProxy->Connect() != TMS_RESULT_SUCCESS)
-            {
-            delete iProxy;
-            iProxy = NULL;
-            ret = TMS_RESULT_FATAL_ERROR;
-            }
-        }
-    else
+    if (!iProxy)
         {
         ret = TMS_RESULT_INSUFFICIENT_MEMORY;
         }
+    RET_REASON_IF_ERR(ret);
+
+    if (iProxy->Connect() != TMS_RESULT_SUCCESS)
+        {
+        delete iProxy;
+        iProxy = NULL;
+        ret = TMS_RESULT_FATAL_ERROR;
+        }
+    else
+        {
+        // Starts TAR if not started already;
+        ret = iProxy->StartRoutingNotifier();
+        }
+    RET_REASON_IF_ERR(ret);
     return ret;
     }
 
 gint TMSGlobalGainEffectBodyImpl::AddObserver(TMSEffectObserver& obsrvr,
-        gpointer /*user_data*/)
+        gpointer user_data)
     {
     gint ret(TMS_RESULT_SUCCESS);
     if (!iObserver)
         {
         iObserver = &obsrvr;
-        //iUserData = user_data;
+        iUserData = user_data;
         if (iProxy)
             {
             ret = iProxy->SetMsgQueueNotifier(EMsgQueueGlobalGainType,
-                    iObserver, iGlobalEffect, iClientId);
+                    iObserver, iParent, iClientId);
+            if (ret == TMS_RESULT_SUCCESS)
+                {
+                ret = iProxy->StartGlobalEffectNotifier();
+                }
             }
         else
             {
@@ -104,19 +112,19 @@ gint TMSGlobalGainEffectBodyImpl::AddObserver(TMSEffectObserver& obsrvr,
         {
         ret = TMS_RESULT_ALREADY_EXIST;
         }
-
     return ret;
     }
 
 gint TMSGlobalGainEffectBodyImpl::RemoveObserver(TMSEffectObserver& obsrvr)
     {
     gint ret(TMS_RESULT_SUCCESS);
-
     if (iProxy && (&obsrvr == iObserver))
         {
         ret = iProxy->RemoveMsgQueueNotifier(EMsgQueueGlobalGainType,
                 iObserver);
         iObserver = NULL;
+        ret = iProxy->CancelGlobalEffectNotifier();
+        ret = iProxy->CancelRoutingNotifier();
         }
     else
         {
@@ -174,10 +182,8 @@ gint TMSGlobalGainEffectBodyImpl::GetType(TMSEffectType& effecttype)
     return ret;
     }
 
-void TMSGlobalGainEffectBodyImpl::SetParentEffect(TMSEffect*& parenteffect)
+void TMSGlobalGainEffectBodyImpl::SetParent(TMSEffect*& parent)
     {
-    iGlobalEffect = NULL;
-    iGlobalEffect = parenteffect;
+    iParent = parent;
     }
 
-// End of file

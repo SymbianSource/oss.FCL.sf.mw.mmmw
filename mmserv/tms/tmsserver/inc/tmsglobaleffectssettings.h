@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef GLOBALEFFECTSSETTINGS_H
-#define GLOBALEFFECTSSETTINGS_H
+#ifndef TMSGLOBALEFFECTSSETTINGS_H
+#define TMSGLOBALEFFECTSSETTINGS_H
 
 //  INCLUDES
 #include <e32property.h>
@@ -114,6 +114,6 @@ private:
 
 } //namespace TMS
 
-#endif      // GLOBALEFFECTSSETTINGS_H
+#endif // TMSGLOBALEFFECTSSETTINGS_H
 
 // End of File

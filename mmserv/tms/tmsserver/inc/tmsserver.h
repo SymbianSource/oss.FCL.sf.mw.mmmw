@@ -47,10 +47,10 @@ public:
 
     void AddSession();
     void DropSession();
-    TInt SessionCount();
+    TInt SessionCount() const;
 
-    void SetDnLinkSession(TBool aSession);
-    void SetUpLinkSession(TBool aSession);
+    void SetDnLinkSession(const TBool aSession);
+    void SetUpLinkSession(const TBool aSession);
 
     TBool HasDnLinkSession() const;
     TBool HasUpLinkSession() const;
@@ -101,7 +101,10 @@ private:
     TMSTarEventHandler* iTarHandler;
     TMSCenRepAudioHandler* iAudioCenRepHandler;
     TMSAudioOutput iCurrentRouting;
+    TInt iTarHandlerCount;
+    TInt iAudioCenRepHandlerCount;
 
+    // for codecs count
     RArray<TFourCC> iDnlCodecs;
     RArray<TFourCC> iUplCodecs;
     };

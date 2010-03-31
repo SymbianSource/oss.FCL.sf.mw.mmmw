@@ -16,20 +16,19 @@
  */
 
 // INCLUDE FILES
-#include "cspcenreplistener.h"
-#include "mcspcenrepobserver.h"
+#include "tmscenreplistener.h"
+#include "tmscenrepobserver.h"
 #include "tmsutility.h"
 
 using namespace TMS;
 
 // -----------------------------------------------------------------------------
 // TMSCenRepListener::TMSCenRepListener
-// C++ default constructor can NOT contain any code, that
-// might leave.
+// C++ default constructor
 // -----------------------------------------------------------------------------
 //
-TMSCenRepListener* TMSCenRepListener::NewL(TUid aUid,
-        TUint32 aMonitorSetting, MCSPCenRepObserver* aObserver)
+TMSCenRepListener* TMSCenRepListener::NewL(TUid aUid, TUint32 aMonitorSetting,
+        TMSCenRepObserver* aObserver)
     {
     TRACE_PRN_FN_ENT;
     TMSCenRepListener* self = new (ELeave) TMSCenRepListener(aUid,
@@ -57,7 +56,11 @@ TMSCenRepListener::~TMSCenRepListener()
 gint TMSCenRepListener::Get(gint& aValue)
     {
     TRACE_PRN_FN_ENT;
-    gint status = iRepository->Get(iMonitorSetting, aValue);
+    gint status(TMS_RESULT_SUCCESS);
+    if (iRepository)
+        {
+        status = iRepository->Get(iMonitorSetting, aValue);
+        }
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -69,7 +72,11 @@ gint TMSCenRepListener::Get(gint& aValue)
 gint TMSCenRepListener::Set(gint aValue)
     {
     TRACE_PRN_FN_ENT;
-    gint status = iRepository->Set(iMonitorSetting, aValue);
+    gint status(TMS_RESULT_SUCCESS);
+    if (iRepository)
+        {
+        status = iRepository->Set(iMonitorSetting, aValue);
+        }
     TRACE_PRN_FN_EXT;
     return status;
 
@@ -81,7 +88,10 @@ gint TMSCenRepListener::Set(gint aValue)
 void TMSCenRepListener::DoCancel()
     {
     TRACE_PRN_FN_ENT;
-    iRepository->NotifyCancel(iMonitorSetting);
+    if (iRepository)
+        {
+        iRepository->NotifyCancel(iMonitorSetting);
+        }
     TRACE_PRN_FN_EXT;
     }
 
@@ -124,7 +134,10 @@ void TMSCenRepListener::RunL()
     // Retrieve the current volume from repository.
     gint volume;
     Get(volume);
-    iObserver->HandleNotifyCenRepL(iUid, iMonitorSetting, volume);
+    if (iObserver)
+        {
+        iObserver->HandleNotifyCenRepL(iUid, iMonitorSetting, volume);
+        }
     TRACE_PRN_FN_EXT;
     }
 
@@ -133,7 +146,7 @@ void TMSCenRepListener::RunL()
 // -----------------------------------------------------------------------------
 //
 TMSCenRepListener::TMSCenRepListener(TUid aUid, TUint32 aMonitorSetting,
-        MCSPCenRepObserver* aObserver) :
+        TMSCenRepObserver* aObserver) :
     CActive(EPriorityStandard),
     iUid(aUid),
     iMonitorSetting(aMonitorSetting),
@@ -165,9 +178,12 @@ void TMSCenRepListener::ConstructL()
 void TMSCenRepListener::SubmitNotifyRequestL()
     {
     TRACE_PRN_FN_ENT;
-    iStatus = KRequestPending;
-    iRepository->NotifyRequest(iMonitorSetting, iStatus);
-    SetActive();
+    if (iRepository)
+        {
+        iStatus = KRequestPending;
+        iRepository->NotifyRequest(iMonitorSetting, iStatus);
+        SetActive();
+        }
     TRACE_PRN_FN_EXT;
     }
 

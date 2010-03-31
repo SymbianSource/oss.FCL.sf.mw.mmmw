@@ -30,7 +30,8 @@ EXPORT_C TMSFactory::~TMSFactory()
     delete impl;
     }
 
-EXPORT_C gint TMSFactory::CreateFactory(TMSFactory*& tmsfactory, TMSVer& /*ver*/)
+EXPORT_C gint TMSFactory::CreateFactory(TMSFactory*& tmsfactory,
+        TMSVer& /*ver*/)
     {
     TMSFactory* self = new TMSFactory();
     tmsfactory = self;
@@ -58,7 +59,8 @@ EXPORT_C gint TMSFactory::DeleteCall(TMSCall*& tmscall)
     return status;
     }
 
-EXPORT_C gint TMSFactory::IsCallTypeSupported(TMSCallType ctype, gboolean& flag)
+EXPORT_C gint TMSFactory::IsCallTypeSupported(TMSCallType ctype,
+        gboolean& flag)
     {
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (impl)

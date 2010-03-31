@@ -23,24 +23,20 @@
 
 namespace TMS {
 
-// FORWARD DECLARATIONS
-class TMSProxy;
-
 // TMSGlobalVolEffectImpl class
 class TMSGlobalVolEffectImpl : public TMSGlobalVolEffect
     {
 public:
-    ~TMSGlobalVolEffectImpl();
+    virtual ~TMSGlobalVolEffectImpl();
     static gint Create(TMSEffect*& tmseffect);
 
 private:
     TMSGlobalVolEffectImpl();
     gint PostConstruct();
-    gint SetParentEffect(TMSEffect*& parenteffect);
+    gint SetParent(TMSEffect*& parent);
     };
 
 } //namespace TMS
 
 #endif // TMS_GLOBAL_VOLUME_EFFECT_IMPL_H
 
-// End of file

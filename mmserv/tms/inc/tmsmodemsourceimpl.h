@@ -30,7 +30,7 @@ class TMSCallProxy;
 class TMSModemSourceImpl : public TMSModemSource
     {
 public:
-    ~TMSModemSourceImpl();
+    virtual ~TMSModemSourceImpl();
     static gint Create(TMSSource*& tmssource);
     gint SetProxy(TMSCallProxy* aProxy, gpointer queuehandler);
 

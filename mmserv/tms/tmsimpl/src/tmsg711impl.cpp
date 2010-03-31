@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmsg711bodyimpl.h"
 #include "tmsg711formatimpl.h"

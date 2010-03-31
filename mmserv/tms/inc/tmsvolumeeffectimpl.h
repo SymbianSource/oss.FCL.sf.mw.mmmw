@@ -30,19 +30,17 @@ class TMSCallProxy;
 class TMSVolumeEffectImpl : public TMSVolumeEffect
     {
 public:
-    ~TMSVolumeEffectImpl();
-
+    virtual ~TMSVolumeEffectImpl();
     static gint Create(TMSEffect*& tmseffect);
     gint SetProxy(TMSCallProxy* aProxy, gpointer queuehandler);
-    gint SetParentEffect(TMSEffect*& parenteffect);
 
 private:
     TMSVolumeEffectImpl();
     gint PostConstruct();
+    gint SetParent(TMSEffect*& parent);
     };
 
 } //namespace TMS
 
 #endif // TMS_VOLUME_EFFECT_IMPL_H
 
-// End of file

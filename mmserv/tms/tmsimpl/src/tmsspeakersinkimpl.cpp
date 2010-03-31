@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmsspeakersinkimpl.h"
 #include "tmsspeakersinkbodyimpl.h"
@@ -24,10 +23,14 @@ using namespace TMS;
 
 TMSSpeakerSinkImpl::TMSSpeakerSinkImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 TMSSpeakerSinkImpl::~TMSSpeakerSinkImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSSpeakerSinkImpl::PostConstruct()

@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef TAREVENTHANDLER_H
-#define TAREVENTHANDLER_H
+#ifndef TMSTAREVENTHANDLER_H
+#define TMSTAREVENTHANDLER_H
 
 //  INCLUDES
 #include <e32base.h>
@@ -72,6 +72,6 @@ private:
 
 } //namespace TMS
 
-#endif  // TAREVENTHANDLER_H
+#endif //TMSTAREVENTHANDLER_H
 
 // End of File

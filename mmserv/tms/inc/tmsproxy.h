@@ -108,12 +108,13 @@ private:
 
     gint CreateQueue(const gint aNumSlots);
     void ReceiveMsgQHandlerEventsL();
+    void ResetObjectLists();
 
 private:
     TRoutingMsgBufPckg ipckg;
     RPointerArray<TMSEffectObserver> iEffectsObsrvrList;
-    RPointerArray<TMSEffect> iEffectsParentList;
     RPointerArray<TMSGlobalRoutingObserver> iRoutingObsrvrList;
+    RPointerArray<TMSEffect> iEffectsParentList;
     RPointerArray<TMSGlobalRouting> iRoutingParentList;
 
     // Message queue and the handler

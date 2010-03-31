@@ -15,15 +15,6 @@
  *
  */
 
-#include <tms.h>
-#include <tmscall.h>
-#include <tmsformat.h>
-#include <tmseffect.h>
-#include <tmsbuffer.h>
-#include <tmssource.h>
-#include <tmssink.h>
-#include "tmsutility.h"
-#include "tmsproxy.h"
 #include "tmscallimpl.h"
 #include "tmsformatimpl.h"
 #include "tmseffectimpl.h"
@@ -31,6 +22,9 @@
 #include "tmssourceimpl.h"
 #include "tmssinkimpl.h"
 #include "tmsglobalroutingimpl.h"
+
+#include "tmsutility.h"
+#include "tmsproxy.h"
 #include "tmsfactoryimpl.h"
 
 using namespace TMS;
@@ -57,9 +51,7 @@ gint TMSFactoryImpl::CreateCall(TMSCallType ctype, TMSCall*& tmscall,
 gint TMSFactoryImpl::DeleteCall(TMSCall*& tmscall)
     {
     gint ret(TMS_RESULT_SUCCESS);
-    // TODO put the delete in the impl
-    delete tmscall; //iTMSCall
-    tmscall = NULL;
+    ret = TMSCallImpl::Delete(tmscall);
     return ret;
     }
 

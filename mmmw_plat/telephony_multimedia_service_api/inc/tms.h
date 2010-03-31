@@ -119,8 +119,8 @@ typedef gint TMSFormatType;
 #define TMS_FORMAT_ILBC                         ((gint)17)
 
 typedef gint TMSRTPSessionType;
-#define TMS_SESSION_RTP_PUSH                    ((gint)18)
-#define TMS_SESSION_RTP_PULL                    ((gint)19)
+#define TMS_SESSION_RTP_PULL                    ((gint)0)
+#define TMS_SESSION_RTP_PUSH                    ((gint)1)
 
 // TMS vectors
 typedef std::vector<TMSFormat*> FormatVector;
@@ -153,6 +153,7 @@ typedef gint TMSAudioOutput;
 #define TMS_AUDIO_OUTPUT_WIRED_ACCESSORY        ((gint)5)
 #define TMS_AUDIO_OUTPUT_ACCESSORY              ((gint)6)
 #define TMS_AUDIO_OUTPUT_ETTY                   ((gint)7)
+#define TMS_AUDIO_OUTPUT_NOT_ACTIVE             ((gint)8)
 
 // TMSSignalEvent structure for callback notifications
 struct TMSSignalEvent

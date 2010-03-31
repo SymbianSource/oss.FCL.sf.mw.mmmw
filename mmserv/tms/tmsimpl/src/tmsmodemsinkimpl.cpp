@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmsmodemsinkimpl.h"
 #include "tmsmodemsinkbodyimpl.h"
@@ -24,10 +23,14 @@ using namespace TMS;
 
 TMSModemSinkImpl::TMSModemSinkImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 TMSModemSinkImpl::~TMSModemSinkImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSModemSinkImpl::PostConstruct()

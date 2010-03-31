@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmsglobalroutingbodyimpl.h"
 #include "tmsglobalroutingimpl.h"
@@ -49,7 +48,6 @@ gint TMSGlobalRoutingImpl::PostConstruct()
     return ret;
     }
 
-// TO DO stop exporting this function
 EXPORT_C gint TMSGlobalRoutingImpl::Create(TMSGlobalRouting*& globrouting)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
@@ -65,7 +63,11 @@ EXPORT_C gint TMSGlobalRoutingImpl::Create(TMSGlobalRouting*& globrouting)
             self = NULL;
             }
         }
-    globrouting = self;
+    if (self && ret == TMS_RESULT_SUCCESS)
+        {
+        globrouting = self;
+        ret = self->SetParent(globrouting);
+        }
     TRACE_PRN_FN_EXT;
     return ret;
     }
@@ -80,4 +82,17 @@ EXPORT_C gint TMSGlobalRoutingImpl::Delete(TMSGlobalRouting*& globrouting)
     return ret;
     }
 
-// End of file
+gint TMSGlobalRoutingImpl::SetParent(TMSGlobalRouting*& parent)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    if (this->iBody)
+        {
+        ((TMSGlobalRoutingBodyImpl*) this->iBody)->SetParent(parent);
+        }
+    else
+        {
+        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
+        }
+    return ret;
+    }
+
