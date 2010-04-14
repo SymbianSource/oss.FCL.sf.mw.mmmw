@@ -695,6 +695,15 @@ void CRadioServer::SetFrequencyComplete(
     TRadioServerError aError )
     {
     RADIO_RDEBUG_INT2(_L("[RADIO-SVR] SetFrequencyComplete(%d) State[%d]"), aError, iState);
+    
+    // Disable squelching, if on
+    if ( iSquelch )
+        {
+        // Restore the last volume
+        iDevSound->SetVolume(iSettings->Volume());
+        iSquelch = EFalse;
+        }
+    
     if ( iAsyncRequest && iAsyncRequest->iType == ERadioServSetFrequency )
         {
         if ( aError == KErrNone )
@@ -1798,6 +1807,12 @@ void CRadioServer::ProcessSetFrequency(
                 }
             else
                 {
+                if ( iSettings->IsSquelchEnabled() && !iSettings->IsMute() )
+                    {
+                    // Simulate squelching
+                    iDevSound->SetVolume(0);
+                    iSquelch = ETrue;
+                    }
                 iTunerControl->SetFrequency(aFrequency);
                 }
             break;
