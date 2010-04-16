@@ -32,6 +32,7 @@ RESOURCE ADVANCED_AUDIO_CONTROLLER_RESOURCE aacDecoder
     {
     shared_buffer_max_num = 2;
     shared_buffer_max_size = 20480;
+    shared_buffer_max_size_non_seekable_source = 20480;
     sampling_rate = EAapSampleRate16000Hz;
     stereo_support = 2;
     metadata_support = EAapMetadataSupportTrue;
@@ -66,6 +67,7 @@ RESOURCE ADVANCED_AUDIO_CONTROLLER_RESOURCE amrDecoder
     {
     shared_buffer_max_num = 2;
     shared_buffer_max_size = 8192;
+    shared_buffer_max_size_non_seekable_source = 8192;
     sampling_rate = EAapSampleRate8000Hz;
     stereo_support = 0;
     metadata_support = EAapMetadataSupportTrue;
@@ -90,6 +92,7 @@ RESOURCE ADVANCED_AUDIO_CONTROLLER_RESOURCE awbDecoder
     {
     shared_buffer_max_num = 2;
     shared_buffer_max_size = 8192;
+    shared_buffer_max_size_non_seekable_source = 8192;
     sampling_rate = EAapSampleRate16000Hz;
     stereo_support = 0;
     metadata_support = EAapMetadataSupportTrue;

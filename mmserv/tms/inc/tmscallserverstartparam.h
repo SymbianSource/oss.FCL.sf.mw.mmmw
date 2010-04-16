@@ -18,13 +18,14 @@
 #ifndef TMSCALLSERVERSTARTPARAM_H
 #define TMSCALLSERVERSTARTPARAM_H
 
+#include <glib.h>
 #include <e32std.h>
 
 namespace TMS {
 
-const TInt KTMSCallServerStackSize = 0x5000; //  20 KB
-const TInt KTMSCallServerInitHeapSize = 0x500000; // 5.2 MB
-const TInt KTMSCallServerMaxHeapSize = 0x1800000; //  25 MB
+const gint KTMSCallServerStackSize = 0x5000; //  20 KB
+const gint KTMSCallServerInitHeapSize = 0x500000; // 5.2 MB
+const gint KTMSCallServerMaxHeapSize = 0x1800000; //  25 MB
 
 // FORWARD DECLARATIONS
 class TMSServer;

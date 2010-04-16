@@ -24,8 +24,6 @@
 
 using namespace TMS;
 
-// CONSTANTS
-
 // -----------------------------------------------------------------------------
 // TMSCallProxy::TMSCallProxy
 //
@@ -34,7 +32,6 @@ using namespace TMS;
 EXPORT_C TMSCallProxy::TMSCallProxy() :
     iTMSProxy(NULL)
     {
-    // No impl
     }
 
 // -----------------------------------------------------------------------------
@@ -285,7 +282,7 @@ EXPORT_C gint TMSCallProxy::BufferEmptied(TMSCallType callType,
     inPckg().StreamId = strmId;
     status = RSessionBase::SendReceive(TMS_DATA_XFER_BUFFER_EMPTIED,
             TIpcArgs(&inPckg));
-    
+
     TRACE_PRN_FN_EXT;
     return TMSRESULT(status);
     }

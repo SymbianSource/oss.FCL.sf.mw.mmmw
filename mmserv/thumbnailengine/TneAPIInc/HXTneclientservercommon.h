@@ -21,8 +21,8 @@
 #define  _HX_TNE_Client_Server_Common_H_
 
 #include <e32base.h>
-#include <GDI.H>
-#include <FBS.H>
+#include <gdi.h>
+#include <fbs.h>
 
 
 // server name

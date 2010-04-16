@@ -146,7 +146,7 @@ void CAWBAudioPlayControllerDecoder::ResetL()
     iOutBufferPtr = iOutBuffer;
 
     iAccLen = 0;
-    iEnabled = ETrue;
+
     DP0(_L ("CAWBAudioPlayControllerDecoder::Reset - Exit"));
 	}
 

@@ -116,6 +116,10 @@ void CTmsAudioServicesTestClass::Delete()
     iLog->Log(_L(""));
     iLog->Log(_L(""));
 
+    delete iRingTonePlayer;
+    delete iDTMFTonePlayerDn;
+    delete iDTMFTonePlayerUp;
+
     // delete iPlayBuf;
 
     if (iTmsDnlink)
@@ -171,6 +175,9 @@ TInt CTmsAudioServicesTestClass::RunMethodL(CStifItemParser& aItem)
         ENTRY( "GetEffectType", CTmsAudioServicesTestClass::GetEffectType ),
         ENTRY( "CreateDownlinkStream", CTmsAudioServicesTestClass::CreateDownlinkStream ),
         ENTRY( "CreateUplinkStream", CTmsAudioServicesTestClass::CreateUplinkStream ),
+        ENTRY( "CreateDTMFTonePlayer", CTmsAudioServicesTestClass::CreateDTMFTonePlayer ),
+        ENTRY( "DeleteDTMFTonePlayer", CTmsAudioServicesTestClass::DeleteDTMFTonePlayer ),
+        ENTRY( "CreateRingTonePlayer", CTmsAudioServicesTestClass::CreateRingTonePlayer ),
         ENTRY( "GetSupportedFormats", CTmsAudioServicesTestClass::GetSupportedFormats ),
         ENTRY( "IsCallTypeSupported", CTmsAudioServicesTestClass::IsCallTypeSupported ),
         ENTRY( "SetDownlinkFormat", CTmsAudioServicesTestClass::SetDownlinkFormat ),
@@ -193,8 +200,18 @@ TInt CTmsAudioServicesTestClass::RunMethodL(CStifItemParser& aItem)
         ENTRY( "GetBitRateList", CTmsAudioServicesTestClass::GetBitRateList ),
         ENTRY( "SetBitrates", CTmsAudioServicesTestClass::SetBitrates ),
         ENTRY( "GetBitrates", CTmsAudioServicesTestClass::GetBitrates ),
+        ENTRY( "InitDTMFTonePlayer", CTmsAudioServicesTestClass::InitDTMFTonePlayer ),
+        ENTRY( "DTMFTonePlay", CTmsAudioServicesTestClass::DTMFTonePlay ),
+        ENTRY( "CloseDTMFPlayer", CTmsAudioServicesTestClass::CloseDTMFPlayer ),
+        ENTRY( "StopDTMFPlayer", CTmsAudioServicesTestClass::StopDTMFTonePlayer ),
         ENTRY( "GetDownlinkVersion", CTmsAudioServicesTestClass::GetDownlinkVersion ),
         ENTRY( "GetUplinkVersion", CTmsAudioServicesTestClass::GetUplinkVersion ),
+        ENTRY( "InitRingTonePlayer", CTmsAudioServicesTestClass::InitRingTonePlayer ),
+        ENTRY( "CloseRingTonePlayer", CTmsAudioServicesTestClass::CloseRingTonePlayer ),
+        ENTRY( "PlayRingTone", CTmsAudioServicesTestClass::PlayRingTone ),
+        ENTRY( "PauseRingTone", CTmsAudioServicesTestClass::PauseRingTone ),
+        ENTRY( "ResumeRingTone", CTmsAudioServicesTestClass::ResumeRingTone ),
+        ENTRY( "StopRingTone", CTmsAudioServicesTestClass::StopRingTone ),
         ENTRY( "GetType", CTmsAudioServicesTestClass::GetType ),
         ENTRY( "GetVAD", CTmsAudioServicesTestClass::GetVAD ),
         ENTRY( "ToggleVAD", CTmsAudioServicesTestClass::ToggleVAD ),
@@ -1115,6 +1132,88 @@ TInt CTmsAudioServicesTestClass::GetUplinkVersion(CStifItemParser& /*aItem */)
     return error;
     }
 
+TInt CTmsAudioServicesTestClass::CreateDTMFTonePlayer(CStifItemParser& aItem)
+    {
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateDTMFTonePlayer"));
+    TInt error = KErrNone;
+    TPtrC StreamType;
+    error = aItem.GetNextString(StreamType);
+
+    if (error == KErrNone)
+        {
+        if (StreamType == KTagDnlink)
+            {
+            if (iTmsCall)
+                {
+                error = iFactory->CreateDTMF(0, iDTMFTonePlayerDn);
+                FTRACE(FPrint(_L("CreateDTMF Error [%d]"),error));
+                }
+            }
+        else if (StreamType == KTagUplink)
+            {
+            if (iTmsCall)
+                {
+                error = iFactory->CreateDTMF(0, iDTMFTonePlayerUp);
+                }
+            }
+        else
+            {
+            iLog->Log(KMsgBadTestParameters);
+            error = KErrBadTestParameter;}
+        }
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateDTMFTonePlayer Error [%d]"),
+            error);
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::DeleteDTMFTonePlayer(CStifItemParser& aItem)
+    {
+    iLog->Log(_L("CTmsAudioServicesTestClass::DeleteDTMFTonePlayer"));
+    TInt error = KErrNone;
+    TPtrC StreamType;
+    error = aItem.GetNextString(StreamType);
+
+    if (error == KErrNone)
+        {
+        if (StreamType == KTagDnlink)
+            {
+            if (iTmsCall && iDTMFTonePlayerDn)
+                {
+                error = iFactory->DeleteDTMF(iDTMFTonePlayerDn);
+                FTRACE(FPrint(_L("DeleteDTMF Error [%d]"),error));
+                }
+            }
+        else if (StreamType == KTagUplink)
+            {
+            if (iTmsCall && iDTMFTonePlayerUp)
+                {
+                error = iFactory->DeleteDTMF(iDTMFTonePlayerUp);
+                }
+            }
+        else
+            {
+            iLog->Log(KMsgBadTestParameters);
+            error = KErrBadTestParameter;
+            }
+        }
+    iLog->Log(_L("CTmsAudioServicesTestClass::DeleteDTMFTonePlayer Error [%d]"),
+            error);
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateRingTonePlayer(CStifItemParser& /*aItem */)
+    {
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateRingTonePlayer"));
+    TInt error = KErrNone;
+    if (iFactory)
+        {
+        error = iFactory->CreateRingTonePlayer(iRingTonePlayer);
+        }
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateRingTonePlayer Error [%d]"),
+            error);
+    return error;
+    }
+
 TInt CTmsAudioServicesTestClass::GetSupportedFormats(CStifItemParser& aItem)
     {
     iLog->Log(_L("CTmsAudioServicesTestClass::GetSupportedFormats"));
@@ -2001,11 +2100,10 @@ TInt CTmsAudioServicesTestClass::GetOutput(CStifItemParser & aItem)
 
     if (iTmsGlobalRouting)
         {
-        error = iTmsGlobalRouting->GetOutput(device);
+        error = iTmsGlobalRouting->GetOutput(iDevice);
         iLog->Log(
-                _L("CTmsAudioServicesTestClass::GetOutput, error:[%d] device:[%d]"),
-                error, device);
-
+                _L("CTmsAudioServicesTestClass::GetOutput, error:[%d] iDevice:[%d]"),
+                error, iDevice);
         }
 
     if (error != KErrNone)
@@ -2019,7 +2117,7 @@ TInt CTmsAudioServicesTestClass::GetOutput(CStifItemParser & aItem)
         {
         if (OutputType == KTagNone)
             {
-            if (device != TMS_AUDIO_OUTPUT_NONE)
+            if (iDevice != TMS_AUDIO_OUTPUT_NONE)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2029,7 +2127,7 @@ TInt CTmsAudioServicesTestClass::GetOutput(CStifItemParser & aItem)
             }
         else if (OutputType == KTagPublic)
             {
-            if (device != TMS_AUDIO_OUTPUT_PUBLIC)
+            if (iDevice != TMS_AUDIO_OUTPUT_PUBLIC)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2039,7 +2137,7 @@ TInt CTmsAudioServicesTestClass::GetOutput(CStifItemParser & aItem)
             }
         else if (OutputType == KTagPrivate)
             {
-            if (device != TMS_AUDIO_OUTPUT_PRIVATE)
+            if (iDevice != TMS_AUDIO_OUTPUT_PRIVATE)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2049,7 +2147,7 @@ TInt CTmsAudioServicesTestClass::GetOutput(CStifItemParser & aItem)
             }
         else if (OutputType == KTagHandset)
             {
-            if (device != TMS_AUDIO_OUTPUT_HANDSET)
+            if (iDevice != TMS_AUDIO_OUTPUT_HANDSET)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2059,7 +2157,7 @@ TInt CTmsAudioServicesTestClass::GetOutput(CStifItemParser & aItem)
             }
         else if (OutputType == KTagLoudspeaker)
             {
-            if (device != TMS_AUDIO_OUTPUT_LOUDSPEAKER)
+            if (iDevice != TMS_AUDIO_OUTPUT_LOUDSPEAKER)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2069,7 +2167,7 @@ TInt CTmsAudioServicesTestClass::GetOutput(CStifItemParser & aItem)
             }
         else if (OutputType == KTagWiredAccessory)
             {
-            if (device != TMS_AUDIO_OUTPUT_WIRED_ACCESSORY)
+            if (iDevice != TMS_AUDIO_OUTPUT_WIRED_ACCESSORY)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2079,7 +2177,7 @@ TInt CTmsAudioServicesTestClass::GetOutput(CStifItemParser & aItem)
             }
         else if (OutputType == KTagAccessory)
             {
-            if (device != TMS_AUDIO_OUTPUT_ACCESSORY)
+            if (iDevice != TMS_AUDIO_OUTPUT_ACCESSORY)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2089,7 +2187,7 @@ TInt CTmsAudioServicesTestClass::GetOutput(CStifItemParser & aItem)
             }
         else if (OutputType == KTagTTY)
             {
-            if (device != TMS_AUDIO_OUTPUT_ETTY)
+            if (iDevice != TMS_AUDIO_OUTPUT_ETTY)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2114,7 +2212,7 @@ TInt CTmsAudioServicesTestClass::GetPreviousOutput(CStifItemParser& aItem)
 
     if (iTmsGlobalRouting)
         {
-        error = iTmsGlobalRouting->GetPreviousOutput(device);
+        error = iTmsGlobalRouting->GetPreviousOutput(iDevice);
         iLog->Log(
                 _L("CTmsAudioServicesTestClass::GetPreviousOutput, error:[%d] "),
                 error);
@@ -2131,7 +2229,7 @@ TInt CTmsAudioServicesTestClass::GetPreviousOutput(CStifItemParser& aItem)
         {
         if (OutputType == KTagNone)
             {
-            if (device != TMS_AUDIO_OUTPUT_NONE)
+            if (iDevice != TMS_AUDIO_OUTPUT_NONE)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2141,7 +2239,7 @@ TInt CTmsAudioServicesTestClass::GetPreviousOutput(CStifItemParser& aItem)
             }
         else if (OutputType == KTagPublic)
             {
-            if (device != TMS_AUDIO_OUTPUT_PUBLIC)
+            if (iDevice != TMS_AUDIO_OUTPUT_PUBLIC)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2151,7 +2249,7 @@ TInt CTmsAudioServicesTestClass::GetPreviousOutput(CStifItemParser& aItem)
             }
         else if (OutputType == KTagPrivate)
             {
-            if (device != TMS_AUDIO_OUTPUT_PRIVATE)
+            if (iDevice != TMS_AUDIO_OUTPUT_PRIVATE)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2161,7 +2259,7 @@ TInt CTmsAudioServicesTestClass::GetPreviousOutput(CStifItemParser& aItem)
             }
         else if (OutputType == KTagHandset)
             {
-            if (device != TMS_AUDIO_OUTPUT_HANDSET)
+            if (iDevice != TMS_AUDIO_OUTPUT_HANDSET)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2171,7 +2269,7 @@ TInt CTmsAudioServicesTestClass::GetPreviousOutput(CStifItemParser& aItem)
             }
         else if (OutputType == KTagLoudspeaker)
             {
-            if (device != TMS_AUDIO_OUTPUT_LOUDSPEAKER)
+            if (iDevice != TMS_AUDIO_OUTPUT_LOUDSPEAKER)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2181,7 +2279,7 @@ TInt CTmsAudioServicesTestClass::GetPreviousOutput(CStifItemParser& aItem)
             }
         else if (OutputType == KTagWiredAccessory)
             {
-            if (device != TMS_AUDIO_OUTPUT_WIRED_ACCESSORY)
+            if (iDevice != TMS_AUDIO_OUTPUT_WIRED_ACCESSORY)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2191,7 +2289,7 @@ TInt CTmsAudioServicesTestClass::GetPreviousOutput(CStifItemParser& aItem)
             }
         else if (OutputType == KTagAccessory)
             {
-            if (device != TMS_AUDIO_OUTPUT_ACCESSORY)
+            if (iDevice != TMS_AUDIO_OUTPUT_ACCESSORY)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2201,7 +2299,7 @@ TInt CTmsAudioServicesTestClass::GetPreviousOutput(CStifItemParser& aItem)
             }
         else if (OutputType == KTagTTY)
             {
-            if (device != TMS_AUDIO_OUTPUT_ETTY)
+            if (iDevice != TMS_AUDIO_OUTPUT_ETTY)
                 {
                 error = KErrUnexpectedValue;
                 iLog->Log(
@@ -2251,6 +2349,92 @@ TInt CTmsAudioServicesTestClass::GetAvailableOutputs(CStifItemParser& /*aItem */
         {
         error = KErrNotReady;
         }
+
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::InitDTMFTonePlayer(CStifItemParser& /*aItem */)
+    {
+    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::InitDTMFTonePlayer")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::InitDTMFTonePlayer"));
+    TInt error = KErrNone;
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::DTMFTonePlay(CStifItemParser& /*aItem */)
+    {
+    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::DTMFTonePlay")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::DTMFTonePlay"));
+    TInt error = KErrNone;
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::CloseDTMFPlayer(CStifItemParser& /*aItem */)
+    {
+    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::CloseDTMFPlayer")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::CloseDTMFPlayer"));
+    TInt error = KErrNone;
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::StopDTMFTonePlayer(CStifItemParser& /*aItem */)
+    {
+    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::StopDTMFTonePlayer")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::StopDTMFTonePlay"));
+    TInt error = KErrNone;
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::InitRingTonePlayer(CStifItemParser& /*aItem */)
+    {
+    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::InitRingTonePlayer")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::InitRingTonePlayer"));
+    TInt error = KErrNone;
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::CloseRingTonePlayer(CStifItemParser& /*aItem*/)
+    {
+    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::CloseRingTonePlayer")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::CloseRingTonePlayer"));
+    TInt error = KErrNone;
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::PlayRingTone(CStifItemParser& /*aItem*/)
+    {
+    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::PlayRingTone")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::PlayRingTone"));
+    TInt error = KErrNone;
+
+    if (iRingTonePlayer)
+        {
+        //iRingTonePlayer->Play();
+        AddExpectedEvent(EPlaybackComplete, KLongTimeout);
+        // Played ringing tone file has to be shorter than KLongTimeout
+        }
+    else
+        {
+        iLog->Log(_L("RT PLR Not Ready: error = %d"), KErrNotFound);
+        error = KErrNotFound;
+        }
+
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::PauseRingTone(CStifItemParser& /*aItem*/)
+    {
+    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::PauseRingTone")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::PauseRingTone"));
+    TInt error = KErrNone;
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::ResumeRingTone(CStifItemParser& /*aItem*/)
+    {
+    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::ResumeRingTone")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::ResumeRingTone"));
+    TInt error = KErrNone;
     return error;
     }
 
@@ -2672,6 +2856,24 @@ TInt CTmsAudioServicesTestClass::TogglePLC(CStifItemParser & /*aItem*/)
         iLog->Log(_L("PLC set: %d"), iPlc);
         }
 
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::StopRingTone(CStifItemParser& /*aItem*/)
+    {
+    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::StopRingTone")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::StopRingTone"));
+    TInt error = KErrNone;
+    if (iRingTonePlayer)
+        {
+        //    iRingTonePlayer->Stop();
+        RemoveExpectedEvent(EPlaybackComplete);
+        }
+    else
+        {
+        iLog->Log(_L("RT PLR Not Ready: error = %d"), KErrNotFound);
+        error = KErrNotFound;
+        }
     return error;
     }
 

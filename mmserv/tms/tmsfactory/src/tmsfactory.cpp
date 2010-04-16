@@ -30,7 +30,8 @@ EXPORT_C TMSFactory::~TMSFactory()
     delete impl;
     }
 
-EXPORT_C gint TMSFactory::CreateFactory(TMSFactory*& tmsfactory, TMSVer& /*ver*/)
+EXPORT_C gint TMSFactory::CreateFactory(TMSFactory*& tmsfactory,
+        TMSVer& /*ver*/)
     {
     TMSFactory* self = new TMSFactory();
     tmsfactory = self;
@@ -58,7 +59,8 @@ EXPORT_C gint TMSFactory::DeleteCall(TMSCall*& tmscall)
     return status;
     }
 
-EXPORT_C gint TMSFactory::IsCallTypeSupported(TMSCallType ctype, gboolean& flag)
+EXPORT_C gint TMSFactory::IsCallTypeSupported(TMSCallType ctype,
+        gboolean& flag)
     {
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (impl)
@@ -199,6 +201,77 @@ EXPORT_C gint TMSFactory::DeleteGlobalRouting(TMSGlobalRouting*& globrouting)
     if (impl)
         {
         status = impl->DeleteGlobalRouting(globrouting);
+        }
+    return status;
+    }
+
+EXPORT_C gint TMSFactory::CreateDTMF(TMSStreamType streamtype, TMSDTMF*& dtmf)
+    {
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (impl)
+        {
+        status = impl->CreateDTMF(streamtype, dtmf);
+        }
+    return status;
+    }
+
+EXPORT_C gint TMSFactory::DeleteDTMF(TMSDTMF*& dtmf)
+    {
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (impl)
+        {
+        status = impl->DeleteDTMF(dtmf);
+        }
+    return status;
+    }
+
+EXPORT_C gint TMSFactory::CreateRingTonePlayer(TMSRingTone*& rt)
+    {
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (impl)
+        {
+        status = impl->CreateRingTonePlayer(rt);
+        }
+    return status;
+    }
+
+EXPORT_C gint TMSFactory::CreateRingTonePlayer(TMSRingTone*& rt,
+        RWindow& window, gint scrid)
+    {
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (impl)
+        {
+        status = impl->CreateRingTonePlayer(rt, window, scrid);
+        }
+    return status;
+    }
+
+EXPORT_C gint TMSFactory::DeleteRingTonePlayer(TMSRingTone*& rt)
+    {
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (impl)
+        {
+        status = impl->DeleteRingTonePlayer(rt);
+        }
+    return status;
+    }
+
+EXPORT_C gint TMSFactory::CreateInbandTonePlayer(TMSInbandTone*& inbandtone)
+    {
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (impl)
+        {
+        status = impl->CreateInbandTonePlayer(inbandtone);
+        }
+    return status;
+    }
+
+EXPORT_C gint TMSFactory::DeleteInbandTonePlayer(TMSInbandTone*& inbandtone)
+    {
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (impl)
+        {
+        status = impl->DeleteInbandTonePlayer(inbandtone);
         }
     return status;
     }

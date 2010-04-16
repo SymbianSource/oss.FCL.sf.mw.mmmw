@@ -149,7 +149,7 @@ void CMP3AudioPlayControllerDecoder::ResetL()
     iOutBufferPtr = iOutBuffer;
 
     iAccLen = 0;
-    iEnabled = ETrue; 
+
     DP0(_L ("CMP3AudioPlayControllerDecoder::Reset - Exit"));
 	}
 

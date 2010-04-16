@@ -1,0 +1,213 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  Project file for openmaxal
+*
+*/
+
+#include <data_caging_paths.hrh>
+#include <platform_paths.hrh>
+
+TARGET		openmaxal.dll
+TARGETTYPE	DLL
+UID		    0x1000008D 0x10207CA3
+VENDORID	VID_DEFAULT
+
+VERSION 10.0
+#if !defined(__WINSCW__) && !defined(__WINS__)
+EpocAllowDllData
+#endif
+
+CAPABILITY ALL -TCB
+
+MACRO   USE_NGA_SURFACES
+//MACRO   _GSTREAMER_BACKEND_
+
+#ifdef _GSTREAMER_BACKEND_
+SOURCEPATH      ../Src/adaptation
+SOURCE	XAAdaptationContextBase.c
+SOURCE	XAAudioEncoderItfAdaptation.c
+SOURCE	XACameraAdaptCtx.c
+SOURCE	XACameraItfAdaptation.c
+SOURCE	XADeviceVolumeItfAdaptation.c
+SOURCE	XADynamicSourceItfAdaptation.c
+SOURCE	XAEngineAdaptCtx.c
+SOURCE	XAEqualizerItfAdaptation.c
+SOURCE	XAImageControlsItfAdaptation.c
+SOURCE	XAImageEffectsItfAdaptation.c
+SOURCE	XAImageEncoderItfAdaptation.c
+SOURCE	XALEDArrayAdaptCtx.c
+SOURCE	XALEDArrayItfAdaptation.c
+SOURCE	XAMediaPlayerAdaptCtx.c
+SOURCE	XAMediaRecorderAdaptCtx.c
+SOURCE	XAMetadataAdaptation.c
+SOURCE	XAMetadataAdaptCtx.c
+SOURCE	XAOutputMixAdaptCtx.c
+SOURCE	XAOutputMixItfAdaptation.c
+SOURCE	XAPlaybackRateItfAdaptation.c
+SOURCE	XAPlayItfAdaptation.c
+SOURCE	XARadioAdaptCtx.c
+SOURCE	XARadioItfAdaptation.c
+SOURCE	XARDSItfAdaptation.c
+SOURCE	XARecordItfAdaptation.c
+SOURCE	XASeekItfAdaptation.c
+SOURCE	XASnapShotItfAdaptation.c
+SOURCE	XAStaticCameraCapsAdaptation.c
+SOURCE	XAStaticCapsAdaptation.c
+SOURCE	XAVibraAdaptCtx.c
+SOURCE	XAVibraItfAdaptation.c
+SOURCE	XAVideoEncoderItfAdaptation.c
+SOURCE	XAVideoPostProsessingItfAdaptation.c
+SOURCE	XAVolumeItfAdaptation.c
+// 9.2 only (Exclude on other platforms)
+SOURCE  XANGAVideoSink.cpp
+#endif
+
+SOURCEPATH      ../src/camera
+SOURCE          xacameradevice.c
+SOURCE          xacameraitf.c
+
+SOURCEPATH      ../src/common
+SOURCE          openmaxal.c
+SOURCE          xacommon.c
+SOURCE          xaconfigextensionsitf.c
+SOURCE          xadynamicsourceitf.c
+SOURCE          xadynintmgmtitf.c
+SOURCE          xaequalizeritf.c
+SOURCE          xaimagecontrolsitf.c
+SOURCE          xaimageeffectsitf.c
+SOURCE          xametadataextractionitf.c
+SOURCE          xametadatatraversalitf.c
+SOURCE          xaobjectitf.c
+SOURCE          xaplatform.c
+SOURCE          xathreadsafety.c
+SOURCE          xavideopostprocessingitf.c
+SOURCE          xavolumeitf.c
+
+SOURCEPATH      ../src/engine
+SOURCE          xaaudiodecodercapabilitiesitf.c
+SOURCE          xaaudioencodercapabilitiesitf.c
+SOURCE          xaaudioiodevicecapabilitiesitf.c
+SOURCE          xacameracapabilitiesitf.c
+SOURCE          xadevicevolumeitf.c
+SOURCE          xaengine.c
+SOURCE          xaengineitf.c
+SOURCE          xaimagedecodercapabilitiesitf.c
+SOURCE          xaimageencodercapabilitiesitf.c
+SOURCE          xathreadsyncitf.c
+SOURCE          xavideodecodercapabilitiesitf.c
+SOURCE          xavideoencodercapabilitiesitf.c
+
+SOURCEPATH      ../src/ledarray
+SOURCE          xaledarraydevice.c
+SOURCE          xaledarrayitf.c
+
+SOURCEPATH      ../src/mediaplayer
+SOURCE          xamediaplayer.c
+SOURCE          xaplaybackrateitf.c
+SOURCE          xaplayitf.c
+SOURCE          xaprefetchstatusitf.c
+SOURCE          xaseekitf.c
+
+SOURCEPATH      ../src/mediarecorder
+SOURCE          xaaudioencoderitf.c
+SOURCE          xaimageencoderitf.c
+SOURCE          xamediarecorder.c
+SOURCE          xametadatainsertionitf.c
+SOURCE          xarecorditf.c
+SOURCE          xasnapshotitf.c
+SOURCE          xavideoencoderitf.c
+
+SOURCEPATH      ../src/metadataextractor
+SOURCE          xametadataextractor.c
+
+SOURCEPATH      ../src/outputmix
+SOURCE          xaoutputmix.c
+SOURCE		    xaoutputmixitf.c
+
+SOURCEPATH      ../src/radio
+SOURCE          xaradiodevice.c
+SOURCE		    xaradioitf.c
+SOURCE		    xardsitf.c
+
+SOURCEPATH      ../src/vibra
+SOURCE          xavibradevice.c
+SOURCE		    xavibraitf.c
+
+SOURCEPATH      ../src/mmf_adaptation
+SOURCE	xaengineadaptctxmmf.c
+SOURCE	xamediaplayeradaptctxmmf.c
+SOURCE	xaplayitfadaptationmmf.c
+SOURCE	xaadaptationcontextbasemmf.c
+SOURCE  cmmfbackendengine.cpp
+SOURCE  xamediarecorderadaptctxmmf.c
+SOURCE  xarecorditfadaptationmmf.c
+SOURCE 	sfmrlocaltimer.cpp
+
+USERINCLUDE     ../inc
+USERINCLUDE     ../src
+USERINCLUDE     ../src/khronos
+USERINCLUDE     ../src/mmf_adaptation
+#ifdef _GSTREAMER_BACKEND_
+USERINCLUDE     ../Src/adaptation
+#endif
+USERINCLUDE     ../src/camera
+USERINCLUDE     ../src/common
+USERINCLUDE     ../src/engine
+USERINCLUDE     ../src/ledarray
+USERINCLUDE     ../src/mediaplayer
+USERINCLUDE     ../src/mediarecorder
+USERINCLUDE     ../src/outputmix
+USERINCLUDE     ../src/radio
+USERINCLUDE     ../src/vibra
+
+MW_LAYER_SYSTEMINCLUDE
+OS_LAYER_LIBC_SYSTEMINCLUDE
+OS_LAYER_GLIB_SYSTEMINCLUDE
+SYSTEMINCLUDE /epoc32/include/platform/mw/khronos 
+// 9.2
+#ifdef _GSTREAMER_BACKEND_
+SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer
+SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer/gst
+SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer/gst/interfaces
+SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer/gst/app
+SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer/gst/video
+#endif
+
+LIBRARY         euser.lib
+LIBRARY         libc.lib
+LIBRARY         libglib.lib
+LIBRARY         libpthread.lib
+
+LIBRARY         mediaclientvideodisplay.lib
+LIBRARY         ws32.lib
+LIBRARY			inetprotutil.lib
+LIBRARY         mediaclientaudio.lib
+LIBRARY         MMFControllerFramework.lib
+LIBRARY         mediaclientvideo.lib
+
+#ifdef _GSTREAMER_BACKEND_
+LIBRARY         libgmodule.lib
+LIBRARY         libgobject.lib
+LIBRARY         libgstreamer.lib
+LIBRARY         libgstapp.lib
+LIBRARY		    libgstphotography.lib
+LIBRARY 	    libgstinterfaces.lib 
+LIBRARY		    libgstvideo.lib
+LIBRARY 	    libgstbase.lib
+LIBRARY 	    libgstcoreelements.lib
+LIBRARY		    libgstcoreindexers.lib
+#endif 
+
+
+

@@ -22,7 +22,7 @@
 
 //  INCLUDES
 
-#include <mcustominterfacecustomcommandimplementor.h>
+#include <MCustomInterfaceCustomCommandImplementor.h>
 
 #include "RadioServerData.h"
 

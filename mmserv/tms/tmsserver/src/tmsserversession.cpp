@@ -19,6 +19,8 @@
 #include "tmsutility.h"
 #include "tmsclientserver.h"
 #include "tmsshared.h"
+#include "tmsaudioinbandtoneplayer.h"
+#include "tmsrtplayer.h"
 #include "tmsserversession.h"
 
 using namespace TMS;
@@ -50,6 +52,7 @@ TMSServerSession::~TMSServerSession()
 
     iServer.DropSession(); // will start shutdown if no more sessions left
     delete iDevSound;
+    delete iInbandTonePlayer;
 
     if (iMsgQueue.Handle() > 0)
         {
@@ -99,7 +102,7 @@ void TMSServerSession::ServiceL(const RMessage2& aMessage)
     {
     TRAPD(err, DispatchMessageL(aMessage));
 
-    if (err != KErrNone)
+    if (err != TMS_RESULT_SUCCESS)
         {
         aMessage.Complete(err);
         }
@@ -143,19 +146,19 @@ void TMSServerSession::DispatchMessageL(const RMessage2& aMessage)
             break;
         case ETMSStartRoutingNotifier:
             iServer.StartRoutingNotifierL();
-            aMessage.Complete(KErrNone);
+            aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
         case ETMSCancelRoutingNotifier:
             iServer.CancelRoutingNotifier();
-            aMessage.Complete(KErrNone);
+            aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
         case ETMSStartGlobalEffectNotifier:
             iServer.StartCenRepHandlerL();
-            aMessage.Complete(KErrNone);
+            aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
         case ETMSCancelGlobalEffectNotifier:
             iServer.CancelCenRepHandler();
-            aMessage.Complete(KErrNone);
+            aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
         case ETMSSetMsgQueueHandle:
             SetMessageQueueHandleL(aMessage);
@@ -178,6 +181,79 @@ void TMSServerSession::DispatchMessageL(const RMessage2& aMessage)
         case ETMSGetMaxGlobalGain:
             iServer.GetMaxGain(aMessage);
             break;
+        case ETMSRingToneInitDefault:
+            iHasRtPlayer = ETrue;
+            iServer.OpenRingTonePlayerFromProfileL(aMessage);
+            break;
+        case ETMSRingToneInitFile:
+            iHasRtPlayer = ETrue;
+            iServer.OpenRingTonePlayerFromFileL(aMessage);
+            break;
+        case ETMSRingToneInitSequence:
+            iHasRtPlayer = ETrue;
+            iServer.OpenRingToneSequencePlayerL(aMessage);
+            break;
+        case ETMSRingToneInitBeepOnce:
+            iHasRtPlayer = ETrue;
+            iServer.OpenRingToneBeepOnceL();
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSRingToneInitSilent:
+            iHasRtPlayer = ETrue;
+            iServer.OpenRingToneSilentL();
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSRingToneInitUnsecureVoIP:
+            iHasRtPlayer = ETrue;
+            iServer.OpenRingToneUnsecureVoipL();
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSRingToneDeinit:
+            iServer.DeinitRingTonePlayer();
+            NotifyClient(ECmdRingToneDeinitComplete, KErrNone);
+            iHasRtPlayer = EFalse;
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSRingTonePlay:
+            iHasRtPlayer = ETrue; //will play w/o prior initialization
+            iServer.PlayRingToneL();
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSRingTonePause:
+            iServer.PauseVideoRingTone();
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSRingToneStop:
+            iServer.StopRingTone();
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSRingToneMute:
+            iServer.MuteRingTone();
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSStartDTMFNotifier:
+            iServer.StartDTMFNotifierL();
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSCancelDTMFNotifier:
+            iServer.CancelDTMFNotifier();
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            break;
+        case ETMSStartDTMF:
+            iServer.StartDTMF(aMessage);
+            break;
+        case ETMSStopDTMF:
+            iServer.StopDTMF(aMessage);
+            break;
+        case ETMSContinueDTMF:
+            iServer.ContinueSendingDTMF(aMessage);
+            break;
+        case ETMSStartInbandTone:
+            StartInbandTone(aMessage);
+            break;
+        case ETMSStopInbandTone:
+            StopInbandTone(aMessage);
+            break;
         default:
             User::Leave(KErrNotSupported);
             break;
@@ -192,16 +268,16 @@ void TMSServerSession::DispatchMessageL(const RMessage2& aMessage)
 //
 void TMSServerSession::SetMessageQueueHandleL(const RMessage2& aMessage)
     {
-    gint status = KErrNone;
+    gint status = TMS_RESULT_SUCCESS;
     if (iMsgQueue.Handle() <= 0)
         {
         status = iMsgQueue.Open(aMessage, 0);
         }
-    if (status != KErrNone)
+    if (status != TMS_RESULT_SUCCESS)
         {
         User::Leave(KErrArgument);
         }
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
@@ -212,7 +288,7 @@ void TMSServerSession::SetVolLevel(const RMessage2& aMessage)
     {
     TInt level = aMessage.Int0();
     iServer.SetLevel(this, TRUE, level);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
@@ -223,7 +299,7 @@ void TMSServerSession::SetMicGain(const RMessage2& aMessage)
     {
     TInt gain = aMessage.Int0();
     iServer.SetGain(this, gain);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
@@ -233,10 +309,8 @@ void TMSServerSession::SetMicGain(const RMessage2& aMessage)
 void TMSServerSession::HandleGlobalEffectChange(TInt globalevent)
     {
     TRACE_PRN_FN_ENT;
-    iMsgBuffer.iRequest = ECmdGlobalEffectChange;
-    iMsgBuffer.iStatus = KErrNone;
     iMsgBuffer.iInt = globalevent;
-    NotifyClient();
+    NotifyClient(ECmdGlobalEffectChange);
     TRACE_PRN_FN_EXT;
     }
 
@@ -247,11 +321,9 @@ void TMSServerSession::HandleGlobalEffectChange(TInt globalevent)
 void TMSServerSession::HandleRoutingChange(TRoutingMsgBufPckg routinginfo)
     {
     TRACE_PRN_FN_ENT;
-    iMsgBuffer.iRequest = ECmdGlobalRoutingChange;
-    iMsgBuffer.iStatus = KErrNone;
     iMsgBuffer.iInt = routinginfo().iEvent;
     iMsgBuffer.iUint = routinginfo().iOutput;
-    NotifyClient();
+    NotifyClient(ECmdGlobalRoutingChange);
     TRACE_PRN_FN_EXT;
     }
 
@@ -280,7 +352,7 @@ void TMSServerSession::GetTMSCallSessionHandleL(const RMessage2& aMessage)
 void TMSServerSession::GetCodecsCountL(const RMessage2& aMessage,
         TMSStreamType strmType)
     {
-    TInt err = KErrNone;
+    TInt err = TMS_RESULT_SUCCESS;
     TInt codecsCount = 0;
 
     RArray<TFourCC>* codecs;
@@ -315,13 +387,6 @@ void TMSServerSession::GetCodecsCountL(const RMessage2& aMessage,
                 err = KErrNotSupported;
                 }
 
-#ifdef __WINSCW__
-            // Support for adaptation stubs
-            codecs->Append(KMccFourCCIdG711);
-            codecs->Append(KMccFourCCIdG729);
-            codecs->Append(KMccFourCCIdILBC);
-            codecs->Append(KMccFourCCIdAMRNB);
-#endif
             codecsCount = codecs->Count();
             }
 
@@ -339,7 +404,7 @@ void TMSServerSession::GetCodecsCountL(const RMessage2& aMessage,
 #endif //__WINSCW__
     p().iStatus = err;
     aMessage.WriteL(0, p);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
@@ -373,7 +438,7 @@ void TMSServerSession::GetSupportedCodecsL(const RMessage2& aMessage,
     aMessage.WriteL(0, dataCopyBuffer->Ptr(0));
     CleanupStack::PopAndDestroy(&stream);
     CleanupStack::PopAndDestroy(dataCopyBuffer);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
 
     TRACE_PRN_FN_EXT;
     }
@@ -386,15 +451,67 @@ void TMSServerSession::SetOutput(const RMessage2& aMessage)
     {
     TInt output = aMessage.Int0();
     iServer.SetOutput(this, output);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServerSession::StartInbandTone
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServerSession::StartInbandTone(const RMessage2& aMessage)
+    {
+    if (!iInbandTonePlayer)
+        {
+        //TODO: Add inband tone observer
+        iInbandTonePlayer = TMSAudioInbandTonePlayer::NewL();
+        }
+
+    if (iInbandTonePlayer)
+        {
+        TMSInbandToneType tonetype = (TMSInbandToneType) aMessage.Int0();
+        iInbandTonePlayer->PlayInbandTone(tonetype);
+        }
+
+    //TODO: Move to inband tone observer callback
+    NotifyClient(ECmdInbandToneStarted);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServerSession::StopInbandTone
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServerSession::StopInbandTone(const RMessage2& aMessage)
+    {
+    if (iInbandTonePlayer)
+        {
+        iInbandTonePlayer->Cancel();
+        }
+
+    //TODO: Move to inband tone observer callback
+    NotifyClient(ECmdInbandToneStopped);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
     }
 
 // -----------------------------------------------------------------------------
 // TMSServerSession::NotifyClient
 // -----------------------------------------------------------------------------
 //
-void TMSServerSession::NotifyClient()
+void TMSServerSession::NotifyClient(const TInt aCommand, const TInt aStatus)
     {
+    if (aCommand == ECmdRingToneOpenComplete ||
+            aCommand == ECmdRingToneOpenComplete)
+        {
+        if (!iHasRtPlayer)
+            {
+            return;
+            }
+        }
+
+    iMsgBuffer.iRequest = aCommand;
+    iMsgBuffer.iStatus = aStatus;
     if (iMsgQueue.Handle() > 0)
         {
         iMsgQueue.Send(iMsgBuffer);

@@ -292,7 +292,6 @@ void CAACAudioPlayControllerDecoder::ResetL()
     iAccLen = 0;
 
 	iAacUtil->Config(iFrameLenConfig);
-	iEnabled = ETrue;
     DP0(_L ("CAACAudioPlayControllerDecoder::Reset - Exit"));
 	}
 	

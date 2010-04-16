@@ -29,9 +29,13 @@ class TMSSource;
 class TMSSourceImpl
     {
 public:
+    ~TMSSourceImpl();
     IMPORT_C static gint Create(TMSSourceType sourcetype,
             TMSSource*& tmssource);
     IMPORT_C static gint Delete(TMSSource*& tmssource);
+
+private:
+    TMSSourceImpl();
     };
 
 } //namespace TMS

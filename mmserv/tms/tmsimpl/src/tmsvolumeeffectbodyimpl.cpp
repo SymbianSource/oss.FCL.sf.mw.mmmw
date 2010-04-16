@@ -17,6 +17,7 @@
 
 #include <tms.h>
 #include <tmseffectobsrvr.h>
+#include "tmsutility.h"
 #include "tmscallproxy.h"
 #include "tmsqueuehandler.h"
 #include "tmsvolumeeffectbodyimpl.h"
@@ -26,12 +27,14 @@ using namespace TMS;
 TMSVolumeEffectBodyImpl::TMSVolumeEffectBodyImpl() :
     iObserver(NULL),
     iProxy(NULL),
-    iParentEffect(NULL)
+    iParent(NULL)
     {
     }
 
 TMSVolumeEffectBodyImpl::~TMSVolumeEffectBodyImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSVolumeEffectBodyImpl::Create(TMSVolumeEffectBody*& bodyimpl)
@@ -136,12 +139,9 @@ gint TMSVolumeEffectBodyImpl::GetType(TMSEffectType& effecttype)
     return ret;
     }
 
-gint TMSVolumeEffectBodyImpl::SetParentEffect(TMSEffect*& parenteffect)
+void TMSVolumeEffectBodyImpl::SetParent(TMSEffect*& parent)
     {
-    gint ret(TMS_RESULT_SUCCESS);
-    iParentEffect = NULL;
-    iParentEffect = parenteffect;
-    return ret;
+    iParent = parent;
     }
 
 void TMSVolumeEffectBodyImpl::SetProxy(TMSCallProxy* aProxy,
@@ -150,7 +150,8 @@ void TMSVolumeEffectBodyImpl::SetProxy(TMSCallProxy* aProxy,
     iProxy = aProxy;
     if (queuehandler)
         {
-        ((CQueueHandler*) queuehandler)->AddObserver(*this, TMS_EFFECT_VOLUME);
+        ((TMSQueueHandler*) queuehandler)->AddObserver(*this,
+                TMS_EFFECT_VOLUME);
         }
     }
 
@@ -158,7 +159,6 @@ void TMSVolumeEffectBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         void* /*user_data*/)
     {
     TMSSignalEvent event;
-
     event.type = TMS_EVENT_EFFECT_VOL_CHANGED;
     event.reason = aError;
 
@@ -166,9 +166,9 @@ void TMSVolumeEffectBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         {
         case TMS_EVENT_EFFECT_VOL_CHANGED:
             {
-            if (iObserver && iParentEffect)
+            if (iObserver && iParent)
                 {
-                iObserver->EffectsEvent(iParentEffect, event);
+                iObserver->EffectsEvent(iParent, event);
                 }
             }
             break;
@@ -177,4 +177,3 @@ void TMSVolumeEffectBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         }
     }
 
-// End of file

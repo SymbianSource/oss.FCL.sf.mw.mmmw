@@ -49,8 +49,7 @@ class TMSStreamBodyImpl : public TMSStreamBody,
 
 public:
     static gint Create(TMSCallType callType, TMSStreamType stype,
-            TMSCallProxy* proxy, TMSStream& parent,
-            TMSStreamBody*& bodyimpl);
+            TMSCallProxy* proxy, TMSStream& parent, TMSStreamBody*& bodyimpl);
     virtual ~TMSStreamBodyImpl();
 
     // From TMSStreamBody
@@ -83,7 +82,7 @@ private:
 
     gint CreateQueue(const gint aNumSlots);
     void ReceiveMsgQHandlerEventsL();
-    
+
     gint ValidateStream();
     gint ValidateSource(TMSSource* source);
     gint ValidateSink(TMSSink* sink);
@@ -102,7 +101,7 @@ private:
 
     // Message queue and the handler
     RMsgQueue<TmsMsgBuf> iMsgQueue;
-    CQueueHandler* iMsgQHandler;
+    TMSQueueHandler* iMsgQHandler;
 
     // Need to make this a list
     TMSStreamObserver* iObserver;

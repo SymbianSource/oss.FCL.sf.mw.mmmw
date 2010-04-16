@@ -2,6 +2,7 @@ EXPORTS
 	?FourCCToTMSFormat@TMSUtility@TMS@@SAHK@Z @ 1 NONAME ; int TMS::TMSUtility::FourCCToTMSFormat(unsigned long)
 	?ToTAROutput@TMSUtility@TMS@@SA?AW4TAudioOutput@CTelephonyAudioRouting@@H@Z @ 2 NONAME ; enum CTelephonyAudioRouting::TAudioOutput TMS::TMSUtility::ToTAROutput(int)
 	?ToFourCC@TMSUtility@TMS@@SAKH@Z @ 3 NONAME ; unsigned long TMS::TMSUtility::ToFourCC(int)
-	?ToTMSOutput@TMSUtility@TMS@@SAHW4TAudioOutput@CTelephonyAudioRouting@@@Z @ 4 NONAME ; int TMS::TMSUtility::ToTMSOutput(enum CTelephonyAudioRouting::TAudioOutput)
-	?TMSResult@TMSUtility@TMS@@SAHH@Z @ 5 NONAME ; int TMS::TMSUtility::TMSResult(int)
+	?EtelToTMSResult@TMSUtility@TMS@@SAHH@Z @ 4 NONAME ; int TMS::TMSUtility::EtelToTMSResult(int)
+	?ToTMSOutput@TMSUtility@TMS@@SAHW4TAudioOutput@CTelephonyAudioRouting@@@Z @ 5 NONAME ; int TMS::TMSUtility::ToTMSOutput(enum CTelephonyAudioRouting::TAudioOutput)
+	?TMSResult@TMSUtility@TMS@@SAHH@Z @ 6 NONAME ; int TMS::TMSUtility::TMSResult(int)
 

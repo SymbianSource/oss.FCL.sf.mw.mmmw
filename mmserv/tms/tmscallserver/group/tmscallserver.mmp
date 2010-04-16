@@ -52,6 +52,11 @@ SOURCE          cspdevsound.cpp
 SOURCE          csdownlink.cpp
 SOURCE          csuplink.cpp
 SOURCE          tarsettings.cpp
+SOURCE          cpeaudiodtmftoneplayer.cpp
+SOURCE          cspdtmfprovider.cpp
+SOURCE          cspeteldtmfmonitor.cpp
+SOURCE          cspeteldtmfstopmonitor.cpp
+SOURCE          dtmfnotifier.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../inc
@@ -62,17 +67,17 @@ USERINCLUDE     /sf/mw/gstreamer/gst_plugins_symbian/gst/devsound
 MW_LAYER_SYSTEMINCLUDE
 OS_LAYER_LIBC_SYSTEMINCLUDE
 OS_LAYER_GLIB_SYSTEMINCLUDE
-
+OS_LAYER_STDCPP_SYSTEMINCLUDE
 SYSTEMINCLUDE   /epoc32/include/mmf/server
 SYSTEMINCLUDE   /epoc32/include/mda/common
 SYSTEMINCLUDE   /epoc32/include/mmf/common
-SYSTEMINCLUDE   /epoc32/include/stdapis/stlport
 
 #ifdef __USE_GSTREAMER__
-SYSTEMINCLUDE   /sf/mw/gstreamer/include/gstreamer
-SYSTEMINCLUDE   /sf/mw/gstreamer/include/gstreamer/gst
-SYSTEMINCLUDE   /sf/mw/gstreamer/include/gstreamer/gst/app
-SYSTEMINCLUDE   /epoc32/include/stdapis/glib-2.0/gobject
+MW_LAYER_GSTREAMER_SYSTEMINCLUDE
+//SYSTEMINCLUDE   /sf/mw/gstreamer/include/gstreamer
+//SYSTEMINCLUDE   /sf/mw/gstreamer/include/gstreamer/gst
+//SYSTEMINCLUDE   /sf/mw/gstreamer/include/gstreamer/gst/app
+//SYSTEMINCLUDE   /epoc32/include/stdapis/glib-2.0/gobject
 
 LIBRARY         libgobject.lib
 LIBRARY         libgstreamer.lib
@@ -100,6 +105,10 @@ LIBRARY         mediaclientaudio.lib
 LIBRARY         profileengine.lib
 LIBRARY         telephonyaudiorouting.lib
 LIBRARY         tmsutility.lib
+// Libraries for ETel
+LIBRARY         etelmm.lib
+LIBRARY         etel.lib
+LIBRARY         customapi.lib
 
 DEFFILE         tmscallserver.def
 NOSTRICTDEF

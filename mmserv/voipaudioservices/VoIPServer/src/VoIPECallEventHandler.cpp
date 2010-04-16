@@ -18,7 +18,7 @@
 // INCLUDE FILES
 #include <ctsydomainpskeys.h>
 #include "debugtracemacros.h"
-#include "voipecalleventhandler.h"
+#include "VoIPECallEventHandler.h"
 
 // -----------------------------------------------------------------------------
 // CVoIPECallEventHandler::CVoIPECallEventHandler
@@ -43,6 +43,7 @@ void CVoIPECallEventHandler::ConstructL()
     CActiveScheduler::Add(this);
     User::LeaveIfError(iProperty.Attach(KPSUidCtsyEmergencyCallInfo,
             KCTSYEmergencyCallInfo));
+    iStatus = KRequestPending;
     iProperty.Subscribe(iStatus);
     SetActive();
     TRACE_PRN_FN_EXT;
@@ -98,6 +99,7 @@ void CVoIPECallEventHandler::RunL()
     // don't miss further updates.
     if (iStatus.Int() == KErrNone)
         {
+        iStatus = KRequestPending;
         iProperty.Subscribe(iStatus);
         SetActive();
 

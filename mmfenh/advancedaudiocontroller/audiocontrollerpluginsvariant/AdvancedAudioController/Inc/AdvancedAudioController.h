@@ -540,6 +540,7 @@ class CAdvancedAudioController : public CMMFController,
 		TInt iSharedBufferMaxNum;
 		// Max buffer size
 		TInt iSharedBufferMaxSize;
+		TInt iSharedBufferMaxSizeForNonSeekableSrc;
 		// Array of shared buffers
 		RPointerArray<CMMFDataBuffer> iSharedBuffers;
 		// Current index within iSharedBuffers

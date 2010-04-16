@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmsmicsourcebodyimpl.h"
 #include "tmsmicsourceimpl.h"
@@ -24,10 +23,14 @@ using namespace TMS;
 
 TMSMicSourceImpl::TMSMicSourceImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 TMSMicSourceImpl::~TMSMicSourceImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSMicSourceImpl::PostConstruct()

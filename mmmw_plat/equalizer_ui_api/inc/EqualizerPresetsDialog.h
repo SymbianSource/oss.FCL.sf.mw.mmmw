@@ -25,7 +25,7 @@
 #include <AknDialog.h> 
 #include <aknlists.h>
 #include <EqualizerConstants.h>
-#include <AudioEqualizerutility.h>
+#include <AudioEqualizerUtility.h>
 
 // CLASS DECLARATION
 class CEqualizerPresetListArray;

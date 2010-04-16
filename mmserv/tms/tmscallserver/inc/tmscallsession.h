@@ -26,7 +26,7 @@ namespace TMS {
 
 // FORWARD DECLARATIONS
 class TMSCallServer;
-class CallAdpt;
+class TMSCallAdpt;
 
 /*
  * Class Name:  TMSCallSession
@@ -88,9 +88,13 @@ private:
     void HandleRoutingGetPreviousOutputL(const RMessage2& aMessage);
     void HandleRoutingGetAvailableOutputsL(const RMessage2& aMessage);
 
+    void HandleDTMFStart(const RMessage2& aMessage);
+    void HandleDTMFStop(const RMessage2& aMessage);
+    void HandleDTMFContinue(const RMessage2& aMessage);
+
 private:
     TMSCallServer& iTMSCallServer;
-    CallAdpt* iCallAdpt;
+    TMSCallAdpt* iCallAdpt;
     gint iGlobalVol;
     gint iGlobalGain;
     };

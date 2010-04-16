@@ -254,6 +254,10 @@ EXPORT_C void C3gpDataSourceAdapter::SetDataSourceL(MDataSource* aDataSource,
         }
 	if ((iSourceType == KUidMmfFileSource) || (iSourceType == KOldProgDLSourceUid))
     	{ // parser has file handle
+	   	if (iSourceType == KUidMmfFileSource) 
+			{
+		    	iIsLocalPlayback = ETrue;
+			}
 		// read async from lib when it has a file handle
 		iClip = static_cast<CMMFClip*>(iDataSource);
         iDataSource->SourcePrimeL();

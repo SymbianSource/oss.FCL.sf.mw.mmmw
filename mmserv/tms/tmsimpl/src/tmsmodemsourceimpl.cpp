@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmsmodemsourceimpl.h"
 #include "tmsmodemsourcebodyimpl.h"
@@ -24,10 +23,14 @@ using namespace TMS;
 
 TMSModemSourceImpl::TMSModemSourceImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 TMSModemSourceImpl::~TMSModemSourceImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSModemSourceImpl::PostConstruct()

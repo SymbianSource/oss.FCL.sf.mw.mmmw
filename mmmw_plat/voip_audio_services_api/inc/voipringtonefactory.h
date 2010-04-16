@@ -1,29 +1,26 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines factory object for creating ring tone player.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines factory object for creating ring tone player.
+ *
+ */
 
 #ifndef __RINGTONEFACTORY_H
 #define __RINGTONEFACTORY_H
 
-
 // FORWARD DECLARATIONS
 class CRingTonePlayer;
 class CRingToneFactoryImpl;
-
 
 /**
  *  CRingToneFactory class
@@ -31,7 +28,7 @@ class CRingToneFactoryImpl;
  *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CRingToneFactory
     {

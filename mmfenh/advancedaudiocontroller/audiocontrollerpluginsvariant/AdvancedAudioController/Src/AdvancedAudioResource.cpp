@@ -89,6 +89,7 @@ EXPORT_C void CAdvancedAudioResource::ReadResourceFileL(
 
 	iProperties.iSharedBufferMaxNum = iResourceReader.ReadInt32();
 	iProperties.iSharedBufferMaxSize = iResourceReader.ReadInt32();
+	iProperties.iSharedBufferMaxSizeForNonSeekableSrc = iResourceReader.ReadInt32();
 	iProperties.iSamplingRate = iResourceReader.ReadInt32();
 	iProperties.iStereoSupport = iResourceReader.ReadInt32();
 	iProperties.iMetaDataSupport = iResourceReader.ReadInt32();

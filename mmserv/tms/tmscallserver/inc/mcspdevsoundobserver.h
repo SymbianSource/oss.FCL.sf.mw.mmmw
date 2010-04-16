@@ -25,7 +25,7 @@ namespace TMS {
  *  successfully ramped up.
  *
  */
-class MCSPDevSoundObserver
+class TMSCSPDevSoundObserver
     {
 public:
     virtual void DownlinkInitCompleted(TInt x) = 0;

@@ -21,28 +21,36 @@
 #include <TelephonyAudioRouting.h>
 #include <MTelephonyAudioRoutingObserver.h>
 #include <e32msgqueue.h>
+#include <etelmm.h>
+#include <rmmcustomapi.h>
 #include "tmsclientserver.h"
+#include "dtmftoneplayerobserver.h"
 #include "calladpt.h"
 #include "mcspdevsoundobserver.h"
+#include "mccpdtmfobserver.h"
 
 namespace TMS {
 
 // FORWARD DECLARATIONS
-class CSUplink;
-class CSDownlink;
-class TarSettings;
+class TMSCSUplink;
+class TMSCSDownlink;
+class TMSTarSettings;
+class TMSAudioDtmfTonePlayer;
+class TMSDTMFProvider;
+class TMSDtmfNotifier;
 
 /*
  * CallCSAdapt class
  */
-class CallCSAdpt : public CBase,
-                   public CallAdpt,
-                   public MCSPDevSoundObserver,
-                   public MTelephonyAudioRoutingObserver
+class TMSCallCSAdpt : public TMSCallAdpt,
+                      public TMSCSPDevSoundObserver,
+                      public MTelephonyAudioRoutingObserver,
+                      public TMSDTMFTonePlayerObserver,
+                      public TMSCCPDTMFObserver
     {
 public:
-    CallCSAdpt();
-    virtual ~CallCSAdpt();
+    TMSCallCSAdpt();
+    virtual ~TMSCallCSAdpt();
     virtual gint PostConstruct();
 
     virtual gint CreateStream(TMSCallType callType, TMSStreamType strmType,
@@ -98,17 +106,28 @@ public:
     virtual gint GetOutput(TMSAudioOutput& output);
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
     virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer);
+    virtual gint StartDTMF(TMSStreamType streamtype, TDes& dtmfstring);
+    virtual gint StopDTMF(TMSStreamType streamtype);
+    virtual gint ContinueDTMF(TBool continuesending);
 
     void NotifyClient(const gint strmId, const gint aCommand,
             const gint aStatus = KErrNone, const gint64 aInt64 = TInt64(0));
 
-    //From MCSPDevSoundObserver
+    //From TMSCSPDevSoundObserver
     void DownlinkInitCompleted(TInt status);
     void UplinkInitCompleted(TInt status);
     void UplinkActivatedSuccessfully();
     void DownlinkActivatedSuccessfully();
     void UplinkActivationFailed();
     void DownlinkActivationFailed();
+
+    //From DTMFTonePlayerObserver
+    void DTMFInitCompleted(TInt error);
+    void DTMFToneFinished(TInt error);
+
+    //From TMSCCPDTMFObserver
+     void HandleDTMFEvent(const TMSCCPDTMFObserver::TCCPDtmfEvent aEvent,
+             const TInt aError, const TChar aTone);
 
 protected:
     void AvailableOutputsChanged(
@@ -121,10 +140,13 @@ protected:
 private:
     gint iNextStreamId;
 
-    CSUplink* iCSUplink;
-    CSDownlink* iCSDownlink;
+    TMSCSUplink* iCSUplink;
+    TMSCSDownlink* iCSDownlink;
     CTelephonyAudioRouting* iRouting;
-    TarSettings* iTarSettings;
+    TMSTarSettings* iTarSettings;
+    TMSAudioDtmfTonePlayer* iDTMFDnlinkPlayer;
+    TMSDtmfNotifier* iDTMFNotifier;
+    TMSDTMFProvider* iDTMFUplinkPlayer;
     TMSStreamType iStrmtype;
 
     RMsgQueue<TmsMsgBuf> iMsgQueueUp;

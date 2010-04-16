@@ -32,7 +32,7 @@
 #endif // RD_TSP_CLIENT_MAPPER
 #include "RadioServerData.h"
 #include "RadioClientServer.h"
-#include "RadioServerFmTuner.h"
+#include "RadioServerFMTuner.h"
 
 // DATA TYPES
 struct TRadioMessageRequestData
@@ -727,6 +727,8 @@ private:    // Data
 	TInt iRdsNotifyCount;
 	// Array to keep track of clients requesting to be notified of RDS Data
 	RArray<TUint> iRdsNotifyClientIdArray;
+	// Wait logic implementation towards adaptation
+	CActiveSchedulerWait* iSchedulerWait;
 
 #ifdef RD_TSP_CLIENT_MAPPER
     // Process Id of the client

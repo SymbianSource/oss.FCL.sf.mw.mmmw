@@ -1,31 +1,28 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines APIs common to all supported codecs.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines APIs common to all supported codecs.
+ *
+ */
 
 #ifndef __VOIPFORMATINTFC_H
 #define __VOIPFORMATINTFC_H
 
 #include <voipaudiocommon.h>
 
-
 // FORWARD DECLARATIONS
 class CVoIPFormatIntfc;
 class CVoIPFormatIntfcImpl;
-
 
 /**
  *  MVoIPFormatObserver class
@@ -33,14 +30,14 @@ class CVoIPFormatIntfcImpl;
  *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class MVoIPFormatObserver
     {
 public:
-    static const TUint KSilenceBegin     = 1;
-    static const TUint KSilenceUpdate    = 2;
-    static const TUint KSilenceEnd       = 3;
+    static const TUint KSilenceBegin = 1;
+    static const TUint KSilenceUpdate = 2;
+    static const TUint KSilenceEnd = 3;
     static const TUint KObserverEventMax = 4;
 
 public:
@@ -55,14 +52,13 @@ public:
     virtual void Event(const CVoIPFormatIntfc& aSrc, TInt aEventType) = 0;
     };
 
-
 /**
  *  CVoIPFormatIntfc class
  *
  *  Base class for codec format configuration
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
+ *
  */
 class CVoIPFormatIntfc
     {
@@ -70,7 +66,7 @@ public:
     /**
      *  TG711CodecMode
      *  ?description
-     *  @since S60 v5.0
+ *
      */
     enum TG711CodecMode
         {
@@ -81,7 +77,7 @@ public:
     /**
      *  TILBCCodecMode
      *  ?description
-     *  @since S60 v5.0
+ *
      */
     enum TILBCCodecMode
         {
@@ -209,6 +205,7 @@ protected:
     void ConstructL(CVoIPFormatIntfcImpl* aVoIPFormatIntfcImpl);
 
 protected:
+
     CVoIPFormatIntfcImpl* iVoIPFormatIntfcImpl;
 
     };

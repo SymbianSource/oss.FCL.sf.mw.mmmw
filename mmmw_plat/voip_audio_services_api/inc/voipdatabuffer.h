@@ -1,43 +1,40 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Defines buffer type for VoIP data streaming.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Defines buffer type for VoIP data streaming.
+ *
+ */
 
 #ifndef __VOIPDATABUFFER_H
 #define __VOIPDATABUFFER_H
 
 #include <e32base.h>
 
-
 // FORWARD DECLARATIONS
 class CVoIPDataBufferImpl;
 class CVoIPJBDataBufferImpl;
 
-
 /**
  *  CVoIPDataBuffer
  *  ?description
- *  @since S60 v5.0
+ *
  */
 class CVoIPDataBuffer
     {
 public:
     /**
-    * Buffer types
-    */
+     * Buffer types
+     */
     enum TVoIPBufferType
         {
         EStandard,
@@ -101,15 +98,15 @@ protected:
     void ConstructL(CVoIPDataBufferImpl* aVoIPDataBufferImpl);
 
 private:
+
     CVoIPDataBufferImpl* iVoIPDataBufferImpl;
 
     };
 
-
 /**
  *  CVoIPJBDataBuffer
  *  ?description
- *  @since S60 v5.0
+ *
  */
 class CVoIPJBDataBuffer : public CVoIPDataBuffer
     {
@@ -161,11 +158,11 @@ protected:
     void ConstructL(CVoIPJBDataBufferImpl* aVoIPJBDataBufferImpl);
 
 private:
+
     CVoIPJBDataBufferImpl* iVoIPJBDataBufferImpl;
 
     };
 
 #endif //__VOIPDATABUFFER_H
-
 
 // End of file

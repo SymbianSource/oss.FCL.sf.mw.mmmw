@@ -58,6 +58,7 @@ void C3GPAudioRecordControllerPlugin::ConstructL()
     DP0(_L("C3GPAudioRecordControllerPlugin::ConstructL(3)"));
     iSharedBufferMaxNum = aapProperties.iSharedBufferMaxNum;    // default size
     iSharedBufferMaxSize = aapProperties.iSharedBufferMaxSize;    // default size
+    iSharedBufferMaxSizeForNonSeekableSrc = aapProperties.iSharedBufferMaxSizeForNonSeekableSrc;
 
     iMetaData = C3GPAudioRecordControllerMetaData::NewL();
 

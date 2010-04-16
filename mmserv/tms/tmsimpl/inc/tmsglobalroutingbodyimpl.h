@@ -27,6 +27,7 @@ namespace TMS {
 
 // FORWARD DECLARATIONS
 class TMSGlobalRoutingObserver;
+class TMSGlobalRouting;
 class TMSProxy;
 
 // TMSGlobalRoutingBodyImpl class
@@ -34,9 +35,9 @@ class TMSGlobalRoutingBodyImpl : public TMSGlobalRoutingBody
     {
 public:
     static gint Create(TMSGlobalRoutingBody*& bodyimpl);
+    virtual ~TMSGlobalRoutingBodyImpl();
 
     // From TMSGlobalRoutingBody
-    virtual ~TMSGlobalRoutingBodyImpl();
     virtual gint AddObserver(TMSGlobalRoutingObserver& obsrvr,
             gpointer user_data);
     virtual gint RemoveObserver(TMSGlobalRoutingObserver& obsrvr);
@@ -44,6 +45,8 @@ public:
     virtual gint GetOutput(TMSAudioOutput& output);
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
     virtual gint GetAvailableOutputs(OutputVector& outputs);
+
+    void SetParent(TMSGlobalRouting*& parent);
 
 private:
     TMSGlobalRoutingBodyImpl();
@@ -56,10 +59,10 @@ private:
     RPointerArray<TMSGlobalRoutingObserver> iObserversList; // (not owned)
     gpointer iUserData;
     TMSProxy* iProxy;
+    TMSGlobalRouting* iParent;
     };
 
 } //namespace TMS
 
 #endif // TMS_GLOBAL_ROUTING_BODY_IMPL_H
 
-// End of file

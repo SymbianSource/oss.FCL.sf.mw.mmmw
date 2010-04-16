@@ -26,8 +26,11 @@ namespace TMS {
 class TMSMemBuffer : public TMSBuffer
     {
 public:
-    ~TMSMemBuffer();
+    virtual ~TMSMemBuffer();
 
+    /**
+     * Factory methods
+     */
     static gint Create(guint size, TMSBuffer*& tmsbuffer);
     static gint Create(guint size, guint8* dataptr, TMSBuffer*& tmsbuffer);
 

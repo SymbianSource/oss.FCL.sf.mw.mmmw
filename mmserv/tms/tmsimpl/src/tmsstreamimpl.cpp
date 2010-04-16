@@ -15,7 +15,7 @@
  *
  */
 
-#include <tms.h>
+#include "tmsutility.h"
 #include "tmsstreambodyimpl.h"
 #include "tmsstreamimpl.h"
 
@@ -23,10 +23,14 @@ using namespace TMS;
 
 TMSStreamImpl::TMSStreamImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 TMSStreamImpl::~TMSStreamImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSStreamImpl::PostConstruct(TMSCallType callType, TMSStreamType stype,
@@ -63,4 +67,13 @@ gint TMSStreamImpl::Create(TMSCallType callType, TMSStreamType stype,
     return ret;
     }
 
-// End of file
+gint TMSStreamImpl::Delete(TMSStream*& strm)
+    {
+    TRACE_PRN_FN_ENT;
+    gint ret(TMS_RESULT_SUCCESS);
+    delete (TMSStreamImpl*) (strm);
+    strm = NULL;
+    TRACE_PRN_FN_EXT;
+    return ret;
+    }
+

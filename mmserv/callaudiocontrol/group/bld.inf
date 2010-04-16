@@ -27,8 +27,8 @@ DEFAULT
 
 PRJ_EXPORTS
 
-../data/CallAudioControl_Stub.sis   /epoc32/data/z/system/install/CallAudioControl_Stub.sis
-../data/backup_registration.xml     /epoc32/data/z/private/10207BD2/backup_registration.xml
+../data/CallAudioControl_Stub.sis   /epoc32/data/z/system/install/callaudiocontrol_stub.sis
+../data/backup_registration.xml     /epoc32/data/z/private/10207bd2/backup_registration.xml
 
 #ifdef __SERIES60_31__
 ../rom/CallAudioControl.iby  /epoc32/rom/include/CallAudioControl.iby

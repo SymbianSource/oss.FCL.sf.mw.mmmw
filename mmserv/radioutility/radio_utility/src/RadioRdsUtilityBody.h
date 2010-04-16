@@ -20,8 +20,8 @@
 #ifndef C_RADIORDSUTILITYBODY_H
 #define C_RADIORDSUTILITYBODY_H
 
-#include <radiordsutility.h>
-#include "radioutilitybody.h"
+#include <RadioRdsUtility.h>
+#include "RadioUtilityBody.h"
 
 class RRadioSession;
 class CRadioUtility;

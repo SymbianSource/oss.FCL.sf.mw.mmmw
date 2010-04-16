@@ -42,7 +42,7 @@ SOURCE          HXTneClientObserver.cpp
 
 SOURCEPATH      ../TneProcessorSrc
 SOURCE          yuv2rgb12.cpp
-SOURCE          yuv2rgb16.cpp
+SOURCE          Yuv2rgb16.cpp
 SOURCE          yuv2rgb24.cpp
 
 SOURCEPATH      ../ImaamiSrc
@@ -59,7 +59,7 @@ SYSTEMINCLUDE   /epoc32/include/libc
 SYSTEMINCLUDE   /epoc32/include/mmf/common
 SYSTEMINCLUDE   /epoc32/include/mmf/devvideo
 
-USERINCLUDE	../../Inc
+USERINCLUDE	../../inc
 USERINCLUDE     ../TneAPIInc
 USERINCLUDE     ../TneProcessorInc
 USERINCLUDE     ../ImaamiInc

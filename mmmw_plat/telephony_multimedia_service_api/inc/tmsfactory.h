@@ -18,6 +18,7 @@
 #ifndef TMS_FACTORY_H
 #define TMS_FACTORY_H
 
+#include <w32std.h>
 #include <tms.h>
 
 namespace TMS {
@@ -35,6 +36,7 @@ class TMSGlobalRouting;
 class TMSDTMF;
 class TMSRTPSession;
 class TMSRingTone;
+class TMSInbandTone;
 
 /**
  * TMSFactory class
@@ -422,7 +424,7 @@ public:
     IMPORT_C gint DeleteRTPSession(TMSRTPSession*& rtpsession);
 
     /**
-     * Creates TMSRingTone player object.
+     * Creates TMSRingTone player object for audio ring tone.
      *
      * @param  rt
      *      RingTone player object to be created.
@@ -435,6 +437,26 @@ public:
     IMPORT_C gint CreateRingTonePlayer(TMSRingTone*& rt);
 
     /**
+     * Creates TMSRingTone player object for video ring tone.
+     *
+     * @param  rt
+     *      Video RingTone player object to be created.
+     *
+     * @param window
+     *      A handle to window to which video should be rendered.
+     *
+     * @param scrid
+     *      An ID of the screen to which video should be rendered.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS when object is created successfully.
+     *      TMS_RESULT_INSUFFICIENT_MEMORY when object creation failed due to
+     *      insufficient memory.
+     */
+    IMPORT_C gint CreateRingTonePlayer(TMSRingTone*& rt, RWindow& window,
+            gint scrid);
+
+    /**
      * Deletes TMSRingTone object.
      *
      * @param  rt
@@ -445,6 +467,31 @@ public:
      *      TMS_RESULT_INVALID_ARGUMENT if RingTone player object is invalid.
      */
     IMPORT_C gint DeleteRingTonePlayer(TMSRingTone*& rt);
+
+    /**
+     * Creates TMSInbandTone player object.
+     *
+     * @param  inbandtone
+     *      InbandTone player object to be created.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS when object is created successfully.
+     *      TMS_RESULT_INSUFFICIENT_MEMORY when object creation failed due to
+     *      insufficient memory.
+     */
+    IMPORT_C gint CreateInbandTonePlayer(TMSInbandTone*& inbandtone);
+
+    /**
+     * Deletes TMSInbandTone object.
+     *
+     * @param  inbandtone
+     *      InbandTone player object to be deleted.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS when object is deleted successfully.
+     *      TMS_RESULT_INVALID_ARGUMENT if InbandTone player object is invalid.
+     */
+    IMPORT_C gint DeleteInbandTonePlayer(TMSInbandTone*& inbandtone);
 
 private:
     /**

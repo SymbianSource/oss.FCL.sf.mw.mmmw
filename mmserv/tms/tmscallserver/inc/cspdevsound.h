@@ -22,24 +22,24 @@
 
 namespace TMS {
 
-class MCSPDevSoundObserver;
+class TMSCSPDevSoundObserver;
 
 /**
  *  Wrapper for CMMFDevSound
  *
  */
-NONSHARABLE_CLASS(CSPDevSound) : public CBase,
-                                 public MDevSoundObserver
+NONSHARABLE_CLASS(TMSCSPDevSound) : public CBase,
+                                    public MDevSoundObserver
     {
 public:
 
     /**
      * Destructor.
      */
-    virtual ~CSPDevSound();
+    virtual ~TMSCSPDevSound();
 
     /**
-     * Activates the dev sound stream. MCSPDevSoundObserver methods are called
+     * Activates the dev sound stream. TMSCSPDevSoundObserver methods are called
      * when activation goes ok or fails. If the stream is already active or
      * activating then nothing is done.
      */
@@ -118,7 +118,7 @@ public:
 
 protected:
 
-    CSPDevSound(MCSPDevSoundObserver& aObserver);
+    TMSCSPDevSound(TMSCSPDevSoundObserver& aObserver);
 
     void ConstructL(TMMFState aMode, gint aAudioPreference,
             gint aAudioPriority);
@@ -155,7 +155,7 @@ protected:
      * Observer for successfull activation.
      * Not own.
      */
-    MCSPDevSoundObserver& iObserver;
+    TMSCSPDevSoundObserver& iObserver;
 
     };
 

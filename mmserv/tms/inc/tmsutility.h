@@ -63,11 +63,15 @@ namespace TMS {
 #define TOFOURCC(format) TMSUtility::ToFourCC(format)
 #define TOTMSFORMAT(fourcc) TMSUtility::FourCCToTMSFormat(fourcc)
 
+_LIT(KTMSPanic, "TMS Panic!" );
+#define PANIC(reason) User::Panic(KTMSPanic, reason)
+
 // TMSUtility class
 class TMSUtility
     {
 public:
     IMPORT_C static gint TMSResult(const gint error);
+    IMPORT_C static gint EtelToTMSResult(const gint error);
     IMPORT_C static TMSAudioOutput ToTMSOutput(
             CTelephonyAudioRouting::TAudioOutput taroutput);
     IMPORT_C static CTelephonyAudioRouting::TAudioOutput ToTAROutput(

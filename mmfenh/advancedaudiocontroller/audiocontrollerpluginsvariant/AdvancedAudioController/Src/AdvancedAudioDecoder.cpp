@@ -122,7 +122,7 @@ EXPORT_C void CAdvancedAudioDecoder::SetConfigL(
 
 	QueueThisBuffer(aIndex); // will set iNextBuffer (current buffer) and update iSharedBufferIndex (to next buffer)
 
-   	if(aSourceSampleRate != aSWConvertSampleRate)  // Sampling Rate Conversion is needed
+   	if(aSourceSampleRate != aSWConvertSampleRate && !IsHwAccelerated())  // Sampling Rate Conversion is needed
    		{
 	    if (!iChannelAndSampleRateConverterFactory)
 			{
@@ -421,7 +421,9 @@ void CAdvancedAudioDecoder::NextSharedBufferL()
     {
     CMMFBuffer* refillBuffer = NULL;
     // index is the next buffer, index-1 is current buffer, check 2 buffers back from the one being selected
-    TInt checkBufIndex = iSharedBufferIndex-2;
+// ou1cimx1#205863    
+    //TInt checkBufIndex = iSharedBufferIndex-2;
+    TInt checkBufIndex = iSharedBufferIndex- (iSharedBuffers->Count()-1) ;
     	
     if (checkBufIndex < 0)
     	{
@@ -430,11 +432,13 @@ void CAdvancedAudioDecoder::NextSharedBufferL()
     	
     if ((*iSharedBuffers)[checkBufIndex]->Status() == EBeingEmptied)
         {
-        if (iSharedBuffers->Count() <= 2)
+// ou1cimx1#205863
+/*        if (iSharedBuffers->Count() <= 2)
             {
             DP1(_L("CAdvancedAudioDecoder::NextSharedBufferL leave, EBeingEmptied is used on Count[%d]"), iSharedBuffers->Count());
             User::Leave(KErrAbort);
             }
+*/            
         DP2(_L("CAdvancedAudioDecoder::NextSharedBufferL, index[%d] [%x] is EBeingEmptied"), 
             	checkBufIndex, static_cast<CMMFDataBuffer*>((*iSharedBuffers)[checkBufIndex])->Data().Ptr() );
         refillBuffer = (*iSharedBuffers)[checkBufIndex];
@@ -488,9 +492,9 @@ EXPORT_C void CAdvancedAudioDecoder::HandleFillBufferL()
     DP3(_L("CAdvancedAudioDecoder::HandleFillBufferL ptr[%x] iRenderEnabled[%d] Position[%d]"), static_cast<CMMFDataBuffer*>(iNextBuffer)->Data().Ptr(), iRenderEnabled, iNextBuffer->Position());
     DP3(_L("CAdvancedAudioDecoder::HandleFillBufferL frm#[%d] d0[%x] dp[%x]"), static_cast<CMMFDataBuffer*>(iNextBuffer)->FrameNumber(), static_cast<CMMFDataBuffer*>(iNextBuffer)->Data().Ptr()[0],
      static_cast<CMMFDataBuffer*>(iNextBuffer)->Data().Ptr()[iNextBuffer->Position()]);
-
-    iBufferToFill->SetPosition(0);
-	static_cast<CMMFDataBuffer*>(iBufferToFill)->Data().SetLength(0);
+// ou1cimx1#205863
+//    iBufferToFill->SetPosition(0);
+//	static_cast<CMMFDataBuffer*>(iBufferToFill)->Data().SetLength(0);
     iBufferToFill->SetLastBuffer(EFalse);
 
     TCodecProcessResult result;

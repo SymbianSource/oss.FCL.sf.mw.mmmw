@@ -43,7 +43,7 @@ public:
     virtual gint GetMaxLevel(guint& level);
     virtual gint GetType(TMSEffectType& effecttype);
 
-    void SetParentEffect(TMSEffect*& parenteffect);
+    void SetParent(TMSEffect*& parent);
 
 private:
     TMSGlobalGainEffectBodyImpl();
@@ -54,11 +54,10 @@ private:
     gint iClientId;
     gpointer iUserData;
     TMSProxy* iProxy;
-    TMSEffect* iGlobalEffect;
+    TMSEffect* iParent;
     };
 
 } //namespace TMS
 
 #endif // TMS_GLOBAL_GAIN_EFFECT_BODY_IMPL_H
 
-// End of file

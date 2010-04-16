@@ -18,8 +18,8 @@
 
 
 // INCLUDE FILES
-#include 	<custominterfacebuilder.h>
-#include 	<custominterfacecustomcommandparser.h>
+#include 	<CustomInterfaceBuilder.h>
+#include 	<CustomInterfaceCustomCommandParser.h>
 #include    <mmf/common/mmfcustomcommandparsermanager.h>
 #include    <mmf/common/mmfcontrollerframework.h>
 #include    <mmf/common/mmfipcserver.h>

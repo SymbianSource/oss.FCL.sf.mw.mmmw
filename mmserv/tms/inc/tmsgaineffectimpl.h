@@ -30,19 +30,17 @@ class TMSCallProxy;
 class TMSGainEffectImpl : public TMSGainEffect
     {
 public:
-    ~TMSGainEffectImpl();
-
+    virtual ~TMSGainEffectImpl();
     static gint Create(TMSEffect*& tmseffect);
     gint SetProxy(TMSCallProxy* aProxy, gpointer queuehandler);
-    gint SetParentEffect(TMSEffect*& parenteffect);
 
 private:
     TMSGainEffectImpl();
     gint PostConstruct();
+    gint SetParent(TMSEffect*& parent);
     };
 
 } //namespace TMS
 
 #endif // TMS_GAIN_EFFECT_IMPL_H
 
-// End of file

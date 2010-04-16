@@ -197,9 +197,7 @@ gint TMSCSCallBodyImpl::RemStreamFromList(TMSStream*& strm)
         // will point to the next item (if available); so, do NOT attempt
         // deleting itStrm here! (Will result in KERN-EXEC)
         iStreamsVector.erase(itStrm); // Remove from array
-        delete strm; // Free memory
-        strm = NULL;
-        ret = TMS_RESULT_SUCCESS;
+        ret = TMSStreamImpl::Delete(strm);
         }
     TRACE_PRN_FN_EXT;
     return ret;

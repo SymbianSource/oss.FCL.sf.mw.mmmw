@@ -47,17 +47,24 @@ enum TMSClientServerRequest
     ETMSStartGlobalEffectNotifier,
     ETMSCancelGlobalEffectNotifier,
     ETMSSetMsgQueueHandle,
-    ETMSRingToneInitDefaultProfile,
+    ETMSRingToneInitDefault,
     ETMSRingToneInitFile,
-    ETMSRingToneInitMimeContent,
+    ETMSRingToneInitSequence,
+    ETMSRingToneInitBeepOnce,
+    ETMSRingToneInitSilent,
+    ETMSRingToneInitUnsecureVoIP,
     ETMSRingToneDeinit,
     ETMSRingTonePlay,
     ETMSRingTonePause,
     ETMSRingToneStop,
+    ETMSRingToneMute,
     ETMSStartDTMFNotifier,
     ETMSCancelDTMFNotifier,
     ETMSStartDTMF,
-    ETMSStopDTMF
+    ETMSStopDTMF,
+    ETMSContinueDTMF,
+    ETMSStartInbandTone,
+    ETMSStopInbandTone
     };
 
 // Ring tone open methods
@@ -85,7 +92,8 @@ enum TMSMsgQueueNotifierType
     EMsgQueueDTMFType,
     EMsgQueueGlobalRoutingType,
     EMsgQueueGlobalVolumeType,
-    EMsgQueueGlobalGainType
+    EMsgQueueGlobalGainType,
+    EMsgQueueInbandToneType
     };
 
 // CONSTANTS

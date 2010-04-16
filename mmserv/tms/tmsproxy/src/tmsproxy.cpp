@@ -16,9 +16,13 @@
  */
 
 #include <s32mem.h>
+#include <gstring.h>
 #include <AudioPreference.h>
 #include <tmseffectobsrvr.h>
 #include <tmsglobalroutingobsrvr.h>
+#include <tmsringtoneobsrvr.h>
+#include <tmsdtmfobsrvr.h>
+#include <tmsinbandtoneobsrvr.h>
 #include "tmsutility.h"
 #include "tmsclientserver.h"
 #include "tmsproxy.h"
@@ -26,8 +30,9 @@
 using namespace TMS;
 
 // CONSTANTS
-const TUint KServerConnectRetries = 2;
+const TUint KTMSServerConnectRetries = 2;
 const TUint KSessionMessageSlots = 10;
+const TUint KUTF8Multiply = 2;
 
 // -----------------------------------------------------------------------------
 // StartServer
@@ -76,10 +81,7 @@ static gint StartServer()
 //
 EXPORT_C TMSProxy::TMSProxy()
     {
-    iEffectsObsrvrList.Reset();
-    iEffectsParentList.Reset();
-    iRoutingObsrvrList.Reset();
-    iRoutingParentList.Reset();
+    ResetObjectLists();
     iMsgQHandler = NULL;
     }
 
@@ -89,10 +91,7 @@ EXPORT_C TMSProxy::TMSProxy()
 //
 EXPORT_C TMSProxy::~TMSProxy()
     {
-    iEffectsObsrvrList.Reset();
-    iEffectsParentList.Reset();
-    iRoutingObsrvrList.Reset();
-    iRoutingParentList.Reset();
+    ResetObjectLists();
 
     if (iMsgQHandler)
         {
@@ -118,7 +117,7 @@ EXPORT_C gint TMSProxy::Connect()
     {
     TRACE_PRN_FN_ENT;
 
-    gint retry = KServerConnectRetries;
+    gint retry = KTMSServerConnectRetries;
     gint err(TMS_RESULT_GENERAL_ERROR);
     gint numMessageSlots = KSessionMessageSlots;
 
@@ -165,8 +164,8 @@ EXPORT_C gint TMSProxy::Connect()
 //
 EXPORT_C TVersion TMSProxy::Version() const
     {
-    return (TVersion(KTMSServMajorVersionNumber,
-            KTMSServMinorVersionNumber, KTMSServBuildVersionNumber));
+    return (TVersion(KTMSServMajorVersionNumber, KTMSServMinorVersionNumber,
+            KTMSServBuildVersionNumber));
     }
 
 // -----------------------------------------------------------------------------
@@ -401,6 +400,221 @@ EXPORT_C gint TMSProxy::SetGain(guint level)
     return TMSRESULT(status);
     }
 
+EXPORT_C gint TMSProxy::InitRT(const TMSRingToneType type, GString* str,
+        GString* tts)
+    {
+    TRACE_PRN_FN_ENT;
+    gint status(TMS_RESULT_INVALID_ARGUMENT);
+    TIpcArgs args;
+    HBufC* ttsBuf(NULL);
+
+    if (tts)
+        {
+        // Convert buffer from UTF-8 to unicode (16-bit)
+        // Note: UTF-8 strings can take up to 4 bytes per character
+        gint unilen = tts->len / KUTF8Multiply;
+        TRAP(status, ttsBuf = HBufC::NewL(unilen));
+        if (status == KErrNone)
+            {
+            TPtr p = ttsBuf->Des();
+            p.Copy((TUint16*) tts->str, unilen);
+            args.Set(1, &p);
+            }
+        }
+
+    switch (type)
+        {
+        case TMS_RINGTONE_DEFAULT:
+            {
+            status = RSessionBase::SendReceive(ETMSRingToneInitDefault, args);
+            break;
+            }
+        case TMS_RINGTONE_FILE:
+            {
+            if (str)
+                {
+                HBufC* buf(NULL);
+                // Convert buffer from UTF-8 to unicode (16-bit)
+                // Note: UTF-8 strings can take up to 4 bytes per character
+                gint unilen = str->len / KUTF8Multiply;
+
+                TRAP(status, buf = HBufC::NewL(unilen));
+                if (status == KErrNone)
+                    {
+                    TPtr p = buf->Des();
+                    p.Copy((TUint16*) str->str, unilen);
+                    TIpcArgs args;
+                    args.Set(0, &p);
+                    status = RSessionBase::SendReceive(ETMSRingToneInitFile,
+                            args);
+                    }
+                delete buf;
+                buf = NULL;
+                }
+            break;
+            }
+        case TMS_RINGTONE_BEEP_ONCE:
+            {
+            status = RSessionBase::SendReceive(ETMSRingToneInitBeepOnce);
+            break;
+            }
+        case TMS_RINGTONE_SILENT:
+            {
+            status = RSessionBase::SendReceive(ETMSRingToneInitSilent);
+            break;
+            }
+        case TMS_RINGTONE_UNSECURE_VOIP:
+            {
+            status = RSessionBase::SendReceive(ETMSRingToneInitUnsecureVoIP);
+            break;
+            }
+        case TMS_RINGTONE_SEQUENCE:
+            {
+            if (str)
+                {
+                HBufC8* buf(NULL);
+                gint len = str->len;
+                TRAP(status, buf = HBufC8::NewL(len));
+                if (status == KErrNone)
+                    {
+                    TPtr8 p = buf->Des();
+                    p.Copy((TUint8*) str->str, len);
+                    TIpcArgs args;
+                    args.Set(0, &p);
+                    status = RSessionBase::SendReceive(
+                            ETMSRingToneInitSequence, args);
+                    }
+                delete buf;
+                buf = NULL;
+                }
+            break;
+            }
+        default:
+            break;
+        }
+
+    delete ttsBuf;
+    ttsBuf = NULL;
+
+    TRACE_PRN_FN_EXT;
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::DeinitRT()
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSRingToneDeinit);
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::PlayRT()
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSRingTonePlay);
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::StopRT()
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSRingToneStop);
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::PauseRT()
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSRingTonePause);
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::MuteRT()
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSRingToneMute);
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::StartDTMF(TMSStreamType streamtype, GString* tone)
+    {
+    TRACE_PRN_FN_ENT;
+    gint status(TMS_RESULT_SUCCESS);
+
+    HBufC* buf(NULL);
+    TRAP(status, buf = HBufC::NewL(tone->len));
+    if (status == KErrNone)
+        {
+        TPtr p1 = buf->Des();
+        TPtr8 p2((TUint8*) tone->str, tone->len, tone->len);
+        p1.Copy(p2);
+
+        TRACE_PRN_N(p1);
+
+        TIpcArgs args;
+        args.Set(0, streamtype);
+        args.Set(1, &p1);
+        status = RSessionBase::SendReceive(ETMSStartDTMF, args);
+        }
+
+    delete buf;
+    buf = NULL;
+
+    TRACE_PRN_FN_EXT;
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::StopDTMF(TMSStreamType streamtype)
+    {
+    TRACE_PRN_FN_ENT;
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSStopDTMF, TIpcArgs(streamtype));
+    TRACE_PRN_FN_EXT;
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::ContinueDTMFStringSending(gboolean continuesending)
+    {
+    TRACE_PRN_FN_ENT;
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSContinueDTMF,
+            TIpcArgs(continuesending));
+    TRACE_PRN_FN_EXT;
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::StartInbandTone(TMSInbandToneType inbandtonetype)
+    {
+    TRACE_PRN_FN_ENT;
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSStartInbandTone,
+            TIpcArgs(inbandtonetype));
+    TRACE_PRN_FN_EXT;
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::StopInbandTone()
+    {
+    TRACE_PRN_FN_ENT;
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSStopInbandTone);
+    TRACE_PRN_FN_EXT;
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::StartDTMFNotifier()
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSStartDTMFNotifier); //DTMFHandler
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::CancelDTMFNotifier()
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    status = RSessionBase::SendReceive(ETMSCancelDTMFNotifier); //DTMFHandler
+    return TMSRESULT(status);
+    }
+
 EXPORT_C gint TMSProxy::StartGlobalEffectNotifier()
     {
     gint status(TMS_RESULT_SUCCESS);
@@ -442,11 +656,23 @@ EXPORT_C gint TMSProxy::SetMsgQueueNotifier(TMSMsgQueueNotifierType type,
         case EMsgQueueGlobalVolumeType:
         case EMsgQueueGlobalGainType:
             status = AddGlobalEffectObserver((*(TMSEffectObserver*) obsrv),
-                    (*(TMSEffect*)parent), clientid);
+                    (*(TMSEffect*) parent), clientid);
             break;
         case EMsgQueueGlobalRoutingType:
             status = AddRoutingObserver((*(TMSGlobalRoutingObserver*) obsrv),
-                    (*(TMSGlobalRouting*)parent), clientid);
+                    (*(TMSGlobalRouting*) parent), clientid);
+            break;
+        case EMsgQueueRingtoneType:
+            status = AddRingToneObserver((*(TMSRingToneObserver*) obsrv),
+                    (*(TMSRingTone*) parent), clientid);
+            break;
+        case EMsgQueueDTMFType:
+            status = AddDTMFObserver((*(TMSDTMFObserver*) obsrv),
+                    (*(TMSDTMF*) parent), clientid);
+            break;
+        case EMsgQueueInbandToneType:
+            status = AddInbandToneObserver((*(TMSInbandToneObserver*) obsrv),
+                    (*(TMSInbandTone*) parent), clientid);
             break;
         default:
             status = TMS_RESULT_INVALID_ARGUMENT;
@@ -471,7 +697,18 @@ EXPORT_C gint TMSProxy::RemoveMsgQueueNotifier(TMSMsgQueueNotifierType type,
             status = RemoveGlobalEffectObserver((*(TMSEffectObserver*) obsrv));
             break;
         case EMsgQueueGlobalRoutingType:
-            status = RemoveRoutingObserver((*(TMSGlobalRoutingObserver*) obsrv));
+            status = RemoveRoutingObserver((*(TMSGlobalRoutingObserver*)
+                    obsrv));
+            break;
+        case EMsgQueueRingtoneType:
+            status = RemoveRingToneObserver((*(TMSRingToneObserver*) obsrv));
+            break;
+        case EMsgQueueDTMFType:
+            status = RemoveDTMFObserver((*(TMSDTMFObserver*) obsrv));
+            break;
+        case EMsgQueueInbandToneType:
+            status = RemoveInbandToneObserver((*(TMSInbandToneObserver*)
+                    obsrv));
             break;
         default:
             status = TMS_RESULT_INVALID_ARGUMENT;
@@ -512,7 +749,6 @@ gint TMSProxy::AddGlobalEffectObserver(TMSEffectObserver& obsrv,
         {
         status = iEffectsObsrvrList.Append(&obsrv);
         status = iEffectsParentList.Append(&parent);
-        //status = iClientList.Append(clientid);
         }
     else
         {
@@ -529,7 +765,6 @@ gint TMSProxy::RemoveGlobalEffectObserver(TMSEffectObserver& obsrv)
         {
         iEffectsObsrvrList.Remove(index);
         iEffectsParentList.Remove(index);
-        //iClientList.Remove(index);
         }
     else
         {
@@ -546,7 +781,6 @@ gint TMSProxy::AddRoutingObserver(TMSGlobalRoutingObserver& obsrv,
         {
         status = iRoutingObsrvrList.Append(&obsrv);
         status = iRoutingParentList.Append(&parent);
-        //status = iClientList.Append(clientid);
         }
     else
         {
@@ -563,7 +797,104 @@ gint TMSProxy::RemoveRoutingObserver(TMSGlobalRoutingObserver& obsrv)
         {
         iRoutingObsrvrList.Remove(index);
         iRoutingParentList.Remove(index);
-        //iClientList.Remove(index);
+        }
+    else
+        {
+        status = TMS_RESULT_DOES_NOT_EXIST;
+        }
+    return TMSRESULT(status);
+    }
+
+gint TMSProxy::AddRingToneObserver(TMSRingToneObserver& obsrv,
+        TMSRingTone& parent, gint /*clientid*/)
+    {
+    gint status = iRingToneObsrvrList.Find(&obsrv);
+    if (status == KErrNotFound)
+        {
+        status = iRingToneObsrvrList.Append(&obsrv);
+        status = iRingToneParentList.Append(&parent);
+        }
+    else
+        {
+        status = TMS_RESULT_ALREADY_EXIST;
+        }
+    return TMSRESULT(status);
+    }
+
+gint TMSProxy::RemoveRingToneObserver(TMSRingToneObserver& obsrv)
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    gint index = iRingToneObsrvrList.Find(&obsrv);
+    if (index >= 0)
+        {
+        iRingToneObsrvrList.Remove(index);
+        iRingToneParentList.Remove(index);
+        }
+    else
+        {
+        status = TMS_RESULT_DOES_NOT_EXIST;
+        }
+    return TMSRESULT(status);
+    }
+
+gint TMSProxy::AddDTMFObserver(TMSDTMFObserver& obsrv, TMSDTMF& parent,
+        gint /*clientid*/)
+    {
+    // Add to list if observer is not already added
+    gint status = iDTMFObsrvrList.Find(&obsrv);
+    if (status == KErrNotFound)
+        {
+        status = iDTMFObsrvrList.Append(&obsrv);
+        status = iDTMFParentList.Append(&parent);
+        }
+    else
+        {
+        status = TMS_RESULT_ALREADY_EXIST;
+        }
+    return TMSRESULT(status);
+    }
+
+gint TMSProxy::RemoveDTMFObserver(TMSDTMFObserver& obsrv)
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    gint index = iDTMFObsrvrList.Find(&obsrv);
+    if (index >= 0)
+        {
+        iDTMFObsrvrList.Remove(index);
+        iDTMFParentList.Remove(index);
+        }
+    else
+        {
+        status = TMS_RESULT_DOES_NOT_EXIST;
+        }
+    return TMSRESULT(status);
+    }
+
+gint TMSProxy::AddInbandToneObserver(TMSInbandToneObserver& obsrv,
+        TMSInbandTone& parent, gint /*clientid*/)
+    {
+    // Add to list if observer is not already added
+    gint status = iInbandToneObsrvrList.Find(&obsrv);
+    if (status == KErrNotFound)
+        {
+        status = iInbandToneObsrvrList.Append(&obsrv);
+        status = iInbandToneParentList.Append(&parent);
+        }
+    else
+        {
+        status = TMS_RESULT_ALREADY_EXIST;
+        }
+    return TMSRESULT(status);
+    }
+
+gint TMSProxy::RemoveInbandToneObserver(TMSInbandToneObserver& obsrv)
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    gint index = iInbandToneObsrvrList.Find(&obsrv);
+    if (index >= 0)
+        {
+        iInbandToneObsrvrList.Remove(index);
+        iInbandToneParentList.Remove(index);
         }
     else
         {
@@ -612,7 +943,7 @@ void TMSProxy::ReceiveMsgQHandlerEventsL()
         }
     else
         {
-        iMsgQHandler = CQueueHandler::NewL(&iMsgQueue, NULL);
+        iMsgQHandler = TMSQueueHandler::NewL(&iMsgQueue, NULL);
         iMsgQHandler->AddObserver(*this, -1);
         }
     iMsgQHandler->Start();
@@ -653,14 +984,63 @@ void TMSProxy::QueueEvent(gint aEventType, gint aError, void* user_data)
                 }
             for (gint i = 0; i < iRoutingObsrvrList.Count(); i++)
                 {
-                iRoutingObsrvrList[i]->GlobalRoutingEvent(iRoutingParentList[i],
-                        event, output);
+                iRoutingObsrvrList[i]->GlobalRoutingEvent(
+                        iRoutingParentList[i], event, output);
+                }
+            break;
+            }
+        case TMS_EVENT_RINGTONE_OPEN_COMPLETE:
+        case TMS_EVENT_RINGTONE_PLAY_COMPLETE:
+        case TMS_EVENT_RINGTONE_DEINIT_COMPLETE:
+            {
+            for (gint i = 0; i < iRingToneObsrvrList.Count(); i++)
+                {
+                iRingToneObsrvrList[i]->RingtoneEvent(iRingToneParentList[i],
+                        event);
+                }
+            break;
+            }
+        case TMS_EVENT_DTMF_TONE_STARTED:
+        case TMS_EVENT_DTMF_TONE_STOPPED:
+            {
+            for (gint i = 0; i < iDTMFObsrvrList.Count(); i++)
+                {
+                iDTMFObsrvrList[i]->DTMFEvent(iDTMFParentList[i], event);
+                }
+            break;
+            }
+        case TMS_EVENT_INBAND_TONE_STARTED:
+        case TMS_EVENT_INBAND_TONE_STOPPED:
+            {
+            for (gint i = 0; i < iInbandToneObsrvrList.Count(); i++)
+                {
+                iInbandToneObsrvrList[i]->InbandToneEvent(
+                        iInbandToneParentList[i], event);
                 }
             break;
             }
         default:
             break;
         }
+    }
+
+// ---------------------------------------------------------------------------
+// TMSProxy::ResetObjectLists
+// ---------------------------------------------------------------------------
+//
+void TMSProxy::ResetObjectLists()
+    {
+    iEffectsObsrvrList.Reset();
+    iRoutingObsrvrList.Reset();
+    iRingToneObsrvrList.Reset();
+    iDTMFObsrvrList.Reset();
+    iInbandToneObsrvrList.Reset();
+
+    iEffectsParentList.Reset();
+    iRoutingParentList.Reset();
+    iRingToneParentList.Reset();
+    iDTMFParentList.Reset();
+    iInbandToneParentList.Reset();
     }
 
 // End of file

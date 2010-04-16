@@ -15,9 +15,8 @@
  *
  */
 
-#include <tms.h>
-#include "tmsglobalvoleffectbodyimpl.h"
 #include "tmsutility.h"
+#include "tmsglobalvoleffectbodyimpl.h"
 #include "tmsglobalvoleffectimpl.h"
 
 using namespace TMS;
@@ -45,7 +44,6 @@ gint TMSGlobalVolEffectImpl::PostConstruct()
         {
         this->iBody = bodyimpl;
         }
-
     TRACE_PRN_FN_EXT;
     return ret;
     }
@@ -65,23 +63,21 @@ gint TMSGlobalVolEffectImpl::Create(TMSEffect*& tmseffect)
             self = NULL;
             }
         }
-
     if (self && ret == TMS_RESULT_SUCCESS)
         {
         tmseffect = self;
-        ret = self->SetParentEffect(tmseffect);
+        ret = self->SetParent(tmseffect);
         }
-
     TRACE_PRN_FN_EXT;
     return ret;
     }
 
-gint TMSGlobalVolEffectImpl::SetParentEffect(TMSEffect*& parenteffect)
+gint TMSGlobalVolEffectImpl::SetParent(TMSEffect*& parent)
     {
-    gint  ret(TMS_RESULT_SUCCESS);
+    gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSGlobalVolEffectBodyImpl*) this->iBody)->SetParentEffect(parenteffect);
+        ((TMSGlobalVolEffectBodyImpl*) this->iBody)->SetParent(parent);
         }
     else
         {
@@ -90,4 +86,3 @@ gint TMSGlobalVolEffectImpl::SetParentEffect(TMSEffect*& parenteffect)
     return ret;
     }
 
-// End of file

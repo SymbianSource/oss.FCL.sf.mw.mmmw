@@ -79,8 +79,11 @@ class TMSFormat;
 #define TMS_EVENT_ROUTING_SET_OUTPUT_COMPLETE   ((gint)0x00000008)
 #define TMS_EVENT_RINGTONE_OPEN_COMPLETE        ((gint)0x00000009)
 #define TMS_EVENT_RINGTONE_PLAY_COMPLETE        ((gint)0x0000000A)
-#define TMS_EVENT_DTMF_TONE_STARTED             ((gint)0x0000000B)
-#define TMS_EVENT_DTMF_TONE_STOPPED             ((gint)0x0000000C)
+#define TMS_EVENT_RINGTONE_DEINIT_COMPLETE      ((gint)0x0000000B)
+#define TMS_EVENT_DTMF_TONE_STARTED             ((gint)0x0000000C)
+#define TMS_EVENT_DTMF_TONE_STOPPED             ((gint)0x0000000D)
+#define TMS_EVENT_INBAND_TONE_STARTED           ((gint)0x0000000E)
+#define TMS_EVENT_INBAND_TONE_STOPPED           ((gint)0x0000000F)
 
 // Stream states
 typedef gint TMSStreamState;
@@ -122,9 +125,17 @@ typedef gint TMSFormatType;
 #define TMS_FORMAT_G729                         ((gint)16)
 #define TMS_FORMAT_ILBC                         ((gint)17)
 
+typedef gint TMSRingToneType;
+#define TMS_RINGTONE_DEFAULT                    ((gint)0)
+#define TMS_RINGTONE_FILE                       ((gint)1)
+#define TMS_RINGTONE_SEQUENCE                   ((gint)2)
+#define TMS_RINGTONE_BEEP_ONCE                  ((gint)3)
+#define TMS_RINGTONE_SILENT                     ((gint)4)
+#define TMS_RINGTONE_UNSECURE_VOIP              ((gint)5)
+
 typedef gint TMSRTPSessionType;
-#define TMS_SESSION_RTP_PUSH                    ((gint)18)
-#define TMS_SESSION_RTP_PULL                    ((gint)19)
+#define TMS_SESSION_RTP_PULL                    ((gint)0)
+#define TMS_SESSION_RTP_PUSH                    ((gint)1)
 
 // TMS vectors
 typedef std::vector<TMSFormat*> FormatVector;
@@ -147,7 +158,7 @@ typedef gint TMSILBCCodecMode;
 #define TMS_ILBC_CODEC_MODE_20MS_FRAME          ((gint)0)
 #define TMS_ILBC_CODEC_MODE_30MS_FRAME          ((gint)1)
 
-// Oudio output types
+// Audio output types
 typedef gint TMSAudioOutput;
 #define TMS_AUDIO_OUTPUT_NONE                   ((gint)0)
 #define TMS_AUDIO_OUTPUT_PUBLIC                 ((gint)1)
@@ -157,6 +168,20 @@ typedef gint TMSAudioOutput;
 #define TMS_AUDIO_OUTPUT_WIRED_ACCESSORY        ((gint)5)
 #define TMS_AUDIO_OUTPUT_ACCESSORY              ((gint)6)
 #define TMS_AUDIO_OUTPUT_ETTY                   ((gint)7)
+#define TMS_AUDIO_OUTPUT_NOT_ACTIVE             ((gint)8)
+
+typedef gint TMSInbandToneType;
+#define TMS_INBAND_USER_BUSY                    ((gint)0)
+#define TMS_INBAND_RADIO_PATH_NOT_AVAIL         ((gint)1)
+#define TMS_INBAND_CONGESTION                   ((gint)2)
+#define TMS_INBAND_SPECIAL_INFO                 ((gint)3)
+#define TMS_INBAND_REORDER                      ((gint)4)
+#define TMS_INBAND_REMOTE_ALEARTING             ((gint)5)
+#define TMS_INBAND_CALL_WAITING                 ((gint)6)
+#define TMS_INBAND_DATA_CALL                    ((gint)7)
+#define TMS_INBAND_NO_SEQUENCE                  ((gint)8)
+#define TMS_INBAND_BEEP_SEQUENCE                ((gint)9)
+
 
 // TMSSignalEvent structure for callback notifications
 struct TMSSignalEvent

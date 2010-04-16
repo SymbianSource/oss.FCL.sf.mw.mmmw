@@ -161,7 +161,7 @@ void TMSClientSourceBodyImpl::SetProxy(TMSCallProxy* aProxy, gint strmid,
     {
     iProxy = aProxy;
     iStreamId = strmid;
-    ((CQueueHandler*) queuehandler)->AddObserver(*this, TMS_SOURCE_CLIENT);
+    ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_SOURCE_CLIENT);
     }
 
 void TMSClientSourceBodyImpl::QueueEvent(TInt aEventType, TInt aError,

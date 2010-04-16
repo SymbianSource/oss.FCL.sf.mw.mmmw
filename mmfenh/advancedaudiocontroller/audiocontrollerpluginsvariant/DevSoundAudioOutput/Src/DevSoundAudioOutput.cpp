@@ -23,6 +23,7 @@
 #include <mmfpaniccodes.h>
 #include <ConfigurationComponentsFactory.h>
 #include <AudioOutputControlUtility.h>
+#include <S60FourCC.h>
 
 // CONSTANTS
 const TUint KSampleRate8000Hz       = 8000;
@@ -329,6 +330,19 @@ void CDevSoundAudioOutput::BuildConfigurationParametersL()
 				}
 			}
 
+		//aac HWcodec will downsample by 2, if it is greater than 48k 
+		//Hence devsound should be onfigured with that value
+		if(iSourceSampleRate > KSampleRate48000Hz && iSourceFourCC == KS60FourCCCodeEAAC && iAdvancedAudioDecoder->IsHwAccelerated())
+		    {
+            TUint samplerate = iSourceSampleRate/2;
+            for (; sampleRateIndex >= 0; sampleRateIndex--)
+                {
+                if(samplerate >= supportedSR[sampleRateIndex][0])
+                    {
+                    break;
+                    }
+                }
+		    }
 		// find the highest sink sample rate below the source rate
 		for (; sampleRateIndex >= 0; sampleRateIndex--)
 			{

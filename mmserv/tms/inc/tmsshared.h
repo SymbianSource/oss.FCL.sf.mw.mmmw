@@ -27,19 +27,19 @@
 namespace TMS {
 
 // CONSTANTS
-const TUint KQueueCreateWaitTime = 10; //10ms
+const guint KQueueCreateWaitTime = 10; //10ms
 
-const TUint KTMSG711FrameLen10ms = 82; //10ms ->  80 + 2 for header
-const TUint KTMSG711FrameLen20ms = 162; //20ms -> 160 + 2 for header
+const guint KTMSG711FrameLen10ms = 82;  //10ms ->  80 + 2 for header
+const guint KTMSG711FrameLen20ms = 162; //20ms -> 160 + 2 for header
 
-const TInt KTMSAMRNBFrameLen   = 14; //frame-mode OFF
-const TInt KTMSAMRNBFrameLenFM = 32; //frame-mode ON
+const gint KTMSAMRNBFrameLen   = 14; //frame-mode OFF
+const gint KTMSAMRNBFrameLenFM = 32; //frame-mode ON
 
-const TInt KTMSILBCFrameLen20ms = 40; //20ms
-const TInt KTMSILBCFrameLen30ms = 52; //30ms
+const gint KTMSILBCFrameLen20ms = 40; //20ms
+const gint KTMSILBCFrameLen30ms = 52; //30ms
 
-const TInt KTMSG729FrameLen   = 24; //10 octets + 2 for header
-const TUint KTMSPCM16FrameLen = 4096;
+const gint KTMSG729FrameLen   = 24; //10 octets + 2 for header
+const guint KTMSPCM16FrameLen = 4096;
 
 // ENUMERATIONS
 
@@ -119,10 +119,13 @@ enum TUserCommand
     ECmdDTMFTonePlayFinished,
     ECmdRingToneOpenComplete,
     ECmdRingTonePlayComplete,
+    ECmdRingToneDeinitComplete,
     ECmdDownlinkClosed,
     ECmdUplinkClosed,
     ECmdGlobalRoutingChange,
-    ECmdGlobalEffectChange
+    ECmdGlobalEffectChange,
+    ECmdInbandToneStarted,
+    ECmdInbandToneStopped
     };
 
 // -----------------------------------------------------------------------------
@@ -150,7 +153,7 @@ public:
     gboolean iFrameMode;
     gboolean iFrameModeReqForEC;
     guint iBitrate;
-    RArray<TUint> iArrBitrates;
+    RArray<guint> iArrBitrates;
     };
 
 // -----------------------------------------------------------------------------

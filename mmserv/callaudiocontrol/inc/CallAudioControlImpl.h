@@ -33,7 +33,7 @@
 #include <PhCltExt.h>       // link against PhoneClientExt.lib
 #include <MediatorCommandInitiator.h>
 #else
-#include <CPhCltCommandHandler.h> // wasn't introduced until 3.2
+#include <cphcltcommandhandler.h> // wasn't introduced until 3.2
 #endif
 
 #include "CallAudioControlUtility.h"

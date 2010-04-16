@@ -27,7 +27,7 @@
 namespace TMS {
 
 // CLASS DECLARATION
-class TarSettings : public CBase
+class TMSTarSettings
     {
 public:
     // Constructors and destructor
@@ -35,12 +35,12 @@ public:
     /**
      * Two-phased constructor.
      */
-    static TarSettings* NewL();
+    static TMSTarSettings* NewL();
 
     /**
      * Destructor.
      */
-    virtual ~TarSettings();
+    virtual ~TMSTarSettings();
 
 public:
     // New functions
@@ -52,7 +52,7 @@ private:
     /**
      * C++ default constructor.
      */
-    TarSettings();
+    TMSTarSettings();
 
     /**
      * By default Symbian 2nd phase constructor is private.
@@ -60,7 +60,7 @@ private:
     void ConstructL();
 
 private:
-    TInt iVolume; //Volume
+    gint iVolume; //Volume
     };
 
 } //namespace TMS

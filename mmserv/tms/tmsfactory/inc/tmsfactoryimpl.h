@@ -19,6 +19,7 @@
 #define TMSFACTORYIMPL_H_
 
 #include <e32cmn.h>
+#include <w32std.h>
 #include <tms.h>
 
 namespace TMS {
@@ -31,6 +32,8 @@ class TMSBuffer;
 class TMSSource;
 class TMSSink;
 class TMSGlobalRouting;
+class TMSDTMF;
+class TMSInbandTone;
 
 // CLASS DECLARATION
 class TMSFactoryImpl
@@ -57,6 +60,13 @@ public:
     gint DeleteSink(TMSSink*& tmssink);
     gint CreateGlobalRouting(TMSGlobalRouting*& globrouting);
     gint DeleteGlobalRouting(TMSGlobalRouting*& globrouting);
+    gint CreateDTMF(TMSStreamType streamid, TMSDTMF*& dtmf);
+    gint DeleteDTMF(TMSDTMF*& dtmf);
+    gint CreateRingTonePlayer(TMSRingTone*& rt);
+    gint CreateRingTonePlayer(TMSRingTone*& rt, RWindow& window, gint scrid);
+    gint DeleteRingTonePlayer(TMSRingTone*& rt);
+    gint CreateInbandTonePlayer(TMSInbandTone*& inbandtone);
+    gint DeleteInbandTonePlayer(TMSInbandTone*& inbandtone);
 
 private:
     gint QueryDevice(const TMSStreamType strmtype);
@@ -68,4 +78,5 @@ private:
 
 } //namespace TMS
 
-#endif
+#endif //TMSFACTORYIMPL_H_
+

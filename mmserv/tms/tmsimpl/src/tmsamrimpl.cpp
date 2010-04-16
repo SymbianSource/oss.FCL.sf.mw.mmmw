@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmsamrbodyimpl.h"
 #include "tmsamrformatimpl.h"

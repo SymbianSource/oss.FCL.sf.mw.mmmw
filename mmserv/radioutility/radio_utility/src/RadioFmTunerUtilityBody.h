@@ -21,7 +21,7 @@
 #ifndef C_RADIOFMTUENRUTILITYBODY_H
 #define C_RADIOFMTUENRUTILITYBODY_H
 
-#include <radiofmtunerutility.h>
+#include <RadioFmTunerUtility.h>
 
 class RRadioSession;
 

@@ -27,11 +27,10 @@ namespace TMS {
 class TMSCallImpl : public TMSCall
     {
 public:
-    ~TMSCallImpl();
-    // We don't have to export this if factory impl is part of tmsimpl.lib
-    // TO DO stop exporting this function
+    virtual ~TMSCallImpl();
     IMPORT_C static gint Create(TMSCallType ctype, TMSCall*& tmscall,
             guint ctxid);
+    IMPORT_C static gint Delete(TMSCall*& tmscall);
 
 private:
     TMSCallImpl();

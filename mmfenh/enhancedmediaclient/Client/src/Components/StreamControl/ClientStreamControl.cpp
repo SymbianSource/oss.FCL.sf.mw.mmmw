@@ -211,12 +211,17 @@ TInt CStreamControl::RemoveEffect(MEffectControl& aEffect)
     {
     TInt status(KErrNotReady);
     // Get the observer from effect
-    CEffectControlBase* effectBase =
+    if(&aEffect)
+       {
+       CEffectControlBase* effectBase =
             dynamic_cast<CEffectControlBase*>(&aEffect);
 
     // Remove the effect from the array
     TInt index(KErrNotFound);
-    index = iAssociatedEffects.Find(effectBase);
+    if(effectBase)
+       {
+       index = iAssociatedEffects.Find(effectBase);
+        
     if (index != KErrNotFound)
         {
         MControlObserver* observer;
@@ -229,9 +234,11 @@ TInt CStreamControl::RemoveEffect(MEffectControl& aEffect)
         iAssociatedEffects.Remove(index);
         status = effectBase->RemovedFromStreamControl(*this);
         RETURN_IF_ERROR( status );
+         }
         }
-
+       }
     return status;
+        
     }
 
 TInt CStreamControl::AddEffect(MEffectControl& aEffect)
@@ -525,7 +532,10 @@ TInt CStreamControl::Close()
     if (iSourceControl)
         {
         CSourceBase* sourcebase = dynamic_cast<CSourceBase*>(iSourceControl);
-        sourcebase->ServerSourceDeleted();
+        if (sourcebase)
+            sourcebase->ServerSourceDeleted();
+        else
+            return status;
         }
 
     SetStreamState(EStreamClosed, KErrNone);
@@ -627,10 +637,13 @@ void CStreamControl::MfaocComplete(TInt& aError,
             // seperate function and call function here...
 
             // Signal the source that server side source is unloaded
+        if (iSourceControl)
+            {
             CSourceBase* sourcebase =
                     dynamic_cast<CSourceBase*>(iSourceControl);
-            sourcebase->ServerSourceDeleted();
-
+             if (sourcebase)
+                 sourcebase->ServerSourceDeleted();
+            }
             if (iControllerEventMonitor)
                 {
                 iControllerEventMonitor->Cancel();
@@ -666,11 +679,18 @@ void CStreamControl::MfaocComplete(TInt& aError,
             // Save the uid of controller loaded.
             iControllerUid = aControllerUid;
             // Signal the source that server side source is loaded
-            CSourceBase* sourcebase =
+            if (iSourceControl)
+                {
+                CSourceBase* sourcebase =
                     dynamic_cast<CSourceBase*>(iSourceControl);
-            sourcebase->ServerSourceCreated( *iCMCustomCommand,
+               if (sourcebase)
+                   sourcebase->ServerSourceCreated( *iCMCustomCommand,
                     *aSourceHandle);
-
+              else
+                 {
+                 SetStreamState(EStreamClosed, aError);
+                 }
+                }
             if (iStreamState == EStreamOpening)
                 {
                 iPrimeController = ETrue;
@@ -699,7 +719,7 @@ void CStreamControl::ConfigureControllerLoader(TUid aMediaType,
 
 TInt CStreamControl::LaunchController()
     {
-    TInt status(KErrNone);
+    TInt status(KErrNotReady);
     // KUidMediaTypeAudio need to be part of source
     ConfigureControllerLoader(KUidMediaTypeAudio,
             CMMFFindAndOpenController::EPlayback);
@@ -707,9 +727,25 @@ TInt CStreamControl::LaunchController()
 
     if (!iSourceControl || !iSinkControl)
         return KErrNotReady;
+   CSourceBase *sourceBase=(dynamic_cast<CSourceBase*>(iSourceControl));
+   TUid sourceUID ;
 
-    TUid sourceUID = (dynamic_cast<CSourceBase*>(iSourceControl))->GetSourceUid();
-    TUid sinkUID = (dynamic_cast<CSinkBase*>(iSinkControl))->GetSinkUid();
+   if (sourceBase)
+      {
+       sourceUID = sourceBase->GetSourceUid();
+      }
+   else
+       {
+       return KErrNotReady;
+       }
+
+   CSinkBase *sinkBase=(dynamic_cast<CSinkBase*>(iSinkControl));
+   TUid sinkUID;
+
+   if(sinkBase)
+      sinkUID = sinkBase ->GetSinkUid();
+   else
+      return KErrNotReady;
 
     if (iSourceControl->Type() == KDataBufferSourceControl)
         {
@@ -755,7 +791,7 @@ TInt CStreamControl::LaunchController()
             HBufC8* mimeType = HBufC8::NewLC(KMaxMimeLength);
             TPtr8 mimeTypePtr = mimeType->Des();
 
-            TInt status = iSourceControl->GetMimeType(mimeTypePtr);
+            status = iSourceControl->GetMimeType(mimeTypePtr);
 
             iFindAndOpenController->ConfigureSourceSink(
                     TMMFileSource(fileNamePtr,
@@ -806,7 +842,7 @@ TInt CStreamControl::LaunchController()
         HBufC8* mimeType = HBufC8::NewLC(KMaxMimeLength);
         TPtr8 mimeTypePtr = mimeType->Des();
 
-        TInt status = iSourceControl->GetMimeType(mimeTypePtr);
+        status = iSourceControl->GetMimeType(mimeTypePtr);
 
         iFindAndOpenController->ConfigureSourceSink(
                 CMMFFindAndOpenController::TSourceSink(sourceUID,

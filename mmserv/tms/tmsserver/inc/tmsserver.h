@@ -23,23 +23,27 @@
 #include <tms.h>
 #include "tmsshared.h"
 #include "tmsclientserver.h"
+#include "tmsrtplayerobsrv.h"
+#include "tmsrtplayer.h"
 
 namespace TMS {
 
 // FORWARD DECLARATIONS
 class TMSServerShutDown;
-class CStartAndMonitorTMSCallThread;
+class TMSStartAndMonitorTMSCallThread;
 class TMSCallProxyLocal;
-class GlobalEffectsSettings;
-class CTarEventHandler;
-class CSPCenRepListener;
-class CSPAudioHandler;
+class TMSGlobalEffectsSettings;
+class TMSTarEventHandler;
+class TMSCSPCenRepListener;
+class TMSCenRepAudioHandler;
+class TMSDtmfEventHandler;
 
 // -----------------------------------------------------------------------------
 // TMSServer class
 // -----------------------------------------------------------------------------
 //
-class TMSServer : public CServer2
+class TMSServer : public CServer2,
+                  private TMSRtPlayerObsrv
     {
 public:
     static TMSServer* NewL();
@@ -47,10 +51,10 @@ public:
 
     void AddSession();
     void DropSession();
-    TInt SessionCount();
+    TInt SessionCount() const;
 
-    void SetDnLinkSession(TBool aSession);
-    void SetUpLinkSession(TBool aSession);
+    void SetDnLinkSession(const TBool aSession);
+    void SetUpLinkSession(const TBool aSession);
 
     TBool HasDnLinkSession() const;
     TBool HasUpLinkSession() const;
@@ -72,11 +76,35 @@ public:
             RArray<TFourCC>*& aCodecs);
 
     TInt NotifyTarClients(TRoutingMsgBufPckg routingpckg);
+    TInt StartDTMF(const RMessage2& aMessage);
+    TInt StopDTMF(const RMessage2& aMessage);
+    TInt ContinueSendingDTMF(const RMessage2& aMessage);
+    TInt NotifyDtmfClients(TmsMsgBufPckg dtmfpckg);
 
+    void StartDTMFNotifierL();
+    void CancelDTMFNotifier();
     void StartRoutingNotifierL();
     void CancelRoutingNotifier();
     void StartCenRepHandlerL();
     void CancelCenRepHandler();
+
+    // for RingTone player
+    void InitRingTonePlayerL();
+    void OpenRingTonePlayerFromProfileL(const RMessage2& aMessage);
+    void OpenRingTonePlayerFromFileL(const RMessage2& aMessage);
+    void OpenRingToneTTSPlayerL(const RMessage2& aMessage);
+    void OpenRingToneSequencePlayerL(const RMessage2& aMessage);
+    void OpenRingToneBeepOnceL();
+    void OpenRingToneSilentL();
+    void OpenRingToneUnsecureVoipL();
+    void DeinitRingTonePlayer();
+    void PlayRingToneL();
+    void PauseVideoRingTone();
+    void StopRingTone();
+    void MuteRingTone();
+
+    // from TMSRtPlayerObsrv
+    void RtPlayerEvent(TInt aEventType, TInt aError);
 
 private:
     TMSServer();
@@ -96,18 +124,29 @@ private:
     TBool iDnlinkSession;
     TBool iUplinkSession;
 
-    mutable RPointerArray<CStartAndMonitorTMSCallThread> iTMSCallServList;
-    GlobalEffectsSettings* iEffectSettings;
-    CTarEventHandler* iTarHandler;
-    CSPAudioHandler* iAudioCenRepHandler;
+    mutable RPointerArray<TMSStartAndMonitorTMSCallThread> iTMSCallServList;
+    TMSGlobalEffectsSettings* iEffectSettings;
+    TMSTarEventHandler* iTarHandler;
+    TMSCenRepAudioHandler* iAudioCenRepHandler;
     TMSAudioOutput iCurrentRouting;
+    TMSDtmfEventHandler* iDTMFHandler;
+    TInt iTarHandlerCount;
+    TInt iAudioCenRepHandlerCount;
+    TInt iDTMFHandlerCount;
 
+    // for RT
+    TMSRingTonePlayer* iTMSRtPlayer;
+    HBufC* iRtFile;
+    HBufC8* iRtSequence;
+    HBufC* iTtsText;
+
+    // for codecs count
     RArray<TFourCC> iDnlCodecs;
     RArray<TFourCC> iUplCodecs;
     };
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread class
+// TMSStartAndMonitorTMSCallThread class
 // -----------------------------------------------------------------------------
 //
 class TMSCallProxyLocal : public RSessionBase
@@ -121,19 +160,19 @@ public:
     };
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread class
+// TMSStartAndMonitorTMSCallThread class
 // -----------------------------------------------------------------------------
 //
-class CStartAndMonitorTMSCallThread : public CActive
+class TMSStartAndMonitorTMSCallThread : public CActive
     {
 public:
-    static CStartAndMonitorTMSCallThread* NewL(TMSServer* aServer);
-    ~CStartAndMonitorTMSCallThread();
+    static TMSStartAndMonitorTMSCallThread* NewL(TMSServer* aServer);
+    ~TMSStartAndMonitorTMSCallThread();
     TInt StartTMSCallServer(TMSCallProxyLocal& aHandle);
 
 private:
     // Construct
-    CStartAndMonitorTMSCallThread(TMSServer* aServer);
+    TMSStartAndMonitorTMSCallThread(TMSServer* aServer);
     void ConstructL();
 
     // From CActive

@@ -40,6 +40,7 @@ STRUCT ADVANCED_AUDIO_CONTROLLER_RESOURCE
     {
     LONG	shared_buffer_max_num;
     LONG	shared_buffer_max_size;
+    LONG	shared_buffer_max_size_non_seekable_source;
     LONG	sampling_rate;
     LONG	stereo_support;
     LONG	metadata_support;

@@ -24,9 +24,9 @@ PRJ_EXPORTS
 ../sis/radioutility/radioutility_stub.sis /epoc32/data/z/system/install/radioutility_stub.sis
 
 PRJ_MMPFILES
-#include "../radioserver/group/bld.inf"
+#include "../radioserver/Group/bld.inf"
 #include "../radio_utility/group/bld.inf"
-#include "../fmpresetutility/group/bld.inf"
+#include "../presetutility/group/bld.inf"
 
 //  End of File  
 

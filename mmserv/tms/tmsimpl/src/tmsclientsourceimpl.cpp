@@ -15,7 +15,6 @@
  *
  */
 
-#include <tms.h>
 #include "tmsutility.h"
 #include "tmsclientsourcebodyimpl.h"
 #include "tmsclientsourceimpl.h"
@@ -24,10 +23,14 @@ using namespace TMS;
 
 TMSClientSourceImpl::TMSClientSourceImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 TMSClientSourceImpl::~TMSClientSourceImpl()
     {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSClientSourceImpl::PostConstruct()
@@ -45,7 +48,6 @@ gint TMSClientSourceImpl::PostConstruct()
     return ret;
     }
 
-// TO DO stop exporting this function
 gint TMSClientSourceImpl::Create(TMSSource*& tmssource)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);

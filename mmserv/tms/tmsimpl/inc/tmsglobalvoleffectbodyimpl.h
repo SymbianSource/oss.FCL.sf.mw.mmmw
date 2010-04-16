@@ -33,9 +33,9 @@ class TMSGlobalVolEffectBodyImpl : public TMSGlobalVolEffectBody
     {
 public:
     static gint Create(TMSGlobalVolEffectBody*& bodyimpl);
+    virtual ~TMSGlobalVolEffectBodyImpl();
 
     // From TMSVolumeEffectBody
-    virtual ~TMSGlobalVolEffectBodyImpl();
     virtual gint AddObserver(TMSEffectObserver& obsrvr, gpointer user_data);
     virtual gint RemoveObserver(TMSEffectObserver& obsrvr);
     virtual gint SetLevel(const guint level);
@@ -43,7 +43,7 @@ public:
     virtual gint GetMaxLevel(guint& level);
     virtual gint GetType(TMSEffectType& effecttype);
 
-    void SetParentEffect(TMSEffect*& parenteffect);
+    void SetParent(TMSEffect*& parent);
 
 private:
     TMSGlobalVolEffectBodyImpl();
@@ -54,11 +54,10 @@ private:
     gint iClientId;
     gpointer iUserData;
     TMSProxy* iProxy;
-    TMSEffect* iGlobalEffect;
+    TMSEffect* iParent;
     };
 
 } //namespace TMS
 
 #endif // TMS_GLOBAL_VOLUME_EFFECT_BODY_IMPL_H
 
-// End of file

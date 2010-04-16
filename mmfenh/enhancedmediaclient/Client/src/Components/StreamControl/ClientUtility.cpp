@@ -12,7 +12,7 @@
 * Contributors:
 *
 * Description:  Definition of the ClientUtility class.
-*  Version     : %version: bh1mmcf#12 %
+*  Version     : %version: bh1mmcf#11 %
 *
 */
 
@@ -2325,7 +2325,7 @@ void CMMFFindAndOpenController::UseSecureDRMProcessL(TBool& aIsSecureDrmProcess)
         }
     else if(iFileName.Length() != 0)  //need to check if file name exist
         {
-        TRAP(error, content = ContentAccess::CContent::NewL(iFileName,EContentShareReadWrite));
+        TRAP(error, content = ContentAccess::CContent::NewL(iFileName));
         if(error == KErrPermissionDenied)
             {
             aIsSecureDrmProcess = ETrue;

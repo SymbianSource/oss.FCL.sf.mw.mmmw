@@ -15,9 +15,8 @@
  *
  */
 
-#include <tms.h>
-#include "tmsglobalgaineffectbodyimpl.h"
 #include "tmsutility.h"
+#include "tmsglobalgaineffectbodyimpl.h"
 #include "tmsglobalgaineffectimpl.h"
 
 using namespace TMS;
@@ -67,19 +66,18 @@ gint TMSGlobalGainEffectImpl::Create(TMSEffect*& tmseffect)
     if (self && ret == TMS_RESULT_SUCCESS)
         {
         tmseffect = self;
-        self->SetParentEffect(tmseffect);
+        ret = self->SetParent(tmseffect);
         }
     TRACE_PRN_FN_EXT;
     return ret;
     }
 
-gint TMSGlobalGainEffectImpl::SetParentEffect(TMSEffect*& parenteffect)
+gint TMSGlobalGainEffectImpl::SetParent(TMSEffect*& parent)
     {
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSGlobalGainEffectBodyImpl*) this->iBody)->SetParentEffect(
-                parenteffect);
+        ((TMSGlobalGainEffectBodyImpl*) this->iBody)->SetParent(parent);
         }
     else
         {
@@ -88,4 +86,3 @@ gint TMSGlobalGainEffectImpl::SetParentEffect(TMSEffect*& parenteffect)
     return ret;
     }
 
-// End of file

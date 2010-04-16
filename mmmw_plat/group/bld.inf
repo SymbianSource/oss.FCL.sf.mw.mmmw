@@ -30,8 +30,6 @@
 #include "../emc_volume_effect_api/group/bld.inf"
 #include "../emc_balance_effect_api/group/bld.inf"
 #include "../emc_descriptor_source_api/group/bld.inf"
-#include "../mtp_wmdrm_api/group/bld.inf"
-#include "../mtp_keys_api/group/bld.inf"
 #include "../emc_drm_config_intfc_api/group/bld.inf"
 #include "../voip_audio_services_api/group/bld.inf"
 #include "../configuration_components_factory_api/group/bld.inf"
@@ -44,3 +42,4 @@
 #include "../radio_monitor_api/group/bld.inf"
 #include "../thumbnail_engine_api/group/bld.inf"
 #include "../telephony_multimedia_service_api/group/bld.inf"
+#include "../openmax_al_api/group/bld.inf"

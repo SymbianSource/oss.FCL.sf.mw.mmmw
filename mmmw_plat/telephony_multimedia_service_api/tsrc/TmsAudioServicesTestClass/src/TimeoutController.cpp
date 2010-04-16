@@ -249,7 +249,7 @@ void CSimpleTimeout::RunL()
         if (iTestCaseTimeout > timeout)
             {
             RDebug::Print(
-                    _L( "Absolute timer still valid. Restaring timer. iStatus: %d" ),
+                    _L("Absolute timer still valid. Restaring timer. iStatus: %d"),
                     iStatus.Int());
             // Start new timer
             iStatus = KErrNone; // reset value

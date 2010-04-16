@@ -24,11 +24,11 @@
 using namespace TMS;
 
 // -----------------------------------------------------------------------------
-// IPCallStreamBase::~IPCallStreamBase
+// TMSIPCallStreamBase::~TMSIPCallStreamBase
 // Destructor
 // -----------------------------------------------------------------------------
 //
-IPCallStreamBase::~IPCallStreamBase()
+TMSIPCallStreamBase::~TMSIPCallStreamBase()
     {
     TRACE_PRN_FN_ENT;
 
@@ -45,11 +45,11 @@ IPCallStreamBase::~IPCallStreamBase()
 
 #ifndef __USE_GSTREAMER__
 // -----------------------------------------------------------------------------
-// IPCallStreamBase::InitDevSoundL
+// TMSIPCallStreamBase::InitDevSoundL
 //
 // -----------------------------------------------------------------------------
 //
-void IPCallStreamBase::InitDevSoundL(const TMMFState aDevSoundState,
+void TMSIPCallStreamBase::InitDevSoundL(const TMMFState aDevSoundState,
         const TMMFPrioritySettings priority)
     {
     TRACE_PRN_FN_ENT;
@@ -69,21 +69,21 @@ void IPCallStreamBase::InitDevSoundL(const TMMFState aDevSoundState,
 #endif //__USE_GSTREAMER__
 
 // -----------------------------------------------------------------------------
-// IPCallStreamBase::SetMsgQueue
+// TMSIPCallStreamBase::SetMsgQueue
 //
 // -----------------------------------------------------------------------------
 //
-void IPCallStreamBase::SetMsgQueue(const RMsgQueue<TmsMsgBuf> aMsgQueue)
+void TMSIPCallStreamBase::SetMsgQueue(const RMsgQueue<TmsMsgBuf> aMsgQueue)
     {
     iMsgQueue = aMsgQueue;
     }
 
 // -----------------------------------------------------------------------------
-// IPCallStreamBase::ConfigureMedia
+// TMSIPCallStreamBase::ConfigureMedia
 //
 // -----------------------------------------------------------------------------
 //
-gint IPCallStreamBase::ConfigureMedia(const guint32 aCodecID)
+gint TMSIPCallStreamBase::ConfigureMedia(const guint32 aCodecID)
     {
     gint framelen = 0;
 
@@ -130,11 +130,11 @@ gint IPCallStreamBase::ConfigureMedia(const guint32 aCodecID)
     }
 
 // -----------------------------------------------------------------------------
-// IPCallStreamBase::DoChunk
+// TMSIPCallStreamBase::DoChunk
 // Checks, adjusts and creates global RChunk.
 // -----------------------------------------------------------------------------
 //
-gint IPCallStreamBase::DoChunk(const gint aDataLen, TmsMsgBuf& aMsgBuffer)
+gint TMSIPCallStreamBase::DoChunk(const gint aDataLen, TmsMsgBuf& aMsgBuffer)
     {
     gint status(KErrNone);
 

@@ -18,22 +18,26 @@
 #include <e32svr.h>
 #include <e32uid.h>
 #include <e32capability.h>
+#include <AudioPreference.h>
 #include "tmsutility.h"
 #include "tmsclientserver.h"
-#include "tmsserver.h"
+#include "tmstelephonycenrep.h"
 #include "tmsservershutdown.h"
 #include "tmsserversession.h"
 #include "tmscallserverstartparam.h"
 #include "tmscallserver.h"
 #include "tmscallclisrv.h"
-#include "globaleffectssettings.h"
-#include "tareventhandler.h"
-#include "cspaudiohandler.h"
+#include "tmsglobaleffectssettings.h"
+#include "tmstareventhandler.h"
+#include "tmscenrepaudiohandler.h"
+#include "tmsdtmfeventhandler.h"
+#include "tmsrtparam.h"
+#include "tmsserver.h"
 
 using namespace TMS;
 
 // CONSTANTS
-const TInt KShutDownDelayTime = 5000000; // 5 sec delay time
+const TInt KTMSShutDownDelayTime = 1000000; // 1 sec delay time
 const TInt KOutputsArraySize = 10;
 
 // -----------------------------------------------------------------------------
@@ -80,6 +84,9 @@ TMSServer::~TMSServer()
     delete iEffectSettings;
     CancelRoutingNotifier();
     CancelCenRepHandler();
+    CancelDTMFNotifier();
+    DeinitRingTonePlayer();
+    delete iTMSRtPlayer;
 
     TRACE_PRN_FN_EXT;
     }
@@ -100,8 +107,7 @@ CSession2* TMSServer::NewSessionL(const TVersion& aVersion,
         }
 
     const TVersion version(KTMSServMajorVersionNumber,
-                           KTMSServMinorVersionNumber,
-                           KTMSServBuildVersionNumber);
+            KTMSServMinorVersionNumber, KTMSServBuildVersionNumber);
 
     if (!User::QueryVersionSupported(version, aVersion))
         {
@@ -126,10 +132,12 @@ void TMSServer::ConstructL()
     iShutdownTimer = TMSServerShutDown::NewL();
     StartL(KTMSServerName);
     RThread().SetPriority(EPriorityRealTime);
-    iEffectSettings = GlobalEffectsSettings::NewL();
+    iEffectSettings = TMSGlobalEffectsSettings::NewL();
     iTarHandler = NULL;
     iAudioCenRepHandler = NULL;
+    iDTMFHandler = NULL;
     iCurrentRouting = TMS_AUDIO_OUTPUT_NONE;
+    InitRingTonePlayerL();
 
     TRACE_PRN_FN_EXT;
     }
@@ -161,7 +169,7 @@ void TMSServer::DropSession()
     if (iSession == 0)
         {
         iShutdownTimer->SetDelay(TTimeIntervalMicroSeconds32(
-                KShutDownDelayTime));
+                KTMSShutDownDelayTime));
         }
 
     TRACE_PRN_N1(_L("TMS->DNL: DropSession->Active Sessions: [%d]"), iSession);
@@ -172,7 +180,7 @@ void TMSServer::DropSession()
 //
 // -----------------------------------------------------------------------------
 //
-TInt TMSServer::SessionCount()
+TInt TMSServer::SessionCount() const
     {
     return iSession;
     }
@@ -182,7 +190,7 @@ TInt TMSServer::SessionCount()
 //
 // -----------------------------------------------------------------------------
 //
-void TMSServer::SetDnLinkSession(TBool aSession)
+void TMSServer::SetDnLinkSession(const TBool aSession)
     {
     iDnlinkSession = aSession;
     }
@@ -192,7 +200,7 @@ void TMSServer::SetDnLinkSession(TBool aSession)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSServer::SetUpLinkSession(TBool aSession)
+void TMSServer::SetUpLinkSession(const TBool aSession)
     {
     iUplinkSession = aSession;
     }
@@ -229,7 +237,7 @@ void TMSServer::GetNewTMSCallSessionHandleL(RHandleBase& aHandle)
     TInt i = 0;
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
         if (!callThread->IsActive())
             {
             iTMSCallServList.Remove(i);
@@ -245,6 +253,7 @@ void TMSServer::GetNewTMSCallSessionHandleL(RHandleBase& aHandle)
     TMSCallProxyLocal tmsCallSessionHandle;
     User::LeaveIfError(StartTMSCallServer(tmsCallSessionHandle));
     aHandle = tmsCallSessionHandle;
+
     TRACE_PRN_FN_EXT;
     }
 
@@ -256,19 +265,19 @@ void TMSServer::GetNewTMSCallSessionHandleL(RHandleBase& aHandle)
 TInt TMSServer::StartTMSCallServer(TMSCallProxyLocal& aHandle)
     {
     TRACE_PRN_FN_ENT;
-    TInt status = KErrNone;
 
-    CStartAndMonitorTMSCallThread* callServerThread = NULL;
-    TRAP(status, callServerThread =
-    CStartAndMonitorTMSCallThread::NewL(const_cast<TMSServer*>(this)));
-    if (status != KErrNone)
+    TInt status = TMS_RESULT_SUCCESS;
+    TMSStartAndMonitorTMSCallThread* callServerThread = NULL;
+    TRAP(status, callServerThread =TMSStartAndMonitorTMSCallThread::NewL(
+            const_cast<TMSServer*>(this)));
+    if (status != TMS_RESULT_SUCCESS)
         {
         delete callServerThread;
         }
     else
         {
         status = iTMSCallServList.Append(callServerThread);
-        if (callServerThread && status == KErrNone)
+        if (callServerThread && status == TMS_RESULT_SUCCESS)
             {
             status = callServerThread->StartTMSCallServer(aHandle);
             TInt count = 0;
@@ -313,10 +322,16 @@ TInt TMSServer::StartTMSCallServer(TMSCallProxyLocal& aHandle)
 //
 void TMSServer::StartRoutingNotifierL()
     {
+    TRACE_PRN_FN_ENT;
+
     if (!iTarHandler)
         {
-        iTarHandler = CTarEventHandler::NewL((const_cast<TMSServer*> (this)));
+        iTarHandlerCount = 0;
+        iTarHandler = TMSTarEventHandler::NewL((const_cast<TMSServer*> (this)));
         }
+    iTarHandlerCount++;
+
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -326,8 +341,11 @@ void TMSServer::StartRoutingNotifierL()
 //
 void TMSServer::CancelRoutingNotifier()
     {
-    delete iTarHandler;
-    iTarHandler = NULL;
+    if (--iTarHandlerCount <= 0)
+        {
+        delete iTarHandler;
+        iTarHandler = NULL;
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -337,13 +355,19 @@ void TMSServer::CancelRoutingNotifier()
 //
 void TMSServer::StartCenRepHandlerL()
     {
+    TRACE_PRN_FN_ENT;
+
 #ifdef _USE_TELEPHONY_CENREP_
     if (!iAudioCenRepHandler)
         {
-        iAudioCenRepHandler = CSPAudioHandler::NewL(
+        iAudioCenRepHandlerCount = 0;
+        iAudioCenRepHandler = TMSCenRepAudioHandler::NewL(
                 (const_cast<TMSServer*> (this)));
         }
+    iAudioCenRepHandlerCount++;
 #endif
+
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -353,8 +377,45 @@ void TMSServer::StartCenRepHandlerL()
 //
 void TMSServer::CancelCenRepHandler()
     {
-    delete iAudioCenRepHandler;
-    iAudioCenRepHandler = NULL;
+    if (--iAudioCenRepHandlerCount <= 0)
+        {
+        delete iAudioCenRepHandler;
+        iAudioCenRepHandler = NULL;
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::StartDTMFNotifierL
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::StartDTMFNotifierL()
+    {
+    TRACE_PRN_FN_ENT;
+
+    if (!iDTMFHandler)
+        {
+        iDTMFHandlerCount = 0;
+        iDTMFHandler = TMSDtmfEventHandler::NewL(
+                (const_cast<TMSServer*> (this)));
+        }
+    iDTMFHandlerCount++;
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::CancelDTMFNotifier
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::CancelDTMFNotifier()
+    {
+    if (--iDTMFHandlerCount <= 0)
+        {
+        delete iDTMFHandler;
+        iDTMFHandler = NULL;
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -365,11 +426,9 @@ void TMSServer::CancelCenRepHandler()
 TInt TMSServer::SetOutput(CSession2* /*sid*/, TInt output)
     {
     TRACE_PRN_FN_ENT;
-    TInt status(KErrNone);
 
-    status = SendMessageToCallServ(TMS_ROUTING_OUTPUT_SET, output);
-
-    if (status == KErrNone)
+    TInt status = SendMessageToCallServ(TMS_ROUTING_OUTPUT_SET, output);
+    if (status == TMS_RESULT_SUCCESS)
         {
         iCurrentRouting = output;
         }
@@ -389,16 +448,16 @@ TInt TMSServer::GetOutput(const RMessage2& aMessage)
 
     TUint output;
     TInt i = 0;
-    TInt status(KErrNone);
+    TInt status(TMS_RESULT_SUCCESS);
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
             status = callThread->iTMSCallProxyLocal.ReceiveFromCallServer(
                     TMS_ROUTING_OUTPUT_GET, output);
-            if (status != KErrNone)
+            if (status != TMS_RESULT_SUCCESS)
                 {
                 break;
                 }
@@ -407,9 +466,10 @@ TInt TMSServer::GetOutput(const RMessage2& aMessage)
         }
     TPckgBuf<TInt> p(output);
     aMessage.Write(0, p);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
+
     TRACE_PRN_FN_EXT;
-    return KErrNone;
+    return status;
     }
 
 // -----------------------------------------------------------------------------
@@ -420,18 +480,19 @@ TInt TMSServer::GetOutput(const RMessage2& aMessage)
 TInt TMSServer::GetPreviousOutput(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
+
     TUint output;
     TInt i = 0;
-    TInt status(KErrNone);
+    TInt status(TMS_RESULT_SUCCESS);
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
             status = callThread->iTMSCallProxyLocal.ReceiveFromCallServer(
                     TMS_ROUTING_PREVIOUSOUTPUT_GET, output);
-            if (status != KErrNone)
+            if (status != TMS_RESULT_SUCCESS)
                 {
                 break;
                 }
@@ -440,7 +501,8 @@ TInt TMSServer::GetPreviousOutput(const RMessage2& aMessage)
         }
     TPckgBuf<TInt> p(output);
     aMessage.Write(0, p);
-    aMessage.Complete(KErrNone);
+    aMessage.Complete(TMS_RESULT_SUCCESS);
+
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -465,7 +527,7 @@ void TMSServer::GetAvailableOutputsL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
 
-    TInt status = KErrNone;
+    TInt status = TMS_RESULT_SUCCESS;
     OutputVector outputs;
     HBufC8* buf = HBufC8::NewLC(KOutputsArraySize * sizeof(TUint32));
     TPtr8 ptr = buf->Des();
@@ -478,13 +540,13 @@ void TMSServer::GetAvailableOutputsL(const RMessage2& aMessage)
 
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
             status = callThread->iTMSCallProxyLocal.ReceiveFromCallServer(
                     TMS_ROUTING_AVAILABLE_OUTPUT_GET, args);
-            if (status != KErrNone)
+            if (status != TMS_RESULT_SUCCESS)
                 {
                 break;
                 }
@@ -509,15 +571,17 @@ void TMSServer::GetAvailableOutputsL(const RMessage2& aMessage)
 TInt TMSServer::GetMaxLevel(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
-    TInt status(KErrNone);
+
+    TInt status(TMS_RESULT_SUCCESS);
     TPckgBuf<TUint> pckg;
 
     pckg() = iEffectSettings->MaxVolume();
-    if (status == KErrNone)
+    if (status == TMS_RESULT_SUCCESS)
         {
         status = aMessage.Write(0, pckg);
         aMessage.Complete(status);
         }
+
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -530,7 +594,8 @@ TInt TMSServer::GetMaxLevel(const RMessage2& aMessage)
 TInt TMSServer::GetLevel(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
-    TInt status(KErrNone);
+
+    TInt status(TMS_RESULT_SUCCESS);
     TPckgBuf<TUint> pckg;
     TInt volume;
 
@@ -546,7 +611,7 @@ TInt TMSServer::GetLevel(const RMessage2& aMessage)
         }
 
     pckg() = volume;
-    if (status == KErrNone)
+    if (status == TMS_RESULT_SUCCESS)
         {
         aMessage.Write(0, pckg);
         aMessage.Complete(status);
@@ -564,11 +629,9 @@ TInt TMSServer::GetLevel(const RMessage2& aMessage)
 TInt TMSServer::SetLevel(CSession2* /*sid*/, TBool tmsclient, TInt level)
     {
     TRACE_PRN_FN_ENT;
-    TInt status(KErrNone);
 
-    status = SendMessageToCallServ(TMS_EFFECT_GLOBAL_VOL_SET, level);
-
-    if (status == KErrNone)
+    TInt status = SendMessageToCallServ(TMS_EFFECT_GLOBAL_VOL_SET, level);
+    if (status == TMS_RESULT_SUCCESS)
         {
         switch (iCurrentRouting)
             {
@@ -625,11 +688,11 @@ TInt TMSServer::SetLevel(CSession2* /*sid*/, TBool tmsclient, TInt level)
 TInt TMSServer::GetMaxGain(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
-    TInt status(KErrNone);
-    TPckgBuf<TUint> pckg;
 
+    TInt status(TMS_RESULT_SUCCESS);
+    TPckgBuf<TUint> pckg;
     pckg() = iEffectSettings->MaxGain();
-    if (status == KErrNone)
+    if (status == TMS_RESULT_SUCCESS)
         {
         status = aMessage.Write(0, pckg);
         aMessage.Complete(status);
@@ -647,11 +710,11 @@ TInt TMSServer::GetMaxGain(const RMessage2& aMessage)
 TInt TMSServer::GetGain(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
-    TInt status(KErrNone);
-    TPckgBuf<TUint> pckg;
 
+    TInt status(TMS_RESULT_SUCCESS);
+    TPckgBuf<TUint> pckg;
     pckg() = iEffectSettings->Gain();
-    if (status == KErrNone)
+    if (status == TMS_RESULT_SUCCESS)
         {
         status = aMessage.Write(0, pckg);
         aMessage.Complete(status);
@@ -669,11 +732,9 @@ TInt TMSServer::GetGain(const RMessage2& aMessage)
 TInt TMSServer::SetGain(CSession2* /*sid*/, TInt level)
     {
     TRACE_PRN_FN_ENT;
-    TInt status(KErrNone);
 
-    status = SendMessageToCallServ(TMS_EFFECT_GLOBAL_GAIN_SET, level);
-
-    if (status == KErrNone)
+    TInt status = SendMessageToCallServ(TMS_EFFECT_GLOBAL_GAIN_SET, level);
+    if (status == TMS_RESULT_SUCCESS)
         {
         iEffectSettings->SetGain(level);
         iSessionIter.SetToFirst();
@@ -701,6 +762,8 @@ TInt TMSServer::SetGain(CSession2* /*sid*/, TInt level)
 TInt TMSServer::GetSupportedCodecs(const TMSStreamType strmType,
         RArray<TFourCC>*& aCodecs)
     {
+    TRACE_PRN_FN_ENT;
+
     if (strmType == TMS_STREAM_UPLINK)
         {
         aCodecs = &iUplCodecs;
@@ -709,7 +772,9 @@ TInt TMSServer::GetSupportedCodecs(const TMSStreamType strmType,
         {
         aCodecs = &iDnlCodecs;
         }
-    return KErrNone;
+
+    TRACE_PRN_FN_EXT;
+    return TMS_RESULT_SUCCESS;
     }
 
 // -----------------------------------------------------------------------------
@@ -719,11 +784,13 @@ TInt TMSServer::GetSupportedCodecs(const TMSStreamType strmType,
 //
 TInt TMSServer::SendMessageToCallServ(TInt func, TInt value)
     {
-    TInt status(KErrNone);
+    TRACE_PRN_FN_ENT;
+
+    TInt status(TMS_RESULT_SUCCESS);
     TInt i = 0;
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
@@ -736,7 +803,7 @@ TInt TMSServer::SendMessageToCallServ(TInt func, TInt value)
                 {
                 status = callThread->iTMSCallProxyLocal.SendToCallServer(
                         func, value);
-                if (status != KErrNone)
+                if (status != TMS_RESULT_SUCCESS)
                     {
                     break;
                     }
@@ -744,6 +811,8 @@ TInt TMSServer::SendMessageToCallServ(TInt func, TInt value)
             }
         i++;
         }
+
+    TRACE_PRN_FN_EXT;
     return status;
     }
 
@@ -754,11 +823,13 @@ TInt TMSServer::SendMessageToCallServ(TInt func, TInt value)
 //
 TInt TMSServer::SendMessageToCallServ(TInt func, TIpcArgs args)
     {
-    TInt status(KErrNone);
+    TRACE_PRN_FN_ENT;
+
+    TInt status(TMS_RESULT_SUCCESS);
     TInt i = 0;
     while (i < iTMSCallServList.Count())
         {
-        CStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
 
         if (callThread)
             {
@@ -771,7 +842,7 @@ TInt TMSServer::SendMessageToCallServ(TInt func, TIpcArgs args)
                 {
                 status = callThread->iTMSCallProxyLocal.SendToCallServer(
                         func, args);
-                if (status != KErrNone)
+                if (status != TMS_RESULT_SUCCESS)
                     {
                     break;
                     }
@@ -779,6 +850,8 @@ TInt TMSServer::SendMessageToCallServ(TInt func, TIpcArgs args)
             }
         i++;
         }
+
+    TRACE_PRN_FN_EXT;
     return status;
     }
 
@@ -789,6 +862,8 @@ TInt TMSServer::SendMessageToCallServ(TInt func, TIpcArgs args)
 //
 TInt TMSServer::NotifyTarClients(TRoutingMsgBufPckg routingpckg)
     {
+    TRACE_PRN_FN_ENT;
+
     iCurrentRouting = routingpckg().iOutput;
     iSessionIter.SetToFirst();
     TMSServerSession* serverSession =
@@ -799,7 +874,397 @@ TInt TMSServer::NotifyTarClients(TRoutingMsgBufPckg routingpckg)
         serverSession->HandleRoutingChange(routingpckg);
         serverSession = static_cast<TMSServerSession*> (iSessionIter++);
         }
-    return KErrNone;
+
+    TRACE_PRN_FN_EXT;
+    return TMS_RESULT_SUCCESS;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::StartDTMF
+//
+// -----------------------------------------------------------------------------
+//
+TInt TMSServer::StartDTMF(const RMessage2& aMessage)
+    {
+    TRACE_PRN_FN_ENT;
+
+    TInt status(TMS_RESULT_SUCCESS);
+    TInt len(0);
+    TMSStreamType strmtype;
+
+    strmtype = (TMSStreamType) aMessage.Int0();
+    len = aMessage.GetDesLength(1);
+    HBufC* tone(NULL);
+    if (len > 0)
+        {
+        delete tone;
+        tone = NULL;
+        TRAP(status,tone = HBufC::NewL(len));
+        if (status == TMS_RESULT_SUCCESS)
+            {
+            TPtr ptr = tone->Des();
+            status = aMessage.Read(1, ptr);
+            TRACE_PRN_N(ptr);
+
+            TIpcArgs args;
+            args.Set(0, strmtype);
+            args.Set(1, &ptr);
+            status = SendMessageToCallServ(TMS_DTMF_START, args);
+            delete tone;
+            tone = NULL;
+            }
+        }
+    aMessage.Complete(status);
+
+    TRACE_PRN_FN_EXT;
+    return status;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::StopDTMF
+//
+// -----------------------------------------------------------------------------
+//
+TInt TMSServer::StopDTMF(const RMessage2& aMessage)
+    {
+    TRACE_PRN_FN_ENT;
+
+    TInt status(TMS_RESULT_SUCCESS);
+    TMSStreamType streamtype;
+    streamtype = (TMSStreamType) aMessage.Int0();
+    status = SendMessageToCallServ(TMS_DTMF_STOP, streamtype);
+    aMessage.Complete(status);
+
+    TRACE_PRN_FN_EXT;
+    return status;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::ContinueSendingDTMF
+//
+// -----------------------------------------------------------------------------
+//
+TInt TMSServer::ContinueSendingDTMF(const RMessage2& aMessage)
+    {
+    TRACE_PRN_FN_ENT;
+
+    TInt status(TMS_RESULT_SUCCESS);
+    TBool continuesending;
+    continuesending = (TBool) aMessage.Int0();
+    status = SendMessageToCallServ(TMS_DTMF_CONTINUE, continuesending);
+    aMessage.Complete(status);
+
+    TRACE_PRN_FN_EXT;
+    return status;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::NotifyDtmfClients
+//
+// -----------------------------------------------------------------------------
+//
+TInt TMSServer::NotifyDtmfClients(TmsMsgBufPckg dtmfpckg)
+    {
+    TRACE_PRN_FN_ENT;
+
+    iSessionIter.SetToFirst();
+    TMSServerSession* serverSession =
+            static_cast<TMSServerSession*> (iSessionIter++);
+
+    while (serverSession != NULL)
+        {
+        serverSession->NotifyClient(dtmfpckg().iRequest, dtmfpckg().iStatus);
+        serverSession = static_cast<TMSServerSession*> (iSessionIter++);
+        }
+
+    TRACE_PRN_FN_EXT;
+    return TMS_RESULT_SUCCESS;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::InitRingTonePlayerL
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::InitRingTonePlayerL()
+    {
+    TRACE_PRN_FN_ENT;
+
+    DeinitRingTonePlayer();
+
+    if (!iTMSRtPlayer)
+        {
+        iTMSRtPlayer = TMSRingTonePlayer::NewL(*this);
+        }
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::DeinitRingTonePlayer
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::DeinitRingTonePlayer()
+    {
+    TRACE_PRN_FN_ENT;
+
+    if (iTMSRtPlayer)
+        {
+        iTMSRtPlayer->DeinitRingTonePlayer();
+        }
+
+    delete iRtFile;
+    iRtFile = NULL;
+    delete iRtSequence;
+    iRtSequence = NULL;
+    delete iTtsText;
+    iTtsText = NULL;
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::OpenRingTonePlayerFromFileL
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::OpenRingTonePlayerFromFileL(const RMessage2& aMessage)
+    {
+    TRACE_PRN_FN_ENT;
+
+    gint status(TMS_RESULT_INVALID_ARGUMENT);
+    gint len = aMessage.GetDesLength(0);
+    if (len > 0)
+        {
+        InitRingTonePlayerL();
+
+        if (iTMSRtPlayer)
+            {
+            iRtFile = HBufC::NewL(len);
+            TPtr ptr = iRtFile->Des();
+            aMessage.ReadL(0, ptr);
+            iTMSRtPlayer->CreateRingTonePlayerL(EPlayerAudio, *iRtFile);
+            len = aMessage.GetDesLength(1);
+            if (len > 0)
+                {
+                delete iTtsText;
+                iTtsText = NULL;
+                iTtsText = HBufC::NewL(len);
+                TPtr ptr1 = iTtsText->Des();
+                aMessage.ReadL(1, ptr1);
+                iTMSRtPlayer->CreateTTSPlayerL(ptr1);
+                }
+            status = TMS_RESULT_SUCCESS;
+            }
+        }
+    aMessage.Complete(status);
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::OpenRingTonePlayerFromProfileL
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::OpenRingTonePlayerFromProfileL(const RMessage2& aMessage)
+    {
+    TRACE_PRN_FN_ENT;
+
+    gint status(TMS_RESULT_INVALID_ARGUMENT);
+    InitRingTonePlayerL();
+
+    if (iTMSRtPlayer)
+        {
+        iTMSRtPlayer->CreateRingTonePlayerL(EPlayerDefault);
+        gint len = aMessage.GetDesLength(1);
+        if (len > 0)
+            {
+            delete iTtsText;
+            iTtsText = NULL;
+            iTtsText = HBufC::NewL(len);
+            TPtr ptr = iTtsText->Des();
+            aMessage.ReadL(1, ptr);
+            iTMSRtPlayer->CreateTTSPlayerL(ptr);
+            }
+        status = TMS_RESULT_SUCCESS;
+        }
+    aMessage.Complete(status);
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::OpenRingToneSequencePlayerL
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::OpenRingToneSequencePlayerL(const RMessage2& aMessage)
+    {
+    TRACE_PRN_FN_ENT;
+
+    gint status(TMS_RESULT_INVALID_ARGUMENT);
+    gint len = aMessage.GetDesLength(0);
+    if (len > 0)
+        {
+        InitRingTonePlayerL();
+        iRtSequence = HBufC8::NewL(len);
+        TPtr8 ptr = iRtSequence->Des();
+        aMessage.ReadL(0, ptr);
+
+        if (iTMSRtPlayer)
+            {
+            iTMSRtPlayer->CreateCustomSequencePlayerL(ptr);
+            status = TMS_RESULT_SUCCESS;
+            }
+        }
+    aMessage.Complete(status);
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::OpenRingToneBeepOnceL
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::OpenRingToneBeepOnceL()
+    {
+    TRACE_PRN_FN_ENT;
+
+    InitRingTonePlayerL();
+
+    if (iTMSRtPlayer)
+        {
+        iTMSRtPlayer->CreateSequencePlayerL(EPlayerBeepOnce);
+        }
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::DeinitRingTone
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::OpenRingToneSilentL()
+    {
+    TRACE_PRN_FN_ENT;
+
+    InitRingTonePlayerL();
+
+    if (iTMSRtPlayer)
+        {
+        iTMSRtPlayer->CreateSequencePlayerL(EPlayerSilent);
+        }
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::OpenRingToneUnsecureVoipL
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::OpenRingToneUnsecureVoipL()
+    {
+    TRACE_PRN_FN_ENT;
+
+    InitRingTonePlayerL();
+
+    if (iTMSRtPlayer)
+        {
+        iTMSRtPlayer->CreateSequencePlayerL(EPlayerUnsecureVoIP);
+        }
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::PlayRingToneL
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::PlayRingToneL()
+    {
+    TRACE_PRN_FN_ENT;
+
+    if (iTMSRtPlayer)
+        {
+        iTMSRtPlayer->PlayRingToneL();
+        }
+    else
+        {
+        User::Leave(TMS_RESULT_UNINITIALIZED_OBJECT);
+        }
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::PauseVideoRingTone
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::PauseVideoRingTone()
+    {
+    StopRingTone();
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::StopRingTone
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::StopRingTone()
+    {
+    TRACE_PRN_FN_ENT;
+
+    if (iTMSRtPlayer)
+        {
+        iTMSRtPlayer->StopPlaying();
+        }
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::MuteRingTone
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::MuteRingTone()
+    {
+    TRACE_PRN_FN_ENT;
+
+    if (iTMSRtPlayer)
+        {
+        iTMSRtPlayer->MuteRingTone();
+        }
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::RtPlayerEvent
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::RtPlayerEvent(gint aEventType, gint aError)
+    {
+    TRACE_PRN_FN_ENT;
+
+    iSessionIter.SetToFirst();
+    TMSServerSession* ss = static_cast<TMSServerSession*> (iSessionIter++);
+
+    while (ss != NULL)
+        {
+        ss->NotifyClient(aEventType, aError);
+        ss = static_cast<TMSServerSession*> (iSessionIter++);
+        }
+
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -820,7 +1285,7 @@ static void RunServerL()
     TMSServer* server = TMSServer::NewL();
 
     // Initialisation complete, now signal the client
-    RProcess::Rendezvous(KErrNone);
+    RProcess::Rendezvous(TMS_RESULT_SUCCESS);
 
     // Start the scheduler and wait for client requests
     CActiveScheduler::Start();
@@ -834,11 +1299,11 @@ static void RunServerL()
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::CStartAndMonitorTMSCallThread
+// TMSStartAndMonitorTMSCallThread::TMSStartAndMonitorTMSCallThread
 // Perhaps we need to move this to a .cpp?
 // -----------------------------------------------------------------------------
 //
-CStartAndMonitorTMSCallThread::CStartAndMonitorTMSCallThread(
+TMSStartAndMonitorTMSCallThread::TMSStartAndMonitorTMSCallThread(
         TMSServer* aServer) :
     CActive(EPriorityStandard),
     iTMSServer(aServer)
@@ -849,11 +1314,11 @@ CStartAndMonitorTMSCallThread::CStartAndMonitorTMSCallThread(
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::~CStartAndMonitorTMSCallThread
+// TMSStartAndMonitorTMSCallThread::~TMSStartAndMonitorTMSCallThread
 //
 // -----------------------------------------------------------------------------
 //
-CStartAndMonitorTMSCallThread::~CStartAndMonitorTMSCallThread()
+TMSStartAndMonitorTMSCallThread::~TMSStartAndMonitorTMSCallThread()
     {
     TRACE_PRN_FN_ENT;
     Cancel();
@@ -861,44 +1326,47 @@ CStartAndMonitorTMSCallThread::~CStartAndMonitorTMSCallThread()
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::NewL
+// TMSStartAndMonitorTMSCallThread::NewL
 //
 // -----------------------------------------------------------------------------
 //
-CStartAndMonitorTMSCallThread* CStartAndMonitorTMSCallThread::NewL(
+TMSStartAndMonitorTMSCallThread* TMSStartAndMonitorTMSCallThread::NewL(
         TMSServer* aServer)
     {
     TRACE_PRN_FN_ENT;
-    CStartAndMonitorTMSCallThread* self =
-            new (ELeave) CStartAndMonitorTMSCallThread(aServer);
+
+    TMSStartAndMonitorTMSCallThread* self =
+            new (ELeave) TMSStartAndMonitorTMSCallThread(aServer);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
+
     TRACE_PRN_FN_EXT;
     return self;
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::ConstructL
+// TMSStartAndMonitorTMSCallThread::ConstructL
 //
 // -----------------------------------------------------------------------------
 //
-void CStartAndMonitorTMSCallThread::ConstructL()
+void TMSStartAndMonitorTMSCallThread::ConstructL()
     {
     TRACE_PRN_FN_ENT;
     TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::StartTMSCallServer
+// TMSStartAndMonitorTMSCallThread::StartTMSCallServer
 //
 // -----------------------------------------------------------------------------
 //
-TInt CStartAndMonitorTMSCallThread::StartTMSCallServer(TMSCallProxyLocal& aHndl)
+TInt TMSStartAndMonitorTMSCallThread::StartTMSCallServer(
+        TMSCallProxyLocal& aHndl)
     {
     TRACE_PRN_FN_ENT;
 
-    TInt status(KErrNone);
+    TInt status(TMS_RESULT_SUCCESS);
     TMSCallServerStartParam start(iTMSServer, iCallSrvrHndl);
     const TUidType serverUid(KNullUid, KNullUid, KUidTMSCallServerUid3);
     TThreadFunction serverFunc = TMSCallServer::StartThread;
@@ -911,7 +1379,7 @@ TInt CStartAndMonitorTMSCallThread::StartTMSCallServer(TMSCallProxyLocal& aHndl)
                                   &start,
                                   EOwnerProcess);
 
-    if (status != KErrNone)
+    if (status != TMS_RESULT_SUCCESS)
         {
         return status;
         }
@@ -935,7 +1403,7 @@ TInt CStartAndMonitorTMSCallThread::StartTMSCallServer(TMSCallProxyLocal& aHndl)
         }
 
     User::WaitForRequest(reqStatus); // wait for start or death
-    if (reqStatus.Int() != KErrNone)
+    if (reqStatus.Int() != TMS_RESULT_SUCCESS)
         {
         iServerThread.Close();
         iCallSrvrHndl.Close();
@@ -943,43 +1411,48 @@ TInt CStartAndMonitorTMSCallThread::StartTMSCallServer(TMSCallProxyLocal& aHndl)
         }
     status = aHndl.Open(iCallSrvrHndl);
 
-    if (status != KErrNone)
+    if (status != TMS_RESULT_SUCCESS)
         {
         iServerThread.Close();
         iCallSrvrHndl.Close();
         return status;
         }
     aHndl.ShareProtected();
+    iStatus = KRequestPending;
     iServerThread.Logon(iStatus);
     SetActive();
 
     TRACE_PRN_FN_EXT;
-    return KErrNone;
+    return TMS_RESULT_SUCCESS;
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::RunL
+// TMSStartAndMonitorTMSCallThread::RunL
 // From CActive
 // -----------------------------------------------------------------------------
 //
-void CStartAndMonitorTMSCallThread::RunL()
+void TMSStartAndMonitorTMSCallThread::RunL()
     {
     TRACE_PRN_FN_ENT;
     iServerThread.Close();
-    //NOTE: This is causing a panic when closing down tms server.
+    //NOTE: This is causing a panic when closing down TMS server.
     //iCallSrvrHndl.Close();
     TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
-// CStartAndMonitorTMSCallThread::DoCancel
+// TMSStartAndMonitorTMSCallThread::DoCancel
 // From CActive
 // -----------------------------------------------------------------------------
 //
-void CStartAndMonitorTMSCallThread::DoCancel()
+void TMSStartAndMonitorTMSCallThread::DoCancel()
     {
     TRACE_PRN_FN_ENT;
-    iServerThread.LogonCancel(iStatus);
+    if (iServerThread.Handle())
+        {
+        iServerThread.LogonCancel(iStatus);
+        User::WaitForRequest(iStatus);
+        }
     TRACE_PRN_FN_EXT;
     }
 
@@ -990,6 +1463,7 @@ void CStartAndMonitorTMSCallThread::DoCancel()
 TInt TMSCallProxyLocal::Open(RServer2& aTMSCallServerHandle)
     {
     TRACE_PRN_FN_ENT;
+
     TInt status(KErrNotSupported);
     status = CreateSession(aTMSCallServerHandle,
                            TVersion(KTMSCallServerMajorVersionNumber,
@@ -1008,7 +1482,7 @@ TInt TMSCallProxyLocal::Open(RServer2& aTMSCallServerHandle)
 //
 TInt TMSCallProxyLocal::SendToCallServer(TInt aFunc, TUint value)
     {
-    TInt status(KErrNone);
+    TInt status(TMS_RESULT_SUCCESS);
     status = SendReceive(aFunc, TIpcArgs(value));
     return status;
     }
@@ -1020,7 +1494,7 @@ TInt TMSCallProxyLocal::SendToCallServer(TInt aFunc, TUint value)
 //
 TInt TMSCallProxyLocal::SendToCallServer(TInt aFunc, TIpcArgs args)
     {
-    TInt status(KErrNone);
+    TInt status(TMS_RESULT_SUCCESS);
     status = SendReceive(aFunc, args);
     return status;
     }
@@ -1032,11 +1506,11 @@ TInt TMSCallProxyLocal::SendToCallServer(TInt aFunc, TIpcArgs args)
 //
 TInt TMSCallProxyLocal::ReceiveFromCallServer(TInt aFunc, TUint& value)
     {
-    TInt status(KErrNone);
+    TInt status(TMS_RESULT_SUCCESS);
     TPckgBuf<TUint> pckg;
     TIpcArgs args(&pckg);
     status = SendReceive(aFunc, args);
-    if (status == KErrNone)
+    if (status == TMS_RESULT_SUCCESS)
         {
         value = pckg();
         }
@@ -1050,7 +1524,7 @@ TInt TMSCallProxyLocal::ReceiveFromCallServer(TInt aFunc, TUint& value)
 //
 TInt TMSCallProxyLocal::ReceiveFromCallServer(TInt aFunc, TIpcArgs args)
     {
-    TInt status(KErrNone);
+    TInt status(TMS_RESULT_SUCCESS);
     status = SendReceive(aFunc, args);
     return status;
     }

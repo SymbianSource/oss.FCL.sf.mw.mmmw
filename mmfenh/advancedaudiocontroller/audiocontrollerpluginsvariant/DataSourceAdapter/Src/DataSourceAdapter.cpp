@@ -38,6 +38,7 @@ EXPORT_C CDataSourceAdapter::CDataSourceAdapter()
     iTimeSeekable = EFalse;
     iDataSource = NULL;
     iIsProtected = EFalse;
+    iIsLocalPlayback = EFalse;
     }
 
 // -----------------------------------------------------------------------------
@@ -109,6 +110,10 @@ EXPORT_C void CDataSourceAdapter::SetDataSourceL(MDataSource* aDataSource,
         }
 	else if ((iSourceType == KUidMmfFileSource) || (iSourceType == KOldProgDLSourceUid))
     	{
+    	if (iSourceType == KUidMmfFileSource) 
+		{
+	    	iIsLocalPlayback = ETrue;
+		}
     	iPosSeekable = ETrue;
     	iDataSource->SourcePrimeL();
    		iIsProtected = static_cast<CMMFFile*>(iDataSource)->IsProtectedL();
@@ -400,6 +405,11 @@ EXPORT_C void CDataSourceAdapter::Event(TUid aEvent)
 		}
 	}
 
+EXPORT_C TBool CDataSourceAdapter::IsLocalPlayback()
+	{
+	DP1(_L("CDataSourceAdapter::iIsLocalPlayback[%d]"), iIsLocalPlayback);
+	return iIsLocalPlayback;
+	}
 // -----------------------------------------------------------------------------
 // CDataSourceAdapter::CAsyncProxyFillBuffer
 // -----------------------------------------------------------------------------

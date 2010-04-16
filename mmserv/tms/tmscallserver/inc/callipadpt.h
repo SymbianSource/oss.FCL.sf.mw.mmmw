@@ -24,21 +24,24 @@
 #include "tmsclientserver.h"
 #include "tmsshared.h"
 #include "calladpt.h"
+#include "cpeaudiodtmftoneplayer.h"
+#include "dtmfnotifier.h"
 
 namespace TMS {
 
 // FORWARD DECLARATIONS
-class TMSVoIPDownlink;
-class TMSVoIPUplink;
+class TMSIPDownlink;
+class TMSIPUplink;
 
-// CallIPAdpt class
-class CallIPAdpt : public CallAdpt
+// TMSCallIPAdpt class
+class TMSCallIPAdpt : public TMSCallAdpt,
+                      public TMSDTMFTonePlayerObserver
     {
 public:
     // Constractor
-    static CallIPAdpt* NewL();
+    static TMSCallIPAdpt* NewL();
 
-    virtual ~CallIPAdpt();
+    virtual ~TMSCallIPAdpt();
     virtual gint PostConstruct();
 
     virtual gint CreateStream(TMSCallType callType, TMSStreamType strmType,
@@ -96,6 +99,10 @@ public:
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
     virtual gint GetAvailableOutputsL(TInt& count, CBufFlat*& outputsbuffer);
 
+    virtual gint StartDTMF(TMSStreamType streamtype, TDes& dtmfstring);
+    virtual gint StopDTMF(TMSStreamType streamtype);
+    virtual gint ContinueDTMF(TBool continuesending);
+
     gint SetIlbcCodecMode(const gint mode, const TMSStreamType strmtype);
     gint GetIlbcCodecMode(gint& mode, const TMSStreamType strmtype);
     gint SetG711CodecMode(const gint mode, const TMSStreamType strmtype);
@@ -115,9 +122,13 @@ public:
     gint GetDataXferChunkHndl(const TMSStreamType strmType,
             const TUint32 key, RChunk& chunk);
 
+    //From DTMFTonePlayerObserver
+     void DTMFInitCompleted(TInt error);
+     void DTMFToneFinished(TInt error);
+
 private:
     void ConstructL();
-    CallIPAdpt();
+    TMSCallIPAdpt();
 
     void NotifyClient(const gint strmId, const TInt aCommand,
             const TInt aStatus = KErrNone, const TInt64 aInt64 = TInt64(0));
@@ -131,8 +142,8 @@ private:
     gboolean iDnlinkInitialized;
     gint iDnlinkStreamId;
 
-    TMSVoIPDownlink* iVoIPDownlink;
-    TMSVoIPUplink* iVoIPUplink;
+    TMSIPDownlink* iIPDownlink;
+    TMSIPUplink* iIPUplink;
 
     // Message queues for communication and data transfer back to the client
     RMsgQueue<TmsMsgBuf> iMsgQueueUp;
@@ -148,6 +159,9 @@ private:
     RArray<TFourCC> iCodecs;
     TInt iCodecsCount;
 
+    TMSAudioDtmfTonePlayer* iDTMFDnlinkPlayer;
+    TMSAudioDtmfTonePlayer* iDTMFUplinkPlayer;
+    TMSDtmfNotifier* iDTMFNotifier;
     };
 
 } //namespace TMS

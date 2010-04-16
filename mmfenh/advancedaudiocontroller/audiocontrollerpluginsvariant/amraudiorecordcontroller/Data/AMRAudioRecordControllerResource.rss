@@ -33,6 +33,7 @@ RESOURCE ADVANCED_AUDIO_CONTROLLER_RESOURCE amrEncoder
     {
     shared_buffer_max_num = 4;
     shared_buffer_max_size = 1024;
+    shared_buffer_max_size_non_seekable_source = 1024;
     sampling_rate = EAapSampleRate8000Hz;
     stereo_support = 0;
     metadata_support = EAapMetadataSupportFalse;

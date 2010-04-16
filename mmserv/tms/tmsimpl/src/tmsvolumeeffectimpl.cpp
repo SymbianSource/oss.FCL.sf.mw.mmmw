@@ -15,9 +15,8 @@
  *
  */
 
-#include <tms.h>
-#include "tmsvolumeeffectbodyimpl.h"
 #include "tmsutility.h"
+#include "tmsvolumeeffectbodyimpl.h"
 #include "tmsvolumeeffectimpl.h"
 
 using namespace TMS;
@@ -64,27 +63,12 @@ gint TMSVolumeEffectImpl::Create(TMSEffect*& tmseffect)
             self = NULL;
             }
         }
-
     if (self && ret == TMS_RESULT_SUCCESS)
         {
         tmseffect = self;
-        ret = self->SetParentEffect(tmseffect);
+        ret = self->SetParent(tmseffect);
         }
     TRACE_PRN_FN_EXT;
-    return ret;
-    }
-
-gint TMSVolumeEffectImpl::SetParentEffect(TMSEffect*& parenteffect)
-    {
-    gint  ret(TMS_RESULT_SUCCESS);
-    if (this->iBody)
-        {
-        ((TMSVolumeEffectBodyImpl*) this->iBody)->SetParentEffect(parenteffect);
-        }
-    else
-        {
-        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
-        }
     return ret;
     }
 
@@ -103,4 +87,17 @@ gint TMSVolumeEffectImpl::SetProxy(TMSCallProxy* aProxy, gpointer queuehandler)
     return ret;
     }
 
-// End of file
+gint TMSVolumeEffectImpl::SetParent(TMSEffect*& parent)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    if (this->iBody)
+        {
+        ((TMSVolumeEffectBodyImpl*) this->iBody)->SetParent(parent);
+        }
+    else
+        {
+        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
+        }
+    return ret;
+    }
+

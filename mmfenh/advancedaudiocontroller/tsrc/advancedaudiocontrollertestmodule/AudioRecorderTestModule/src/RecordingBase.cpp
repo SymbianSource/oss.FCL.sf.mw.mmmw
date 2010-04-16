@@ -41,8 +41,11 @@ CRecordingBase::CRecordingBase(CTestModuleIf *aConsole, CStifLogger *aLogger)
 }
 
 CRecordingBase::~CRecordingBase()
-{
+{  
+	TInt err( iFileMan->Delete( recordingFileName ) );
 	if (recorder) delete recorder;
+	iFs.Close();
+	if(iFileMan) delete iFileMan;
 	recorder = NULL;
 }
 
@@ -113,6 +116,9 @@ TInt CRecordingBase::RunTestL(CTestModuleIf *aConsole,
 void CRecordingBase::ConstructL(TFileName* fileName)
 {
 	logger->Log(_L("Creating file: %S"),fileName);
+	User::LeaveIfError( iFs.Connect() );
+	iFileMan = CFileMan::NewL( iFs );
+
 	recorder = CMdaAudioRecorderUtility::NewL(*this);
 	if (recorder)
 	{

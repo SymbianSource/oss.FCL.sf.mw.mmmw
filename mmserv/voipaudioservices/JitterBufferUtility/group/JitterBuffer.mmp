@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description:  VOIP AUdio Services
+* Description:  VOIP Audio Services
 *
 */
 
@@ -28,6 +28,7 @@ USERINCLUDE     ../inc
 USERINCLUDE     ../../inc
 
 MW_LAYER_SYSTEMINCLUDE
+APP_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE   /epoc32/include/mmf/common
 
 SOURCEPATH      ../src

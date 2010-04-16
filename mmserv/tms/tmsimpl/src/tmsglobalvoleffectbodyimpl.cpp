@@ -26,7 +26,7 @@ using namespace TMS;
 TMSGlobalVolEffectBodyImpl::TMSGlobalVolEffectBodyImpl() :
     iObserver(NULL),
     iProxy(NULL),
-    iGlobalEffect(NULL)
+    iParent(NULL)
     {
     }
 
@@ -39,7 +39,7 @@ TMSGlobalVolEffectBodyImpl::~TMSGlobalVolEffectBodyImpl()
         iProxy = NULL;
         }
     iObserver = NULL;
-    iGlobalEffect = NULL;
+    iParent = NULL;
     iUserData = NULL;
     }
 
@@ -65,34 +65,39 @@ gint TMSGlobalVolEffectBodyImpl::PostConstruct()
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
     iProxy = new TMSProxy;
-    if (iProxy)
+    if (!iProxy)
         {
-        if (iProxy->Connect() != TMS_RESULT_SUCCESS)
-            {
-            delete iProxy;
-            iProxy = NULL;
-            ret = TMS_RESULT_FATAL_ERROR;
-            }
+        ret = TMS_RESULT_INSUFFICIENT_MEMORY;
+        }
+    RET_REASON_IF_ERR(ret);
+
+    if (iProxy->Connect() != TMS_RESULT_SUCCESS)
+        {
+        delete iProxy;
+        iProxy = NULL;
+        ret = TMS_RESULT_FATAL_ERROR;
         }
     else
         {
-        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
+        // Starts TAR if not started already;
+        ret = iProxy->StartRoutingNotifier();
         }
+    RET_REASON_IF_ERR(ret);
     return ret;
     }
 
 gint TMSGlobalVolEffectBodyImpl::AddObserver(TMSEffectObserver& obsrvr,
-        gpointer /*user_data*/)
+        gpointer user_data)
     {
     gint ret(TMS_RESULT_SUCCESS);
     if (!iObserver)
         {
         iObserver = &obsrvr;
-        //iUserData = user_data;
+        iUserData = user_data;
         if (iProxy)
             {
             ret = iProxy->SetMsgQueueNotifier(EMsgQueueGlobalVolumeType,
-                    iObserver, iGlobalEffect, iClientId);
+                    iObserver, iParent, iClientId);
             if (ret == TMS_RESULT_SUCCESS)
                 {
                 ret = iProxy->StartGlobalEffectNotifier();
@@ -113,12 +118,13 @@ gint TMSGlobalVolEffectBodyImpl::AddObserver(TMSEffectObserver& obsrvr,
 gint TMSGlobalVolEffectBodyImpl::RemoveObserver(TMSEffectObserver& obsrvr)
     {
     gint ret(TMS_RESULT_SUCCESS);
-
     if (iProxy && (&obsrvr == iObserver))
         {
-        iProxy->RemoveMsgQueueNotifier(EMsgQueueGlobalVolumeType, iObserver);
+        ret = iProxy->RemoveMsgQueueNotifier(EMsgQueueGlobalVolumeType,
+            iObserver);
         iObserver = NULL;
-        //ret = iProxy->StopEffectNotifier(obsrvr);
+        ret = iProxy->CancelGlobalEffectNotifier();
+        ret = iProxy->CancelRoutingNotifier();
         }
     else
         {
@@ -176,10 +182,8 @@ gint TMSGlobalVolEffectBodyImpl::GetType(TMSEffectType& effecttype)
     return ret;
     }
 
-void TMSGlobalVolEffectBodyImpl::SetParentEffect(TMSEffect*& parenteffect)
+void TMSGlobalVolEffectBodyImpl::SetParent(TMSEffect*& parent)
     {
-    iGlobalEffect = NULL;
-    iGlobalEffect = parenteffect;
+    iParent = parent;
     }
 
-// End of file
