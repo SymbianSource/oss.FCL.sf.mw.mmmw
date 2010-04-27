@@ -150,30 +150,27 @@ void TMSVolumeEffectBodyImpl::SetProxy(TMSCallProxy* aProxy,
     iProxy = aProxy;
     if (queuehandler)
         {
-        ((TMSQueueHandler*) queuehandler)->AddObserver(*this,
+        static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
                 TMS_EFFECT_VOLUME);
         }
     }
 
 void TMSVolumeEffectBodyImpl::QueueEvent(TInt aEventType, TInt aError,
-        void* /*user_data*/)
+        void* event_data)
     {
-    TMSSignalEvent event;
+    TMSSignalEvent event = {}; //all elements initialized to zeros
+    event.user_data = NULL; //use only to return data passed in by the user
     event.type = TMS_EVENT_EFFECT_VOL_CHANGED;
     event.reason = aError;
 
-    switch (aEventType)
+    if (event_data)
         {
-        case TMS_EVENT_EFFECT_VOL_CHANGED:
-            {
-            if (iObserver && iParent)
-                {
-                iObserver->EffectsEvent(iParent, event);
-                }
-            }
-            break;
-        default:
-            break;
+        event.event_data = static_cast<gpointer>(event_data);
+        }
+
+    if (iObserver && iParent && aEventType == TMS_EVENT_EFFECT_VOL_CHANGED)
+        {
+        iObserver->EffectsEvent(*iParent, event);
         }
     }
 

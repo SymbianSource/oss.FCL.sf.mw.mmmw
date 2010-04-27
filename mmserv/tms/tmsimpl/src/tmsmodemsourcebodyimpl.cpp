@@ -64,7 +64,7 @@ void TMSModemSourceBodyImpl::SetProxy(TMSCallProxy* aProxy,
         gpointer /*queuehandler*/)
     {
     iProxy = aProxy;
-    //((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_SOURCE_MODEM);
+    //static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this, TMS_SOURCE_MODEM);
     }
 
 // End of file

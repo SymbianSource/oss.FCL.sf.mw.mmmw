@@ -73,7 +73,8 @@ gint TMSClientSinkImpl::SetProxy(TMSCallProxy* aProxy, gpointer queuehandler)
     gint ret = TMS_RESULT_SUCCESS;
     if (this->iBody)
         {
-        ((TMSClientSinkBodyImpl*) this->iBody)->SetProxy(aProxy, queuehandler);
+        static_cast<TMSClientSinkBodyImpl*>(this->iBody)->SetProxy(aProxy,
+                queuehandler);
         }
     else
         {

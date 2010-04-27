@@ -77,7 +77,7 @@ gint TMSVolumeEffectImpl::SetProxy(TMSCallProxy* aProxy, gpointer queuehandler)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSVolumeEffectBodyImpl*) this->iBody)->SetProxy(aProxy,
+        static_cast<TMSVolumeEffectBodyImpl*>(this->iBody)->SetProxy(aProxy,
                 queuehandler);
         }
     else
@@ -92,7 +92,7 @@ gint TMSVolumeEffectImpl::SetParent(TMSEffect*& parent)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSVolumeEffectBodyImpl*) this->iBody)->SetParent(parent);
+        static_cast<TMSVolumeEffectBodyImpl*>(this->iBody)->SetParent(parent);
         }
     else
         {

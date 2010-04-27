@@ -156,7 +156,7 @@ void TMSIPDownlink::Stop()
 void TMSIPDownlink::BufferToBeFilled(CMMFBuffer* aBuffer)
     {
     // Store pointer to the received buffer
-    iDevSoundBufPtr = static_cast<CMMFDataBuffer*> (aBuffer);
+    iDevSoundBufPtr = static_cast<CMMFDataBuffer*>(aBuffer);
     iBufLen = iDevSoundBufPtr->RequestSize();
     TRACE_PRN_N1(_L("TMS->DNL->BTBF: LEN[%d]"), iBufLen);
 

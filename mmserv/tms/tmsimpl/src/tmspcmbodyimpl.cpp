@@ -74,7 +74,8 @@ void TMSPCMFormatBodyImpl::SetProxy(TMSGlobalContext* context,
         iProxy = context->CallProxy;
         iStreamType = context->StreamType;
         TMSFormatBodyImpl::SetProxy(iProxy, queuehandler);
-        ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_FORMAT_PCM);
+        static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
+                TMS_FORMAT_PCM);
         }
     }
 

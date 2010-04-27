@@ -11,7 +11,8 @@
  *
  * Contributors:
  *
- * Description: Telephony Multimedia Service
+ * Description: This class provides callback mechanism for TMSClientSink
+ * listeners.
  *
  */
 
@@ -57,7 +58,7 @@ public:
      *      Buffer with recorded data to be emptied by the client.
      *
      */
-    virtual void ProcessBuffer(TMSBuffer* buffer) = 0;
+    virtual void ProcessBuffer(const TMSBuffer* buffer) = 0;
     };
 
 } //namespace TMS

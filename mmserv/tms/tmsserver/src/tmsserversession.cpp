@@ -230,10 +230,14 @@ void TMSServerSession::SetMicGain(const RMessage2& aMessage)
 // TMSServerSession::HandleGlobalEffectChange
 // -----------------------------------------------------------------------------
 //
-void TMSServerSession::HandleGlobalEffectChange(TInt globalevent)
+void TMSServerSession::HandleGlobalEffectChange(TInt globalevent, TInt level,
+        TBool output_change, TMSAudioOutput output)
     {
     TRACE_PRN_FN_ENT;
     iMsgBuffer.iInt = globalevent;
+    iMsgBuffer.iUint = (guint)level;
+    iMsgBuffer.iInt2 = (gint)output;
+    iMsgBuffer.iBool = output_change;
     NotifyClient(ECmdGlobalEffectChange);
     TRACE_PRN_FN_EXT;
     }
@@ -287,7 +291,7 @@ void TMSServerSession::GetCodecsCountL(const RMessage2& aMessage,
         codecsCount = codecs->Count();
         }
 
-    if (codecsCount <= 0)
+    if (codecs && codecsCount <= 0)
         {
         delete iDevSound;
         iDevSound = NULL;

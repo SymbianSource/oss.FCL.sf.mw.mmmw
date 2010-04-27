@@ -357,6 +357,14 @@ const TDesC& aPreset)
 	   // To prevent two tickmarks from appearing sometimes
 	   iListBox->DrawNow(); 
 	   }
+   else
+       {
+	   #ifdef _DEBUG
+       	RDebug::Print(_L("CEqualizerPresetsDialog::ActivateEqrPresetL err = %d "), err);
+	   #endif
+        // To prevent multiple tickmarks from appearing 
+        iListBox->DrawNow(); 
+       }
    }
 
 // ---------------------------------------------------------------------------

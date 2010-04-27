@@ -1053,7 +1053,7 @@ void TMSCallSession::HandleRoutingGetOutputL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    TMSAudioOutput outputtype;
+    TMSAudioOutput outputtype(TMS_AUDIO_OUTPUT_NONE);
     if (iCallAdpt)
         {
         status = iCallAdpt->GetOutput(outputtype);
@@ -1073,7 +1073,7 @@ void TMSCallSession::HandleRoutingGetPreviousOutputL(
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    TMSAudioOutput outputtype;
+    TMSAudioOutput outputtype(TMS_AUDIO_OUTPUT_NONE);
     if (iCallAdpt)
         {
         status = iCallAdpt->GetPreviousOutput(outputtype);

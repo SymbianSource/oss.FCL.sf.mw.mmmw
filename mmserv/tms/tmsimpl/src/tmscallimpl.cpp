@@ -87,9 +87,9 @@ EXPORT_C gint TMSCallImpl::Delete(TMSCall*& tmscall)
     {
     TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    delete (TMSCallImpl*) (tmscall);
+    delete (static_cast<TMSCallImpl*>(tmscall));
     tmscall = NULL;
-    TRACE_PRN_FN_EXT;    
+    TRACE_PRN_FN_EXT;
     return ret;
     }
 

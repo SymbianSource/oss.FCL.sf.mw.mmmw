@@ -78,23 +78,23 @@ EXPORT_C gint TMSFormatImpl::Delete(TMSFormat*& tmsfmt)
     switch (fmttype)
         {
         case TMS_FORMAT_PCM:
-            delete (TMSPCMFormatImpl*) (tmsfmt);
+            delete (static_cast<TMSPCMFormatImpl*>(tmsfmt));
             tmsfmt = NULL;
             break;
         case TMS_FORMAT_AMR:
-            delete (TMSAMRFormatImpl*) (tmsfmt);
+            delete (static_cast<TMSAMRFormatImpl*>(tmsfmt));
             tmsfmt = NULL;
             break;
         case TMS_FORMAT_G711:
-            delete (TMSG711FormatImpl*) (tmsfmt);
+            delete (static_cast<TMSG711FormatImpl*>(tmsfmt));
             tmsfmt = NULL;
             break;
         case TMS_FORMAT_G729:
-            delete (TMSG729FormatImpl*) (tmsfmt);
+            delete (static_cast<TMSG729FormatImpl*>(tmsfmt));
             tmsfmt = NULL;
             break;
         case TMS_FORMAT_ILBC:
-            delete (TMSILBCFormatImpl*) (tmsfmt);
+            delete (static_cast<TMSILBCFormatImpl*>(tmsfmt));
             tmsfmt = NULL;
             break;
         default:

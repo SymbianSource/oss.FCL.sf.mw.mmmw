@@ -65,8 +65,6 @@ gint TMSFactoryImpl::IsCallTypeSupported(TMSCallType ctype, gboolean& flag)
         case TMS_CALL_IP:
             flag = ETrue;
             break;
-        case TMS_CALL_ECS: //from TB 10.1
-        case TMS_CALL_RTP: //from TB 10.1
         default:
             flag = EFalse;
             break;

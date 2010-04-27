@@ -123,6 +123,7 @@ TInt CVoIPDownlinkThread::ThreadFunction(TAny* aData)
 
     if (!cleanupStack)
         {
+        shared.iMutex.Signal();
         return KErrNoMemory;
         }
 
@@ -130,6 +131,7 @@ TInt CVoIPDownlinkThread::ThreadFunction(TAny* aData)
     TRAPD(err, thread = CVoIPDownlinkThread::NewL(shared));
     if (err != KErrNone)
         {
+        shared.iMutex.Signal();
         return err;
         }
 

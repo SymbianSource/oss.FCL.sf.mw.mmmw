@@ -111,10 +111,8 @@ gint TMSClientSourceBodyImpl::BufferFilled(TMSBuffer& buffer)
     {
     // TODO send stream attributes here
     gint ret(TMS_RESULT_SUCCESS);
-    ret = iProxy->BufferFilled(TMS_CALL_IP,
-                               TMS_STREAM_DOWNLINK,
-                               iStreamId,
-                               buffer);
+    ret = iProxy->BufferFilled(TMS_CALL_IP, TMS_STREAM_DOWNLINK, iStreamId,
+            buffer);
     return ret;
     }
 
@@ -161,7 +159,8 @@ void TMSClientSourceBodyImpl::SetProxy(TMSCallProxy* aProxy, gint strmid,
     {
     iProxy = aProxy;
     iStreamId = strmid;
-    ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_SOURCE_CLIENT);
+    static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
+            TMS_SOURCE_CLIENT);
     }
 
 void TMSClientSourceBodyImpl::QueueEvent(TInt aEventType, TInt aError,
@@ -172,10 +171,11 @@ void TMSClientSourceBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         switch (aEventType)
             {
             case TMS_EVENT_SOURCE_FILL_BUFFER:
-                iObserver->FillBuffer(*((TMSBuffer*) user_data));
+                iObserver->FillBuffer(*(static_cast<TMSBuffer*>(user_data)));
                 break;
             case TMS_EVENT_SOURCE_PROCESSED_BUFFER:
-                iObserver->BufferProcessed((TMSBuffer*) user_data, aError);
+                iObserver->BufferProcessed(static_cast<TMSBuffer*>(user_data),
+                        aError);
                 break;
             default:
                 break;

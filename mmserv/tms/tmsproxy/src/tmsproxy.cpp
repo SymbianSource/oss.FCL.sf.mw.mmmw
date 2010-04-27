@@ -435,12 +435,14 @@ EXPORT_C gint TMSProxy::SetMsgQueueNotifier(TMSMsgQueueNotifierType type,
         {
         case EMsgQueueGlobalVolumeType:
         case EMsgQueueGlobalGainType:
-            status = AddGlobalEffectObserver((*(TMSEffectObserver*) obsrv),
-                    (*(TMSEffect*) parent), clientid);
-            break;
+            status = AddGlobalEffectObserver(
+                    *(static_cast<TMSEffectObserver*>(obsrv)),
+                    *(static_cast<TMSEffect*>(parent)), clientid);
+			break;
         case EMsgQueueGlobalRoutingType:
-            status = AddRoutingObserver((*(TMSGlobalRoutingObserver*) obsrv),
-                    (*(TMSGlobalRouting*) parent), clientid);
+            status = AddRoutingObserver(
+                    *(static_cast<TMSGlobalRoutingObserver*>(obsrv)),
+                    *(static_cast<TMSGlobalRouting*>(parent)), clientid);
             break;
         default:
             status = TMS_RESULT_INVALID_ARGUMENT;
@@ -462,11 +464,12 @@ EXPORT_C gint TMSProxy::RemoveMsgQueueNotifier(TMSMsgQueueNotifierType type,
         {
         case EMsgQueueGlobalVolumeType:
         case EMsgQueueGlobalGainType:
-            status = RemoveGlobalEffectObserver((*(TMSEffectObserver*) obsrv));
+            status = RemoveGlobalEffectObserver(
+                    *(static_cast<TMSEffectObserver*>(obsrv)));
             break;
         case EMsgQueueGlobalRoutingType:
-            status = RemoveRoutingObserver((*(TMSGlobalRoutingObserver*)
-                    obsrv));
+            status = RemoveRoutingObserver(
+                    *(static_cast<TMSGlobalRoutingObserver*>(obsrv)));
             break;
         default:
             status = TMS_RESULT_INVALID_ARGUMENT;
@@ -614,21 +617,33 @@ void TMSProxy::ReceiveMsgQHandlerEventsL()
 // Call from QueueHandler as a result of TMS Server callback.
 // ---------------------------------------------------------------------------
 //
-void TMSProxy::QueueEvent(gint aEventType, gint aError, void* user_data)
+void TMSProxy::QueueEvent(gint aEventType, gint aError, void* event_data)
     {
-    TMSSignalEvent event;
+    TMSSignalEvent event = {}; //all elements initialized to zeros
     event.type = aEventType;
     event.reason = aError;
-    event.user_data = user_data;
+    event.user_data = NULL; //use only to return data passed in by the user
 
     switch (aEventType)
         {
         case TMS_EVENT_EFFECT_VOL_CHANGED:
+            {
+            if (event_data)
+                {
+                event.event_data = static_cast<gpointer>(event_data);
+                }
+            for (gint i = 0; i < iEffectsObsrvrList.Count(); i++)
+                {
+                iEffectsObsrvrList[i]->EffectsEvent(*iEffectsParentList[i],
+                        event);
+                }
+            break;
+            }
         case TMS_EVENT_EFFECT_GAIN_CHANGED:
             {
             for (gint i = 0; i < iEffectsObsrvrList.Count(); i++)
                 {
-                iEffectsObsrvrList[i]->EffectsEvent(iEffectsParentList[i],
+                iEffectsObsrvrList[i]->EffectsEvent(*iEffectsParentList[i],
                         event);
                 }
             break;
@@ -638,14 +653,14 @@ void TMSProxy::QueueEvent(gint aEventType, gint aError, void* user_data)
         case TMS_EVENT_ROUTING_SET_OUTPUT_COMPLETE:
             {
             guint output(0);
-            if (user_data != NULL)
+            if (event_data != NULL)
                 {
-                output = *((guint*) user_data);
+                output = *(static_cast<guint*>(event_data));
                 }
             for (gint i = 0; i < iRoutingObsrvrList.Count(); i++)
                 {
                 iRoutingObsrvrList[i]->GlobalRoutingEvent(
-                        iRoutingParentList[i], event, output);
+                        *iRoutingParentList[i], event, output);
                 }
             break;
             }

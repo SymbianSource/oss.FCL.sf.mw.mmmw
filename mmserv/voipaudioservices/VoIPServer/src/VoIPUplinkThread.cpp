@@ -115,6 +115,7 @@ TInt CVoIPUplinkThread::ThreadFunction(TAny* aData)
 
     if (!cleanupStack)
         {
+        shared.iMutex.Signal();
         return KErrNoMemory;
         }
 
@@ -122,6 +123,7 @@ TInt CVoIPUplinkThread::ThreadFunction(TAny* aData)
     TRAPD(err, thread = CVoIPUplinkThread::NewL(shared));
     if (err != KErrNone)
         {
+        shared.iMutex.Signal();
         return err;
         }
 

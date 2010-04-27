@@ -158,7 +158,7 @@ void TMSIPUplink::Stop()
 //
 void TMSIPUplink::BufferToBeEmptied(CMMFBuffer* aBuffer)
     {
-    iDevSoundBufPtr = static_cast<CMMFDataBuffer*> (aBuffer);
+    iDevSoundBufPtr = static_cast<CMMFDataBuffer*>(aBuffer);
     TDes8& data = iDevSoundBufPtr->Data();
 
     iBufLen = iDevSoundBufPtr->BufferSize();

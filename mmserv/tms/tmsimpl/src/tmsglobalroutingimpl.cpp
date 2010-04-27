@@ -76,7 +76,7 @@ EXPORT_C gint TMSGlobalRoutingImpl::Delete(TMSGlobalRouting*& globrouting)
     {
     gint ret(TMS_RESULT_SUCCESS);
     TRACE_PRN_FN_ENT;
-    delete (TMSGlobalRoutingImpl*) globrouting;
+    delete (static_cast<TMSGlobalRoutingImpl*>(globrouting));
     globrouting = NULL;
     TRACE_PRN_FN_EXT;
     return ret;
@@ -87,7 +87,7 @@ gint TMSGlobalRoutingImpl::SetParent(TMSGlobalRouting*& parent)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSGlobalRoutingBodyImpl*) this->iBody)->SetParent(parent);
+        static_cast<TMSGlobalRoutingBodyImpl*>(this->iBody)->SetParent(parent);
         }
     else
         {

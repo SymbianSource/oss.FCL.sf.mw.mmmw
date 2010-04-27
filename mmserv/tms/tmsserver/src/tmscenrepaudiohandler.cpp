@@ -75,17 +75,23 @@ void TMSCenRepAudioHandler::HandleNotifyPSL(const TUid /*aUid*/,
         {
         err = iMuteListener->Get(muteVal);
         }
-    if (iTMSSer && err == KErrNone && muteVal == EPSTelMicMuteOn)
+    if (err == KErrNone && muteVal == EPSTelMicMuteOn)
         {
 #if !defined(__WINSCW__)
-        iTMSSer->SetGain(NULL, 0);
+        if (iTMSSer)
+            {
+            iTMSSer->SetGain(NULL, 0);
+            }
 #endif //__WINSCW__
         }
     else if (err == KErrNone)
         {
 #if !defined(__WINSCW__)
         // Change when gain is really changed
-        iTMSSer->SetGain(NULL, KDefaultMaxGain);
+        if (iTMSSer)
+            {
+            iTMSSer->SetGain(NULL, KDefaultMaxGain);
+            }
 #endif //__WINSCW__
         }
     }

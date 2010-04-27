@@ -141,7 +141,6 @@ EXPORT_C gint TMSUtility::EtelToTMSResult(const gint aError)
         case KErrEtelCallNotActive: //-2007
             result = TMS_REASON_CALL_NOT_ACTIVE;//add TMS_RESULT_CALL_NOT_ACTIVE
             break;
-        /**********************************/
         //case KErrEtelCoreBase: //-2000
         case KErrEtelNotCallOwner: //-2000
         case KErrEtelDuplicatePhoneName: //-2001

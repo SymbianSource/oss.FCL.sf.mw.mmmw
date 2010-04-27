@@ -64,7 +64,7 @@ void TMSModemSinkBodyImpl::SetProxy(TMSCallProxy* aProxy,
         gpointer /*queuehandler*/)
     {
     iProxy = aProxy;
-    //((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_SINK_MODEM);
+    //static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this, TMS_SINK_MODEM);
     }
 
 // End of file

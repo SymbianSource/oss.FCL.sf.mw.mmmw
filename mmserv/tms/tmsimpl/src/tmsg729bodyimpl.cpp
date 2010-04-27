@@ -94,7 +94,8 @@ void TMSG729FormatBodyImpl::SetProxy(TMSGlobalContext* context,
         iProxy = context->CallProxy;
         iStreamType = context->StreamType;
         TMSFormatBodyImpl::SetProxy(iProxy, queuehandler);
-        ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_FORMAT_G729);
+        static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
+                TMS_FORMAT_G729);
         }
     }
 

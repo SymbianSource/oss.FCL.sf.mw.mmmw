@@ -77,7 +77,7 @@ gint TMSFormatBodyImpl::GetType(TMSFormatType& fmttype)
 void TMSFormatBodyImpl::SetProxy(TMSCallProxy* aProxy, gpointer /*queuehandler*/)
     {
     iProxy = aProxy;
-    //  ((TMSQueueHandler*)queuehandler)->AddObserver(*this,TMS_FORMAT_TYPE);
+    //static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this, TMS_FORMAT_TYPE);
     }
 
 // End of file

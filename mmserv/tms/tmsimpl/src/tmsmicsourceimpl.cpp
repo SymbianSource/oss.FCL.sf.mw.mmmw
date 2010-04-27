@@ -72,7 +72,7 @@ gint TMSMicSourceImpl::SetProxy(TMSCallProxy* /*aProxy*/,
         gpointer /*queuehandler*/)
     {
     gint ret = TMS_RESULT_SUCCESS;
-//   ((TMSMicSourceBodyImpl*) this->iBody)->SetProxy(aProxy, queuehandler);
+    //static_cast<TMSMicSourceBodyImpl*>(this->iBody)->SetProxy(aProxy, queuehandler);
     return ret;
     }
 

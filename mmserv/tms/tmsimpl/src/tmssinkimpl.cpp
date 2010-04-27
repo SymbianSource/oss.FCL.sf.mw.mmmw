@@ -69,21 +69,21 @@ EXPORT_C gint TMSSinkImpl::Delete(TMSSink*& tmssink)
         {
         case TMS_SINK_CLIENT:
             {
-            delete (TMSClientSinkImpl*) (tmssink);
+            delete (static_cast<TMSClientSinkImpl*>(tmssink));
             tmssink = NULL;
             ret = TMS_RESULT_SUCCESS;
             }
             break;
         case TMS_SINK_MODEM:
             {
-            delete (TMSModemSinkImpl*) (tmssink);
+            delete (static_cast<TMSModemSinkImpl*>(tmssink));
             tmssink = NULL;
             ret = TMS_RESULT_SUCCESS;
             }
             break;
         case TMS_SINK_SPEAKER:
             {
-            delete (TMSSpeakerSinkImpl*) (tmssink);
+            delete (static_cast<TMSSpeakerSinkImpl*>(tmssink));
             tmssink = NULL;
             ret = TMS_RESULT_SUCCESS;
             }

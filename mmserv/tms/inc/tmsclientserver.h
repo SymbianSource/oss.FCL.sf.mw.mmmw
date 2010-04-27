@@ -128,6 +128,7 @@ struct TmsMsgBuf //max 240
     gint iStatus;
     gboolean iBool;
     gint iInt;
+    gint iInt2;
     gint64 iInt64;
     guint iUint;
     guint32 iUint32;

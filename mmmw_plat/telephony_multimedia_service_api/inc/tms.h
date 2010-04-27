@@ -155,7 +155,7 @@ typedef gint TMSAudioOutput;
 #define TMS_AUDIO_OUTPUT_ETTY                   ((gint)7)
 #define TMS_AUDIO_OUTPUT_NOT_ACTIVE             ((gint)8)
 
-// TMSSignalEvent structure for callback notifications
+// Structure signalling callback notifications
 struct TMSSignalEvent
     {
     guint type;
@@ -166,12 +166,12 @@ struct TMSSignalEvent
     gint prev_state;
     };
 
-// TMSRTPStreamDescription for RTP
-struct TMSRTPStreamDescription
+// Structure for global volume effect change event
+struct TMSVolumeEventChangeData
     {
-    gint filler1;
-    gint filler2;
-    gint filler3;
+    guint level;
+    TMSAudioOutput output;
+    gboolean output_changed;
     };
 
 } //namespace TMS

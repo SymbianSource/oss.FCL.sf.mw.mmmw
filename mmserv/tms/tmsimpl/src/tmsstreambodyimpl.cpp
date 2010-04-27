@@ -342,7 +342,7 @@ gint TMSStreamBodyImpl::Init()
 
     RET_REASON_IF_ERR(ret);
 
-    TMSFormatType fmttype;
+    TMSFormatType fmttype(TMS_FORMAT_PCM);
     if (!iFormat && iContext.CallType == TMS_CALL_IP)
         {
         return TMS_RESULT_FORMAT_TYPE_UNSPECIFIED;
@@ -373,12 +373,13 @@ gint TMSStreamBodyImpl::Init()
             switch (effecttype)
                 {
                 case TMS_EFFECT_GAIN:
-                    ((TMSGainEffectImpl*) iEffectsList[i])->SetProxy(
+                    static_cast<TMSGainEffectImpl*>(iEffectsList[i])->SetProxy(
                             iContext.CallProxy, iMsgQHandler);
                     break;
                 case TMS_EFFECT_VOLUME:
-                    ((TMSVolumeEffectImpl*) iEffectsList[i])->SetProxy(
-                            iContext.CallProxy, iMsgQHandler);
+                    static_cast<TMSVolumeEffectImpl*>
+                        (iEffectsList[i])->SetProxy(iContext.CallProxy,
+                        iMsgQHandler);
                     break;
                 default:
                     ret = TMS_RESULT_INVALID_ARGUMENT;
@@ -394,23 +395,23 @@ gint TMSStreamBodyImpl::Init()
         switch (fmttype)
             {
             case TMS_FORMAT_PCM:
-                ((TMSPCMFormatImpl*) iFormat)->SetProxy(&iContext,
+                static_cast<TMSPCMFormatImpl*>(iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             case TMS_FORMAT_AMR:
-                ((TMSAMRFormatImpl*) iFormat)->SetProxy(&iContext,
+                static_cast<TMSAMRFormatImpl*>(iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             case TMS_FORMAT_G711:
-                ((TMSG711FormatImpl*) iFormat)->SetProxy(&iContext,
+                static_cast<TMSG711FormatImpl*>(iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             case TMS_FORMAT_G729:
-                ((TMSG729FormatImpl*) iFormat)->SetProxy(&iContext,
+                static_cast<TMSG729FormatImpl*>(iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             case TMS_FORMAT_ILBC:
-                ((TMSILBCFormatImpl*) iFormat)->SetProxy(&iContext,
+                static_cast<TMSILBCFormatImpl*>(iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             default:
@@ -428,7 +429,7 @@ gint TMSStreamBodyImpl::Init()
             switch (sinkType)
                 {
                 case TMS_SINK_CLIENT:
-                    ((TMSClientSinkImpl*) iSink)->SetProxy(
+                    static_cast<TMSClientSinkImpl*>(iSink)->SetProxy(
                             iContext.CallProxy, iMsgQHandler);
                     break;
                 case TMS_SINK_MODEM:
@@ -453,7 +454,7 @@ gint TMSStreamBodyImpl::Init()
             switch (sourceType)
                 {
                 case TMS_SOURCE_CLIENT:
-                    ((TMSClientSourceImpl*) iSource)->SetProxy(
+                    static_cast<TMSClientSourceImpl*>(iSource)->SetProxy(
                             iContext.CallProxy, iContext.StreamId,
                             iMsgQHandler);
                     break;
@@ -717,7 +718,7 @@ void TMSStreamBodyImpl::ReceiveMsgQHandlerEventsL()
 void TMSStreamBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         void* user_data)
     {
-    TMSSignalEvent event;
+    TMSSignalEvent event = {}; //all elements initialized to zeros
     event.reason = aError;
     event.user_data = user_data;
     iStreamState = aEventType;
@@ -734,7 +735,7 @@ void TMSStreamBodyImpl::QueueEvent(TInt aEventType, TInt aError,
             if (iObserver)
                 {
                 event.type = TMS_EVENT_STREAM_STATE_CHANGED;
-                iObserver->TMSStreamEvent(iParent, event);
+                iObserver->TMSStreamEvent(*iParent, event);
                 }
             break;
             }

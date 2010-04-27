@@ -178,7 +178,11 @@ void TMSQueueHandler::RunL()
         switch (msgBuf.iRequest)
             {
             case ECmdGlobalEffectChange:
-                iObserver->QueueEvent(msgBuf.iInt, msgBuf.iStatus, NULL);
+                TMSVolumeEventChangeData event;
+                event.level = msgBuf.iUint;
+                event.output = static_cast<TMSAudioOutput>(msgBuf.iInt2);
+                event.output_changed = msgBuf.iBool;
+                iObserver->QueueEvent(msgBuf.iInt, msgBuf.iStatus, &event);
                 break;
             case ECmdGlobalRoutingChange:
                 iObserver->QueueEvent(msgBuf.iInt, msgBuf.iStatus,

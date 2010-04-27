@@ -11,7 +11,8 @@
  *
  * Contributors:
  *
- * Description:This class provides callback mechanism for TMSGlobalRouting listeners.
+ * Description: This class provides callback mechanism for TMSGlobalRouting
+ * listeners.
  *
  */
 
@@ -72,7 +73,7 @@ public:
      *  TMS_EVENT_ROUTING_SET_OUTPUT_COMPLETE
      *
      * @param  routing
-     *      Pointer to the object that is being signaled.
+     *      Reference to the object that is being signaled.
      *
      * @param  event
      *      Event descriptor.
@@ -81,7 +82,7 @@ public:
      *      Indicates the output device that audio will be routed to.
      *
      */
-    virtual void GlobalRoutingEvent(TMSGlobalRouting* routing,
+    virtual void GlobalRoutingEvent(const TMSGlobalRouting& routing,
             TMSSignalEvent event, TMSAudioOutput output) = 0;
     };
 

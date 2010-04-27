@@ -11,7 +11,7 @@
  *
  * Contributors:
  *
- * Description:This class provides callback mechanism for TMSEffect listeners.
+ * Description: This class provides callback mechanism for TMSEffect listeners.
  *
  */
 
@@ -74,13 +74,14 @@ public:
      *  TMS_EVENT_EFFECT_GAIN_CHANGED
      *
      * @param  tmseffect
-     *      Pointer to the object that is being signaled.
+     *      Reference to the object that is being signaled.
      *
      * @param  event
      *      Event descriptor.
      *
      */
-    virtual void EffectsEvent(TMSEffect* tmseffect, TMSSignalEvent event) = 0;
+    virtual void EffectsEvent(const TMSEffect& tmseffect,
+            TMSSignalEvent event) = 0;
     };
 
 } //namespace TMS

@@ -95,10 +95,9 @@ gint TMSClientSinkBodyImpl::BufferProcessed(TMSBuffer* buffer)
 
     if (iProxy)
         {
-        ret = iProxy->BufferEmptied(TMS_CALL_IP,
-                                    TMS_STREAM_UPLINK,
-                                    1, //TODO: must use strm_id
-                                    *buffer);
+        //TODO: must use strm_id instead of 1
+        ret = iProxy->BufferEmptied(TMS_CALL_IP, TMS_STREAM_UPLINK, 1,
+		        *buffer);
         }
     else
         {
@@ -120,7 +119,8 @@ void TMSClientSinkBodyImpl::SetProxy(TMSCallProxy* aProxy,
     iProxy = aProxy;
     if (queuehandler)
         {
-        ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_SINK_CLIENT);
+        static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
+                TMS_SINK_CLIENT);
         }
     }
 
@@ -132,7 +132,7 @@ void TMSClientSinkBodyImpl::QueueEvent(TInt aEventType, TInt /*aError*/,
         switch (aEventType)
             {
             case TMS_EVENT_SINK_PROCESS_BUFFER:
-                iObserver->ProcessBuffer(((TMSBuffer*) user_data));
+                iObserver->ProcessBuffer(static_cast<TMSBuffer*>(user_data));
                 break;
             default:
                 break;

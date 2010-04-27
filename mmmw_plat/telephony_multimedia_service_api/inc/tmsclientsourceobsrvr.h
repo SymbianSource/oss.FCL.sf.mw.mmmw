@@ -11,7 +11,7 @@
  *
  * Contributors:
  *
- * Description:This class provides callback mechanism for TMSClientSource
+ * Description: This class provides callback mechanism for TMSClientSource
  * listeners.
  *
  */
@@ -72,7 +72,7 @@ public:
      *      The status of the operation.
      *
      */
-    virtual void BufferProcessed(TMSBuffer* buffer, gint reason) = 0;
+    virtual void BufferProcessed(const TMSBuffer* buffer, gint reason) = 0;
     };
 
 } //namespace TMS

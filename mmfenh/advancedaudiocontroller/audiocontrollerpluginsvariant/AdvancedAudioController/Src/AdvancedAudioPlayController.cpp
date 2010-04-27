@@ -2219,8 +2219,12 @@ EXPORT_C void CAdvancedAudioPlayController::DoInitializeSinkL()
 	DP0(_L("CAdvancedAudioPlayController::DoInitializeSinkL"));
 	iSinkInitDataReady = EFalse;
 	
+	  if (!iAudioOutput)
+	        {
+	        User::Leave(KErrNotReady);
+	        }	
 	//both source and sink have been added
-     if(iAudioOutput && iDataSourceAdapter)     
+     if(iDataSourceAdapter)     
          {
          iAudioOutput->SetDataSourceAdapter(iDataSourceAdapter);
          }
@@ -2248,20 +2252,15 @@ EXPORT_C void CAdvancedAudioPlayController::DoInitializeSinkL()
     // Read the default codec configuration parameters from resource file
 	RArray<TInt>& codecConfigData = const_cast<RArray<TInt>&>(iAudioResource->CodecConfigParametersL());
 	// Override default values with values found from header, if available
-	GetCodecConfigData(codecConfigData);
-         if (!iAudioOutput)
-	   {		
-		User::Leave(KErrNotReady);
-           }  
-        else
-           {
-	       iAudioOutput->ConfigureL(iSampleRate, iSinkNumChannels, iDataType, codecConfigData);
-               DP0(_L("CAdvancedAudioPlayController::DoInitializeSinkL, output configured"));
-	       iAudioOutput->PrimeL();
-               DP0(_L("CAdvancedAudioPlayController::DoInitializeSinkL, output primed"));
-	   }		    
-	// we would use this code when we have a NULL sink
-/*	if (iDuration > 0)
+	 GetCodecConfigData(codecConfigData);
+   iAudioOutput->ConfigureL(iSampleRate, iSinkNumChannels, iDataType, codecConfigData);
+   DP0(_L("CAdvancedAudioPlayController::DoInitializeSinkL, output configured"));
+   iAudioOutput->PrimeL();
+   DP0(_L("CAdvancedAudioPlayController::DoInitializeSinkL, output primed"));
+   
+   	// we would use this code when we have a NULL sink
+	
+	/*	if (iDuration > 0)
 		{
 		DP0(_L("CAdvancedAudioPlayController::BufferFilledL, unblocking duration"));
 		iBlockDuration = EFalse;

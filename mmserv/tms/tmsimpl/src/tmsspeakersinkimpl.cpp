@@ -68,7 +68,7 @@ gint TMSSpeakerSinkImpl::SetProxy(TMSCallProxy* /*aProxy*/,
         gpointer /*queuehandler*/)
     {
     gint ret = TMS_RESULT_SUCCESS;
-    //((TMSSpeakerSinkBodyImpl*) this->iBody)->SetProxy(aProxy, queuehandler);
+    //static_cast<TMSSpeakerSinkBodyImpl*>(this->iBody)->SetProxy(aProxy, queuehandler);
     return ret;
     }
 

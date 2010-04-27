@@ -51,6 +51,7 @@ void CMetaDataParserRA::ConstructL()
     {
 	if ( ValidateL() )
 		{
+	    iExists = TRUE;
 		iHxMetaDataUtility = CHXMetaDataUtility::NewL();
 		}
 	else
