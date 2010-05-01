@@ -8,7 +8,7 @@ The current AL implementation not a complete implementation and it is not compli
   <libs>
     <lib name="openmaxal.lib"/>
   </libs>
-  <release category="platform" sinceversion="0"/>
+  <release category="platform" sinceversion="^4"/>
   <attributes>
     <htmldocprovided>no</htmldocprovided>
     <adaptation>no</adaptation>

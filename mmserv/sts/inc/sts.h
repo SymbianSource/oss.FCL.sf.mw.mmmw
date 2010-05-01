@@ -32,9 +32,10 @@ class CSts : private MStsPlayerObserver
 public:
     static CSts* Create();
     static void Delete(CSts* aSts);
-    void PlayTone(CSystemToneService::TToneType aToneType,
-            unsigned int& aPlayToneContext);
-    void StopTone(unsigned int aPlayToneContext);
+    void PlayTone(CSystemToneService::TToneType aTone);
+    void PlayAlarm(CSystemToneService::TAlarmType aAlarm,
+            unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
+    void StopAlarm(unsigned int aAlarmContext);
 
 protected:
     CSts();
@@ -45,12 +46,13 @@ private:
     void CleanUpPlayers();
 
     // inherited from MPlayerObserver
-    virtual void PlayToneComplete(unsigned int aPlayToneContext);
+    virtual void PlayComplete(unsigned int aContext);
 
 private:
     unsigned int iNextContext;
-    typedef std::map<unsigned int, CStsPlayer*> TPlayerMap;
-    TPlayerMap iMap;
+    class CPlayerNode;
+    typedef std::map<unsigned int, CPlayerNode*> TPlayerMap;
+    TPlayerMap iPlayerMap;
     };
 
 #endif //STS_H

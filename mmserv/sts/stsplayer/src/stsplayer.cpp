@@ -15,20 +15,46 @@
  * This file provides the implementation for creating and deleting a
  * an MMF based player for playing and stopping a tone playback.
  */
+
 #include "stsplayer.h"
+
 _LIT(KDefaultFile,"z:\\data\\sounds\\digital\\clock.aac");
 
-/*static*/CStsPlayer* CStsPlayer::Create(MStsPlayerObserver& aObserver,
-        CSystemToneService::TToneType aToneType, unsigned int aPlayToneContext)
+/*static*/CStsPlayer* CStsPlayer::CreateTonePlayer(
+        MStsPlayerObserver& aObserver, CSystemToneService::TToneType aTone,
+        unsigned int aContext)
     {
     CStsPlayer* self = 0;
-    switch (aToneType)
+    switch (aTone)
+        {
+        default:
+            self = new CStsPlayer(aObserver, KDefaultFile, 0, aContext);
+            break;
+        }
+    if (self != 0)
+        {
+        bool successful = self->Init();
+        if (!successful)
+            {
+            delete self;
+            self = 0;
+            }
+        }
+    return self;
+    }
+
+/*static*/CStsPlayer* CStsPlayer::CreateAlarmPlayer(
+        MStsPlayerObserver& aObserver, CSystemToneService::TAlarmType aAlarm,
+        unsigned int aContext)
+    {
+    CStsPlayer* self = 0;
+    switch (aAlarm)
         {
         case CSystemToneService::EClockAlarm:
-            self = new CStsPlayer(aObserver, KDefaultFile, 10, aPlayToneContext);
+            self = new CStsPlayer(aObserver, KDefaultFile, 10, aContext);
             break;
         default:
-            self = new CStsPlayer(aObserver, KDefaultFile, 0, aPlayToneContext);
+            self = new CStsPlayer(aObserver, KDefaultFile, 10, aContext);
             break;
         }
     if (self != 0)
@@ -44,10 +70,9 @@ _LIT(KDefaultFile,"z:\\data\\sounds\\digital\\clock.aac");
     }
 
 CStsPlayer::CStsPlayer(MStsPlayerObserver& aObserver, const TDesC& aFileName,
-        int aRepeatNumberOfTimes, unsigned int aPlayToneContext) :
+        int aRepeatNumberOfTimes, unsigned int aContext) :
     iObserver(aObserver), iPlayer(0), iFileName(aFileName),
-            iRepeatNumberOfTimes(aRepeatNumberOfTimes), iPlayToneContext(
-                    aPlayToneContext)
+            iRepeatNumberOfTimes(aRepeatNumberOfTimes), iContext(aContext)
     {
     }
 
@@ -64,7 +89,15 @@ CStsPlayer::~CStsPlayer()
 
 void CStsPlayer::Play()
     {
-    TRAP_IGNORE(iPlayer->OpenFileL(iFileName));
+    // Play the tone
+    TRAPD(err, iPlayer->OpenFileL(iFileName));
+
+    // If there is an error, indicate that the playback is complete. 
+    if (err)
+        {
+        //TODO: Add trace here
+        iObserver.PlayComplete(iContext);
+        }
     }
 
 void CStsPlayer::Stop()
@@ -72,7 +105,8 @@ void CStsPlayer::Stop()
     iPlayer->Stop();
     }
 
-void CStsPlayer::MapcInitComplete(TInt aError, const TTimeIntervalMicroSeconds& /*aDuration*/)
+void CStsPlayer::MapcInitComplete(TInt aError,
+        const TTimeIntervalMicroSeconds& /*aDuration*/)
     {
     if (aError == KErrNone)
         {
@@ -83,6 +117,8 @@ void CStsPlayer::MapcInitComplete(TInt aError, const TTimeIntervalMicroSeconds& 
     else
         {
         //TODO: add trace
+        // Since there is an error, indicate that the playback is complete
+        iObserver.PlayComplete(iContext);
         }
     }
 
@@ -92,5 +128,5 @@ void CStsPlayer::MapcPlayComplete(TInt aError)
         {
         //TODO: add trace
         }
-    iObserver.PlayToneComplete(iPlayToneContext);
+    iObserver.PlayComplete(iContext);
     }

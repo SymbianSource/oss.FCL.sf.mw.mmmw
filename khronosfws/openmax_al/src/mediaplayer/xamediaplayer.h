@@ -21,11 +21,9 @@
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
 #include "xaobjectitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAMediaPlayerAdaptCtx.h"
-#endif
+#include "xamediaplayeradaptctx.h"
 #include "xamediaplayeradaptctxmmf.h"
-
+#include "xacapabilitiesmgr.h"
 /** MACROS **/
 
 
@@ -51,6 +49,9 @@ typedef enum
     MP_METADATATRAVERSALITF,
     MP_PLAYBACKRATEITF,
     MP_VIDEOPOSTPROCESSINGITF,
+    MP_NOKIAVOLUMEEXT,
+    MP_NOKIALINEARVOLUME,
+    MP_STREAMINFORMATIONITF,
     MP_ITFCOUNT
 } MPInterfaces;
 
@@ -71,11 +72,10 @@ typedef struct XAMediaPlayerImpl_
     XAuint32 numRequiredInterfaces;
     XAInterfaceID *requiredItfIds;
 
-#ifdef _GSTREAMER_BACKEND_
-    XAAdaptationBaseCtx* adaptationCtx;
-#endif
-    XAAdaptationBaseMMFCtx* adaptationCtxMMF;
-    XAboolean isMMFPlayback;
+    XAAdaptationBaseCtx* curAdaptCtx;
+    XAAdaptationBaseCtx* adaptationCtxGst;
+    XAAdaptationBaseCtx* adaptationCtxMMF;
+
 } XAMediaPlayerImpl;
 
 
@@ -85,8 +85,6 @@ typedef struct XAMediaPlayerImpl_
 XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self);
 XAresult XAMediaPlayerImpl_DoResume(XAObjectItf self);
 void XAMediaPlayerImpl_FreeResources(XAObjectItf self);
-
-XAresult XAMediaPlayerImpl_DeterminePlaybackEngine(XAObjectItf self, XADataLocator_URI *uri);
 
 /* DynamicInterfaceManagement object-specific methods */
 XAresult XAMediaPlayerImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry );

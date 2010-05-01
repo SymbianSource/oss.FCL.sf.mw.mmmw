@@ -46,7 +46,7 @@ OS_LAYER_SYSTEMINCLUDE
 SOURCEPATH      ../src
 
 SOURCE          systemtoneservicestif.cpp
-SOURCE          systemtoneservicestifBlocks.cpp
+SOURCE          systemtoneservicestifblocks.cpp
 
 
 LIBRARY         euser.lib

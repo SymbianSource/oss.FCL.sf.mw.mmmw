@@ -27,6 +27,8 @@
 #include "xavolumeitf.h"
 #include "xaoutputmixitf.h"
 #include "xathreadsafety.h"
+#include "xaoutputmixadaptctx.h"
+#include "xacapabilitiesmgr.h"
 
 /* Static mapping of enumeration XAOMixInterfaces to interface iids */
 static const XAInterfaceID* xaOMixItfIIDs[OMIX_ITFCOUNT]={
@@ -50,7 +52,9 @@ static const XAInterfaceID* xaOMixItfIIDs[OMIX_ITFCOUNT]={
  *                                   const XAboolean *pInterfaceRequired)
  * Description: Create object
  */
-XAresult XAOMixImpl_CreateOutputMix(XAObjectItf *pMix,
+XAresult XAOMixImpl_CreateOutputMix(FrameworkMap* mapper,
+                                    XACapabilities* capabilities,
+                                    XAObjectItf *pMix,
                                     XAuint32 numInterfaces,
                                     const XAInterfaceID *pInterfaceIds,
                                     const XAboolean *pInterfaceRequired)
@@ -61,6 +65,9 @@ XAresult XAOMixImpl_CreateOutputMix(XAObjectItf *pMix,
     XAuint32 itfIdx = 0;
     DEBUG_API("->XAOMixImpl_CreateOutputMix");
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSOutputMix);
+
+    
+    
     if(!pMix)
     {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSOutputMix);
@@ -126,28 +133,25 @@ XAresult XAOMixImpl_CreateOutputMix(XAObjectItf *pMix,
     }
     /* Mark interfaces that can be handled dynamically */
     pBaseObj->interfaceMap[OMIX_EQUALIZERITF].isDynamic = XA_BOOLEAN_TRUE;
-#ifdef _GSTREAMER_BACKEND_
-    /* Create outputmix adaptation context */
-    pImpl->adaptationCtx = XAOutputMixAdapt_Create();
-#endif 
-    
+
     /* This code is put here to return Feature Not Supported since adaptation is not present*/
     /*************************************************/
     XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
     XA_IMPL_THREAD_SAFETY_EXIT(XATSOutputMix);
     DEBUG_ERR("Required interface not found - abort creation!");
     return XA_RESULT_FEATURE_UNSUPPORTED;
-    /*************************************************/
+    /*************************************************/    
     
-    /* Set ObjectItf to point to newly created object */
-/*
+/*    // Create outputmix adaptation context 
+    pImpl->adaptationCtx = XAOutputMixAdapt_Create();
+ 
+     //Set ObjectItf to point to newly created object 
     *pMix = (XAObjectItf)&(pBaseObj->self);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSOutputMix);
    
     DEBUG_API("<-XAOMixImpl_CreateOutputMix");
-    return XA_RESULT_SUCCESS;
-*/
+    return XA_RESULT_SUCCESS;*/
 }
 
 /*
@@ -187,9 +191,9 @@ XAresult XAOMixImpl_QuerySupportedInterfaces(XAuint32 index,
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
+
         *pInterfaceId = *(xaOMixItfIIDs[index]);
-#endif
+
         DEBUG_API("<-XAOMixImpl_QuerySupportedInterfaces");
         return XA_RESULT_SUCCESS;
     }
@@ -206,12 +210,12 @@ XAresult XAOMixImpl_QuerySupportedInterfaces(XAuint32 index,
  */
 XAresult XAOMixImpl_DoRealize(XAObjectItf self)
 {
-#ifdef _GSTREAMER_BACKEND_
+
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XAresult ret = XA_RESULT_SUCCESS;
-    DEBUG_API("->XAOMixImpl_DoRealize");
     XAOMixImpl* pMixImpl = (XAOMixImpl*)(pObj);
     XAuint8 itfIdx = 0;
+    DEBUG_API("->XAOMixImpl_DoRealize");
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSOutputMix);
 
     /* check casting from correct pointer type */
@@ -225,7 +229,7 @@ XAresult XAOMixImpl_DoRealize(XAObjectItf self)
     }
 
     /* Initialize adaptation */
-    ret = XAOutputMixAdapt_PostInit( pMixImpl->adaptationCtx );
+    ret = XAOutputMixAdapt_PostInit( (XAAdaptationGstCtx*)pMixImpl->adaptationCtx );
     if( ret != XA_RESULT_SUCCESS )
     {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSOutputMix);
@@ -283,7 +287,7 @@ XAresult XAOMixImpl_DoRealize(XAObjectItf self)
 
     pObj->state = XA_OBJECT_STATE_REALIZED;
     XA_IMPL_THREAD_SAFETY_EXIT(XATSOutputMix);
-#endif    
+    
     DEBUG_API("<-XAOMixImpl_DoRealize");
     return XA_RESULT_SUCCESS;
 }
@@ -306,7 +310,7 @@ XAresult XAOMixImpl_DoResume(XAObjectItf self)
  */
 void XAOMixImpl_FreeResources(XAObjectItf self)
 {
-#ifdef _GSTREAMER_BACKEND_
+
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XAOMixImpl* pImpl = (XAOMixImpl*)(*self);
     XAuint8 itfIdx = 0;
@@ -316,7 +320,7 @@ void XAOMixImpl_FreeResources(XAObjectItf self)
 
     if ( pImpl->adaptationCtx != NULL )
     {
-        XAOutputMixAdapt_Destroy( pImpl->adaptationCtx );
+        XAOutputMixAdapt_Destroy( (XAAdaptationGstCtx*)pImpl->adaptationCtx );
         pImpl->adaptationCtx = NULL;
     }
 
@@ -352,12 +356,12 @@ void XAOMixImpl_FreeResources(XAObjectItf self)
 
     if ( pImpl->adaptationCtx != NULL )
     {
-        XAOutputMixAdapt_Destroy( pImpl->adaptationCtx );
+        XAOutputMixAdapt_Destroy( (XAAdaptationGstCtx*)pImpl->adaptationCtx );
         pImpl->adaptationCtx = NULL;
     }
 
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS(XATSOutputMix);
-#endif    
+    
     DEBUG_API("<-XAOMixImpl_FreeResources");
 }
 
@@ -370,10 +374,10 @@ void XAOMixImpl_FreeResources(XAObjectItf self)
  */
 XAresult XAOMixImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry  )
 {
-#ifdef _GSTREAMER_BACKEND_
+
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XAOMixImpl* pImpl = (XAOMixImpl*)(pObj);
-#endif
+
     XAresult ret = XA_RESULT_SUCCESS;
     DEBUG_API("->XAOMixImpl_DoAddItf");
     if(mapEntry)
@@ -381,9 +385,9 @@ XAresult XAOMixImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry  )
         switch( mapEntry->mapIdx )
         {
         case OMIX_EQUALIZERITF:
-#ifdef _GSTREAMER_BACKEND_
+
             mapEntry->pItf = XAEqualizerItfImpl_Create( pImpl->adaptationCtx );
-#endif
+
             break;
         default:
             DEBUG_ERR("XAOMixImpl_DoAddItf unknown id");

@@ -18,11 +18,8 @@
 #ifndef XAMETADATATRAVERSALITF_H
 #define XAMETADATATRAVERSALITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xaadptbasectx.h"
+
 /** MACROS **/
 
 /** TYPES **/
@@ -43,9 +40,9 @@ typedef struct XAMetadataTraversalImpl_
     XAuint32 index;
     XAuint32 nodedepth;
 
-#ifdef _GSTREAMER_BACKEND_  
+
     XAAdaptationBaseCtx *adaptCtx;
-#endif
+
 } XAMetadataTraversalImpl;
 
 /** METHODS **/
@@ -71,10 +68,9 @@ XAresult XAMetadataTraversalItfImpl_GetChildInfo(XAMetadataTraversalItf self,
 XAresult XAMetadataTraversalItfImpl_SetActiveNode(XAMetadataTraversalItf self,
                                                 XAuint32 index);
 
-#ifdef _GSTREAMER_BACKEND_  
+
 /* XAMetadataExtractionItfImpl -specific methods */
 XAMetadataTraversalImpl* XAMetadataTraversalItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
-#endif
 void XAMetadataTraversalItfImpl_Free(XAMetadataTraversalImpl* self);
 
 #endif /* XAMETADATATRAVERSALITF_H */

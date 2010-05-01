@@ -482,25 +482,6 @@ void* XAObjectItfImpl_AsyncResume(void* args)
     return NULL;
 }
 
-void XAObjectItfImpl_AsyncCleanup(void* args)
-{
-    XAObjectItfImpl* pObjImp = (XAObjectItfImpl*)(*(XAObjectItf)(args));
-    DEBUG_API("->XAObjectItfImpl_AsyncCleanup");
-
-    if( pObjImp &&
-       (pObjImp == pObjImp->self) &&
-        pObjImp->FreeResourcesImpl )
-    {
-        pObjImp->FreeResourcesImpl((XAObjectItf)(args));
-    }
-    else
-    {
-        DEBUG_API("XAObjectItfImpl_AsyncCleanup: INVALID args");
-    }
-
-    DEBUG_API("<-XAObjectItfImpl_AsyncCleanup");
-}
-
 XAObjItfMapEntry* XAObjectItfImpl_GetItfEntry(const XAObjectItf self,
                                               const XAInterfaceID iid)
 {

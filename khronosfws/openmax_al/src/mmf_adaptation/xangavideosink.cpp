@@ -20,7 +20,7 @@ Media Helper Class for handling surface events
 Shy Ward
 */
 
-#include "XANGAVideoSink.h"
+#include "xangavideosink.h"
 #include "openmaxalwrapper.h"
 
 
@@ -33,14 +33,20 @@ CNgaVideoSink* CNgaVideoSink::NewL()
 
 CNgaVideoSink::~CNgaVideoSink()
 {
-	iMediaClientVideoDisplay->RemoveDisplayWindow(*m_pWindow);
-	delete iMediaClientVideoDisplay;
-  if(IsActive())
-  {
-     Cancel();
-  }	
+    RemoveWindow();
+    
+    delete iMediaClientVideoDisplay;
+    if(IsActive())
+    {
+    Cancel();
+    }	
 }
     
+void CNgaVideoSink::RemoveWindow()
+    {
+    iMediaClientVideoDisplay->RemoveDisplayWindow(*m_pWindow);
+    }
+
 CNgaVideoSink::CNgaVideoSink()
                   :CActive(EPriorityStandard)
 {
@@ -133,8 +139,8 @@ void CNgaVideoSink::SetNativeDisplayInformation(void* display_info)
   m_pWindow = ((RWindow*)(nativeDisplay->hWindow));
   
 
-  iMediaClientVideoDisplay->AddDisplayWindowL(m_pWindow, m_clipRect, m_cropRegion, m_videoExtent, m_scaleWidth, m_scaleHeight,
-                                               m_rotation, EAutoScaleBestFit, m_horizPos, m_vertPos, m_pWindow);  
+  TRAPD(err, iMediaClientVideoDisplay->AddDisplayWindowL(m_pWindow, m_clipRect, m_cropRegion, m_videoExtent, m_scaleWidth, m_scaleHeight,
+                                               m_rotation, EAutoScaleBestFit, m_horizPos, m_vertPos, m_pWindow));  
 
 }
 

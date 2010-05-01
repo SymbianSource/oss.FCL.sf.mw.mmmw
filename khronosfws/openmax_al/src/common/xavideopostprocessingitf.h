@@ -18,11 +18,8 @@
 #ifndef XAVIDEOPOSTPROCESSINGITF_H
 #define XAVIDEOPOSTPROCESSINGITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_   
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xaadptbasectx.h"
+
 /** MACROS **/
 
 /** TYPES **/
@@ -52,10 +49,10 @@ typedef struct XAVideoPostProcessingItfImpl_
     XAboolean		isDestRect;
     XAboolean		isSrcRect;
     XAboolean		isScaleOptions;
-#ifdef _GSTREAMER_BACKEND_   
+
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
+
 } XAVideoPostProcessingItfImpl;
 
 /** METHODS **/
@@ -82,12 +79,9 @@ XAresult XAVideoPostProcessingItfImpl_SetMirror(XAVideoPostProcessingItf self,
                                                 XAuint32 mirror);
 
 XAresult XAVideoPostProcessingItfImpl_Commit(XAVideoPostProcessingItf self);
-#ifdef _GSTREAMER_BACKEND_   
+ 
 /* XAVideoPostProcessingItfImpl -specific methods */
 XAVideoPostProcessingItfImpl* XAVideoPostProcessingItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
-XAresult XAVideoPostProcessingItfImpl_ThreadEntry(XAAdaptationBaseCtx *adapCtx);
-XAresult XAVideoPostProcessingItfImpl_ThreadExit(XAVideoPostProcessingItfImpl* impl);
-#endif
 void XAVideoPostProcessingItfImpl_Free(XAVideoPostProcessingItfImpl* self);
 
 #endif /* XAVIDEOPOSTPROCESSINGITF_H */

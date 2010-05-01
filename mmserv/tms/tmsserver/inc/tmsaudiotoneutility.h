@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef CPEAUDIOTONEUTILITY_H
-#define CPEAUDIOTONEUTILITY_H
+#ifndef TMSAUDIOTONEUTILITY_H
+#define TMSAUDIOTONEUTILITY_H
 
 #include <mdaaudiotoneplayer.h>
 
@@ -28,12 +28,11 @@ namespace TMS {
  */
 class TMSAudioToneUtility
     {
-
 public:
     /**
      * See CMdaAudioToneUtility::PrepareToPlayDesSequence.
      */
-    virtual void PrepareToPlayDesSequence(const TDesC8& aSequence ) = 0;
+    virtual void PrepareToPlayDesSequence(const TDesC8& aSequence) = 0;
 
     /**
      * See CMdaAudioToneUtility::State.
@@ -53,27 +52,24 @@ public:
     /**
      * See CMdaAudioToneUtility::SetVolume.
      */
-    virtual void SetVolume( TInt aVolume ) = 0;
+    virtual void SetVolume(TInt aVolume) = 0;
 
     /**
      * See CMdaAudioToneUtility::SetRepeats.
      */
-    virtual void SetRepeats(
-        TInt aRepeatNumberOfTimes,
-        const TTimeIntervalMicroSeconds& aTrailingSilence ) = 0;
+    virtual void SetRepeats(TInt aRepeatNumberOfTimes,
+            const TTimeIntervalMicroSeconds& aTrailingSilence) = 0;
 
     /**
      * See CMdaAudioToneUtility::SetPriority.
      */
-    virtual void SetPriority(
-        TInt aPriority,
-        TMdaPriorityPreference aPref) = 0;
+    virtual void SetPriority(TInt aPriority, TMdaPriorityPreference aPref) = 0;
 
     /**
      * See CMdaAudioToneUtility::SetVolumeRamp.
      */
     virtual void SetVolumeRamp(
-        const TTimeIntervalMicroSeconds& aRampDuration) = 0;
+            const TTimeIntervalMicroSeconds& aRampDuration) = 0;
 
     /**
      * See CMdaAudioToneUtility::SetVolumeRamp.
@@ -89,4 +85,4 @@ public:
 
 } //namespace TMS
 
-#endif // CPEAUDIOTONEUTILITY_H
+#endif // TMSAUDIOTONEUTILITY_H

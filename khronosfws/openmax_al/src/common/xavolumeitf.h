@@ -18,24 +18,9 @@
 #ifndef XAVOLUMEITF_H
 #define XAVOLUMEITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAAdaptationContextBase.h"
-#endif
-/** MACROS **/
+#include "xaadptbasectx.h"
 
-/* Max volume level is implementation-dependent but must be at least 0mB
- * now used max volume 10 mB
- */
-#define MAX_VOLUME_LEVEL 10
-#define MAX_VOLUME_AT_LEAST 0
-/* Stereo position range is -1000 to 1000 permille. -1000 permille is fully left
- * and 1000 permille is fully right. 0 permille is center.
- */
-#define STEREO_POSITION_RIGHT 1000
-#define STEREO_POSITION_LEFT -1000
-#define STEREO_POSITION_CENTER 0
+/** MACROS **/
 
 /** TYPES **/
 
@@ -54,10 +39,8 @@ typedef struct XAVolumeItfImpl_
     XAboolean mute;
     XAboolean enableStereoPos;
     XApermille stereoPosition;
-#ifdef _GSTREAMER_BACKEND_  
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
 } XAVolumeItfImpl;
 
 /** METHODS **/
@@ -81,10 +64,9 @@ XAresult XAVolumeItfImpl_SetStereoPosition(XAVolumeItf self, XApermille stereoPo
 
 XAresult XAVolumeItfImpl_GetStereoPosition(XAVolumeItf self, XApermille *pStereoPosition);
 
-#ifdef _GSTREAMER_BACKEND_  
+ 
 /* XAVolumeItfImpl -specific methods */
 XAVolumeItfImpl* XAVolumeItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
-#endif
 void XAVolumeItfImpl_Free(XAVolumeItfImpl* self);
 
 #endif /* XAVOLUMEITF_H */

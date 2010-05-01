@@ -18,11 +18,8 @@
 #ifndef XALEDARRAYITF_H
 #define XALEDARRAYITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xaadptbasectx.h"
+
 /** MACROS **/
 #define LED_COUNT 1
 #define PRIMARY_LED 0
@@ -45,10 +42,10 @@ typedef struct XALEDArrayItfImpl_
     XAuint32    lightMask;
     XAHSL       color;
 
-#ifdef _GSTREAMER_BACKEND_  
+ 
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
+
 } XALEDArrayItfImpl;
 
 /** METHODS **/
@@ -61,9 +58,9 @@ XAresult XALEDArrayItfImpl_IsLEDArrayActivated ( XALEDArrayItf self, XAuint32 * 
 XAresult XALEDArrayItfImpl_SetColor ( XALEDArrayItf self, XAuint8 index, const XAHSL * pColor );
 XAresult XALEDArrayItfImpl_GetColor ( XALEDArrayItf self, XAuint8 index, XAHSL * pColor );
 /* XALEDArrayItfImpl -specific methods */
-#ifdef _GSTREAMER_BACKEND_  
+ 
 XALEDArrayItfImpl* XALEDArrayItfImpl_Create( XAAdaptationBaseCtx *adapCtx );
 void XALEDArrayItfImpl_Free(XALEDArrayItfImpl* self);
-#endif
+
 
 #endif /* XALEDARRAYITF_H */

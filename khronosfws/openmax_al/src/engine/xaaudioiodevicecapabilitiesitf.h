@@ -20,7 +20,7 @@
 
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
-
+#include "xacapabilitiesmgr.h"
 /** MACROS **/
 
 /** TYPES **/
@@ -50,6 +50,7 @@ typedef struct XAAudIODevCapaItfImpl_
     XAuint32 numInputDevices;
     XAuint32 numOutputDevices;
     XAmilliHertz sampleRateArray[12];
+    XACapabilities* capslist;
     
 } XAAudIODevCapaItfImpl;
 
@@ -104,7 +105,7 @@ XAresult XAAudIODevCapaItfImpl_QuerySampleFormatsSupported(XAAudioIODeviceCapabi
                                                            XAint32* pNumOfSampleFormats);
 
 /* XAAudIODevCapaItfImpl -specific methods */
-XAAudIODevCapaItfImpl* XAAudIODevCapaItfImpl_Create(void);
+XAAudIODevCapaItfImpl* XAAudIODevCapaItfImpl_Create(XACapabilities* caps);
 void XAAudIODevCapaItfImpl_Free(XAAudIODevCapaItfImpl* self);
 
 #endif /* XAAUDIOIODEVICECAPABILITIESITF_H */

@@ -29,12 +29,8 @@ class TMSSink;
 class TMSSinkImpl
     {
 public:
-    ~TMSSinkImpl();
     IMPORT_C static gint Create(TMSSinkType sinktype, TMSSink*& tmssink);
     IMPORT_C static gint Delete(TMSSink*& tmssink);
-
-private:
-    TMSSinkImpl();
     };
 
 } //namespace TMS

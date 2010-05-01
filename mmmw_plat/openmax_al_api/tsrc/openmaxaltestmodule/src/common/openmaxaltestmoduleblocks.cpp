@@ -113,6 +113,8 @@ TInt COpenMAXALTestModule::RunMethodL(
         ENTRY( "al_SetDataSink", COpenMAXALTestModule::al_SetDataSink ),
         ENTRY( "al_SetDataLocator", COpenMAXALTestModule::al_SetDataLocator ),
         ENTRY( "al_SetDataFormat", COpenMAXALTestModule::al_SetDataFormat ),
+        ENTRY( "al_CreateWindow", COpenMAXALTestModule::al_CreateWindow ),
+        ENTRY( "al_DeleteWindow", COpenMAXALTestModule::al_DeleteWindow ),
         /* Common Utility Functions ends*/
         
         ENTRY( "al_createEngine", COpenMAXALTestModule::al_createEngine ),
@@ -212,6 +214,94 @@ TInt COpenMAXALTestModule::RunMethodL(
         ENTRY( "al_metadatainsertionitf_InsertMetadataItem", COpenMAXALTestModule::al_metadatainsertionitf_InsertMetadataItem ),
         ENTRY( "al_metadatainsertionitf_RegisterCallback", COpenMAXALTestModule::al_metadatainsertionitf_RegisterCallback ),
         /*MetadataInsertionItf ends*/
+
+        /*PlayItf begins*/
+        ENTRY( "al_playitf_SetPlayState", COpenMAXALTestModule::al_playitf_SetPlayState ),
+        ENTRY( "al_playitf_GetPlayState", COpenMAXALTestModule::al_playitf_GetPlayState ),
+        ENTRY( "al_playitf_GetDurationNullParam", COpenMAXALTestModule::al_playitf_GetDurationNullParam ),
+        ENTRY( "al_playitf_GetDuration", COpenMAXALTestModule::al_playitf_GetDuration ),
+        ENTRY( "al_playitf_GetPositionNullParam", COpenMAXALTestModule::al_playitf_GetPositionNullParam ),
+        ENTRY( "al_playitf_GetPosition", COpenMAXALTestModule::al_playitf_GetPosition ),
+        ENTRY( "al_playitf_RegisterCallback", COpenMAXALTestModule::al_playitf_RegisterCallback ),
+        ENTRY( "al_playitf_SetCallbackEventMask", COpenMAXALTestModule::al_playitf_SetCallbackEventMask ),
+        ENTRY( "al_playitf_GetCallbackEventMaskNullParam", COpenMAXALTestModule::al_playitf_GetCallbackEventMaskNullParam ),
+        ENTRY( "al_playitf_GetCallbackEventMask", COpenMAXALTestModule::al_playitf_GetCallbackEventMask ),
+        ENTRY( "al_playitf_SetMarkerPosition", COpenMAXALTestModule::al_playitf_SetMarkerPosition ),
+        ENTRY( "al_playitf_ClearMarkerPosition", COpenMAXALTestModule::al_playitf_ClearMarkerPosition ),
+        ENTRY( "al_playitf_GetMarkerPositionNullParam", COpenMAXALTestModule::al_playitf_GetMarkerPositionNullParam ),
+        ENTRY( "al_playitf_GetMarkerPosition", COpenMAXALTestModule::al_playitf_GetMarkerPosition ),
+        ENTRY( "al_playitf_SetPositionUpdatePeriod", COpenMAXALTestModule::al_playitf_SetPositionUpdatePeriod ),
+        ENTRY( "al_playitf_GetPositionUpdatePeriodNullParam", COpenMAXALTestModule::al_playitf_GetPositionUpdatePeriodNullParam ),
+        ENTRY( "al_playitf_GetPositionUpdatePeriod", COpenMAXALTestModule::al_playitf_GetPositionUpdatePeriod ),
+        /*PlayItf ends*/
+
+        /*SeekItf begins*/
+        ENTRY( "al_seekitf_SetPosition", COpenMAXALTestModule::al_seekitf_SetPosition ),
+        ENTRY( "al_seekitf_SetLoop", COpenMAXALTestModule::al_seekitf_SetLoop ),
+        ENTRY( "al_seekitf_GetLoop", COpenMAXALTestModule::al_seekitf_GetLoop ),
+        /*SeekItf ends*/
+
+        /*DynamicSourceItf begins*/
+        ENTRY( "al_dynsrcitf_SetSource", COpenMAXALTestModule::al_dynsrcitf_SetSource ),
+        /*DynamicSourceItf ends*/
+        
+        /*StreamInformationItf begins*/
+        ENTRY( "al_strminfoitf_QueryMediaContainerInformation", COpenMAXALTestModule::al_strminfoitf_QueryMediaContainerInformation ),
+        ENTRY( "al_strminfoitf_QueryStreamType", COpenMAXALTestModule::al_strminfoitf_QueryStreamType ),
+        ENTRY( "al_strminfoitf_QueryStreamInformation", COpenMAXALTestModule::al_strminfoitf_QueryStreamInformation ),
+        ENTRY( "al_strminfoitf_QueryStreamName", COpenMAXALTestModule::al_strminfoitf_QueryStreamName ),
+        ENTRY( "al_strminfoitf_RegisterStreamChangeCallback", COpenMAXALTestModule::al_strminfoitf_RegisterStreamChangeCallback ),
+        ENTRY( "al_strminfoitf_QueryActiveStreams", COpenMAXALTestModule::al_strminfoitf_QueryActiveStreams ),
+        ENTRY( "al_strminfoitf_SetActiveStream", COpenMAXALTestModule::al_strminfoitf_SetActiveStream ),
+        /*StreamInformationItf ends*/
+        
+        /*VolumeItf begins*/
+        ENTRY( "al_volumeitf_SetVolumeLevel", COpenMAXALTestModule::al_volumeitf_SetVolumeLevel ),
+        ENTRY( "al_volumeitf_GetVolumeLevel", COpenMAXALTestModule::al_volumeitf_GetVolumeLevel ),
+        ENTRY( "al_volumeitf_GetMaxVolumeLevel", COpenMAXALTestModule::al_volumeitf_GetMaxVolumeLevel ),
+        ENTRY( "al_volumeitf_SetMute", COpenMAXALTestModule::al_volumeitf_SetMute ),
+        ENTRY( "al_volumeitf_GetMute", COpenMAXALTestModule::al_volumeitf_GetMute ),
+        ENTRY( "al_volumeitf_EnableStereoPosition", COpenMAXALTestModule::al_volumeitf_EnableStereoPosition ),
+        ENTRY( "al_volumeitf_IsEnabledStereoPosition", COpenMAXALTestModule::al_volumeitf_IsEnabledStereoPosition ),
+        ENTRY( "al_volumeitf_SetStereoPosition", COpenMAXALTestModule::al_volumeitf_SetStereoPosition ),
+        ENTRY( "al_volumeitf_GetStereoPosition", COpenMAXALTestModule::al_volumeitf_GetStereoPosition ),
+        /*VolumeItf ends*/        
+        
+        /*NokiaVolumeExtItf begins*/
+        ENTRY( "al_nokiavolumeextitf_SetVolumeLevel", COpenMAXALTestModule::al_nokiavolumeextitf_SetVolumeLevel ),
+        ENTRY( "al_nokiavolumeextitf_GetVolumeLevel", COpenMAXALTestModule::al_nokiavolumeextitf_GetVolumeLevel ),
+        ENTRY( "al_nokiavolumeextitf_GetMaxVolumeLevel", COpenMAXALTestModule::al_nokiavolumeextitf_GetMaxVolumeLevel ),
+        ENTRY( "al_nokiavolumeextitf_SetMute", COpenMAXALTestModule::al_nokiavolumeextitf_SetMute ),
+        ENTRY( "al_nokiavolumeextitf_GetMute", COpenMAXALTestModule::al_nokiavolumeextitf_GetMute ),
+        ENTRY( "al_nokiavolumeextitf_EnableStereoPosition", COpenMAXALTestModule::al_nokiavolumeextitf_EnableStereoPosition ),
+        ENTRY( "al_nokiavolumeextitf_IsEnabledStereoPosition", COpenMAXALTestModule::al_nokiavolumeextitf_IsEnabledStereoPosition ),
+        ENTRY( "al_nokiavolumeextitf_SetStereoPosition", COpenMAXALTestModule::al_nokiavolumeextitf_SetStereoPosition ),
+        ENTRY( "al_nokiavolumeextitf_GetStereoPosition", COpenMAXALTestModule::al_nokiavolumeextitf_GetStereoPosition ),
+        ENTRY( "al_nokiavolumeextitf_RegisterVolumeCallback", COpenMAXALTestModule::al_nokiavolumeextitf_RegisterVolumeCallback ),
+        ENTRY( "al_nokiavolumeextitf_SetCallbackEventsMask", COpenMAXALTestModule::al_nokiavolumeextitf_SetCallbackEventsMask ),
+        ENTRY( "al_nokiavolumeextitf_GetCallbackEventsMask", COpenMAXALTestModule::al_nokiavolumeextitf_GetCallbackEventsMask ),
+        /*NokiaVolumeExtItf ends*/        
+        
+        /*NokiaLinearVolumeItf begins*/
+        ENTRY( "al_nokialinearvolumeitf_SetVolumeLevel", COpenMAXALTestModule::al_nokialinearvolumeitf_SetVolumeLevel ),
+        ENTRY( "al_nokialinearvolumeitf_GetVolumeLevel", COpenMAXALTestModule::al_nokialinearvolumeitf_GetVolumeLevel ),
+        ENTRY( "al_nokialinearvolumeitf_GetStepCount", COpenMAXALTestModule::al_nokialinearvolumeitf_GetStepCount ),
+        ENTRY( "al_nokialinearvolumeitf_RegisterVolumeCallback", COpenMAXALTestModule::al_nokialinearvolumeitf_RegisterVolumeCallback ),
+        ENTRY( "al_nokialinearvolumeitf_SetCallbackEventsMask", COpenMAXALTestModule::al_nokialinearvolumeitf_SetCallbackEventsMask ),
+        ENTRY( "al_nokialinearvolumeitf_GetCallbackEventsMask", COpenMAXALTestModule::al_nokialinearvolumeitf_GetCallbackEventsMask ),
+        /*NokiaLinearVolumeItf ends*/        
+
+        /*MetadataExtractionItf*/
+        ENTRY( "al_metadataextractionitf_GetItemCount", COpenMAXALTestModule::al_metadataextractionitf_GetItemCount ),
+        ENTRY( "al_metadataextractionitf_GetKeySize", COpenMAXALTestModule::al_metadataextractionitf_GetKeySize ),
+        ENTRY( "al_metadataextractionitf_GetKey", COpenMAXALTestModule::al_metadataextractionitf_GetKey ),
+  	    ENTRY( "al_metadataextractionitf_GetValueSize", COpenMAXALTestModule::al_metadataextractionitf_GetValueSize ),
+        ENTRY( "al_metadataextractionitf_GetValue", COpenMAXALTestModule::al_metadataextractionitf_GetValue ),
+        ENTRY( "al_metadataextractionitf_AddKeyFilter", COpenMAXALTestModule::al_metadataextractionitf_AddKeyFilter ),
+        ENTRY( "al_metadataextractionitf_ClearKeyFilter", COpenMAXALTestModule::al_metadataextractionitf_ClearKeyFilter ),
+        ENTRY( "al_metadataextractionitf_GetCoverArt", COpenMAXALTestModule::al_metadataextractionitf_GetCoverArt ),        
+         /*MetadataExtractionItf ends*/
+        
         
         //ADD NEW ENTRY HERE
         // [test cases entries] - Do not remove
@@ -224,6 +314,244 @@ TInt COpenMAXALTestModule::RunMethodL(
     return RunInternalL( KFunctions, count, aItem );
 
     }
+
+// -----------------------------------------------------------------------------
+// COpenMAXALTestModule::EventName
+// Return descriptor with the notification description
+// -----------------------------------------------------------------------------
+TPtrC COpenMAXALTestModule::EventName( TInt aKey )
+{
+    static TText* const badKeyword = (TText*)L"BadKeyword";
+    static TText* const keywords[] =
+    {
+
+        (TText*)L"EEOSReceived",
+        
+    };
+
+            
+
+    if( (TUint)aKey >= (sizeof( keywords )/sizeof(TText*)) )
+        {
+        iLog->Log(_L("Keyword out of bounds"));
+        TPtrC keyword( badKeyword );
+        return keyword;
+        }
+    else
+        {
+        TPtrC keyword( keywords[aKey] );
+        return keyword;
+        }
+}
+
+// -----------------------------------------------------------------------------
+// COpenMAXALTestModule::AddExpectedEvent
+// Add an event to the expected events' list
+// -----------------------------------------------------------------------------
+void COpenMAXALTestModule::AddExpectedEvent(TOMXExpectedEvent event, TInt ms)
+{
+   iLog->Log(_L("COpenMAXALTestModule::AddExpectedEvent"));
+    iExpectedEvents.Append(event);
+    TPtrC eventName = EventName(event);
+    iLog->Log(_L("Adding expected event:(0x%02x)%S Total=%d"), event, &eventName, iExpectedEvents.Count() );
+
+    if ( iTimeoutController && !iTimeoutController->IsActive() )
+        {
+        if (ms > 0)
+            {
+            iTimeoutController->Start( TTimeIntervalMicroSeconds(ms * 1000) );
+            }
+        else
+            {
+            iLog->Log(_L("Timeout with default value (1s)"));
+            iTimeoutController->Start( TTimeIntervalMicroSeconds(1000000) );
+            }
+        }
+}
+
+// -----------------------------------------------------------------------------
+// COpenMAXALTestModule::RemoveExpectedEvent
+// Remove the indicated event from the expected events' list
+// -----------------------------------------------------------------------------
+TBool COpenMAXALTestModule::RemoveExpectedEvent(TOMXExpectedEvent aEvent)
+{
+   iLog->Log(_L("COpenMAXALTestModule::RemoveExpectedEvent"));
+    TBool match = EFalse;
+    for (TUint i=0; i < iExpectedEvents.Count() ; i++)
+        {
+        if (iExpectedEvents[i] == aEvent)
+            {
+            iExpectedEvents.Remove(i);
+            match = ETrue;
+            break;
+            }
+        }
+
+    return match;
+}
+
+
+// -----------------------------------------------------------------------------
+// COpenMAXALTestModule::RemoveAllExpectedEvents
+// Remove the indicated event from the expected events' list
+// -----------------------------------------------------------------------------
+void COpenMAXALTestModule::RemoveAllExpectedEvents()
+{
+   iLog->Log(_L("COpenMAXALTestModule::RemoveAllExpectedEvents"));
+    iLog->Log(_L("Removing all expected events"));
+    
+    iExpectedEvents.Reset();
+    iOcurredEvents.Reset();
+}
+
+
+// -----------------------------------------------------------------------------
+// COpenMAXALTestModule::ProcessEvent
+// -----------------------------------------------------------------------------
+void COpenMAXALTestModule::ProcessEvent(TOMXExpectedEvent aEvent, TInt aError)
+{
+   iLog->Log(_L("COpenMAXALTestModule::ProcessExpectedEvent"));
+    TPtrC nameEvent = EventName(aEvent);
+
+    // Check for error
+    if (aError == KErrNone)
+        {
+        // Remove the event
+        if (RemoveExpectedEvent(aEvent))
+            {
+            iLog->Log(_L("Expected Event: (0x%02x)%S has ocurred Total=%d"), aEvent, &nameEvent,iExpectedEvents.Count());
+            }
+        else
+            {
+            iLog->Log(_L("Event: (0x%02x)%S has ocurred"), aEvent, &nameEvent);
+            return;
+            }
+
+        
+
+        // All expected events have ocurred
+        if (iExpectedEvents.Count() == 0 )
+            {
+            Signal();
+            iTimeoutController->Cancel();
+            }
+        
+        
+        }
+    else
+        {
+        iLog->Log(_L("[Error] Event: (0x%02x)%S return with error code=%d"), aEvent, &nameEvent, aError);
+        if (iExpectedEvents.Count() != 0 )
+            {
+            RemoveExpectedEvent(aEvent);
+            }
+        iTimeoutController->Cancel();
+        Signal(KErrCallbackErrorCode);
+        }
+}
+
+// -----------------------------------------------------------------------------
+// COpenMAXALTestModule::HandleTimeout
+// Review if all the expected events have ocurred once the time is over
+// -----------------------------------------------------------------------------
+
+void COpenMAXALTestModule::HandleTimeout(TInt aError)
+{
+   iLog->Log(_L("COpenMAXALTestModule::HandleTimeout"));
+    // All expected events have ocurred
+    if (aError != KErrNone)
+        {
+        if (iExpectedEvents.Count() == 0 )
+            {
+            iLog->Log(_L("Timing out but events have ocurred"));
+            Signal();
+            }
+        else
+            {
+            RemoveAllExpectedEvents();
+            iLog->Log(_L("Timing out and events still pending"));
+            Signal(KErrEventPending);
+            }
+        }
+    else
+        {
+        iLog->Log(_L("Timing out return a error %d"), aError);
+        Signal(aError);
+        }
+}
+
+// -----------------------------------------------------------------------------
+// COpenMAXALTestModule::SetTimeout
+// Create a timer and set a timeout
+// When the timeout is reached the test case is marked as failed
+// It's used rather than the "timeout" keyword in the configuration file
+// because in this way the log continues
+// -----------------------------------------------------------------------------
+TInt COpenMAXALTestModule::SetTimeout( CStifItemParser& aItem )
+{
+   iLog->Log(_L("COpenMAXALTestModule::SetTimeout"));
+    TInt timeout=0;
+    TInt error = aItem.GetNextInt(timeout) ;
+    if ( iTimeoutController )
+        {
+        if ( timeout > 0 )
+            {
+            iTimeoutController->Start( TTimeIntervalMicroSeconds(timeout*1000) );
+            }
+        else
+            {
+            iTimeoutController->Start( TTimeIntervalMicroSeconds(1000000) );
+            }
+        }
+    else
+        {
+        iLog->Log(_L("Timeout Controller doesn't exist"));
+        error = KErrTimeoutController;
+        }
+    return error;
+}
+
+
+// -----------------------------------------------------------------------------
+// Uses the TestModuleBase API to allow a panic as exit reason for a test case
+// -----------------------------------------------------------------------------
+TInt COpenMAXALTestModule::SetAllowedPanic( CStifItemParser& aItem )
+{
+   iLog->Log(_L("COpenMAXALTestModule::SetAllowedPanic"));
+    TInt error = KErrNone;
+    TInt panicCode;
+    TPtrC panicType;
+    if (  ( KErrNone == aItem.GetNextString(panicType) ) &&
+    ( KErrNone == aItem.GetNextInt(panicCode) )  )
+        {
+        iLog->Log(_L("Allowing panic: %S %d"), &panicType, panicCode);
+        iTestModuleIf.SetExitReason( CTestModuleIf::EPanic, panicCode );
+        iNormalExitReason = EFalse;
+        }
+    else
+        {
+        iLog->Log(KMsgBadTestParameters);
+        error = KErrBadTestParameter;
+        }
+    return error;
+}
+
+// -----------------------------------------------------------------------------
+// COpenMAXALTestModule::SetExpectedEvents()
+// -----------------------------------------------------------------------------
+TInt COpenMAXALTestModule::SetExpectedEvents( CStifItemParser& aItem )
+{
+   iLog->Log(_L("COpenMAXALTestModule::SetExpectedEvents"));
+    TInt error = KErrNone;
+    TInt event=0;
+    while ( KErrNone == aItem.GetNextInt(event))
+        {
+        TInt timeout=0;
+        aItem.GetNextInt(timeout);
+        AddExpectedEvent(static_cast<TOMXExpectedEvent>(event), timeout); // Default timeout value
+        }
+    return error;
+}
 
 // -----------------------------------------------------------------------------
 // COpenMAXALTestModule::ExampleL
@@ -444,6 +772,12 @@ XAInterfaceID COpenMAXALTestModule::MapInterface(TInt interface)
         case 40:
             id = XA_IID_STREAMINFORMATION;
             break;
+        case 41:
+            id = XA_IID_NOKIAVOLUMEEXT;
+            break;
+        case 42:
+            id = XA_IID_NOKIALINEARVOLUME;
+            break;
         default:
             break;
         }
@@ -519,6 +853,7 @@ TInt COpenMAXALTestModule::StoreInterface(TInt interface, void* id)
             break;
         case 7:
 /*            XA_IID_PLAY;*/
+            m_PlayItf = XAPlayItf(id);
             break;
         case 8:
 /*            XA_IID_PLAYBACKRATE;*/
@@ -528,9 +863,11 @@ TInt COpenMAXALTestModule::StoreInterface(TInt interface, void* id)
             break;
         case 10:
 /*            XA_IID_SEEK;*/
+            m_SeekItf = XASeekItf(id);
             break;
         case 11:
 /*            XA_IID_VOLUME;*/
+            m_VolumeItf = XAVolumeItf(id);
             break;
         case 12:
 /*            XA_IID_IMAGECONTROLS;*/
@@ -549,6 +886,7 @@ TInt COpenMAXALTestModule::StoreInterface(TInt interface, void* id)
             break;
         case 17:
 /*            XA_IID_METADATAEXTRACTION;*/
+            m_MetadataExtractionItf = XAMetadataExtractionItf(id);
             break;
         case 18:
             m_MetadataInsertionItf = XAMetadataInsertionItf(id);
@@ -559,6 +897,7 @@ TInt COpenMAXALTestModule::StoreInterface(TInt interface, void* id)
             break;
         case 20:
 /*            XA_IID_DYNAMICSOURCE;*/
+            m_DynSrcItf = XADynamicSourceItf(id);
             break;
         case 21:
 /*            XA_IID_CAMERACAPABILITIES;*/
@@ -622,7 +961,17 @@ TInt COpenMAXALTestModule::StoreInterface(TInt interface, void* id)
             break;
         case 40:
 /*            XA_IID_STREAMINFORMATION;*/
+            m_StrInfoItf = XAStreamInformationItf(id);
             break;
+        case 41:
+/*            XA_IID_NOKIAVOLUMEEXTITF;*/
+            m_NokiaVolumeExtItf = XANokiaVolumeExtItf(id);
+            break;
+        case 42:
+/*            XA_IID_NOKIALINEARVOLUMEITF;*/
+            m_NokiaLinearVolumeItf = XANokiaLinearVolumeItf(id);
+            break;
+            
         default:
             break;
             

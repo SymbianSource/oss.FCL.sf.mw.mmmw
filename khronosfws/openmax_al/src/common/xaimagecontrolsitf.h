@@ -18,11 +18,8 @@
 #ifndef XAIMAGECONTROLSITF_H
 #define XAIMAGECONTROLSITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xaadptbasectx.h"
+
 
 /** MACROS **/
 #define DEFAULT_BRIGHTNESS_VALUE    50
@@ -49,10 +46,10 @@ typedef struct XAImageControlsItfImpl_
     XAuint32    brightness;
     XAint32     contrast;
     XApermille  gamma;
-#ifdef _GSTREAMER_BACKEND_
+
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif    
+   
 
 } XAImageControlsItfImpl;
 
@@ -81,10 +78,9 @@ XAresult XAImageControlsItfImpl_GetSupportedGammaSettings(XAImageControlsItf sel
                                                           XApermille *pMaxValue,
                                                           XAuint32 *pNumSettings,
                                                           XApermille **ppSettings);
-#ifdef _GSTREAMER_BACKEND_   
+
 /* XAImageControlsItfImpl -specific methods */
 XAImageControlsItfImpl* XAImageControlsItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
-#endif
 void XAImageControlsItfImpl_Free(XAImageControlsItfImpl* self);
 
 #endif /* XAIMAGECONTROLSITF_H */

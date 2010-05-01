@@ -28,8 +28,7 @@ class CStsServer : private CPolicyServer
 public:
 
     // Runs the server on the current thread, and blocks until the server exits.
-    IMPORT_C static void RunServerL(bool aPerformProcessRendezvous = EFalse,
-            bool aPerformThreadRendezvous = EFalse);
+    IMPORT_C static void RunServerL();
 
     void AddSession(CStsServerSession* aSession);
 

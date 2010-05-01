@@ -19,7 +19,7 @@
 #include <StifTestInterface.h>
 #include "openmaxaltestmodule.h"
 #include <SettingServerClient.h>
-
+#include <glib.h>
 // EXTERNAL DATA STRUCTURES
 //extern  ?external_data;
 
@@ -79,7 +79,8 @@
 //
 COpenMAXALTestModule::COpenMAXALTestModule( 
     CTestModuleIf& aTestModuleIf ):
-        CScriptBase( aTestModuleIf )
+        CScriptBase( aTestModuleIf ), 
+        iTestModuleIf(aTestModuleIf)
     {
     }
 
@@ -129,6 +130,7 @@ void COpenMAXALTestModule::ConstructL()
                           EFalse );
     
     SendTestClassVersion();
+    g_setenv("G_SLICE", "always-malloc", 1);
     }
 
 // -----------------------------------------------------------------------------

@@ -24,15 +24,15 @@
  * Allocates memory for Engine Adaptation Context and makes 1st phase initialization
  * @returns XAEngineAdaptationCtx* - Pointer to created context
  */
-XAAdaptationBaseMMFCtx* XAEngineAdaptMMF_Create()
+XAAdaptationMMFCtx* XAEngineAdaptMMF_Create()
 {
     XAEngineAdaptationMMFCtx *pSelf = NULL;
     DEBUG_API("->XAEngineAdaptMMF_Create");
 
-    pSelf = calloc(1, sizeof(XAEngineAdaptationMMFCtx));
+    pSelf = (XAEngineAdaptationMMFCtx*)calloc(1, sizeof(XAEngineAdaptationMMFCtx));
     if ( pSelf)
     {
-        if( XAAdaptationBaseMMF_Init(&(pSelf->baseObj),XAEngineAdaptationMMF)
+        if( XAAdaptationBaseMMF_Init(&(pSelf->baseObj),XAEngineAdaptation)
                     != XA_RESULT_SUCCESS )
             {
                 DEBUG_ERR("Failed to init base context!!!");
@@ -46,14 +46,14 @@ XAAdaptationBaseMMFCtx* XAEngineAdaptMMF_Create()
     }
 
     DEBUG_API("<-XAEngineAdaptMMF_Create");
-    return (XAAdaptationBaseMMFCtx*)pSelf;
+    return (XAAdaptationMMFCtx*)pSelf;
 }
 
 /*
  * XAresult XAEngineAdaptMMF_PostInit()
  * 2nd phase initialization of engine Adaptation Context
  */
-XAresult XAEngineAdaptMMF_PostInit(XAAdaptationBaseMMFCtx* bCtx)
+XAresult XAEngineAdaptMMF_PostInit(XAAdaptationMMFCtx* bCtx)
 {
     XAresult ret = XA_RESULT_SUCCESS;
 
@@ -66,7 +66,7 @@ XAresult XAEngineAdaptMMF_PostInit(XAAdaptationBaseMMFCtx* bCtx)
  * Destroys Engine Adaptation Context
  * @param ctx - Engine Adaptation context to be destroyed
  */
-void XAEngineAdaptMMF_Destroy(XAAdaptationBaseMMFCtx* bCtx)
+void XAEngineAdaptMMF_Destroy(XAAdaptationMMFCtx* bCtx)
 {
 	XAEngineAdaptationMMFCtx* ctx = NULL;
 

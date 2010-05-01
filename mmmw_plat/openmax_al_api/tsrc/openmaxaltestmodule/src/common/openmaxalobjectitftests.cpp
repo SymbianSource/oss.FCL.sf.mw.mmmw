@@ -20,6 +20,7 @@
 #include <StifParser.h>
 #include <StifTestInterface.h>
 #include "openmaxaltestmodule.h"
+#include "profileutilmacro.h"
 
 // EXTERNAL DATA STRUCTURES
 //extern  ?external_data;
@@ -86,7 +87,17 @@ TInt COpenMAXALTestModule::al_objitf_Realize( CStifItemParser& aItem )
             status = aItem.GetNextInt(async);
             if(!status)
                 {
-                res = (*itf)->Realize(itf, async);
+                if (object == XA_OBJECTID_MEDIAPLAYER)
+                    {
+                    TAG_TIME_PROFILING_BEGIN;
+                    res = (*itf)->Realize(itf, async);
+                    TAG_TIME_PROFILING_END;
+                    PRINT_TO_CONSOLE_TIME_DIFF;
+                    }
+                else
+                    {
+                    res = (*itf)->Realize(itf, async);
+                    }
                 status = res;
                 }
             else
@@ -196,7 +207,7 @@ TInt COpenMAXALTestModule::al_objitf_RegisterCallback( CStifItemParser& aItem )
             func = GetCallbackFunc(object);
             if(func)
                 {
-                res = (*itf)->RegisterCallback(itf, func, NULL);
+                res = (*itf)->RegisterCallback(itf, func, this);
                 status = res;
                 }
             else
@@ -238,7 +249,17 @@ TInt COpenMAXALTestModule::al_objitf_Destroy( CStifItemParser& aItem )
         XAObjectItf itf = GetObject(object);
         if(itf != NULL)
             {
-            (*itf)->Destroy(itf);
+            if (object == XA_OBJECTID_MEDIAPLAYER)
+                {
+                TAG_TIME_PROFILING_BEGIN;
+                (*itf)->Destroy(itf);
+                TAG_TIME_PROFILING_END;
+                PRINT_TO_CONSOLE_TIME_DIFF;
+                }
+            else
+                {
+                (*itf)->Destroy(itf);
+                }
             }
         else
             {

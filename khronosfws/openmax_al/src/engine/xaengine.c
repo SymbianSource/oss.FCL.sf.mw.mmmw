@@ -35,25 +35,28 @@
 #include "xadevicevolumeitf.h"
 #include "xaconfigextensionsitf.h"
 #include "xathreadsafety.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAStaticCameraCapsAdaptation.h"
-#endif
+#include "xaframeworkmgr.h"  
+#include "xastaticcameracapsadaptation.h"
+
+
 /* Static mapping of enumeration XAEngineInterfaces to interface iids */
 static const XAInterfaceID* xaEngineItfIIDs[ENGINE_ITFCOUNT]={
     &XA_IID_OBJECT,
     &XA_IID_ENGINE,
     &XA_IID_DYNAMICINTERFACEMANAGEMENT,
     &XA_IID_THREADSYNC,
-    &XA_IID_CONFIGEXTENSION,
-    &XA_IID_DEVICEVOLUME,
+/*    &XA_IID_CONFIGEXTENSION,*/
+/*    &XA_IID_DEVICEVOLUME,*/
     &XA_IID_AUDIOIODEVICECAPABILITIES,
-    &XA_IID_AUDIODECODERCAPABILITIES,
-    &XA_IID_AUDIOENCODERCAPABILITIES,
+/*    &XA_IID_AUDIODECODERCAPABILITIES,*/
+    &XA_IID_AUDIOENCODERCAPABILITIES
+/*
     &XA_IID_CAMERACAPABILITIES,
     &XA_IID_IMAGEDECODERCAPABILITIES,
     &XA_IID_IMAGEENCODERCAPABILITIES,
     &XA_IID_VIDEODECODERCAPABILITIES,
     &XA_IID_VIDEOENCODERCAPABILITIES
+*/
 };
 
 /*****************************************************************************
@@ -173,9 +176,11 @@ XAresult XAEngineImpl_Create(XAObjectItf *pEngine,
         }
     }
 
-#ifdef _GSTREAMER_BACKEND_  
+/*
+  
     pImpl->adaptationCtx = XAEngineAdapt_Create();
-#endif
+
+*/
     /* Set ObjectItf to point to newly created object */
     *pEngine = ((XAObjectItf)&(pBaseObj->self));
 
@@ -257,23 +262,26 @@ XAresult XAEngineImpl_DoRealize(XAObjectItf self)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAEngineAdapt_PostInit( pObjImpl->adaptationCtx );
-#endif
-    if( ret != XA_RESULT_SUCCESS )
+   
+    /* Table containing use-case framework map */
+    pObjImpl->frameworkMap = XAFrameworkMgr_CreateFrameworkMap();
+    if (pObjImpl->frameworkMap == NULL)
     {
-        DEBUG_ERR_A1("Engine postinit failed - %d", ret);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
         DEBUG_API("<-XAEngineImpl_DoRealize");
-        return ret;
+        /* memory allocation failed */
+        return XA_RESULT_MEMORY_FAILURE;
     }
 
-    ret = XAEngineAdaptMMF_PostInit( pObjImpl->adaptationMmfCtx );
-    if( ret != XA_RESULT_SUCCESS )
-    {
-        DEBUG_ERR_A1("Engine postinit failed (MMF) - %d", ret);
-        DEBUG_API("<-XAEngineImpl_DoRealize");
+
+    /* Create capabilities list */
+    ret = XACapabilitiesMgr_CreateCapabilitieList(pObjImpl->frameworkMap, &(pObjImpl->capabilities));
+    if (ret != XA_RESULT_SUCCESS)
+        {
         return ret;
-    }
+        }
+
+
     /* Realize all implicit and explicitly wanted interfaces */
     for(itfIdx=0; itfIdx<ENGINE_ITFCOUNT; itfIdx++)
     {
@@ -284,7 +292,7 @@ XAresult XAEngineImpl_DoRealize(XAObjectItf self)
             switch(itfIdx)
             {
                 case ENGINE_ENGINEITF:
-                    pItf = XAEngineItfImpl_Create();
+                    pItf = XAEngineItfImpl_Create(pObjImpl->frameworkMap, pObjImpl->capabilities);
                     break;
                 case ENGINE_THREADSYNCITF:
                     pItf = XAThreadSyncItfImpl_Create();
@@ -293,11 +301,12 @@ XAresult XAEngineImpl_DoRealize(XAObjectItf self)
                     pItf = XADIMItfImpl_Create();
                     break;
                 case ENGINE_AUDIOIODEVICECAPAITF:
-                    pItf = XAAudIODevCapaItfImpl_Create();
+                    pItf = XAAudIODevCapaItfImpl_Create(pObjImpl->capabilities);
                     break;
                 case ENGINE_AUDIOENCODERCAPAITF:
-                    pItf = XAAudioEncoderCapabilitiesItfImpl_Create();
+                    pItf = XAAudioEncoderCapabilitiesItfImpl_Create(pObjImpl->capabilities);
                     break;
+/*
                 case ENGINE_AUDIODECODERCAPAITF:
                     pItf = XAAudioDecoderCapabilitiesItfImpl_Create();
                     break;
@@ -305,15 +314,13 @@ XAresult XAEngineImpl_DoRealize(XAObjectItf self)
                     pItf = XAConfigExtensionsItfImpl_Create();
                     break;
                 case ENGINE_DEVICEVOLUMEITF:
-#ifdef _GSTREAMER_BACKEND_  
                     pItf = XADeviceVolumeItfImpl_Create(pObjImpl->adaptationCtx);
-#endif
                     break;
                 case ENGINE_CAMERACAPAITF:
-#ifdef _GSTREAMER_BACKEND_
+
                     XAStaticCameraCaps_Init();
                     pItf = XACameraCapabilitiesItfImpl_Create();
-#endif                    
+                    
                     break;
                 case ENGINE_IMAGEDECODERCAPAITF:
                     pItf = XAImageDecoderCapabilitiesItfImpl_Create();
@@ -327,6 +334,7 @@ XAresult XAEngineImpl_DoRealize(XAObjectItf self)
                 case ENGINE_VIDEOENCODERCAPAITF:
                     pItf = XAVideoEncoderCapabilitiesItfImpl_Create();
                     break;
+*/
                 default:
                     break;
             }
@@ -394,6 +402,7 @@ void XAEngineImpl_FreeResources(XAObjectItf self)
                 case ENGINE_AUDIOENCODERCAPAITF:
                     XAAudioEncoderCapabilitiesItfImpl_Free(pItf);
                     break;
+/*
                 case ENGINE_AUDIODECODERCAPAITF:
                     XAAudioDecoderCapabilitiesItfImpl_Free(pItf);
                     break;
@@ -404,9 +413,9 @@ void XAEngineImpl_FreeResources(XAObjectItf self)
                     XADeviceVolumeItfImpl_Free(pItf);
                     break;
                 case ENGINE_CAMERACAPAITF:
-#ifdef _GSTREAMER_BACKEND_
+
                     XACameraCapabilitiesItfImpl_Free(pItf);
-#endif                    
+                    
                     break;
                 case ENGINE_IMAGEDECODERCAPAITF:
                     XAImageDecoderCapabilitiesItfImpl_Free(pItf);
@@ -420,6 +429,7 @@ void XAEngineImpl_FreeResources(XAObjectItf self)
                 case ENGINE_VIDEOENCODERCAPAITF:
                     XAVideoEncoderCapabilitiesItfImpl_Free(pItf);
                     break;
+*/
                 default:
                     break;
             }
@@ -428,20 +438,25 @@ void XAEngineImpl_FreeResources(XAObjectItf self)
     }
 
     /* free all other allocated resources*/
-#ifdef _GSTREAMER_BACKEND_  
+/*  
     if ( pImpl->adaptationCtx != NULL )
     {
         XAEngineAdapt_Destroy( pImpl->adaptationCtx );
         pImpl->adaptationCtx = NULL;
     }
-#endif    
+    
     if ( pImpl->adaptationMmfCtx != NULL )
     {
         XAEngineAdaptMMF_Destroy( pImpl->adaptationMmfCtx );
         pImpl->adaptationMmfCtx = NULL;
-    }
-
-    XAThreadSafety_Destroy();
+    }*/
+    /* free framework map */
+    XAFrameworkMgr_DeleteFrameworkMap(&pImpl->frameworkMap);
+    
+    /* TODO free capabilities list */
+    XACapabilitiesMgr_DeleteCapabilitieList(&pImpl->capabilities);
+    
+     XAThreadSafety_Destroy();
 
     DEBUG_API("<-XAEngineImpl_FreeResources");
     return;

@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xarecorditf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XARecordItfAdaptation.h"
-#endif
+
+#include "xarecorditfadaptation.h"
+
 #include "xarecorditfadaptationmmf.h"
 #include "xathreadsafety.h"
 #include <string.h>
@@ -69,15 +69,13 @@ XAresult XARecordItfImpl_SetRecordState(XARecordItf self,
     /* check is play state changed, if not do nothing */
     if(state != impl->recordState)
     {
-        if(impl->isMMFRecord)
+        if(impl->adapCtx->fwtype == FWMgrFWMMF)
         {
-           ret = XARecordItfAdaptMMF_SetRecordState(impl->adaptCtxMMF, state);
+           ret = XARecordItfAdaptMMF_SetRecordState((XAAdaptationMMFCtx*)impl->adapCtx, state);
         }
         else
         {
-#ifdef _GSTREAMER_BACKEND_
-           ret = XARecordItfAdapt_SetRecordState(impl->adapCtx, state);
-#endif
+           ret = XARecordItfAdapt_SetRecordState((XAAdaptationGstCtx*)impl->adapCtx, state);
         }
 
         if(ret == XA_RESULT_SUCCESS)
@@ -139,15 +137,13 @@ XAresult XARecordItfImpl_SetDurationLimit(XARecordItf self,
 
     impl->durationLimitSetted = 1;
     impl->durationLimit = msec;
-    if(!(impl->isMMFRecord))
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
     {
-#ifdef _GSTREAMER_BACKEND_
-       ret = XARecordItfAdapt_EnablePositionTracking( impl->adapCtx, 1 );
-#endif
+       ret = XARecordItfAdapt_EnablePositionTracking( (XAAdaptationGstCtx*)impl->adapCtx, 1 );
     }
     else
     {
-    ret = XARecordItfAdaptMMF_EnablePositionTracking( impl->adaptCtxMMF, 1 );
+    ret = XARecordItfAdaptMMF_EnablePositionTracking( (XAAdaptationMMFCtx*)impl->adapCtx, 1 );
     }
 
 
@@ -179,16 +175,13 @@ XAresult XARecordItfImpl_GetPosition(XARecordItf self,
     }
 
     
-    if(!(impl->isMMFRecord))
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
     {
-    
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARecordItfAdapt_GetPosition(impl->adapCtx, pMsec);
-#endif
+    ret = XARecordItfAdapt_GetPosition((XAAdaptationGstCtx*)impl->adapCtx, pMsec);
     }
     else
     {
-    ret = XARecordItfAdaptMMF_GetPosition(impl->adaptCtxMMF, pMsec);
+    ret = XARecordItfAdaptMMF_GetPosition((XAAdaptationMMFCtx*)impl->adapCtx, pMsec);
     }
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
@@ -259,14 +252,13 @@ XAresult XARecordItfImpl_SetCallbackEventsMask(XARecordItf self,
 
     impl->eventFlags = eventFlags;
     
-    if(!(impl->isMMFRecord))
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
         {
-#ifdef _GSTREAMER_BACKEND_
             /* enable position tracking if client wants so */
             if( (eventFlags & (XA_RECORDEVENT_HEADATMARKER | XA_RECORDEVENT_HEADATNEWPOS))
                 &&  impl->adapCtx && !impl->positionupdateOn)
             {
-                ret = XARecordItfAdapt_EnablePositionTracking(impl->adapCtx, XA_BOOLEAN_TRUE);
+                ret = XARecordItfAdapt_EnablePositionTracking((XAAdaptationGstCtx*)impl->adapCtx, XA_BOOLEAN_TRUE);
                 if( ret == XA_RESULT_SUCCESS )
                 {
                     impl->positionupdateOn = XA_BOOLEAN_TRUE;
@@ -275,30 +267,29 @@ XAresult XARecordItfImpl_SetCallbackEventsMask(XARecordItf self,
             else if( !(eventFlags & (XA_RECORDEVENT_HEADATMARKER | XA_RECORDEVENT_HEADATNEWPOS))
                     &&  impl->adapCtx && impl->positionupdateOn)
             {
-                ret = XARecordItfAdapt_EnablePositionTracking(impl->adapCtx, XA_BOOLEAN_FALSE);
+                ret = XARecordItfAdapt_EnablePositionTracking((XAAdaptationGstCtx*)impl->adapCtx, XA_BOOLEAN_FALSE);
                 if( ret == XA_RESULT_SUCCESS )
                 {
                     impl->positionupdateOn = XA_BOOLEAN_FALSE;
                 }
             }
-#endif
         }
     else
         {
             /* enable position tracking if client wants so */
             if( (eventFlags & (XA_RECORDEVENT_HEADATMARKER | XA_RECORDEVENT_HEADATNEWPOS))
-                &&  impl->adaptCtxMMF && !impl->positionupdateOn)
+                &&  impl->adapCtx && !impl->positionupdateOn)
             {
-                ret = XARecordItfAdaptMMF_EnablePositionTracking(impl->adaptCtxMMF, XA_BOOLEAN_TRUE);
+                ret = XARecordItfAdaptMMF_EnablePositionTracking((XAAdaptationMMFCtx*)impl->adapCtx, XA_BOOLEAN_TRUE);
                 if( ret == XA_RESULT_SUCCESS )
                 {
                     impl->positionupdateOn = XA_BOOLEAN_TRUE;
                 }
             }
             else if( !(eventFlags & (XA_RECORDEVENT_HEADATMARKER | XA_RECORDEVENT_HEADATNEWPOS))
-                    &&  impl->adaptCtxMMF && impl->positionupdateOn)
+                    &&  impl->adapCtx && impl->positionupdateOn)
             {
-                ret = XARecordItfAdaptMMF_EnablePositionTracking(impl->adaptCtxMMF, XA_BOOLEAN_FALSE);
+                ret = XARecordItfAdaptMMF_EnablePositionTracking((XAAdaptationMMFCtx*)impl->adapCtx, XA_BOOLEAN_FALSE);
                 if( ret == XA_RESULT_SUCCESS )
                 {
                     impl->positionupdateOn = XA_BOOLEAN_FALSE;
@@ -478,14 +469,12 @@ XAresult XARecordItfImpl_GetPositionUpdatePeriod(XARecordItf self,
  * XARecordItfImpl* XARecordItfImpl_Create()
  * Description: Allocate and initialize XARecordItfImpl
  **/
-XARecordItfImpl* XARecordItfImpl_Create( 
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adapCtx,
-#endif
-        XAMediaRecorderImpl* impl )
+XARecordItfImpl* XARecordItfImpl_Create( XAMediaRecorderImpl* impl )
 {
     XARecordItfImpl* self = (XARecordItfImpl*)
         calloc(1,sizeof(XARecordItfImpl));
+    
+    
     DEBUG_API("->XARecordItfImpl_Create");
     if( self )
     {
@@ -513,14 +502,10 @@ XARecordItfImpl* XARecordItfImpl_Create(
         self->callback = NULL;
         self->cbcontext = NULL;
         self->eventFlags = 0;
-        self->adaptCtxMMF = impl->adaptationCtxMMF;
         self->cbPtrToSelf = NULL;
         self->pObjImpl = impl;
-#ifdef _GSTREAMER_BACKEND_
-        self->adapCtx = adapCtx;
-        XAAdaptationBase_AddEventHandler( adapCtx, &XARecordItfImpl_AdaptCb, XA_RECORDITFEVENTS, self );
-#endif
-        XAAdaptationBaseMMF_AddEventHandler( impl->adaptationCtxMMF, &XARecordItfImplMMF_AdaptCb, XA_RECORDITFEVENTS, self );
+        self->adapCtx = impl->adaptationCtx;
+        XAAdaptationBase_AddEventHandler( impl->adaptationCtx, &XARecordItfImpl_AdaptCb, XA_RECORDITFEVENTS, self );
         self->self = self;
     }
     DEBUG_API("<-XARecordItfImpl_Create");
@@ -535,15 +520,11 @@ void XARecordItfImpl_Free(XARecordItfImpl* self)
 {
     DEBUG_API("->XARecordItfImpl_Free");
     assert( self==self->self );
-#ifdef _GSTREAMER_BACKEND_
     XAAdaptationBase_RemoveEventHandler( self->adapCtx, &XARecordItfImpl_AdaptCb );
-#endif    
-    XAAdaptationBaseMMF_RemoveEventHandler( self->adaptCtxMMF, &XARecordItfImplMMF_AdaptCb );
     free( self );
     DEBUG_API("<-XARecordItfImpl_Free");
 }
 
-#ifdef _GSTREAMER_BACKEND_
 /* void XARecordItfImpl_AdaptCb
  * Description: Listen changes in adaptation
  */
@@ -594,9 +575,9 @@ void XARecordItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
         /* Check have we reached record duration limit */
         if ( impl->durationLimitSetted)
         {
-            if ( impl->lastPosition >= impl->durationLimit )
+            if ( impl->callback && (impl->lastPosition >= impl->durationLimit ))
             {
-                XARecordItfImpl_SetRecordState( impl->cbPtrToSelf,XA_RECORDSTATE_STOPPED );
+                impl->itf.SetRecordState(impl->cbPtrToSelf,XA_RECORDSTATE_STOPPED);
                 impl->callback(impl->cbPtrToSelf, impl->cbcontext, XA_RECORDEVENT_HEADATLIMIT);
             }
         }
@@ -635,129 +616,4 @@ void XARecordItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
 
     DEBUG_API("<-XARecordItfImpl_AdaptCb");
 }
-#endif
 
-
-/* void XARecordItfImpl_AdaptCb
- * Description: Listen changes in adaptation
- */
-void XARecordItfImplMMF_AdaptCb( void *pHandlerCtx, XAAdaptEventMMF *event )
-{
-    XARecordItfImpl* impl = (XARecordItfImpl*)pHandlerCtx;
-    DEBUG_API("->XARecordItfImpl_AdaptCb");
-
-    if(!impl)
-    {
-        DEBUG_ERR("XARecordItfImpl_AdaptCb, invalid context pointer!");
-        DEBUG_API("<-XARecordItfImpl_AdaptCb");
-        return;
-    }
-    assert(event);
-    /* check position update events */
-    if( event->eventid == XA_ADAPT_POSITION_UPDATE_EVT )
-    {
-        XAuint32 newpos = 0;
-        assert(event->data);
-        newpos = *((XAuint32*)(event->data));
-        DEBUG_INFO_A1("new position %u",newpos);
-        /* check if marker passed and callback needed */
-        if( (impl->markerPosition != NO_POSITION) &&
-            (impl->eventFlags & XA_RECORDEVENT_HEADATMARKER) )
-        {
-            if( (impl->lastPosition < impl->markerPosition) &&
-                (newpos >= impl->markerPosition) &&
-                impl->callback )
-            {
-                impl->callback(impl->cbPtrToSelf, impl->cbcontext, XA_RECORDEVENT_HEADATMARKER);
-            }
-        }
-        /* check if update period passed and callback needed */
-        if( (impl->positionUpdatePeriod > 0) &&
-            (impl->eventFlags & XA_RECORDEVENT_HEADATNEWPOS) &&
-            impl->callback )
-        {
-            if( (XAuint32)((impl->lastPosition)/(impl->positionUpdatePeriod )) <
-                (XAuint32)(newpos/(impl->positionUpdatePeriod )) )
-            {
-                impl->callback(impl->cbPtrToSelf, impl->cbcontext, XA_RECORDEVENT_HEADATNEWPOS);
-            }
-        }
-        /* store position */
-        impl->lastPosition = newpos;
-
-        /* Check have we reached record duration limit */
-        if ( impl->durationLimitSetted && impl->callback)
-        {
-            if ( impl->lastPosition >= impl->durationLimit )
-            {
-                XARecordItfImpl_SetRecordState( impl->cbPtrToSelf,XA_RECORDSTATE_STOPPED );
-                impl->callback(impl->cbPtrToSelf, impl->cbcontext, XA_RECORDEVENT_HEADATLIMIT);
-            }
-        }
-    }
-    else if( event->eventid == XA_RECORDEVENT_HEADSTALLED )
-    {
-        impl->recordState = XA_RECORDSTATE_PAUSED;
-        /* send callback if needed */
-        if( (XA_RECORDEVENT_HEADSTALLED & impl->eventFlags) && impl->callback )
-        {
-            impl->callback(impl->cbPtrToSelf, impl->cbcontext, XA_RECORDEVENT_HEADSTALLED);
-        }
-    }
-    else if( event->eventid == XA_RECORDEVENT_BUFFER_FULL )
-    {
-        /* Adaptation is set to pause, need to sync state with AL-layer*/
-        impl->recordState = XA_RECORDSTATE_STOPPED;
-        /* send callback if needed */
-        if( (XA_RECORDEVENT_BUFFER_FULL & impl->eventFlags) && impl->callback )
-        {
-            impl->callback(impl->cbPtrToSelf, impl->cbcontext, XA_RECORDEVENT_BUFFER_FULL);
-        }
-    }
-    else if( event->eventid == XA_RECORDEVENT_HEADMOVING )
-    {
-        /* send callback if needed */
-        if( (XA_RECORDEVENT_HEADMOVING & impl->eventFlags) && impl->callback )
-        {
-            impl->callback(impl->cbPtrToSelf, impl->cbcontext, XA_RECORDEVENT_HEADMOVING);
-        }
-    }
-    else
-    {
-        impl->pObjImpl->baseObj.callBack(impl->pObjImpl->baseObj.cbPtrToSelf, impl->pObjImpl->baseObj.context, 
-                                        event->eventid, 0 ,
-                                        impl->pObjImpl->baseObj.state , NULL);
-    }
-
-    DEBUG_API("<-XARecordItfImpl_AdaptCb");
-}
-
-XAresult XARecordItfImpl_DetermineRecordEngine(XARecordItf self, XADataLocator_URI *uri)
-{
-
-  XAresult ret = XA_RESULT_SUCCESS;
-  
-  char* tempPtr = NULL;
-  char extension[5];
-  
-  XARecordItfImpl* impl = (XARecordItfImpl*)(self);
-  DEBUG_API("->XAPlayItfImpl_DetermineRecordEngine");
-    
-  //need to move to configuration file and add more in final class
-  
-  impl->isMMFRecord = XA_BOOLEAN_TRUE;
-	
-  tempPtr = strchr((char*)(uri->URI), '.');
-  strcpy(extension, tempPtr);
-	
-	//TODO:
-	//For now all record use cases need to go to MMF in the future can move wav to gst
-  //if(!strcmp(extension, ".wav"))  
-  //{
-  //   impl->isMMFRecord = XA_BOOLEAN_FALSE;
-  //}
-
-  return ret;  
-  
-  DEBUG_API("<-XAPlayItfImpl_DetermineRecordEngine");
-}

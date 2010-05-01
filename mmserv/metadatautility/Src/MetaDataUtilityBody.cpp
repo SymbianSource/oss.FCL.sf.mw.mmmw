@@ -108,7 +108,7 @@ void CMetaDataUtilityBody::OpenFileL(
 	iParser = FindParserFileL(aFileName);
 	if ( iParser )
 		{
-		iParser->ParseL(aWantedFields, *iContainer);
+		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
 		}
 	}
 
@@ -130,7 +130,7 @@ void CMetaDataUtilityBody::OpenFileL(
 	iParser = FindParserFileL(aFile);
 	if ( iParser )
 		{
-		iParser->ParseL(aWantedFields, *iContainer);
+		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
 		}
 	}
 
@@ -152,7 +152,7 @@ void CMetaDataUtilityBody::OpenDesL(
 	iParser = FindParserDesL(aDes);
 	if ( iParser )
 		{
-		iParser->ParseL(aWantedFields, *iContainer);
+		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
 		}
 	}
 
@@ -467,10 +467,7 @@ void CMetaDataUtilityBody::OpenFileL(
 		{
 		User::Leave(KErrAlreadyExists);
 		}
-	
-	// iParser = FindParserFileL(aFileName);	
-		
-	if(KErrNone == IsSupportedMimeType(aMimeType))	
+		if(KErrNone == IsSupportedMimeType(aMimeType))	
 	{
 		iParser = FindParserFileL(aFileName, aMimeType);
 	}
@@ -481,7 +478,7 @@ void CMetaDataUtilityBody::OpenFileL(
 	
 	if ( iParser )
 	{
-		iParser->ParseL(aWantedFields, *iContainer);
+		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
 	}	
 	}
 // -----------------------------------------------------------------------------
@@ -501,8 +498,6 @@ void CMetaDataUtilityBody::OpenFileL(
 		User::Leave(KErrAlreadyExists);
 	}
 		
-	//iParser = FindParserFileL(aFile);	
-	
 	if(KErrNone == IsSupportedMimeType(aMimeType))	
 	{
 		iParser = FindParserFileL(aFile, aMimeType);
@@ -512,10 +507,9 @@ void CMetaDataUtilityBody::OpenFileL(
 		User::Leave(KErrNotSupported);		
 	}
 	
-	//iParser = FindParserFileL(aFile);
 	if ( iParser )
 	{
-		iParser->ParseL(aWantedFields, *iContainer);
+		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
 	}
 	}
 
@@ -703,7 +697,7 @@ void CMetaDataUtilityBody::OpenDesL(
 		}
 	if ( iParser )
 		{
-		iParser->ParseL(aWantedFields, *iContainer);
+		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
 		}
 	}	
 	

@@ -19,10 +19,10 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xadynamicsourceitf.h"
-#ifdef _GSTREAMER_BACKEND_   
-#include "XAAdaptationContextBase.h"
-#include "XADynamicSourceItfAdaptation.h"
-#endif
+ 
+#include "xadynamicsourceitfadaptation.h"
+#include "xadynamicsourceitfadaptationmmf.h"
+
 
 /*****************************************************************************
  * Base interface XADynamicSourceItf implementation
@@ -44,7 +44,7 @@ XAresult XADynamicSourceItfImpl_SetSource(XADynamicSourceItf self,
         DEBUG_API("<-XADynamicSourceItfImpl_SetSource");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_   
+ 
     if( !impl->adaptCtx )
     {
         DEBUG_ERR("Adaptation not ready!!");
@@ -57,10 +57,17 @@ XAresult XADynamicSourceItfImpl_SetSource(XADynamicSourceItf self,
         res = XACommon_CheckDataSource(pDataSource,NULL);
         if(res==XA_RESULT_SUCCESS)
         {
-            res = XADynamicSourceItfAdapt_SetSource(impl->adaptCtx, pDataSource );
+            if(impl->adaptCtx->fwtype == FWMgrFWGST)
+                {
+                res = XADynamicSourceItfAdapt_SetSource((XAAdaptationGstCtx*)impl->adaptCtx, pDataSource );
+                }
+            else
+                {
+                res = XADynamicSourceItfAdaptMMF_SetSource((XAAdaptationMMFCtx*)impl->adaptCtx, pDataSource );
+                }
         }
     }
-#endif
+
     DEBUG_API("<-XADynamicSourceItfImpl_SetSource");
     return res;
 }
@@ -68,7 +75,6 @@ XAresult XADynamicSourceItfImpl_SetSource(XADynamicSourceItf self,
 /*****************************************************************************
  * XADynamicSourceItfImpl -specific methods
  *****************************************************************************/
-#ifdef _GSTREAMER_BACKEND_   
 
 /* XADynamicSourceItfImpl* XADynamicSourceItfImpl_Create()
  * Description: Allocate and initialize DynamicSourceItfImpl
@@ -77,6 +83,7 @@ XADynamicSourceItfImpl* XADynamicSourceItfImpl_Create( XAAdaptationBaseCtx *adap
 {
     XADynamicSourceItfImpl* self = (XADynamicSourceItfImpl*)
         calloc(1,sizeof(XADynamicSourceItfImpl));
+    
     DEBUG_API("->XADynamicSourceItfImpl_Create");
     if( self )
     {
@@ -89,7 +96,7 @@ XADynamicSourceItfImpl* XADynamicSourceItfImpl_Create( XAAdaptationBaseCtx *adap
     DEBUG_API("<-XADynamicSourceItfImpl_Create");
     return self;
 }
-#endif
+
 /* void XADynamicSourceItfImpl_Free(XADynamicSourceItfImpl* self)
  * Description: Free all resources reserved at XADynamicSourceItfImpl_Create
  */

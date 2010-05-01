@@ -24,9 +24,28 @@
 #include <StifTestModule.h>
 #include <TestclassAssert.h>
 #include <OpenMAXAL.h>
+#include <xanokialinearvolumeitf.h>
+#include <xanokiavolumeextitf.h>
+#include <e32msgqueue.h>
+#include "TimeoutController.h"
+#include <w32std.h>
+
 // CONSTANTS
 //const ?type ?constant_var = ?constant;
+// CONSTANTS
+const TInt KErrBadTestParameter= -1000;         // Error on configuration file
 
+const TInt KErrEventPending =-2000;             // Timeout and not callback 
+const TInt KErrCallbackErrorCode = -2001;       // Callback return error code
+const TInt KErrUnexpectedValue =-2002;          // Unexpected value at setting    
+const TInt KErrTimeoutController = -2007;       // Unexpected notification
+
+const TInt KShortTimeout = 1000;
+const TInt KMediumTimeout = 4000;
+const TInt KLongTimeout = 100000;
+
+
+_LIT( KMsgBadTestParameters, "[Error] No valid test case parameters");
 // MACROS
 #define RET_ERR_IF_ERR(err) if (err!=KErrNone) return err;
 //#define ?macro ?macro_def
@@ -63,7 +82,8 @@ class COpenMAXALTestModule;
 *  @lib ?library
 *  @since ?Series60_version
 */
-NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
+NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
+                                            public MTimeoutObserver
     {
     public:  // Constructors and destructor
 
@@ -77,6 +97,15 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
         */
         virtual ~COpenMAXALTestModule();
 
+        virtual void HandlePlayItfCallback( XAPlayItf caller, XAuint32 event );
+        virtual void HandleObjectCallback(XAObjectItf caller,XAuint32 event,
+                                XAresult result,XAuint32 param, void * pInterface);
+     
+        enum TOMXExpectedEvent
+            {
+            EEOSReceived = 1
+            };
+    
     public: // New functions
 
         /**
@@ -97,6 +126,21 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
         */
         virtual TInt RunMethodL( CStifItemParser& aItem );
 
+        // From MTimeoutObserver
+
+        /**
+        * @since ?Series60_version
+        * @param none
+        * Review if all the expected events have ocurred once the time is over
+        */
+        void HandleTimeout(TInt error);
+
+        /**
+        * Verify that the event was expected, removes it from the list
+        * Signal the TestScripter with the returned error code
+        * @since ?Series60_version
+        */
+        void ProcessEvent(TOMXExpectedEvent aEvent, TInt aError);        
     protected:  // New functions
 
         /**
@@ -138,6 +182,63 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
         void Delete();
 
         /**
+        * Set an event as expected and set default timeout
+        * @since ?Series60_version
+        */
+        void AddExpectedEvent(TOMXExpectedEvent event, TInt ms);
+
+
+        /**
+        * Unset an event as expected
+        * @since ?Series60_version
+        */
+        TBool RemoveExpectedEvent(TOMXExpectedEvent event);
+
+
+        /**
+        * @since ?Series60_version
+        * @param none
+        * Removes all expected events
+        */
+        void RemoveAllExpectedEvents();
+
+
+
+        /**
+        * Maps a event with a descriptor with its name
+        * @since ?Series60_version
+        */
+        TPtrC EventName( TInt aKey );
+
+        /*
+        * Test methods are listed below.
+        */
+
+        /**
+        * Sets a timeout different since the default
+        * @since Series60_3_2
+        * @param aItem Script line containing parameters.
+        * @return Symbian OS error code.
+        */
+        TInt SetTimeout( CStifItemParser& aItem );
+
+        /**
+        *
+        * @since Series60_3_2
+        * @param aItem Script line containing parameters.
+        * @return Symbian OS error code.
+        */
+        TInt SetExpectedEvents( CStifItemParser& aItem );
+
+        /**
+        *
+        * @since Series60_3_2
+        * @param aItem Script line containing parameters.
+        * @return Symbian OS error code.
+        */
+        TInt SetAllowedPanic( CStifItemParser& aItem );
+        
+        /**
         * Test methods are listed below. 
         */
 
@@ -153,7 +254,9 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
         virtual TInt al_SetDataSink( CStifItemParser& aItem );        
         virtual TInt al_SetDataLocator( CStifItemParser& aItem );        
         virtual TInt al_SetDataFormat( CStifItemParser& aItem );        
-        
+        virtual TInt al_CreateWindow( CStifItemParser& aItem );
+        virtual TInt al_DeleteWindow( CStifItemParser& aItem );        
+
         virtual TInt al_createEngine( CStifItemParser& aItem );
         virtual TInt al_queryNumSupportedEngineInterfaces( CStifItemParser& aItem );
         virtual TInt al_querySupportedEngineInterfaces( CStifItemParser& aItem );
@@ -227,6 +330,77 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
         virtual TInt al_metadatainsertionitf_InsertMetadataItem( CStifItemParser& aItem );
         virtual TInt al_metadatainsertionitf_RegisterCallback( CStifItemParser& aItem );
         
+        virtual TInt al_playitf_SetPlayState( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetPlayState( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetDurationNullParam( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetDuration( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetPositionNullParam( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetPosition( CStifItemParser& aItem );
+        virtual TInt al_playitf_RegisterCallback( CStifItemParser& aItem );
+        virtual TInt al_playitf_SetCallbackEventMask( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetCallbackEventMaskNullParam( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetCallbackEventMask( CStifItemParser& aItem );
+        virtual TInt al_playitf_SetMarkerPosition( CStifItemParser& aItem );
+        virtual TInt al_playitf_ClearMarkerPosition( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetMarkerPositionNullParam( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetMarkerPosition( CStifItemParser& aItem );
+        virtual TInt al_playitf_SetPositionUpdatePeriod( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetPositionUpdatePeriodNullParam( CStifItemParser& aItem );
+        virtual TInt al_playitf_GetPositionUpdatePeriod( CStifItemParser& aItem );
+
+        virtual TInt al_seekitf_SetPosition( CStifItemParser& aItem );
+        virtual TInt al_seekitf_SetLoop( CStifItemParser& aItem );
+        virtual TInt al_seekitf_GetLoop( CStifItemParser& aItem );
+        
+        virtual TInt al_dynsrcitf_SetSource( CStifItemParser& aItem );
+        
+        virtual TInt al_strminfoitf_QueryMediaContainerInformation( CStifItemParser& aItem );
+        virtual TInt al_strminfoitf_QueryStreamType( CStifItemParser& aItem );
+        virtual TInt al_strminfoitf_QueryStreamInformation( CStifItemParser& aItem );
+        virtual TInt al_strminfoitf_QueryStreamName( CStifItemParser& aItem );
+        virtual TInt al_strminfoitf_RegisterStreamChangeCallback( CStifItemParser& aItem );
+        virtual TInt al_strminfoitf_QueryActiveStreams( CStifItemParser& aItem );
+        virtual TInt al_strminfoitf_SetActiveStream( CStifItemParser& aItem );        
+        
+        virtual TInt al_volumeitf_SetVolumeLevel( CStifItemParser& aItem );
+        virtual TInt al_volumeitf_GetVolumeLevel( CStifItemParser& aItem );
+        virtual TInt al_volumeitf_GetMaxVolumeLevel( CStifItemParser& aItem );
+        virtual TInt al_volumeitf_SetMute( CStifItemParser& aItem );
+        virtual TInt al_volumeitf_GetMute( CStifItemParser& aItem );
+        virtual TInt al_volumeitf_EnableStereoPosition( CStifItemParser& aItem );
+        virtual TInt al_volumeitf_IsEnabledStereoPosition( CStifItemParser& aItem );
+        virtual TInt al_volumeitf_SetStereoPosition( CStifItemParser& aItem );
+        virtual TInt al_volumeitf_GetStereoPosition( CStifItemParser& aItem );
+
+        virtual TInt al_nokiavolumeextitf_SetVolumeLevel( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_GetVolumeLevel( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_GetMaxVolumeLevel( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_SetMute( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_GetMute( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_EnableStereoPosition( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_IsEnabledStereoPosition( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_SetStereoPosition( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_GetStereoPosition( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_RegisterVolumeCallback( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_SetCallbackEventsMask( CStifItemParser& aItem ); 
+        virtual TInt al_nokiavolumeextitf_GetCallbackEventsMask( CStifItemParser& aItem ); 
+
+        virtual TInt al_nokialinearvolumeitf_SetVolumeLevel( CStifItemParser& aItem );
+        virtual TInt al_nokialinearvolumeitf_GetVolumeLevel( CStifItemParser& aItem );
+        virtual TInt al_nokialinearvolumeitf_GetStepCount( CStifItemParser& aItem );
+        virtual TInt al_nokialinearvolumeitf_RegisterVolumeCallback( CStifItemParser& aItem );
+        virtual TInt al_nokialinearvolumeitf_SetCallbackEventsMask( CStifItemParser& aItem );
+        virtual TInt al_nokialinearvolumeitf_GetCallbackEventsMask( CStifItemParser& aItem );
+
+        virtual TInt al_metadataextractionitf_GetItemCount( CStifItemParser& aItem );
+		virtual TInt al_metadataextractionitf_GetKeySize( CStifItemParser& aItem );
+		virtual TInt al_metadataextractionitf_GetKey( CStifItemParser& aItem );
+		virtual TInt al_metadataextractionitf_GetValueSize( CStifItemParser& aItem );
+		virtual TInt al_metadataextractionitf_GetValue( CStifItemParser& aItem );
+		virtual TInt al_metadataextractionitf_AddKeyFilter( CStifItemParser& aItem );
+		virtual TInt al_metadataextractionitf_ClearKeyFilter( CStifItemParser& aItem );
+		virtual TInt al_metadataextractionitf_GetCoverArt( CStifItemParser& aItem );
+
         /**
          * Method used to log version of test class
          */
@@ -242,8 +416,11 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
             {
             EEngine = 1,
             EMediaRecorder,
+/*
             ERecordItf,
             EEngineItf
+*/
+            EMediaPlayer = 4
             };
 
     protected:  // Data
@@ -256,6 +433,22 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
         //?data_declaration;
 
     private:    // Data
+        
+        // reference to TestModuleIf
+        CTestModuleIf& iTestModuleIf;
+        // Active object with a timer to timeout the test case
+        CSimpleTimeout * iTimeoutController;
+
+        // Indicates if the test case use a normal exit reason
+        TBool iNormalExitReason;
+
+        // List of expected events
+        RArray<TOMXExpectedEvent> iExpectedEvents;
+
+        // List of notification event (by the callback)
+        RArray<TOMXExpectedEvent> iOcurredEvents;
+        
+        
         XAboolean     required[MAX_NUMBER_INTERFACES]; 
         XAInterfaceID iidArray[MAX_NUMBER_INTERFACES]; 
         XAEngineOption EngineOption[MAX_NUMBER_OPTIONS];
@@ -271,31 +464,44 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
         XAObjectItf m_MOLEDObject;
         XAObjectItf m_MORadioObject;
         XAObjectItf m_MOCameraObject;
+
+        XAPlayItf m_PlayItf;
+        XASeekItf m_SeekItf;
+        XADynamicSourceItf m_DynSrcItf;
         
+        XAVolumeItf m_VolumeItf;
+        XANokiaLinearVolumeItf  m_NokiaLinearVolumeItf;
+        XANokiaVolumeExtItf m_NokiaVolumeExtItf;
         
         XADynamicInterfaceManagementItf m_DIMItf;
-        
+        XAStreamInformationItf m_StrInfoItf;
         
         XAEngineItf m_EngineItf;
         XAAudioIODeviceCapabilitiesItf m_AIODevCapItf;
         XAAudioEncoderCapabilitiesItf m_AEncCapItf;
         XAAudioEncoderItf m_AudEncItf;
         XAMetadataInsertionItf m_MetadataInsertionItf;
+        XAMetadataExtractionItf m_MetadataExtractionItf;
         
         /*Audio Source*/
         XADataSource m_AudioSource;
-        XADataLocator_IODevice  m_IODevice;
+        XADataLocator_IODevice  m_SrcIODevice;
+        XADataLocator_IODevice  m_SinkIODevice;
 
         /*Image/Video Source*/
         XADataSource m_VideoSource;
        
         /*MetadataExtractor Source*/
         XADataSource m_MOMetadataExtractorSource;
+
+        /*Dynamic Source*/
+        XADataSource m_DynamicSource;
         
         /*Data Sink*/
         XADataSink m_DataSink;
         XADataSink m_AudioSink;
         XADataSink m_VideoSink;
+        XADataLocator_NativeDisplay m_NativeDisplay;
         XADataSink m_LEDSink;
         XADataSink m_VibraSink;
         
@@ -305,7 +511,12 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase
         
         XADataFormat_MIME m_Mime;
         HBufC8* m_MimeType;
-        
+
+        RWsSession iRwSession;
+        RWindowGroup iRwGroup;
+        RWindow iRWindow;
+        CWsScreenDevice* iDevice;
+
         // ?one_line_short_description_of_data
         //?data_declaration;
 

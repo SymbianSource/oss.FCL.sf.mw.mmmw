@@ -19,7 +19,7 @@
 #include <e32svr.h>
 #include <StifParser.h>
 #include <StifTestInterface.h>
-#include <systemtoneservice.h>
+#include <StifTestEventInterface.h>
 #include "systemtoneservicestif.h"
 
 
@@ -34,9 +34,9 @@ TInt CSystemToneServiceStif::RunMethodL(CStifItemParser& aItem )
         // Second is the actual implementation member function.
         ENTRY( "Create", CSystemToneServiceStif::CreateSystemToneService ),
         ENTRY( "Delete", CSystemToneServiceStif::DeleteSystemToneService ),
-        ENTRY( "PlayTone", CSystemToneServiceStif::PlaySystemToneService ),
-        ENTRY( "PlayToneWithContext", CSystemToneServiceStif::PlaySystemToneServiceWithContext ),
-        ENTRY( "StopTone", CSystemToneServiceStif::StopSystemToneService ),
+        ENTRY( "PlayTone", CSystemToneServiceStif::PlayTone ),
+        ENTRY( "PlayAlarm", CSystemToneServiceStif::PlayAlarm ),
+        ENTRY( "StopAlarm", CSystemToneServiceStif::StopAlarm ),
         
 
 
@@ -119,7 +119,7 @@ TInt CSystemToneServiceStif::DeleteSystemToneService( )
     }
     
     
-TInt CSystemToneServiceStif::PlaySystemToneService( CStifItemParser& aItem )
+TInt CSystemToneServiceStif::PlayTone( CStifItemParser& aItem )
     {
         // Print to UI
             _LIT( Ksystemtoneservicestif, "systemtoneservicestif" );
@@ -150,7 +150,7 @@ TInt CSystemToneServiceStif::PlaySystemToneService( CStifItemParser& aItem )
 }
 
 
-TInt CSystemToneServiceStif::PlaySystemToneServiceWithContext( CStifItemParser& aItem )
+TInt CSystemToneServiceStif::PlayAlarm( CStifItemParser& aItem )
     {
         // Print to UI
             _LIT( Ksystemtoneservicestif, "systemtoneservicestif" );
@@ -160,22 +160,22 @@ TInt CSystemToneServiceStif::PlaySystemToneServiceWithContext( CStifItemParser& 
             iLog->Log( KPrint );
             
                TInt lRetVal = KErrNone;
-               TInt toneType = 0;
+               TInt alarmType = 0;
 
-               lRetVal = aItem.GetNextInt(toneType);
+               lRetVal = aItem.GetNextInt(alarmType);
 
                if ( lRetVal != KErrNone )
                 {
                    iLog->Log(_L("CSystemToneServiceStif::PlaySystemToneService tone type missing in config file "));
                    iLog->Log(_L("Playing Default Tone"));
                    
-            iSts->PlayTone(CSystemToneService::EDefaultBeep, iCurrentContext);
+            iSts->PlayAlarm(CSystemToneService::EClockAlarm, iCurrentContext, *this);
         }
 			  else
         {
             //iSts->PlayTone(CSystemToneService::EClockAlarm, iCurrentContext);
-            iSts->PlayTone(CSystemToneService::TToneType(toneType), iCurrentContext);
-            iLog->Log(_L("CSystemToneService::TToneType(toneType) %d"),CSystemToneService::TToneType(toneType) );
+            iSts->PlayAlarm(CSystemToneService::TAlarmType(alarmType), iCurrentContext, *this);
+            iLog->Log(_L("CSystemToneService::TAlarmType(alarmType) %d"),CSystemToneService::TAlarmType(alarmType) );
         }
         
         return lRetVal;       
@@ -183,8 +183,15 @@ TInt CSystemToneServiceStif::PlaySystemToneServiceWithContext( CStifItemParser& 
         }
 
 
-TInt  CSystemToneServiceStif::StopSystemToneService(CStifItemParser& aItem  )
+TInt  CSystemToneServiceStif::StopAlarm(CStifItemParser& aItem  )
     {
+    // Print to UI
+          _LIT( Ksystemtoneservicestif, "systemtoneservicestif" );
+          _LIT( KPrint, "In StopSystemToneService" );
+          TestModuleIf().Printf( 0, Ksystemtoneservicestif, KPrint );
+          // Print to log file
+          iLog->Log( KPrint );
+          
     TPtrC StopType;
 		TInt error = KErrNone;
 		
@@ -195,15 +202,26 @@ TInt  CSystemToneServiceStif::StopSystemToneService(CStifItemParser& aItem  )
     {
 				iLog->Log(_L("Stop Tone with recognized context number"));
           
-        iSts->StopTone(iCurrentContext);
+        iSts->StopAlarm(iCurrentContext);
 		}
 		else
 		{
 		    iLog->Log(_L("Stop Tone with unrecognized context number"));
           
-        iSts->StopTone(iCurrentContext+1);
+        iSts->StopAlarm(iCurrentContext+1);
     }
     
     return error;
 }
+    
+void CSystemToneServiceStif::PlayAlarmComplete(unsigned int aAlarmContext)
+    {
+    if (aAlarmContext == iCurrentContext)
+        {
+        iPlayState = EStopped;
+        TEventIf event( TEventIf::ESetEvent, _L("Event_PlayAlarmComplete") );
+        TestModuleIf().Event( event );
+        
+        }
+    }  
 

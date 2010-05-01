@@ -18,12 +18,9 @@
 #ifndef XAEQUALIZERITF_H
 #define XAEQUALIZERITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_   
-#include "XAAdaptationContextBase.h"
-#include "XAEqualizerItfAdaptation.h"
-#endif
+#include "xaadptbasectx.h"
+#include "xaequalizeritfadaptation.h"
+
 /** MACROS **/
 /** TYPES **/
 
@@ -41,12 +38,12 @@ typedef struct XAEqualizerItfImpl_
     /* variables */
     XAboolean   enabled;
     XAuint16    preset;
-#ifdef _GSTREAMER_BACKEND_   
+   
     XAmillibel  levels[EQUALIZER_NUM_OF_BANDS];
     XAboolean   changeLevel[EQUALIZER_NUM_OF_BANDS];
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
+
 } XAEqualizerItfImpl;
 
 /** METHODS **/
@@ -90,10 +87,10 @@ XAresult XAEqualizerItfImpl_GetNumberOfPresets(XAEqualizerItf self,
 XAresult XAEqualizerItfImpl_GetPresetName(XAEqualizerItf self, XAuint16 index,
                                           const XAchar **ppName);
 
-#ifdef _GSTREAMER_BACKEND_  
+
 /* XAEqualizerItfImpl -specific methods */
 XAEqualizerItfImpl* XAEqualizerItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
-#endif
+
 void XAEqualizerItfImpl_Free(XAEqualizerItfImpl* self);
 
 #endif /* XAEQUALIZERITF_H */

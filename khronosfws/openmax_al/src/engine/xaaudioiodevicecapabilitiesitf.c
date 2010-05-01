@@ -22,9 +22,8 @@
 
 #include "xaglobals.h"
 #include "xaaudioiodevicecapabilitiesitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAStaticCapsAdaptation.h"
-#endif
+#include "xacapabilitiesmgr.h"
+
 
 static XAchar deviceName1[] = "Default Mic";
 
@@ -76,17 +75,15 @@ XAresult XAAudIODevCapaItfImpl_GetAvailableAudioInputs(
             }
             else
             {
-
-#ifdef _GSTREAMER_BACKEND_
                 XAuint32 i;
-                XAStaticCapsData temp;
+                XACapabilities temp;
                 for( i=0; i<impl->numInputDevices; i++ )
                 {
                     /* query device id from adaptation using index value */
-                    res = XAStaticCapsAdapt_GetCapsByIdx(XACAP_DEVSRC|XACAP_AUDIO, i, &temp);
+                    res = XACapabilitiesMgr_GetCapsByIdx(impl->capslist, (XACapsType)(XACAP_DEVSRC|XACAP_AUDIO), i, &temp);
                     pInputDeviceIDs[i] = temp.xaid;
                 }
-#endif
+
                 pInputDeviceIDs[0] = 0xAD7E5001;
             }
         }
@@ -105,6 +102,7 @@ XAresult XAAudIODevCapaItfImpl_QueryAudioInputCapabilities(
                                             XAAudioInputDescriptor* pDescriptor)
 {
     XAAudIODevCapaItfImpl* impl = GetImpl(self);
+    XACapabilities temp;
     XAresult res = XA_RESULT_SUCCESS;
     DEBUG_API("->XAAudIODevCapaItfImpl_QueryAudioInputCapabilities");
 
@@ -116,19 +114,20 @@ XAresult XAAudIODevCapaItfImpl_QueryAudioInputCapabilities(
     else
     {
         memset(pDescriptor,0,sizeof(XAAudioInputDescriptor));
-#ifdef _GSTREAMER_BACKEND_
-        /* query capabilities from adaptation using device id */
-        XAStaticCapsData temp;
 
-        res = XAStaticCapsAdapt_GetCapsById(XACAP_DEVSRC|XACAP_AUDIO, deviceId, &temp);
+        /* query capabilities from adaptation using device id */
+        
+
+        res = XACapabilitiesMgr_GetCapsById(impl->capslist, (XACapsType)(XACAP_DEVSRC|XACAP_AUDIO), deviceId, &temp);
         if( res == XA_RESULT_SUCCESS )
         {
+            XAAudioInputDescriptor* desc = ((XAAudioInputDescriptor*)(temp.pEntry));
             /* map applicable values to XAAudioCodecCapabilities */
-            pDescriptor->maxChannels=temp.maxCh;
-            pDescriptor->minSampleRate=temp.minSR*1000; /* milliHz */
-            if (temp.maxSR < (0xFFFFFFFF / 1000))
+            pDescriptor->maxChannels=desc->maxChannels;
+            pDescriptor->minSampleRate=desc->minSampleRate*1000; /* milliHz */
+            if (desc->maxSampleRate < (0xFFFFFFFF / 1000))
             {
-                pDescriptor->maxSampleRate = temp.maxSR*1000;
+                pDescriptor->maxSampleRate = desc->maxSampleRate*1000;
             }
             else
             {
@@ -141,7 +140,7 @@ XAresult XAAudIODevCapaItfImpl_QueryAudioInputCapabilities(
             pDescriptor->deviceName = temp.adaptId;
             /* other caps undefined */
         }
-#endif
+
         switch (deviceId)
                 {
                 case 0xAD7E5001:
@@ -242,16 +241,16 @@ XAresult XAAudIODevCapaItfImpl_GetAvailableAudioOutputs(
             else
             {
 
-#ifdef _GSTREAMER_BACKEND_
+
                 XAuint32 i = 0;
-                XAStaticCapsData temp;
+                XACapabilities temp;
                 for( i=0; i<impl->numOutputDevices; i++ )
                 {
                     /* query device id from adaptation using index value */
-                    res = XAStaticCapsAdapt_GetCapsByIdx(XACAP_DEVSNK|XACAP_AUDIO, i, &temp);
+                    res = XACapabilitiesMgr_GetCapsByIdx(impl->capslist, (XACapsType)(XACAP_DEVSNK|XACAP_AUDIO), i, &temp);
                     pOutputDeviceIDs[i] = temp.xaid;
                 }
-#endif
+
                 pOutputDeviceIDs[0] = 0xAD7E5002;
             }
         }
@@ -272,6 +271,7 @@ XAresult XAAudIODevCapaItfImpl_QueryAudioOutputCapabilities(
 
     XAAudIODevCapaItfImpl* impl = GetImpl(self);
     XAresult res = XA_RESULT_SUCCESS;
+    XACapabilities temp;
     DEBUG_API("->XAAudIODevCapaItfImpl_QueryAudioOutputCapabilities");
 
     if( !impl || !pDescriptor )
@@ -283,18 +283,19 @@ XAresult XAAudIODevCapaItfImpl_QueryAudioOutputCapabilities(
     {
         memset(pDescriptor,0,sizeof(XAAudioOutputDescriptor));
         /* query capabilities from adaptation using device id */
-#ifdef _GSTREAMER_BACKEND_
-        XAStaticCapsData temp;
 
-        res = XAStaticCapsAdapt_GetCapsById(XACAP_DEVSNK|XACAP_AUDIO, deviceId, &temp);
+        
+
+        res = XACapabilitiesMgr_GetCapsById(impl->capslist, (XACapsType)(XACAP_DEVSNK|XACAP_AUDIO), deviceId, &temp);
         if( res == XA_RESULT_SUCCESS )
         {
+            XAAudioOutputDescriptor* desc = ((XAAudioOutputDescriptor*)(temp.pEntry));
             /* map applicable values to XAAudioCodecCapabilities */
-            pDescriptor->maxChannels=temp.maxCh;
-            pDescriptor->minSampleRate=temp.minSR*1000; /* milliHz */
-            if (temp.maxSR < (0xFFFFFFFF / 1000))
+            pDescriptor->maxChannels=desc->maxChannels;
+            pDescriptor->minSampleRate=desc->minSampleRate*1000; /* milliHz */
+            if (desc->maxSampleRate < (0xFFFFFFFF / 1000))
             {
-                pDescriptor->maxSampleRate = temp.maxSR*1000;
+                pDescriptor->maxSampleRate = desc->maxSampleRate*1000;
             }
             else
             {
@@ -307,7 +308,7 @@ XAresult XAAudIODevCapaItfImpl_QueryAudioOutputCapabilities(
             pDescriptor->pDeviceName = temp.adaptId;
             /* other caps undefined */
         }
-#endif
+
 
         switch (deviceId)
                 {
@@ -427,15 +428,15 @@ XAresult XAAudIODevCapaItfImpl_GetAssociatedAudioInputs(
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-        XAStaticCapsData temp;
+
+        XACapabilities temp;
         XAuint32 associatedCount = 0;
 
         XAuint32 i = 0;
         for( i=0; i<impl->numInputDevices; i++ )
         {
             /* query device id from adaptation using index value */
-            res = XAStaticCapsAdapt_GetCapsByIdx(XACAP_DEVSRC|XACAP_AUDIO, i, &temp);
+            res = XACapabilitiesMgr_GetCapsByIdx(impl->capslist, (XACapsType)(XACAP_DEVSRC|XACAP_AUDIO), i, &temp);
             if (temp.xaid != deviceId)
             {
                 associatedCount++;
@@ -454,7 +455,7 @@ XAresult XAAudIODevCapaItfImpl_GetAssociatedAudioInputs(
             for( i=0, associatedCount = 0; i<impl->numInputDevices; i++ )
             {
                 /* query device id from adaptation using index value */
-                res = XAStaticCapsAdapt_GetCapsByIdx(XACAP_DEVSRC|XACAP_AUDIO, i, &temp);
+                res = XACapabilitiesMgr_GetCapsByIdx(impl->capslist, (XACapsType)(XACAP_DEVSRC|XACAP_AUDIO), i, &temp);
                 if (temp.xaid != deviceId)
                 {
                     pAudioInputDeviceIDs[associatedCount++] = temp.xaid;
@@ -463,7 +464,7 @@ XAresult XAAudIODevCapaItfImpl_GetAssociatedAudioInputs(
         }
 
         *pNumAudioInputs = associatedCount;
-#endif
+
 
     if(!pAudioInputDeviceIDs)
         {
@@ -523,15 +524,15 @@ XAresult XAAudIODevCapaItfImpl_GetAssociatedAudioOutputs(
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-        XAStaticCapsData temp;
+
+        XACapabilities temp;
         XAuint32 associatedCount = 0;
 
         XAuint32 i = 0;
         for( i=0; i<impl->numOutputDevices; i++ )
         {
             /* query device id from adaptation using index value */
-            res = XAStaticCapsAdapt_GetCapsByIdx(XACAP_DEVSNK|XACAP_AUDIO, i, &temp);
+            res = XACapabilitiesMgr_GetCapsByIdx(impl->capslist, (XACapsType)(XACAP_DEVSNK|XACAP_AUDIO), i, &temp);
             if (temp.xaid != deviceId)
             {
                 associatedCount++;
@@ -550,7 +551,7 @@ XAresult XAAudIODevCapaItfImpl_GetAssociatedAudioOutputs(
             for( i=0, associatedCount = 0; i<impl->numOutputDevices; i++ )
             {
                 /* query device id from adaptation using index value */
-                res = XAStaticCapsAdapt_GetCapsByIdx(XACAP_DEVSNK|XACAP_AUDIO, i, &temp);
+                res = XACapabilitiesMgr_GetCapsByIdx(impl->capslist, (XACapsType)(XACAP_DEVSNK|XACAP_AUDIO), i, &temp);
                 if (temp.xaid != deviceId)
                 {
                     pAudioOutputDeviceIDs[associatedCount++] = temp.xaid;
@@ -559,7 +560,7 @@ XAresult XAAudIODevCapaItfImpl_GetAssociatedAudioOutputs(
         }
 
         *pNumAudioOutputs = associatedCount;
-#endif
+
 
         if(!pAudioOutputDeviceIDs)
             {
@@ -674,18 +675,19 @@ XAresult XAAudIODevCapaItfImpl_QuerySampleFormatsSupported(
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-        XAStaticCapsData temp;
-        res = XAStaticCapsAdapt_GetCapsById(XACAP_DEVSNK|XACAP_AUDIO,
+
+/*        XACapabilities temp;
+        res = XACapabilitiesMgr_GetCapsById(NULL, (XACapsType)(XACAP_DEVSNK|XACAP_AUDIO),
                                             deviceId, &temp);
-        /* deviceid can be either input or output*/
+         deviceid can be either input or output
         if( res == XA_RESULT_FEATURE_UNSUPPORTED )
         {
-            res = XAStaticCapsAdapt_GetCapsById(XACAP_DEVSRC|XACAP_AUDIO,
+            res = XACapabilitiesMgr_GetCapsById(NULL, (XACapsType)(XACAP_DEVSRC|XACAP_AUDIO),
                                                 deviceId, &temp);
         }
         if( res == XA_RESULT_SUCCESS )
         {
+            XAAudioOutputDescriptor* desc = ((XAAudioOutputDescriptor*)(temp.pEntry));
             XAuint32 count = 0, i = 0;
             for (i=0; i < sizeof(temp.pcmProfilesSupported)*8; i++)
                 count+=temp.pcmProfilesSupported>>i&0x1;
@@ -714,8 +716,8 @@ XAresult XAAudIODevCapaItfImpl_QuerySampleFormatsSupported(
                 }
             }
             *pNumOfSampleFormats = count;
-        }
-#endif
+        }*/
+
 
     if(!pSampleFormats)
         {
@@ -739,7 +741,7 @@ XAresult XAAudIODevCapaItfImpl_QuerySampleFormatsSupported(
 /* XAAudIODevCapaItfImpl_Create
  * Description: Allocate and initialize XAAudIODevCapaItfImpl
  */
-XAAudIODevCapaItfImpl* XAAudIODevCapaItfImpl_Create()
+XAAudIODevCapaItfImpl* XAAudIODevCapaItfImpl_Create(XACapabilities* caps)
 {
     XAAudIODevCapaItfImpl* self = (XAAudIODevCapaItfImpl*)
         calloc(1,sizeof(XAAudIODevCapaItfImpl));
@@ -770,13 +772,16 @@ XAAudIODevCapaItfImpl* XAAudIODevCapaItfImpl_Create()
             XAAudIODevCapaItfImpl_RegisterAvailableAudioOutputsChangedCallback;
         self->itf.RegisterDefaultDeviceIDMapChangedCallback =
             XAAudIODevCapaItfImpl_RegisterDefaultDeviceIDMapChangedCallback;
-#ifdef _GSTREAMER_BACKEND_
+        self->capslist = caps;
         /* init variables */
-        assert( XAStaticCapsAdapt_GetCapsCount( XACAP_DEVSNK|XACAP_AUDIO,
-                                  &(self->numOutputDevices) ) == XA_RESULT_SUCCESS );
-        assert( XAStaticCapsAdapt_GetCapsCount( XACAP_DEVSRC|XACAP_AUDIO,
-                                  &(self->numInputDevices) ) == XA_RESULT_SUCCESS );
-#endif
+        XACapabilitiesMgr_GetCapsCount( caps, (XACapsType)(XACAP_DEVSNK|XACAP_AUDIO),
+                                  &(self->numOutputDevices) );
+        XACapabilitiesMgr_GetCapsCount( caps, (XACapsType)(XACAP_DEVSRC|XACAP_AUDIO),
+                                  &(self->numInputDevices) );
+        
+        /*TODO: Remove this later*/
+        XACapabilitiesMgr_QueryColorFormats(caps, NULL, NULL);
+
         self->inputCbPtrToSelf = NULL;
         self->outputCbPtrToSelf = NULL;
         self->deviceMapCbPtrToSelf = NULL;

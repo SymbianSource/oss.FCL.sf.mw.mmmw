@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xaequalizeritf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAEqualizerItfAdaptation.h"
-#endif
+
+#include "xaequalizeritfadaptation.h"
+
 static const XAuint16 equalizerNumOfPresets = 0;
 
 /**
@@ -53,7 +53,7 @@ XAresult XAEqualizerItfImpl_SetEnabled(XAEqualizerItf self,XAboolean enabled)
 {
     XAresult ret = XA_RESULT_SUCCESS;
     XAEqualizerItfImpl* impl = GetImpl(self);
-    
+    XAuint16 index = 0;
     DEBUG_API("->XAEqualizerItfImpl_SetEnabled");
 
     if(!impl)
@@ -63,15 +63,15 @@ XAresult XAEqualizerItfImpl_SetEnabled(XAEqualizerItf self,XAboolean enabled)
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_
-    XAuint16 index = 0;
+
+
     if(enabled && !(impl->enabled))
     {
         for(index = 0; index < EQUALIZER_NUM_OF_BANDS; index++)
         {
             if(impl->changeLevel[index])
             {
-                ret = XAEqualizerItfAdapt_SetBandLevel(impl->adapCtx, index, impl->levels[index]);
+                ret = XAEqualizerItfAdapt_SetBandLevel((XAAdaptationGstCtx*)impl->adapCtx, index, impl->levels[index]);
 
                 if(XA_RESULT_SUCCESS == ret)
                 {
@@ -84,7 +84,7 @@ XAresult XAEqualizerItfImpl_SetEnabled(XAEqualizerItf self,XAboolean enabled)
     {
         for(index = 0; index < EQUALIZER_NUM_OF_BANDS; index++)
         {
-            ret = XAEqualizerItfAdapt_SetBandLevel(impl->adapCtx, index, EQUALIZER_DEFAULT_BAND_LEVEL);
+            ret = XAEqualizerItfAdapt_SetBandLevel((XAAdaptationGstCtx*)impl->adapCtx, index, EQUALIZER_DEFAULT_BAND_LEVEL);
 
             if(XA_RESULT_SUCCESS == ret)
             {
@@ -96,7 +96,7 @@ XAresult XAEqualizerItfImpl_SetEnabled(XAEqualizerItf self,XAboolean enabled)
     {
         /* do nothing */
     }
-#endif
+
     if(ret == XA_RESULT_SUCCESS)
     {
         impl->enabled = enabled;
@@ -152,9 +152,9 @@ XAresult XAEqualizerItfImpl_GetNumberOfBands(XAEqualizerItf self,
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+
     *pNumBands = EQUALIZER_NUM_OF_BANDS;
-#endif
+
     DEBUG_API("<-XAEqualizerItfImpl_GetNumberOfBands");
     return ret;
 }
@@ -180,16 +180,16 @@ XAresult XAEqualizerItfImpl_GetBandLevelRange(XAEqualizerItf self,
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAEqualizerItfAdapt_ThreadEntry(impl->adapCtx);
+
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAEqualizerItfImpl_GetBandLevelRange");
         return ret;
     }
-    ret = XAEqualizerItfAdapt_GetBandLevelRange(impl->adapCtx, pMin, pMax);
-    XAEqualizerItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    ret = XAEqualizerItfAdapt_GetBandLevelRange((XAAdaptationGstCtx*)impl->adapCtx, pMin, pMax);
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAEqualizerItfImpl_GetBandLevelRange");
     return ret;
 }
@@ -236,8 +236,8 @@ XAresult XAEqualizerItfImpl_SetBandLevel(XAEqualizerItf self, XAuint16 band,
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAEqualizerItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID  || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAEqualizerItfImpl_SetBandLevel");
@@ -246,7 +246,7 @@ XAresult XAEqualizerItfImpl_SetBandLevel(XAEqualizerItf self, XAuint16 band,
 
     if(impl->enabled)
     {
-        ret = XAEqualizerItfAdapt_SetBandLevel(impl->adapCtx, band, level);
+        ret = XAEqualizerItfAdapt_SetBandLevel((XAAdaptationGstCtx*)impl->adapCtx, band, level);
         if(XA_RESULT_SUCCESS == ret)
         {
             impl->levels[band] = level;
@@ -258,8 +258,8 @@ XAresult XAEqualizerItfImpl_SetBandLevel(XAEqualizerItf self, XAuint16 band,
         impl->levels[band] = level;
     }
 
-    XAEqualizerItfAdapt_ThreadExit(impl->adapCtx);
-#endif    
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAEqualizerItfImpl_SetBandLevel");
     return ret;
 }
@@ -273,9 +273,10 @@ XAresult XAEqualizerItfImpl_GetBandLevel(XAEqualizerItf self, XAuint16 band,
                                          XAmillibel *pLevel)
 {
     XAresult ret = XA_RESULT_SUCCESS;
-    DEBUG_API("->XAEqualizerItfImpl_GetBandLevel");
-#ifdef _GSTREAMER_BACKEND_  
+    
     XAEqualizerItfImpl* impl = GetImpl(self);
+    DEBUG_API("->XAEqualizerItfImpl_GetBandLevel");
+
     if(!impl || !pLevel ||  band >= EQUALIZER_NUM_OF_BANDS)
     {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
@@ -285,7 +286,6 @@ XAresult XAEqualizerItfImpl_GetBandLevel(XAEqualizerItf self, XAuint16 band,
     }
 
     *pLevel = impl->levels[band];
-#endif
     DEBUG_API("<-XAEqualizerItfImpl_GetBandLevel");
     return ret;
 }
@@ -309,17 +309,17 @@ XAresult XAEqualizerItfImpl_GetCenterFreq(XAEqualizerItf self, XAuint16 band,
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAEqualizerItfAdapt_ThreadEntry(impl->adapCtx);
+
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAEqualizerItfImpl_GetCenterFreq");
         return ret;
     }
-    ret = XAEqualizerItfAdapt_GetCenterFreq(impl->adapCtx, band, pCenter);
+    ret = XAEqualizerItfAdapt_GetCenterFreq((XAAdaptationGstCtx*)impl->adapCtx, band, pCenter);
 
-    XAEqualizerItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAEqualizerItfImpl_GetCenterFreq");
     return ret;
 }
@@ -356,17 +356,17 @@ XAresult XAEqualizerItfImpl_GetBandFreqRange(XAEqualizerItf self, XAuint16 band,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAEqualizerItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAEqualizerItfImpl_GetBandFreqRange");
         return ret;
     }
-    ret = XAEqualizerItfAdapt_GetBandFreqRange(impl->adapCtx, band, pMin, pMax);
+    ret = XAEqualizerItfAdapt_GetBandFreqRange((XAAdaptationGstCtx*)impl->adapCtx, band, pMin, pMax);
 
-    XAEqualizerItfAdapt_ThreadExit(impl->adapCtx);
-#endif    
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+  
     DEBUG_API("<-XAEqualizerItfImpl_GetBandFreqRange");
     return ret;
 }
@@ -392,17 +392,17 @@ XAresult XAEqualizerItfImpl_GetBand(XAEqualizerItf self, XAmilliHertz frequency,
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAEqualizerItfAdapt_ThreadEntry(impl->adapCtx);
+  
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAEqualizerItfImpl_GetBand");
         return ret;
     }
-    ret = XAEqualizerItfAdapt_GetBand(impl->adapCtx, frequency, pBand);
+    ret = XAEqualizerItfAdapt_GetBand((XAAdaptationGstCtx*)impl->adapCtx, frequency, pBand);
 
-    XAEqualizerItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAEqualizerItfImpl_GetBand");
     return ret;
 }
@@ -541,7 +541,7 @@ XAresult XAEqualizerItfImpl_GetPresetName(XAEqualizerItf self, XAuint16 index,
 /**
  * XAEqualizerItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_  
+ 
 
 /**
  * XAEqualizerItfImplImpl* XAEqualizerItfImpl_Create()
@@ -591,7 +591,7 @@ XAEqualizerItfImpl* XAEqualizerItfImpl_Create(XAAdaptationBaseCtx *adapCtx)
     DEBUG_API("<-XAEqualizerItfImpl_Create");
     return self;
 }
-#endif
+
 /**
  * void XAEqualizerItfImpl_Free(XAEqualizerItfImpl* self)
  * @param  XAEqualizerItfImpl* self -

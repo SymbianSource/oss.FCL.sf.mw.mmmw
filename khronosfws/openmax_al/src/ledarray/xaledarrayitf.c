@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xaledarrayitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XALEDArrayItfAdaptation.h"
-#endif
+  
+#include "xaledarrayitfadaptation.h"
+
 #include "xathreadsafety.h"
 
 /* XALEDArrayItfImpl* GetImpl(XALEDArrayItf self)
@@ -69,9 +69,9 @@ XAresult XALEDArrayItfImpl_ActivateLEDArray ( XALEDArrayItf self,
     /* check is ligtMask mode changed */
     if( impl->lightMask != lightMask )
     {
-#ifdef _GSTREAMER_BACKEND_  
-        ret = XALEDArrayItfAdapt_ActivateLEDArray( impl->adapCtx, lightMask );
-#endif
+  
+        ret = XALEDArrayItfAdapt_ActivateLEDArray( (XAAdaptationGstCtx*)impl->adapCtx, lightMask );
+
         if ( ret == XA_RESULT_SUCCESS )
         {
             impl->lightMask = lightMask;
@@ -152,9 +152,9 @@ XAresult XALEDArrayItfImpl_SetColor ( XALEDArrayItf self,
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_  
-        ret = XALEDArrayItfAdapt_SetColor( impl->adapCtx, index, pColor);
-#endif
+  
+        ret = XALEDArrayItfAdapt_SetColor( (XAAdaptationGstCtx*)impl->adapCtx, index, pColor);
+
         if ( ret == XA_RESULT_SUCCESS )
         {
             impl->color = *pColor;
@@ -208,7 +208,7 @@ XAresult XALEDArrayItfImpl_GetColor ( XALEDArrayItf self,
 /*****************************************************************************
  * XALEDArrayItfImpl -specific methods
  *****************************************************************************/
-#ifdef _GSTREAMER_BACKEND_  
+  
 
 /* XALEDArrayItfImpl* XALEDArrayItfImpl_Create()
  * Description: Allocate and initialize LEDArrayItfImpl
@@ -239,7 +239,7 @@ XALEDArrayItfImpl* XALEDArrayItfImpl_Create( XAAdaptationBaseCtx *adapCtx )
     DEBUG_API("<-XALEDArrayItfImpl_Create");
     return self;
 }
-#endif
+
 /* void XALEDArrayItfImpl_Free(XALEDArrayItfImpl* self)
  * Description: Free all resources reserved at XALEDArrayItfImpl_Create
  */

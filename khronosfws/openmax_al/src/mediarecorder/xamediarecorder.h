@@ -21,10 +21,8 @@
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
 #include "xaobjectitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAMediaRecorderAdaptCtx.h"
-#endif
-#include "xamediarecorderadaptctxmmf.h"
+#include "xaadptbasectx.h"
+#include "xacapabilitiesmgr.h"
 
 /** MACROS **/
 
@@ -67,12 +65,7 @@ typedef struct XAMediaRecorderImpl_
     XADataSource *imageVideoSrc;
     XADataSink *dataSnk;
     XAuint8 recModes;
-    XAboolean isMMFRecord;    
-
-#ifdef _GSTREAMER_BACKEND_
     XAAdaptationBaseCtx* adaptationCtx;
-#endif
-    XAAdaptationBaseMMFCtx* adaptationCtxMMF;    
 
 } XAMediaRecorderImpl;
 
@@ -84,8 +77,6 @@ XAresult    XAMediaRecorderImpl_DoRealize(XAObjectItf self);
 XAresult    XAMediaRecorderImpl_DoResume(XAObjectItf self);
 void        XAMediaRecorderImpl_FreeResources(XAObjectItf self);
 
-
-XAresult XAMediaRecorderImpl_DetermineRecordEngine(XAObjectItf self, XADataLocator_URI *uri);
 
 /* MediaRecorderImpl -specific methods*/
 XAresult XAMediaRecorderImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry  );

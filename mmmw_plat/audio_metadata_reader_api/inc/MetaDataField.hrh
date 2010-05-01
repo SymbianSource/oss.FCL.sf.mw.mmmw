@@ -22,38 +22,40 @@
 
 // DATA TYPES
 enum TMetaDataFieldId		// Possible metadata fields
-	{
-	EUnknownMetaDataField = 0,
+    {
+    EUnknownMetaDataField = 0,
 
-	EMetaDataSongTitle = 1,
-	EMetaDataArtist,
-	EMetaDataAlbum,
-	EMetaDataYear,
-	EMetaDataComment,
-	EMetaDataAlbumTrack,
-	EMetaDataGenre,
-	EMetaDataComposer,
-	EMetaDataCopyright,
-	EMetaDataOriginalArtist,
-	EMetaDataUrl,
-	EMetaDataUserUrl,
-	EMetaDataJpeg,
-	EMetaDataVendor,
-	EMetaDataRating,
-	EMetaDataUniqueFileIdentifier,
-	EMetaDataDuration,
-	EMetaDataDate,
-	EMetaDataUnsyncLyrics
-	// More later...
-	};
+    EMetaDataSongTitle = 1,
+    EMetaDataArtist,
+    EMetaDataAlbum,
+    EMetaDataYear,
+    EMetaDataComment,
+    EMetaDataAlbumTrack,
+    EMetaDataGenre,
+    EMetaDataComposer,
+    EMetaDataCopyright,
+    EMetaDataOriginalArtist,
+    EMetaDataUrl,
+    EMetaDataUserUrl,
+    EMetaDataJpeg,
+    EMetaDataVendor,
+    EMetaDataRating,
+    EMetaDataUniqueFileIdentifier,
+    EMetaDataDuration,
+    EMetaDataDate,
+    EMetaDataUnsyncLyrics,
+    EMetaDataProtected        // get the Protected info, "0"=non protected, "1"=protected
+	
+    // More later...
+    };
 
 // ENUM for ID3 Version
 enum TID3Version
-	{
-	ENonID3,
-	EID3Version1,
-	EID3Version2
-	};
+    {
+    ENonID3,
+    EID3Version1,
+    EID3Version2
+    };
 
 #endif      // CMETADATAFIELD_HRH
 

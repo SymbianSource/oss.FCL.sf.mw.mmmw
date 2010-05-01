@@ -26,6 +26,8 @@ PRJ_EXPORTS
 #ifdef FF_OPENMAX_AL
 ../data/openmax_al_stub.sis /epoc32/data/z/system/install/openmax_al_stub.sis
 ../rom/openmax_al.iby       CORE_MW_LAYER_IBY_EXPORT_PATH(openmax_al.iby)
+../data/openmaxal.cfg       /epoc32/winscw/c/openmaxal/openmaxal.cfg
+
 #endif
 
 PRJ_MMPFILES

@@ -21,8 +21,8 @@
 
 #include "openmaxalwrapper.h"
 #include "openmaxal_iid.c"
-#include "common/xaglobals.h"
-
+#include "xaglobals.h"
+#include "xaobjects.h"
 
 EXPORT_C XAresult XAAPIENTRY xaCreateEngine(XAObjectItf *pEngine, XAuint32 numOptions,
                                    const XAEngineOption *pEngineOptions,

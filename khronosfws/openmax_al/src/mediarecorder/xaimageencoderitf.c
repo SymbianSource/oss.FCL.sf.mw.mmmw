@@ -20,12 +20,11 @@
 #include <assert.h>
 #include <string.h>
 #include "xaimageencoderitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAImageEncoderItfAdaptation.h"
-#include "XARecordItfAdaptation.h"
-#include "XAStaticCapsAdaptation.h"
-#endif
+
+#include "xaimageencoderitfadaptation.h"
+#include "xarecorditfadaptation.h"
 #include "xathreadsafety.h"
+#include "xacapabilitiesmgr.h"
 
 #define APPROX_MAXRATIO (90/100)
 
@@ -56,8 +55,7 @@ XAresult XAImageEncoderItfImpl_SetImageSettings(XAImageEncoderItf self,
                                                 const XAImageSettings *pSettings)
 {
     XAresult res = XA_RESULT_SUCCESS;
-#ifdef _GSTREAMER_BACKEND_
-    XAStaticCapsData temp;
+    XACapabilities temp;
     XAImageEncoderItfImpl *impl = GetImpl(self);
 
     DEBUG_API("->XAImageEncoderItfImpl_SetImageSettings");
@@ -71,19 +69,22 @@ XAresult XAImageEncoderItfImpl_SetImageSettings(XAImageEncoderItf self,
         DEBUG_API("<-XAImageEncoderItfImpl_SetImageSettings");
         return XA_RESULT_PARAMETER_INVALID;
     }
-    res = XAStaticCapsAdapt_GetCapsById(XACAP_ENCODER|XACAP_IMAGE, pSettings->encoderId, &temp);
-    if( res == XA_RESULT_SUCCESS )
-    {
-        res = XAImageEncoderItfAdapt_SetImageSettings(impl->adaptCtx, pSettings);
-    }
-    else
-    {
-        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
-        DEBUG_API("<-XAImageEncoderItfImpl_SetImageSettings");
-        return XA_RESULT_FEATURE_UNSUPPORTED;
-    }
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        res = XACapabilitiesMgr_GetCapsById(NULL, (XACapsType)(XACAP_ENCODER|XACAP_IMAGE), pSettings->encoderId, &temp);
+        if( res == XA_RESULT_SUCCESS )
+            {
+            res = XAImageEncoderItfAdapt_SetImageSettings((XAAdaptationGstCtx*)impl->adaptCtx, pSettings);
+            }
+        else
+            {
+            DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+            res = XA_RESULT_FEATURE_UNSUPPORTED;
+            }
+        }
+    
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
-#endif
+
     DEBUG_API("<-XAImageEncoderItfImpl_SetImageSettings");
     return res;
 }
@@ -105,9 +106,17 @@ XAresult XAImageEncoderItfImpl_GetImageSettings(XAImageEncoderItf self,
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_
-    res = XAImageEncoderItfAdapt_GetImageSettings(impl->adaptCtx, pSettings);
-#endif
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        res = XAImageEncoderItfAdapt_GetImageSettings((XAAdaptationGstCtx*)impl->adaptCtx, pSettings);
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XAImageEncoderItfImpl_GetImageSettings");
+        return XA_RESULT_FEATURE_UNSUPPORTED;    
+        }
+
     DEBUG_API("<-XAImageEncoderItfImpl_GetImageSettings");
     return res;
 }
@@ -133,9 +142,17 @@ XAresult XAImageEncoderItfImpl_GetSizeEstimate(XAImageEncoderItf self,
     }
     /* calculate size estimate */
 
-#ifdef _GSTREAMER_BACKEND_
-    XAImageEncoderItfAdapt_GetImageSettings(impl->adaptCtx, &curSettings);
-#endif
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        XAImageEncoderItfAdapt_GetImageSettings((XAAdaptationGstCtx*)impl->adaptCtx, &curSettings);
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XAImageEncoderItfImpl_GetSizeEstimate");
+        return XA_RESULT_FEATURE_UNSUPPORTED;   
+        }
+    
     switch(curSettings.colorFormat)
     {
         case XA_COLORFORMAT_MONOCHROME:
@@ -221,26 +238,25 @@ XAresult XAImageEncoderItfImpl_GetSizeEstimate(XAImageEncoderItf self,
 /* XAImageEncoderItfImpl* XAImageEncoderItfImpl_Create()
  * Description: Allocate and initialize ImageEncoderItfImpl
  */
-XAImageEncoderItfImpl* XAImageEncoderItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adaptCtx
-#endif
-        )
+XAImageEncoderItfImpl* XAImageEncoderItfImpl_Create(XAMediaRecorderImpl* impl)
 {
     XAImageEncoderItfImpl* self = (XAImageEncoderItfImpl*)
         calloc(1,sizeof(XAImageEncoderItfImpl));
+    //XAMediaRecorderAdaptationCtx* mCtx = (XAMediaRecorderAdaptationCtx*)(impl->adaptationCtx);
+    
     DEBUG_API("->XAImageEncoderItfImpl_Create");
     if( self )
     {
-        /* init itf default implementation */
-        self->itf.GetImageSettings = XAImageEncoderItfImpl_GetImageSettings;
-        self->itf.SetImageSettings = XAImageEncoderItfImpl_SetImageSettings;
-        self->itf.GetSizeEstimate = XAImageEncoderItfImpl_GetSizeEstimate;
+        //if(mCtx->fwtype == FWMgrFWGST)
+            {
+            /* init itf default implementation */
+            self->itf.GetImageSettings = XAImageEncoderItfImpl_GetImageSettings;
+            self->itf.SetImageSettings = XAImageEncoderItfImpl_SetImageSettings;
+            self->itf.GetSizeEstimate = XAImageEncoderItfImpl_GetSizeEstimate;
+            }
 
         /* init variables */
-#ifdef _GSTREAMER_BACKEND_
-        self->adaptCtx = adaptCtx;
-#endif        
+        self->adaptCtx = impl->adaptationCtx;
         
         self->self = self;
     }

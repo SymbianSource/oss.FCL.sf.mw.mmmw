@@ -491,6 +491,8 @@ void CRadioServer::TunerOnComplete(
     {
     RADIO_RDEBUG_INT3(_L("[RADIO-SVR] TunerOnComplete(%d) State[%d] Trigger[%d]"), aError, iState, iTunerOnTrigger);
     TFourCC radioFourCC;
+    // TBool antennaStatus = iSettings->IsAntennaAttached();
+    
     switch ( iTunerOnTrigger )
         {
         case ETriggerTunerControl:
@@ -559,10 +561,13 @@ void CRadioServer::TunerOnComplete(
             if ( aError == KErrNone )
                 {
                 iState = EStateTunerOn;
-                // AK - begin: to cause publishing (CPHU-73YTQW)
-                iSettings->SetAntennaStatus(EFalse, EFalse);
-                // - end
-                iSettings->SetAntennaStatus(ETrue);
+                if ( iSettings->IsAntennaAttached() )
+                    {
+                    // AK - begin: to cause publishing (CPHU-73YTQW)
+                    iSettings->SetAntennaStatus(EFalse, EFalse);
+                    // - end
+                    iSettings->SetAntennaStatus(ETrue);
+                    }
                 }
             // else
                 // Unable to turn the tuner back on. It's possible that after TunerOn request
@@ -593,6 +598,14 @@ void CRadioServer::TunerOnComplete(
             break;
         default:
             break;
+        }
+    
+    if ( iSettings->IsAntennaAttached() == EFalse )
+        {
+        // antenna removed during TunerOn sequence, request TunerOff
+        // can not shutdown totally in TunerOffComplete thus set iState to EStateTunerOff
+        iState = EStateTunerOff;
+        iTunerControl->TunerOff();    
         }
     }
 
@@ -648,13 +661,14 @@ void CRadioServer::TunerOffComplete(
                     CompleteAsyncRequest(aError);
                     }
                 }
+            else if( aError == KRadioServErrDuplicateRequest )
+                {
+                // tuner off and duplicate request going on, trace it out
+                RADIO_RDEBUG(_L("[RADIO-SVR] TunerOffComplete() - EStateTunerOff - KRadioServErrDuplicateRequest"));
+                }
             else
                 {
-                if( aError == KRadioServErrDuplicateRequest )
-                    {
-                    // tuner off and duplicate request going on, trace it out
-                    RADIO_RDEBUG(_L("[RADIO-SVR] TunerOffComplete() - EStateTunerOff - KRadioServErrDuplicateRequest"));
-                    }
+                RADIO_RDEBUG(_L("[RADIO-SVR] TunerOffComplete() - iState = EStateTunerOff;"));
                 }
             break;
         default:

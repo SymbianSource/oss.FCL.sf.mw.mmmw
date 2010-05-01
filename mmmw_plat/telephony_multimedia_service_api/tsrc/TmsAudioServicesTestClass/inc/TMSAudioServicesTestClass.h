@@ -31,8 +31,6 @@
 #include <tmscall.h>
 #include <tmsstream.h>
 #include <tmsformat.h>
-#include <tmsdtmf.h>
-#include <tmsringtone.h>
 #include <tmsclientsink.h>
 #include <tmsclientsource.h>
 #include <tmsclientsourceobsrvr.h>
@@ -51,6 +49,12 @@
 #include <tmsilbcformat.h>
 #include <tmspcmformat.h>
 #include <tmsamrformat.h>
+#include <tmsdtmf.h>
+#include <tmsdtmfobsrvr.h>
+#include <tmsringtone.h>
+#include <tmsringtoneobsrvr.h>
+#include <tmsinbandtone.h>
+#include <tmsinbandtoneobsrvr.h>
 
 #include "TimeoutController.h"
 
@@ -63,6 +67,7 @@ const TInt KErrCallbackErrorCode = -2001; // Callback return error code
 const TInt KErrUnexpectedValue = -2002; // Unexpected value at setting
 const TInt KErrTimeoutController = -2007; // Unexpected notification
 
+const TInt KMicroTimeout = 1000;
 const TInt KShortTimeout = 2000;
 const TInt KMediumTimeout = 10000;
 const TInt KLongTimeout = 100000;
@@ -105,20 +110,43 @@ _LIT( KTagTTY, "TTY");
 _LIT( KTagPublic, "Public");
 _LIT( KTagPrivate, "Private");
 
+_LIT( KTagRTDefault, "RTDefault");
+_LIT( KTagRTFile, "RTFile");
+_LIT( KTagRTBeepOnce, "RTBeepOnce");
+_LIT( KTagRTSilent, "RTSilent");
+_LIT( KTagRTUnsecureVoIP, "RTUnsecureVoIP");
+_LIT( KTagRTSequence, "RTSequence");
+_LIT( KTagRTTts, "RTTts");
+
+_LIT( KTagUserBusy, "UserBusy" );
+_LIT( KTagRadioPathNotFound, "RadioPathNotFound" );
+_LIT( KTagCongestion, "Congestion" );
+_LIT( KTagSpecialInfo, "SpecialInfo" );
+_LIT( KTagReorder, "Reorder" );
+_LIT( KTagAlerting, "Alerting" );
+_LIT( KTagWaiting, "Waiting" );
+_LIT( KTagDataCall, "DataCall" );
+_LIT( KTagNoSequence, "NoSequence" );
+_LIT( KTagBeepSequence, "BeepSequence" );
+
 // MACROS
-//#define ?macro ?macro_def
-// Logging path
+
 #ifdef __WINSCW__
 _LIT( KTmsAudioServicesTestClassLogPath, "\\logs\\testframework\\" );
 _LIT16(KTestFile1, "\\testing\\data\\alarm 1.aac");
 _LIT16(KTestFile2, "\\testing\\data\\alarm.aac");
-_LIT16(KTestFile3, "\\testing\\data\\test_8khz.wav");
+//_LIT16(KTestFile3, "\\testing\\data\\test_8khz.wav");
+_LIT16(KTestFile3, "c:\\data\\sounds\\digital\\test_8khz.wav");
 #else
 _LIT( KTmsAudioServicesTestClassLogPath, "c:\\testing\\Log\\" );
 _LIT16(KTestFile1, "c:\\testing\\data\\alarm 1.aac");
 _LIT16(KTestFile2, "c:\\testing\\data\\alarm.aac");
-_LIT16(KTestFile3, "c:\\testing\\data\\test_8khz.wav");
+//_LIT16(KTestFile3, "c:\\testing\\data\\test_8khz.wav");
+_LIT16(KTestFile3, "c:\\data\\sounds\\digital\\test_8khz.wav");
 #endif
+_LIT8(KRTBeepSequence, "\x00\x11\x0A\x0A\x08\x73\x0A\x40\x28\x0A\xF7\
+\x05\xFC\x40\x64\x0A\x08\x40\x32\x0A\xF7\x06\x0B");
+_LIT16(KTextToSpeak, "THE PHONE IS RINGING");
 
 // Log file
 _LIT( KTmsAudioServicesTestClassLogFile, "CTmsAudioServicesTestClass.txt" );
@@ -150,7 +178,10 @@ NONSHARABLE_CLASS(CTmsAudioServicesTestClass) :
     public TMSClientSourceObserver,
     public TMSClientSinkObserver,
     public TMSEffectObserver,
-    public TMSGlobalRoutingObserver
+    public TMSGlobalRoutingObserver,
+    public TMSRingToneObserver,
+    public TMSDTMFObserver,
+    public TMSInbandToneObserver
     {
     enum StreamState
         {
@@ -188,6 +219,13 @@ public: // Constructors and destructor
         EFillBuffer,
         EOutputChanged,
         ESetOutputComplete,
+        ERTInitComplete,
+        ERTPlayComplete,
+        ERTDeinitComplete,
+        EInbToneStarted,
+        EInbToneStopped,
+        EDTMFToneStarted,
+        EDTMFToneStopped
         };
 
 public:
@@ -226,6 +264,15 @@ public:
     // from TMSGlobalRoutingObserver
     void GlobalRoutingEvent(const TMSGlobalRouting& /*routing*/,
             TMSSignalEvent event, TMSAudioOutput output);
+
+    // from TMSRingToneObserver
+    void RingtoneEvent(const TMSRingTone& rt, TMSSignalEvent event);
+
+    // from TMSDTMFObserver
+    void DTMFEvent(const TMSDTMF& dtmf, TMSSignalEvent event);
+
+    // from TMSInbandToneObserver
+    void InbandToneEvent(const TMSInbandTone& inbandtone, TMSSignalEvent event);
 
 private:
 
@@ -333,10 +380,8 @@ private:
     TInt GetDownlinkVersion(CStifItemParser& aItem);
     TInt CreateUplinkStream(CStifItemParser& aItem);
     TInt GetUplinkVersion(CStifItemParser& aItem);
-    TInt CreateDTMFTonePlayer(CStifItemParser& aItem);
-    TInt DeleteDTMFTonePlayer(CStifItemParser& aItem);
-    TInt CreateRingTonePlayer(CStifItemParser& aItem);
     TInt GetSupportedFormats(CStifItemParser& aItem);
+
     TInt IsCallTypeSupported(CStifItemParser& aItem);
     TInt SetDownlinkFormat(CStifItemParser& aItem);
     TInt SetUplinkFormat(CStifItemParser& aItem);
@@ -352,18 +397,25 @@ private:
     TInt Gain(CStifItemParser& aItem);
     TInt Volume(CStifItemParser& aItem);
 
-    TInt InitDTMFTonePlayer(CStifItemParser& aItem);
+    TInt CreateDTMFTonePlayer(CStifItemParser& aItem);
     TInt DTMFTonePlay(CStifItemParser& aItem);
-    TInt CloseDTMFPlayer(CStifItemParser& aItem);
     TInt StopDTMFTonePlayer(CStifItemParser& aItem);
+    TInt ContinueDTMFStringSending(CStifItemParser& aItem);
+    TInt CloseDTMFPlayer(CStifItemParser& aItem);
 
+    TInt CreateRingTonePlayer(CStifItemParser& aItem);
     TInt InitRingTonePlayer(CStifItemParser& aItem);
-    TInt CloseRingTonePlayer(CStifItemParser& aItem);
     TInt PlayRingTone(CStifItemParser& aItem);
-    TInt PauseRingTone(CStifItemParser& aItem);
-    TInt ResumeRingTone(CStifItemParser& aItem);
+    TInt PlayRingToneNoEvent(CStifItemParser& aItem);
+    TInt PauseRingTone(CStifItemParser& aItem); //IP video call only (10.2)
     TInt StopRingTone(CStifItemParser& aItem);
-    TInt GetBufferType(CStifItemParser& aItem);
+    TInt MuteRingTone(CStifItemParser& aItem);
+    TInt CloseRingTonePlayer(CStifItemParser& aItem);
+
+    TInt CreateInbandTonePlayer(CStifItemParser& aItem);
+    TInt StartInbandTone(CStifItemParser& aItem);
+    TInt StopInbandTone(CStifItemParser& aItem);
+    TInt CloseInbandTonePlayer(CStifItemParser& aItem);
 
     //  TInt GetSupportedBitrates( CStifItemParser& aItem );
 
@@ -385,6 +437,7 @@ private:
     void DisplayFormat(TMSFormatType aFormat);
     void GetSupportedBitrates(RArray<TUint>& aBrArr);
     void DisplayDevice(TMSAudioOutput device);
+    TInt GetBufferType(CStifItemParser& aItem);
 
     TInt ConfigEncAudDevice(CStifItemParser& aItem);
 
@@ -407,15 +460,15 @@ private:
     TInt RemoveSinkObserver(CStifItemParser& aItem);
 
     gint CreateVolumeEffect();
-    gint CreateVolumeGlobleEffect();
+    gint CreateVolumeGlobalEffect();
     TInt AddVolumeEffectToStream(CStifItemParser& aItem);
-    TInt AddGlobleVolumeEffectToStream(CStifItemParser& aItem);
-    TInt RemoveGlobleVolumeEffectToStream(CStifItemParser& aItem);
+    TInt AddGlobalVolumeEffectToStream(CStifItemParser& aItem);
+    TInt RemoveGlobalVolumeEffectToStream(CStifItemParser& aItem);
     gint CreateGainEffect();
-    gint CreateGlobleGainEffect();
+    gint CreateGlobalGainEffect();
     TInt AddGainEffectToStream(CStifItemParser& aItem);
-    TInt AddGlobleGainEffectToStream(CStifItemParser& aItem);
-    TInt RemoveGlobleGainEffectToStream(CStifItemParser& aItem);
+    TInt AddGlobalGainEffectToStream(CStifItemParser& aItem);
+    TInt RemoveGlobalGainEffectToStream(CStifItemParser& aItem);
     TInt GetStreamType(CStifItemParser& aItem);
     TInt GetStreamState(CStifItemParser& aItem);
 
@@ -439,6 +492,7 @@ private:
     TMSDTMF* iDTMFTonePlayerDn;
     TMSDTMF* iDTMFTonePlayerUp;
     TMSRingTone* iRingTonePlayer;
+    TMSInbandTone* iInbandTonePlayer;
     TMSAudioOutput iDevice;
 
     // Codec format APIs
@@ -486,8 +540,8 @@ private:
     TBool iRecBufReady;
 
     // For ring tone playback
-    RFile iRTFile;
-    RFs iFs;
+    GString* iRTStr;
+    GString* iTTSStr;
 
     // Active object with a timer to timeout the test case
     CSimpleTimeout * iTimeoutController;
@@ -502,7 +556,6 @@ private:
     RArray<TTmsExpectedEvent> iOcurredEvents;
 
     CActiveSchedulerWait* iActive;
-
     };
 
 #endif //__TMSAUDIOSERVICESTESTCLASS_H

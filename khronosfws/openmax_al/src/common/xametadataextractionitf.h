@@ -18,11 +18,9 @@
 #ifndef XAMETADATAEXTRACTIONITF_H
 #define XAMETADATAEXTRACTIONITF_H
 
-#include "openmaxalwrapper.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAAdaptationContextBase.h"
-#include "XAMetadataAdaptation.h"
-#endif
+#include "xaadptbasectx.h"
+#include "xametadataadaptation.h"
+
 /** MACROS **/
 
 /** TYPES **/
@@ -42,11 +40,11 @@ typedef struct XAMetadataExtractionItfImpl_
     XAuint32                filteredcount;
     XAboolean*              tagmatchesfilter;
     XAboolean               filteringOn;
-#ifdef _GSTREAMER_BACKEND_  
+  
     XAMetadataImplTagList   currentTags;
 
     XAAdaptationBaseCtx *adaptCtx;
-#endif
+
 } XAMetadataExtractionItfImpl;
 
 /** METHODS **/
@@ -83,11 +81,10 @@ XAresult XAMetadataExtractionItfImpl_AddKeyFilter(XAMetadataExtractionItf self,
 
 XAresult XAMetadataExtractionItfImpl_ClearKeyFilter(XAMetadataExtractionItf self);
 
-#ifdef _GSTREAMER_BACKEND_  
+
 /* XAMetadataExtractionItfImpl -specific methods */
 XAMetadataExtractionItfImpl* XAMetadataExtractionItfImpl_Create( XAAdaptationBaseCtx *adaptCtx);
 void XAMetadataExtractionItfImp_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
-#endif
 void XAMetadataExtractionItfImpl_Free(XAMetadataExtractionItfImpl* self);
 
 /* internal methods */

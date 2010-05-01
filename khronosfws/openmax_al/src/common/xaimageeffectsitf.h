@@ -18,11 +18,8 @@
 #ifndef XAIMAGEEFFECTSITF_H
 #define XAIMAGEEFFECTSITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_   
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xaadptbasectx.h"
+
 /** MACROS **/
 #define NO_IMAGE_EFFECTS 0
 
@@ -43,10 +40,10 @@ typedef struct XAImageEffectsItfImpl_
     XAuint32    index;
     XAboolean   enabled;
     XAuint32    imageEffectID;
-#ifdef _GSTREAMER_BACKEND_   
+
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
+
 
 } XAImageEffectsItfImpl;
 
@@ -67,10 +64,8 @@ XAresult XAImageEffectsItfImpl_IsImageEffectEnabled(XAImageEffectsItf self,
                                                     XAuint32 imageEffectID,
                                                     XAboolean *pEnabled);
 
-#ifdef _GSTREAMER_BACKEND_   
+   
 /* XAImageEffectsItfImpl -specific methods */
 XAImageEffectsItfImpl* XAImageEffectsItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
-#endif
-
 void XAImageEffectsItfImpl_Free(XAImageEffectsItfImpl* self);
 #endif /* XAIMAGEEFFECTSITF_H */

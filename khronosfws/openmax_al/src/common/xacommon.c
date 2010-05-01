@@ -120,15 +120,15 @@ XAresult XACommon_CheckDataSource(XADataSource* source, XAMediaType* type)
                 {
                     /* try to parse mimetype first */
                     mime = ((XADataFormat_MIME*)(source->pFormat))->mimeType;
-                    if(strncmp((char*)mime,"audio",5)==0)
+                    if(mime && (strncmp((char*)mime,"audio",5)==0))
                     {
                         *type = XA_MEDIATYPE_AUDIO;
                     }
-                    else if(strncmp((char*)mime,"video",5)==0)
+                    else if(mime && (strncmp((char*)mime,"video",5)==0))
                     {
                         *type = XA_MEDIATYPE_VIDEO;
                     }
-                    else if(strncmp((char*)mime,"image",5)==0)
+                    else if(mime && (strncmp((char*)mime,"image",5)==0))
                     {
                         *type = XA_MEDIATYPE_IMAGE;
                     }

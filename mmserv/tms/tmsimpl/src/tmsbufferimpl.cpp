@@ -21,18 +21,6 @@
 
 using namespace TMS;
 
-TMSBufferImpl::TMSBufferImpl()
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-TMSBufferImpl::~TMSBufferImpl()
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
 EXPORT_C gint TMSBufferImpl::Create(TMSBufferType buffertype, guint size,
         TMSBuffer*& tmsbuffer)
     {

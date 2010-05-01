@@ -206,23 +206,6 @@ TInt CEnhanMediaTestClass::RunMethodL(
 
         ENTRY( "DSGetSize", CEnhanMediaTestClass::DSGetSize ),
 
-        ENTRY( "DSGetSize", CEnhanMediaTestClass::GeneralGen_StartProgDLL ),
-
-        ENTRY( "Gen_StartProgDL",CEnhanMediaTestClass::GeneralGen_StartProgDLL ),
-        ENTRY( "PDLSOpenL",CEnhanMediaTestClass::PDLSOpenL ),
-        ENTRY( "PDLSGetCurFileSizeL",CEnhanMediaTestClass::PDLSGetCurFileSizeL ),
-        ENTRY( "PDLSGetExpFileSizeL",CEnhanMediaTestClass::PDLSGetExpFileSizeL ),
-        ENTRY( "PDLSGetDLStatusL",CEnhanMediaTestClass::PDLSGetDLStatusL ),
-        ENTRY( "PDLSIsDLCompleteL",CEnhanMediaTestClass::PDLSIsDLCompleteL ),
-        ENTRY( "PDLSGetPerDownloadedL",CEnhanMediaTestClass::PDLSGetPerDownloadedL ),
-        ENTRY( "PDLSGetPerBufferedL",CEnhanMediaTestClass::PDLSGetPerBufferedL ),
-        ENTRY( "PDLSGetDLRateL",CEnhanMediaTestClass::PDLSGetDLRateL ),
-        ENTRY( "PDLSGetBitRateL",CEnhanMediaTestClass::PDLSGetBitRateL ),
-        ENTRY( "PDLSResumeDownloadL",CEnhanMediaTestClass::PDLSResumeDownloadL ),
-        ENTRY( "PDLSMoveFileL",CEnhanMediaTestClass::PDLSMoveFileL ),
-        ENTRY( "PDLSCancelDownloadL",CEnhanMediaTestClass::PDLSCancelDownloadL ),
-        ENTRY( "PDLSGetSize",CEnhanMediaTestClass::PDLSGetSize ),
-
         ENTRY( "AudioEffect_IsEnabled",CEnhanMediaTestClass::AudioEffectIsEnabled ),
         ENTRY( "AudioEffect_IsEnforced",CEnhanMediaTestClass::AudioEffectIsEnforced ),
         ENTRY( "AudioEffect_Uid",CEnhanMediaTestClass::AudioEffectUid ),
@@ -328,7 +311,6 @@ TPtrC CEnhanMediaTestClass::EventName( TInt aKey )
 		(TText*)L"EEStreamOpen",
 		(TText*)L"EEStreamPrime",
 		(TText*)L"EEStreamStart",
-		(TText*)L"EEPDLSOpen",
 
 	};
 	if( (TUint)aKey >= (sizeof( keywords )/sizeof(TText*)) )
@@ -625,15 +607,7 @@ TInt CEnhanMediaTestClass::DeleteFactory( CStifItemParser& /*aItem*/ )
         delete iDRMConfigIntfc;
         iDRMConfigIntfc = NULL;
         }
-    if(iUrlName)
-        {
-        delete iUrlName;
-        }
 
-    if(iAccessPtName)
-        {
-        delete iAccessPtName;
-        }
    // ProcessEvent(EECreateFactory, error);
 /*	for (TUint i =0; i < iExpectedEvents.Count() ; i++)
 		{
@@ -680,15 +654,6 @@ TInt CEnhanMediaTestClass::CreateSourceControl( CStifItemParser& aItem )
                 }
             break;
             }
-        case EPDLSOURCE:
-            {
-            status = iFactory->CreateSourceControl( KProgDLSourceControl, iSourceControl );
-            if(status == KErrNone)
-                {
-                iMProgDLSource = static_cast<MProgDLSource*>(iSourceControl);
-                }
-            break;
-            }
         default:
         	{
         	status = KErrNotSupported;
@@ -731,12 +696,6 @@ TInt CEnhanMediaTestClass::DeleteSource(CStifItemParser& /*aItem*/)
         MSourceControl* objPtr = iMFileSource;
         iFactory->DeleteSourceControl(objPtr);
         iMFileSource = NULL;
-        }
-    if(iMProgDLSource)
-        {
-        MSourceControl* objPtr = iMProgDLSource;
-        iFactory->DeleteSourceControl(objPtr);
-        iMProgDLSource = NULL;
         }
     iLog->Log(_L("DeleteSourceControl OK"));
     //ProcessEvent(EECreateSource, status);
@@ -1563,18 +1522,6 @@ TInt CEnhanMediaTestClass::AddObserver(CStifItemParser& aItem)
                 }
 	        break;
 	        }
-        case EPDLSOURCE:
-	        {
-	        if(iMProgDLSource)
-	            {
-                iMProgDLSource->AddObserver(*this);
-	            }
-            else
-                {
-                status = KErrNotFound;
-                }
-	        break;
-	        }
         case EVOLUMECONTROL:
 	        {
 	        if(iMVolumeControl)
@@ -2054,11 +2001,6 @@ TInt CEnhanMediaTestClass::StreamRemoveSource(CStifItemParser& aItem)
             iSourceControl = iMDescriptorSource;
             }
             break;
-        case EPDLSOURCE:
-            {
-            iSourceControl = iMProgDLSource;
-            }
-            break;
         }
 
 	status = iMStreamControl->RemoveSource(*iSourceControl);
@@ -2097,11 +2039,6 @@ TInt CEnhanMediaTestClass::StreamAddSource(CStifItemParser& aItem)
         case EDESCRIPTORSOURCE:
             {
             iSourceControl = iMDescriptorSource;
-            }
-            break;
-        case EPDLSOURCE:
-            {
-            iSourceControl = iMProgDLSource;
             }
             break;
         }
@@ -2195,10 +2132,6 @@ TInt CEnhanMediaTestClass::StreamClose(CStifItemParser& /*aItem*/)
 	else
 		{
 	        iLog->Log(_L("iMStreamControl->GetState() = %d"), state);
-	        if (iMProgDLSource)
-	        	{
-	        	status = iMProgDLSource->Close();
-	        	}
 			status = iMStreamControl->Close();
 	        iLog->Log(_L("iMStreamControl->GetState() = %d"), iMStreamControl->GetState());
 
@@ -2275,18 +2208,6 @@ TInt CEnhanMediaTestClass::RemoveObserver(CStifItemParser& aItem)
 	        if(iMAudioSink)
 	            {
                 iMAudioSink->RemoveObserver(*this);
-	            }
-            else
-                {
-                status = KErrNotFound;
-                }
-	        break;
-	        }
-        case EPDLSOURCE:
-	        {
-	        if(iMProgDLSource)
-	            {
-                iMProgDLSource->RemoveObserver(*this);
 	            }
             else
                 {
@@ -3628,18 +3549,6 @@ TInt CEnhanMediaTestClass::ControlTypeL(CStifItemParser& aItem)
                 }
 	        break;
 	        }
-        case EPDLSOURCE:
-	        {
-	        if(iMProgDLSource)
-	            {
-                controlUid = iMProgDLSource->Type();
-	            }
-            else
-                {
-                status = KErrNotFound;
-                }
-	        break;
-	        }
 	    }
     iLog->Log(_L("CEnhanMediaTestClass::ControlTypeL  = [%d]"),control);
 	return status;
@@ -3735,18 +3644,6 @@ TInt CEnhanMediaTestClass::ControlControlTypeL(CStifItemParser& aItem)
                 {
                 status = KErrNotFound;
                 }
-	        break;
-	        }
-        case EPDLSOURCE:
-	        {
-	        if(iMProgDLSource)
-	            {
-				controlType = iMProgDLSource->ControlType();
-	            }
-            else
-              {
-              status = KErrNotFound;
-              }
 	        break;
 	        }
 	    }
@@ -3986,378 +3883,6 @@ TInt CEnhanMediaTestClass::CreateSeekableData(CStifItemParser& /*aItem*/)
     	}
     return status;
     }
-
-TInt CEnhanMediaTestClass::GeneralGen_StartProgDLL(CStifItemParser& aItem)
-    {
-    TInt status = KErrNone;
-    TPtrC string;
-	//AddExpectedEvent(EEStartDownload,KMediumTimeout);
-    aItem.SetParsingType( CStifItemParser::EQuoteStyleParsing );
-
-    status = aItem.GetNextString ( string );
-
-    if ( status != KErrNone )
-        {
-        iLog->Log(_L("CHelixSTIFClient:: File name missing in config file "));
-        return status;
-        }
-    else
-        {
-        if(iUrlName)
-            {
-            delete iUrlName;
-            iUrlName = NULL;
-            }
-        iUrlName = HBufC8::NewL(string.Length());
-        TPtr8 des = iUrlName->Des();
-        des.Copy(string);
-        }
-
-    status = aItem.GetNextString ( string );
-
-    if ( status != KErrNone )
-        {
-        iLog->Log(_L("CHelixSTIFClient:: File name missing in config file "));
-        return status;
-        }
-    else
-        {
-        if(iAccessPtName)
-            {
-            delete iAccessPtName;
-            iAccessPtName = NULL;
-            }
-        iAccessPtName = HBufC::NewL(string.Length());
-        TPtr des = iAccessPtName->Des();
-        des.Copy(string);
-        }
-
-    status = aItem.GetNextString ( string );
-
-    if ( status != KErrNone )
-        {
-        iLog->Log(_L("CHelixSTIFClient:: File name missing in config file "));
-        return status;
-        }
-    else
-        {
-        if(iFileName)
-            {
-            delete iFileName;
-            iFileName = NULL;
-            }
-        iFileName = HBufC::NewL(string.Length());
-        TPtr des = iFileName->Des();
-        des.Copy(string);
-        }
-
-    if ( !iDMgrConnected )
-        {
-        TRAP(status,iDownloadMgr.ConnectL( TUid::Uid(1), *this, EFalse ));
-        if(!status)
-            {
-            iDMgrConnected = ETrue;
-            }
-        else
-            {
-            iLog->Log(_L("CHelixSTIFClient::GeneralGen_StartProgDLL Connection failed to DlMgr "));
-            return status;
-            }
-        }
-
-    // Get IAP names and ids from the database
-    TInt res;
-    TBuf<40> name;
-    TUint32 id;
-
-    CCommsDatabase* TheDb = CCommsDatabase::NewL(EDatabaseTypeIAP);
-    CleanupStack::PushL(TheDb);
-
-    TheDb->ShowHiddenRecords();
-
-    CCommsDbTableView* view = TheDb->OpenTableLC(TPtrC(IAP));
-    res = view->GotoFirstRecord();
-
-    while(res == KErrNone)
-        {
-        view->ReadTextL(TPtrC(COMMDB_NAME), name);
-        view->ReadUintL(TPtrC(COMMDB_ID), id);
-
-				iLog->Log(_L("CHelixSTIFClient::GeneralGen_StartProgDLL Name[%s] ID[%d] "),&name,id);
-        if(!iAccessPtName->Des().Compare(name))
-            {
-            break;
-            }
-
-        res = view->GotoNextRecord();
-        RDebug::Print(_L("IAP name, id: %S, %d"), &name, id);
-        }
-
-    CleanupStack::PopAndDestroy(); // view
-    CleanupStack::PopAndDestroy(); // TheDb
-
-    status = iDownloadMgr.SetIntAttribute( EDlMgrIap,id );
-    if(status != KErrNone)
-        {
-        return status;
-        }
-
-    status = iDownloadMgr.SetDefaultStringAttribute( EDlAttrDestFilename, *iFileName ) ;
-
-
-    TRAP(status,iDownload = &(iDownloadMgr.CreateDownloadL(*iUrlName)));
-    if(status != KErrNone)
-        {
-        return status;
-        }
-
-    status = iDownload->Start();
-    if(status != KErrNone)
-        {
-        iLog->Log(_L("CHelixSTIFClient::GeneralGen_StartProgDLL Download Start Failed "));
-        return status;
-        }
-    status = iDownload->GetIntAttribute(EDlAttrId, iDownloadId);
-    if(status != KErrNone)
-        {
-        iLog->Log(_L("CHelixSTIFClient::GeneralGen_StartProgDLL Getting DLId failed "));
-        return status;
-        }
-
-    if(iActive)
-        {
-        delete iActive;
-        iActive = NULL;
-        }
-
-    iActive = new CActiveSchedulerWait;
-    RDebug::Print(_L("Before"));
-    iLog->Log(_L("Before = %d"), status);
-    iActive->Start();
-    iLog->Log(_L("After = %d"), status);
-    RDebug::Print(_L("AFter"));
-    iLog->Log(_L("CEnhanMediaTestClass::GeneralGen_StartProgDLL = %d"), status);
-    return status;
-    }
-
-
-TInt CEnhanMediaTestClass::PDLSOpenL(CStifItemParser& /*aItem*/)
-	{
-	AddExpectedEvent(EEPDLSOpen,KMediumTimeout);
-	TInt status(KErrNone);
-	//TBool stateDL;
-	//TUint percent;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-    status = iMProgDLSource->Open(*iFileName,iDownloadId);
-//	iMProgDLSource->GetPercentageDownloaded(percent);
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSGetCurFileSizeL(CStifItemParser& /*aItem*/)
-	{
-	TInt status(KErrNone);
-	TUint fileSize;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-    status = iMProgDLSource->GetCurrentFileSize(fileSize);
-    iLog->Log(_L("PDLSGetCurFileSizeL = %d"), fileSize);
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSGetExpFileSizeL(CStifItemParser& /*aItem*/)
-	{
-	TInt status(KErrNone);
-	TUint fileSize;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-    status = iMProgDLSource->GetExpectedFileSize(fileSize);
-    iLog->Log(_L("PDLSGetExpFileSizeL = %d"), fileSize);
-
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSGetDLStatusL(CStifItemParser& /*aItem*/)
-	{
-	TInt status(KErrNone);
-	MProgDLSource::TDownloadStatus dlStatus;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-
-    dlStatus = iMProgDLSource->GetDownloadStatus();
-    iLog->Log(_L("PDLSGetDLStatusL = %d"), dlStatus);
-
-	return status;
-	}
-
-
-TInt CEnhanMediaTestClass::PDLSIsDLCompleteL(CStifItemParser& /*aItem*/)
-	{
-	TInt status(KErrNone);
-	TBool dlComplete;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-
-    status = iMProgDLSource->IsDownloadComplete(dlComplete);
-    iLog->Log(_L("PDLSIsDLCompleteL = %d"), dlComplete);
-
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSGetPerDownloadedL(CStifItemParser& /*aItem*/)
-	{
-	TInt status(KErrNone);
-	TUint perDl;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-
-    status = iMProgDLSource->GetPercentageDownloaded(perDl);
-    iLog->Log(_L("PDLSGetPerDownloadedL = %d"), perDl);
-
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSGetPerBufferedL(CStifItemParser& /*aItem*/)
-	{
-	TInt status(KErrNone);
-	TUint perBuf;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-
-    status = iMProgDLSource->GetPercentageBuffered(perBuf);
-    iLog->Log(_L("PDLSGetPerBufferedL = %d"), perBuf);
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSGetDLRateL(CStifItemParser& /*aItem*/)
-	{
-	TInt status(KErrNone);
-	TUint dlRate;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-
-    status = iMProgDLSource->GetDownloadingRate(dlRate);
-    iLog->Log(_L("PDLSGetDLRateL = %d"), dlRate);
-
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSGetBitRateL(CStifItemParser& /*aItem*/)
-	{
-	TInt status(KErrNone);
-	TUint bitRate;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-
-    status = iMProgDLSource->GetBitRate(bitRate);
-    iLog->Log(_L("PDLSGetBitRateL = %d"), bitRate);
-
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSResumeDownloadL(CStifItemParser& /*aItem*/)
-	{
-	TInt status(KErrNone);
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-
-    status = iMProgDLSource->ResumeDownload();
-    iLog->Log(_L("PDLSResumeDownloadL = %d"), status);
-
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSMoveFileL(CStifItemParser& aItem)
-	{
-	TInt status(KErrNone);
-    TPtrC string;
-    TFileName fileName;
-	if(!iMProgDLSource)
-	    {
-	    return status = KErrNotReady;
-	    }
-	status = 	aItem.GetNextString(string);
-	if ( status != KErrNone )
-		{
-		iLog->Log(_L("CEnhanMediaTestClass:: File name missing in config file "));
-		return status;
-		}
-	else
-		{
-		fileName.Copy(string);
-		}
-    if(iFileName)
-        {
-        delete iFileName;
-        iFileName = NULL;
-        }
-    iFileName = HBufC::NewL(fileName.Length());
-    iFileName->Des().Copy(fileName);
-
-
-    status = iMProgDLSource->MoveFile(*iFileName);
-    iLog->Log(_L("PDLSMoveFileL = %d"), status);
-
-	return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSGetSize(CStifItemParser& /*aItem*/)
-	{
-
-    iLog->Log(_L("CEnhanMediaTestClass::PDLSGetSize "));
-    TInt status(KErrNone);
-	TUint sizes = 0;
-	if(!iMProgDLSource)
-	    {
-	    status = KErrNotReady;
-	    }
-	else
-		{
-		status = iMProgDLSource->GetSize(sizes);
-		}
-    iLog->Log(_L("CEnhanMediaTestClass::PDLSGetSize [%d]"), status);
-
-    return status;
-	}
-
-TInt CEnhanMediaTestClass::PDLSCancelDownloadL(CStifItemParser& /*aItem*/)
-	{
-	TMediaId mediaId;
-	TFourCC dataType;
-    iLog->Log(_L("CEnhanMediaTestClass::PDLSCancelDownloadL "));
-    TInt status(KErrNone);
-	if(!iMProgDLSource)
-	    {
-	    status = KErrNotReady;
-	    }
-	else
-		{
-	    status = iMProgDLSource->CancelDownload();
-		}
-    iLog->Log(_L("CEnhanMediaTestClass::PDLSCancelDownloadL [%d]"), status);
-
-    return status;
-	}
 
 TInt CEnhanMediaTestClass::StreamCustomInterface(CStifItemParser& /*aItem*/)
 	{
@@ -5632,19 +5157,6 @@ TInt CEnhanMediaTestClass::HandleControlTypeL(CStifItemParser& aItem)
                 }
 	        break;
 	        }
-        case EPDLSOURCE:
-	        {
-	        if(iMProgDLSource)
-	            {
-                controlUid = iMProgDLSource->Type();
-	            }
-            else
-                {
-                status = KErrNotFound;
-                }
-	        break;
-	        }
-
         case EVOLUMECONTROL:
 	        {
 	        if(iMVolumeControl)
@@ -5913,19 +5425,6 @@ TInt CEnhanMediaTestClass::HandleControlControlTypeL(CStifItemParser& aItem)
               }
 	        break;
 	        }
-        case EPDLSOURCE:
-	        {
-	        if(iMProgDLSource)
-	            {
-				controlType = iMProgDLSource->ControlType();
-	            }
-            else
-              {
-              status = KErrNotFound;
-              }
-	        break;
-	        }
-
         case EVOLUMECONTROL:
 	        {
 	        if(iMVolumeControl)

@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xaplaybackrateitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAPlaybackRateItfAdaptation.h"
-#endif
+
+#include "xaplaybackrateitfadaptation.h"
+
 #include "xathreadsafety.h"
 
 static XAPlaybackRateItfImpl* GetImpl(XAPlaybackRateItf self)
@@ -56,9 +56,16 @@ XAresult XAPlaybackRateItfImpl_SetRate(XAPlaybackRateItf self, XApermille rate)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    res = XAPlaybackRateItfAdapt_SetRate(impl->adaptCtx, rate);
-#endif
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        res = XAPlaybackRateItfAdapt_SetRate((XAAdaptationGstCtx*)impl->adaptCtx, rate);
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;          
+        }
+    
     if(res == XA_RESULT_SUCCESS)
     {
         impl->currentRate = rate;
@@ -81,7 +88,15 @@ XAresult XAPlaybackRateItfImpl_GetRate(XAPlaybackRateItf self, XApermille *pRate
         DEBUG_API("<-XAPlaybackRateItfImpl_GetRate");
         return XA_RESULT_PARAMETER_INVALID;
     }
-    *pRate = impl->currentRate;
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        *pRate = impl->currentRate;
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;          
+        }
 
     DEBUG_API("<-XAPlaybackRateItfImpl_GetRate");
     return res;
@@ -103,10 +118,17 @@ XAresult XAPlaybackRateItfImpl_SetPropertyConstraints(XAPlaybackRateItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
     
-#ifdef _GSTREAMER_BACKEND_
-    /* set to adaptation */
-    res = XAPlaybackRateItfAdapt_SetPropertyConstraints(impl->adaptCtx, constraints);
-#endif
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        /* set to adaptation */
+        res = XAPlaybackRateItfAdapt_SetPropertyConstraints((XAAdaptationGstCtx*)impl->adaptCtx, constraints);
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;          
+        }
+    
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
     DEBUG_API("<-XAPlaybackRateItfImpl_SetPropertyConstraints");
     return res;
@@ -126,10 +148,17 @@ XAresult XAPlaybackRateItfImpl_GetProperties(XAPlaybackRateItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
    
-#ifdef _GSTREAMER_BACKEND_
-    /* needs to be queried from adaptation */
-    res = XAPlaybackRateItfAdapt_GetProperties(impl->adaptCtx, pProperties);
-#endif
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        /* needs to be queried from adaptation */
+        res = XAPlaybackRateItfAdapt_GetProperties((XAAdaptationGstCtx*)impl->adaptCtx, pProperties);
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;          
+        }
+    
     DEBUG_API("<-XAPlaybackRateItfImpl_GetProperties");
     return res;
 }
@@ -152,10 +181,17 @@ XAresult XAPlaybackRateItfImpl_GetCapabilitiesOfRate(XAPlaybackRateItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
     
-#ifdef _GSTREAMER_BACKEND_
-    /* needs to be queried from adaptation */
-    res = XAPlaybackRateItfAdapt_GetCapabilitiesOfRate(impl->adaptCtx, rate, pCapabilities);
-#endif
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        /* needs to be queried from adaptation */
+        res = XAPlaybackRateItfAdapt_GetCapabilitiesOfRate((XAAdaptationGstCtx*)impl->adaptCtx, rate, pCapabilities);
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;          
+        }
+
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
     DEBUG_API("<-XAPlaybackRateItfImpl_GetCapabilitiesOfRate");
     return res;
@@ -180,12 +216,18 @@ XAresult XAPlaybackRateItfImpl_GetRateRange(XAPlaybackRateItf self,
         DEBUG_API("<-XAPlaybackRateItfImpl_GetRateRange");
         return XA_RESULT_PARAMETER_INVALID;
     }
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        /* needs to be queried from adaptation */
+        res = XAPlaybackRateItfAdapt_GetRateRange((XAAdaptationGstCtx*)impl->adaptCtx, index, pMinRate,
+                                                  pMaxRate,pStepSize, pCapabilities);
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;          
+        }
     
-#ifdef _GSTREAMER_BACKEND_
-    /* needs to be queried from adaptation */
-    res = XAPlaybackRateItfAdapt_GetRateRange(impl->adaptCtx, index, pMinRate,
-                                              pMaxRate,pStepSize, pCapabilities);
-#endif
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
     DEBUG_API("<-XAPlaybackRateItfImpl_GetRateRange");
     return res;
@@ -194,13 +236,11 @@ XAresult XAPlaybackRateItfImpl_GetRateRange(XAPlaybackRateItf self,
 /**
  * XAPlaybackRateItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_
-
 /**
  * XAPlaybackRateItfImpl* XAPlaybackRateItfImpl_Create();
  * @return  XAPlaybackRateItfImpl* - Pointer to  PlaybackRateItf interface implementation
  **/
-XAPlaybackRateItfImpl* XAPlaybackRateItfImpl_Create( XAAdaptationBaseCtx *adaptCtx )
+XAPlaybackRateItfImpl* XAPlaybackRateItfImpl_Create( XAMediaPlayerImpl *impl )
 {
     XAPlaybackRateItfImpl *self = (XAPlaybackRateItfImpl*)
         calloc(1,sizeof(XAPlaybackRateItfImpl));
@@ -217,7 +257,7 @@ XAPlaybackRateItfImpl* XAPlaybackRateItfImpl_Create( XAAdaptationBaseCtx *adaptC
         self->itf.SetRate = XAPlaybackRateItfImpl_SetRate;
 
         /* init variables */
-        self->adaptCtx = adaptCtx;
+        self->adaptCtx = impl->curAdaptCtx;
         self->currentRate = 1000;
         self->self = self;
     }
@@ -225,7 +265,7 @@ XAPlaybackRateItfImpl* XAPlaybackRateItfImpl_Create( XAAdaptationBaseCtx *adaptC
     DEBUG_API("<-XAPlaybackRateItfImpl_Create");
     return self;
 }
-#endif
+
 /**
  * void XAPlaybackRateItfImpl_Free(XAPlaybackRateItfImpl* self);
  * @param  XAPlaybackRateItfImpl* self -

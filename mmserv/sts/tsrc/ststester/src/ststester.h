@@ -19,8 +19,7 @@
 #define STSTESTER_H_
 
 #include "testappbase.h"
-
-class CSystemToneService;
+#include <systemtoneservice.h>
 
 enum TOperations
     {
@@ -29,7 +28,7 @@ enum TOperations
     EOperation_StopClockAlarm
     };
 
-class CStsTester : public CTestAppBase
+class CStsTester : public CTestAppBase, MStsPlayAlarmObserver
     {
 public:
     // Methods
@@ -54,6 +53,9 @@ private:
             const TDesC& aOperationText);
 
 private:
+    // inherited from MPlayAlarmObserver
+    virtual void PlayAlarmComplete(unsigned int aAlarmContext);
+    
     // Attributes
 
     enum TPlayState

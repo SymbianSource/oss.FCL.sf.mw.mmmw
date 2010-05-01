@@ -47,7 +47,7 @@ public:
     /**
      * Destructor.
      */
-    ~TMSAudioInbandTonePlayer();
+    virtual ~TMSAudioInbandTonePlayer();
 
     /**
      * Plays given tone. Originates from CCP plugin.

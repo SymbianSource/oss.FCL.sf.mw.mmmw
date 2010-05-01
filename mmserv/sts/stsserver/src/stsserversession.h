@@ -20,13 +20,15 @@
 
 #include <e32base.h>
 #include <e32msgqueue.h>
+#include <map>
 
 #include "stsclientservercommon.h"
 
 class CSts;
 class CStsServer;
+class CStsPlayAlarmObserver;
 
-class CStsServerSession : public CSession2
+class CStsServerSession : public CSession2, private MStsPlayAlarmObserver
     {
 public:
 
@@ -41,12 +43,20 @@ public:
 
 private:
 
+    void DoRegisterMsgQueueL(const RMessage2& aMessage);
     void DoPlayToneL(const RMessage2& aMessage);
-    void DoStopToneL(const RMessage2& aMessage);
+    void DoPlayAlarmL(const RMessage2& aMessage);
+    void DoStopAlarmL(const RMessage2& aMessage);
+
+    // inherited from MPlayAlarmObserver
+    virtual void PlayAlarmComplete(unsigned int aAlarmContext);
 
     CStsServer& iServer;
     CSts& iSts;
 
+    typedef std::map<unsigned int, MStsPlayAlarmObserver*> TObserverMap;
+    TObserverMap iObserverMap;
+    RMsgQueue<TStsCallBack> iMsgQueue;
     };
 
 #endif // STSSERVERSESSION_H_

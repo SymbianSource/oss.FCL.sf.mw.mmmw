@@ -22,9 +22,14 @@
 
 #include "xametadataextractionitf.h"
 #include "xadebug.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAMetadataAdaptation.h"
-#endif
+
+#include "xametadataadaptation.h"
+
+#include "xaadaptationmmf.h"
+#include "xametadataadaptctxmmf.h"
+#include "xamediaplayeradaptctxmmf.h"
+#include "cmetadatautilityitf.h"
+
 /* XAMetadataExtractionItfImpl* GetImpl(XAMetadataExtractionItf self)
  * Description: Validate interface pointer and cast it to implementation pointer.
  **/
@@ -41,6 +46,20 @@ static XAMetadataExtractionItfImpl* GetImpl(XAMetadataExtractionItf self)
     return NULL;
 }
 
+static void* GetMetadataUtilityContext(XAAdaptationMMFCtx* adaptCtx)
+{
+	switch(adaptCtx->baseObj.ctxId)
+	{
+		case XAMediaPlayerAdaptation:
+	          return ((XAMediaPlayerAdaptationMMFCtx*)adaptCtx)->mmfMetadataContext;
+		case XAMDAdaptation:
+	          return ((XAMetadataAdaptationMMFCtx*)adaptCtx)->mmfContext;
+		default:
+			break;
+	}
+
+	return NULL;
+}
 /*****************************************************************************
  * Base interface XAMetadataExtractionItf implementation
  *****************************************************************************/
@@ -66,24 +85,40 @@ XAresult XAMetadataExtractionItfImpl_GetItemCount(XAMetadataExtractionItf self,
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_  
+ 
         if( impl->adaptCtx )
         {
-            if(impl->filteringOn)
-            {
-                *pItemCount = impl->filteredcount;
-            }
-            else
-            {
-                *pItemCount = impl->currentTags.itemcount;
-            }
-            res = XA_RESULT_SUCCESS;
+        	
+			if(impl->adaptCtx->fwtype == FWMgrFWMMF)
+			{
+				void *mmfCtx = GetMetadataUtilityContext((XAAdaptationMMFCtx*)impl->adaptCtx);
+				if(mmfCtx)
+				{
+					res = mmf_get_item_count(mmfCtx, pItemCount);
+				}
+				else
+				{
+					res = XA_RESULT_PARAMETER_INVALID;
+				}
+			}
+			else
+			{
+            	if(impl->filteringOn)
+            	{
+	                *pItemCount = impl->filteredcount;
+    	        }
+        	    else
+            	{
+	                *pItemCount = impl->currentTags.itemcount;
+    	        }
+        	    res = XA_RESULT_SUCCESS;
+			}
         }
         else
         {
             res = XA_RESULT_INTERNAL_ERROR;
         }
-#endif
+
         DEBUG_INFO_A1("itemCount = %d", (int)*pItemCount);
     }
 
@@ -117,17 +152,32 @@ XAresult XAMetadataExtractionItfImpl_GetKeySize(XAMetadataExtractionItf self,
     }
     *pKeySize = 0;
 
-    /* check index and return unfiltered index */
-    if( CheckAndUnfilterIndex(impl,index,&newidx) != XA_RESULT_SUCCESS )
-    {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("<-XAMetadataExtractionItfImpl_GetKeySize");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-#ifdef _GSTREAMER_BACKEND_  
-    /* size = size of struct + size of data - 1 (struct size already includes one char) */
-    *pKeySize = sizeof(XAMetadataInfo) + impl->currentTags.mdeKeys[newidx]->size - 1;
-#endif
+	if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWMMF)
+	{
+		void *mmfCtx = GetMetadataUtilityContext((XAAdaptationMMFCtx*)impl->adaptCtx);
+		if(mmfCtx)
+		{
+			res = mmf_get_key_size(mmfCtx, index, pKeySize);
+		}
+		else
+		{
+			res = XA_RESULT_PARAMETER_INVALID;
+		}
+	}
+	else
+	{
+	    /* check index and return unfiltered index */
+	    if( CheckAndUnfilterIndex(impl,index,&newidx) != XA_RESULT_SUCCESS )
+    	{
+	        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+    	    DEBUG_API("<-XAMetadataExtractionItfImpl_GetKeySize");
+        	return XA_RESULT_PARAMETER_INVALID;
+	    }
+ 
+	    /* size = size of struct + size of data - 1 (struct size already includes one char) */
+    	*pKeySize = sizeof(XAMetadataInfo) + impl->currentTags.mdeKeys[newidx]->size - 1;
+	}
+
     DEBUG_API_A1("<-XAMetadataExtractionItfImpl_GetKeySize (%d)", (int)res);
     return res;
 }
@@ -149,9 +199,9 @@ XAresult XAMetadataExtractionItfImpl_GetKey(XAMetadataExtractionItf self,
     XAMetadataExtractionItfImpl *impl = NULL;
     XAresult res = XA_RESULT_SUCCESS;
     XAuint32 newidx = 0;
-#ifdef _GSTREAMER_BACKEND_  
+ 
     XAuint32 neededsize = 0;
-#endif
+
     XAuint32 newdatasize = 0;
     DEBUG_API("->XAMetadataExtractionItfImpl_GetKey");
 
@@ -163,35 +213,52 @@ XAresult XAMetadataExtractionItfImpl_GetKey(XAMetadataExtractionItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-    /* check index and return unfiltered index */
-    if(CheckAndUnfilterIndex(impl,index,&newidx) != XA_RESULT_SUCCESS)
-    {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("<-XAMetadataExtractionItfImpl_GetKey");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-
     memset(pKey,0,keySize);
-#ifdef _GSTREAMER_BACKEND_     
-    /* needed size = size of struct + size of data - 1 (struct size already includes one char) */
-    neededsize = sizeof(XAMetadataInfo) + impl->currentTags.mdeKeys[newidx]->size - 1;
-    if( keySize<neededsize )
-    {   /* cannot fit all of key data */
-        newdatasize = impl->currentTags.mdeKeys[newidx]->size - (neededsize-keySize);
-        DEBUG_ERR("XA_RESULT_BUFFER_INSUFFICIENT");
-        res = XA_RESULT_BUFFER_INSUFFICIENT;
-    }
-    else
-    {
-        newdatasize = impl->currentTags.mdeKeys[newidx]->size;
-        res = XA_RESULT_SUCCESS;
-    }
-    /* copy data up to given size */
-    memcpy(pKey,impl->currentTags.mdeKeys[newidx],keySize-1);
-    /* ensure null-termination */
-#endif    
-    memset(pKey->data+newdatasize-1,0,1);
-    pKey->size = newdatasize;
+	
+	if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWMMF)
+	{
+		void *mmfCtx = GetMetadataUtilityContext((XAAdaptationMMFCtx*)impl->adaptCtx);
+		if(mmfCtx)
+		{
+			res = mmf_get_key(mmfCtx, index, keySize, pKey);
+		}
+		else
+		{
+			res = XA_RESULT_PARAMETER_INVALID;
+		}
+	}
+	else
+	{
+
+	    /* check index and return unfiltered index */
+	    if(CheckAndUnfilterIndex(impl,index,&newidx) != XA_RESULT_SUCCESS)
+	    {
+	        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+	        DEBUG_API("<-XAMetadataExtractionItfImpl_GetKey");
+	        return XA_RESULT_PARAMETER_INVALID;
+	    }
+
+	    
+	    /* needed size = size of struct + size of data - 1 (struct size already includes one char) */
+	    neededsize = sizeof(XAMetadataInfo) + impl->currentTags.mdeKeys[newidx]->size - 1;
+	    if( keySize<neededsize )
+	    {   /* cannot fit all of key data */
+	        newdatasize = impl->currentTags.mdeKeys[newidx]->size - (neededsize-keySize);
+	        DEBUG_ERR("XA_RESULT_BUFFER_INSUFFICIENT");
+	        res = XA_RESULT_BUFFER_INSUFFICIENT;
+	    }
+	    else
+	    {
+	        newdatasize = impl->currentTags.mdeKeys[newidx]->size;
+	        res = XA_RESULT_SUCCESS;
+	    }
+	    /* copy data up to given size */
+	    memcpy(pKey,impl->currentTags.mdeKeys[newidx],keySize-1);
+	    /* ensure null-termination */
+	    
+	    memset(pKey->data+newdatasize-1,0,1);
+	    pKey->size = newdatasize;
+	}
 
     DEBUG_API_A1("<-XAMetadataExtractionItfImpl_GetKey (%d)", (int)res);
     return res;
@@ -223,17 +290,32 @@ XAresult XAMetadataExtractionItfImpl_GetValueSize(XAMetadataExtractionItf self,
     }
     *pValueSize = 0;
 
-    /* check index and return unfiltered index */
-    if(CheckAndUnfilterIndex(impl,index,&newidx) != XA_RESULT_SUCCESS)
-    {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("<-XAMetadataExtractionItfImpl_GetValueSize");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-#ifdef _GSTREAMER_BACKEND_  
-    /* size = size of struct + size of data - 1 (struct size already includes one char) */
-    *pValueSize = sizeof(XAMetadataInfo) + impl->currentTags.mdeValues[newidx]->size - 1;
-#endif
+	if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWMMF)
+	{
+		void *mmfCtx = GetMetadataUtilityContext((XAAdaptationMMFCtx*)impl->adaptCtx);
+		if(mmfCtx)
+		{
+			res = mmf_get_value_size(mmfCtx, index,pValueSize);
+		}
+		else
+		{
+			res = XA_RESULT_PARAMETER_INVALID;
+		}
+	}
+	else
+	{
+	    /* check index and return unfiltered index */
+	    if(CheckAndUnfilterIndex(impl,index,&newidx) != XA_RESULT_SUCCESS)
+	    {
+	        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+	        DEBUG_API("<-XAMetadataExtractionItfImpl_GetValueSize");
+	        return XA_RESULT_PARAMETER_INVALID;
+	    }
+	 
+	    /* size = size of struct + size of data - 1 (struct size already includes one char) */
+	    *pValueSize = sizeof(XAMetadataInfo) + impl->currentTags.mdeValues[newidx]->size - 1;
+	}
+
     DEBUG_API_A1("<-XAMetadataExtractionItfImpl_GetValueSize (%d)", (int)res);
     return res;
 }
@@ -255,9 +337,9 @@ XAresult XAMetadataExtractionItfImpl_GetValue(XAMetadataExtractionItf self,
     XAMetadataExtractionItfImpl *impl = NULL;
     XAresult res = XA_RESULT_SUCCESS;
     XAuint32 newidx = 0;
-#ifdef _GSTREAMER_BACKEND_  
+ 
     XAuint32 neededsize = 0;
-#endif
+
     XAuint32 newdatasize = 0;
     DEBUG_API("->XAMetadataExtractionItfImpl_GetValue");
 
@@ -269,36 +351,51 @@ XAresult XAMetadataExtractionItfImpl_GetValue(XAMetadataExtractionItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-    /* check index and return unfiltered index */
-    if(CheckAndUnfilterIndex(impl,index,&newidx) != XA_RESULT_SUCCESS)
-    {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("<-XAMetadataExtractionItfImpl_GetValue");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
+	memset(pValue,0,valueSize);
 
-    memset(pValue,0,valueSize);
-#ifdef _GSTREAMER_BACKEND_  
-    /* needed size = size of struct + size of data - 1 (struct size already includes one char) */
-    neededsize = sizeof(XAMetadataInfo) + impl->currentTags.mdeValues[newidx]->size - 1;
-    if( valueSize<neededsize )
-    {   /* cannot fit all of key data */
-        newdatasize = impl->currentTags.mdeValues[newidx]->size - (neededsize-valueSize);
-        DEBUG_ERR("XA_RESULT_BUFFER_INSUFFICIENT");
-        res = XA_RESULT_BUFFER_INSUFFICIENT;
-    }
-    else
-    {
-        newdatasize = impl->currentTags.mdeValues[newidx]->size;
-        res = XA_RESULT_SUCCESS;
-    }
-    /* copy data up to given size */
-    memcpy(pValue,impl->currentTags.mdeValues[newidx],valueSize-1);
-    /* ensure null-termination */
-#endif
-    memset(pValue->data+newdatasize-1,0,1);
+	if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWMMF)
+	{
+		void *mmfCtx = GetMetadataUtilityContext((XAAdaptationMMFCtx*)impl->adaptCtx);
+		if(mmfCtx)
+		{
+			res = mmf_get_value(mmfCtx, index, valueSize, pValue);
+		}
+		else
+		{
+			res = XA_RESULT_PARAMETER_INVALID;
+		}
+	}
+	else
+	{
+	    /* check index and return unfiltered index */
+	    if(CheckAndUnfilterIndex(impl,index,&newidx) != XA_RESULT_SUCCESS)
+	    {
+	        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+	        DEBUG_API("<-XAMetadataExtractionItfImpl_GetValue");
+	        return XA_RESULT_PARAMETER_INVALID;
+	    }
 
-    pValue->size = newdatasize;
+	    /* needed size = size of struct + size of data - 1 (struct size already includes one char) */
+	    neededsize = sizeof(XAMetadataInfo) + impl->currentTags.mdeValues[newidx]->size - 1;
+	    if( valueSize<neededsize )
+	    {   /* cannot fit all of key data */
+	        newdatasize = impl->currentTags.mdeValues[newidx]->size - (neededsize-valueSize);
+	        DEBUG_ERR("XA_RESULT_BUFFER_INSUFFICIENT");
+	        res = XA_RESULT_BUFFER_INSUFFICIENT;
+	    }
+	    else
+	    {
+	        newdatasize = impl->currentTags.mdeValues[newidx]->size;
+	        res = XA_RESULT_SUCCESS;
+	    }
+	    /* copy data up to given size */
+	    memcpy(pValue,impl->currentTags.mdeValues[newidx],valueSize-1);
+	    /* ensure null-termination */
+
+	    memset(pValue->data+newdatasize-1,0,1);
+
+	    pValue->size = newdatasize;
+	}
 
     DEBUG_API_A1("<-XAMetadataExtractionItfImpl_GetValue (%d)",(int)res);
     return res;
@@ -330,17 +427,18 @@ XAresult XAMetadataExtractionItfImpl_AddKeyFilter(XAMetadataExtractionItf self,
 {
     XAresult res = XA_RESULT_SUCCESS;
     
+    XAuint32 idx = 0;
+    XAuint8 matchMask = 0;
     
-#ifdef _GSTREAMER_BACKEND_  
+ 
     XAMetadataExtractionItfImpl *impl = NULL;
     const XAchar* parsedkey;
     impl = GetImpl(self);
-#endif
+
     DEBUG_API("->XAMetadataExtractionItfImpl_AddKeyFilter");
 
-#ifdef _GSTREAMER_BACKEND_  
-    XAuint32 idx = 0;
-    XAuint8 matchMask = 0;
+ 
+
     if( !impl )
     {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
@@ -349,51 +447,59 @@ XAresult XAMetadataExtractionItfImpl_AddKeyFilter(XAMetadataExtractionItf self,
     }
     else
     {
-        impl->filteringOn = XA_BOOLEAN_TRUE;
-        for(idx=0; idx < impl->currentTags.itemcount; idx++)
-        {
-            if((filterMask & XA_METADATA_FILTER_KEY) && pKey)
-            {
-                parsedkey = XAMetadataAdapt_ParseKhronosKey(pKey);
-                if( strcmp((char*)parsedkey,
-                           (char*)impl->currentTags.mdeKeys[idx]->data) == 0 )
-                {
-                    matchMask |= XA_METADATA_FILTER_KEY;
-                }
-            }
-            if(filterMask & XA_METADATA_FILTER_LANG && pValueLangCountry)
-            {
-                if( strcmp((char*)pValueLangCountry,
-                           (char*)impl->currentTags.mdeKeys[idx]->langCountry) == 0 )
-                {
-                    matchMask |= XA_METADATA_FILTER_LANG;
-                }
-            }
-            if(filterMask & XA_METADATA_FILTER_ENCODING)
-            {
-                if(keyEncoding==impl->currentTags.mdeKeys[idx]->encoding)
-                {
-                    matchMask |= XA_METADATA_FILTER_ENCODING;
-                }
-                if(valueEncoding==impl->currentTags.mdeValues[idx]->encoding)
-                {
-                    matchMask |= XA_METADATA_FILTER_ENCODING;
-                }
-            }
-            /* check if all filters apply */
-            if(filterMask == matchMask)
-            {
-                if(impl->tagmatchesfilter[idx] == XA_BOOLEAN_FALSE)
-                {
-                    impl->tagmatchesfilter[idx] = XA_BOOLEAN_TRUE;
-                    impl->filteredcount++;
-                }
-            }
-            /*reset matchmask*/
-            matchMask=0;
-        }
+    
+		if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWMMF)
+		{
+			DEBUG_API("<-XAMetadataExtractionItfImpl_AddKeyFilter Not Supported in MMF");
+			res = XA_RESULT_PARAMETER_INVALID;
+		}
+		else
+		{
+	        impl->filteringOn = XA_BOOLEAN_TRUE;
+	        for(idx=0; idx < impl->currentTags.itemcount; idx++)
+	        {
+	            if((filterMask & XA_METADATA_FILTER_KEY) && pKey)
+	            {
+	                parsedkey = XAMetadataAdapt_ParseKhronosKey(pKey);
+	                if( strcmp((char*)parsedkey,
+	                           (char*)impl->currentTags.mdeKeys[idx]->data) == 0 )
+	                {
+	                    matchMask |= XA_METADATA_FILTER_KEY;
+	                }
+	            }
+	            if(filterMask & XA_METADATA_FILTER_LANG && pValueLangCountry)
+	            {
+	                if( strcmp((char*)pValueLangCountry,
+	                           (char*)impl->currentTags.mdeKeys[idx]->langCountry) == 0 )
+	                {
+	                    matchMask |= XA_METADATA_FILTER_LANG;
+	                }
+	            }
+	            if(filterMask & XA_METADATA_FILTER_ENCODING)
+	            {
+	                if(keyEncoding==impl->currentTags.mdeKeys[idx]->encoding)
+	                {
+	                    matchMask |= XA_METADATA_FILTER_ENCODING;
+	                }
+	                if(valueEncoding==impl->currentTags.mdeValues[idx]->encoding)
+	                {
+	                    matchMask |= XA_METADATA_FILTER_ENCODING;
+	                }
+	            }
+	            /* check if all filters apply */
+	            if(filterMask == matchMask)
+	            {
+	                if(impl->tagmatchesfilter[idx] == XA_BOOLEAN_FALSE)
+	                {
+	                    impl->tagmatchesfilter[idx] = XA_BOOLEAN_TRUE;
+	                    impl->filteredcount++;
+	                }
+	            }
+	            /*reset matchmask*/
+	            matchMask=0;
+	        }
+	    }
     }
-#endif    
     DEBUG_API_A1("<-XAMetadataExtractionItfImpl_AddKeyFilter (%d)", (int)res);
     return res;
  }
@@ -405,9 +511,9 @@ XAresult XAMetadataExtractionItfImpl_ClearKeyFilter(XAMetadataExtractionItf self
 {
     XAMetadataExtractionItfImpl *impl = NULL;
     XAresult res = XA_RESULT_SUCCESS;
-#ifdef _GSTREAMER_BACKEND_  
+ 
     XAuint32 idx = 0;
-#endif
+
     DEBUG_API("->XAMetadataExtractionItfImpl_ClearKeyFilter");
     impl = GetImpl(self);
     if( !impl )
@@ -417,17 +523,26 @@ XAresult XAMetadataExtractionItfImpl_ClearKeyFilter(XAMetadataExtractionItf self
     }
     else
     {
-        if(impl->tagmatchesfilter)
-        {
-#ifdef _GSTREAMER_BACKEND_  
-            for(idx=0; idx < impl->currentTags.itemcount; idx++)
-            {
-                impl->tagmatchesfilter[idx] = XA_BOOLEAN_FALSE;
-            }
-#endif
-        }
-        impl->filteredcount = 0;
-        impl->filteringOn = XA_BOOLEAN_FALSE;
+    
+		if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWMMF)
+		{
+			DEBUG_API("<-XAMetadataExtractionItfImpl_ClearKeyFilter Not Supported in MMF");
+			res = XA_RESULT_PARAMETER_INVALID;
+		}
+		else
+		{
+	        if(impl->tagmatchesfilter)
+	        {
+	 
+	            for(idx=0; idx < impl->currentTags.itemcount; idx++)
+	            {
+	                impl->tagmatchesfilter[idx] = XA_BOOLEAN_FALSE;
+	            }
+
+	        }
+	        impl->filteredcount = 0;
+	        impl->filteringOn = XA_BOOLEAN_FALSE;
+	    }
     }
 
     DEBUG_API_A1("<-XAMetadataExtractionItfImpl_ClearKeyFilter (%d)", (int)res);
@@ -437,7 +552,7 @@ XAresult XAMetadataExtractionItfImpl_ClearKeyFilter(XAMetadataExtractionItf self
 /*****************************************************************************
  * XAMetadataExtractionItfImpl -specific methods
  *****************************************************************************/
-#ifdef _GSTREAMER_BACKEND_  
+
 /* XAMetadataExtractionItfImpl* XAMetadataExtractionItfImpl_Create()
  * Description: Allocate and initialize XAMetadataExtractionItfImpl
  */
@@ -464,7 +579,11 @@ XAMetadataExtractionItfImpl* XAMetadataExtractionItfImpl_Create(XAAdaptationBase
         self->filteringOn = XA_BOOLEAN_FALSE;
 
         self->adaptCtx = adaptCtx;
-        XAAdaptationBase_AddEventHandler( adaptCtx, &XAMetadataExtractionItfImp_AdaptCb, XA_METADATAEVENTS, self );
+
+		if(self->adaptCtx->fwtype != FWMgrFWMMF)
+		{
+	        XAAdaptationBase_AddEventHandler( adaptCtx, &XAMetadataExtractionItfImp_AdaptCb, XA_METADATAEVENTS, self );
+		}
 
         self->self = self;
     }
@@ -472,7 +591,7 @@ XAMetadataExtractionItfImpl* XAMetadataExtractionItfImpl_Create(XAAdaptationBase
     DEBUG_API("<-XAMetadataExtractionItfImpl_Create");
     return self;
 }
-#endif
+
 /* void XAMetadataExtractionItfImpl_Free(XAMetadataExtractionItfImpl* self)
  * Description: Free all resources reserved at XAMetadataExtractionItfImpl_Create
  */
@@ -480,19 +599,23 @@ void XAMetadataExtractionItfImpl_Free(XAMetadataExtractionItfImpl* self)
 {
     DEBUG_API("->XAMetadataExtractionItfImpl_Free");
     assert(self==self->self);
-#ifdef _GSTREAMER_BACKEND_  
-    XAAdaptationBase_RemoveEventHandler( self->adaptCtx, &XAMetadataExtractionItfImp_AdaptCb );
-    XAMetadataAdapt_FreeImplTagList(&(self->currentTags), XA_BOOLEAN_TRUE);
-#endif
-    if(self->tagmatchesfilter)
-    {
-        free(self->tagmatchesfilter);
-    }
+ 
+	 if(self->adaptCtx->fwtype != FWMgrFWMMF)
+	 {
+    	XAAdaptationBase_RemoveEventHandler( self->adaptCtx, &XAMetadataExtractionItfImp_AdaptCb );
+	    XAMetadataAdapt_FreeImplTagList(&(self->currentTags), XA_BOOLEAN_TRUE);
+		
+		if(self->tagmatchesfilter)
+		{
+			free(self->tagmatchesfilter);
+		}
+	 }
+
     free(self);
     DEBUG_API("<-XAMetadataExtractionItfImpl_Free");
 }
 
-#ifdef _GSTREAMER_BACKEND_  
+ 
 /* With this method, adaptation infroms that new tags are found (e.g. if source,
  * has changed, live stream contains metadata...)
  */
@@ -510,7 +633,7 @@ void XAMetadataExtractionItfImp_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event 
     if( event && event->eventid == XA_ADAPT_MDE_TAGS_AVAILABLE )
     {
         /* get the tag list */
-        XAMetadataExtractionItfAdapt_FillTagList( impl->adaptCtx, &(impl->currentTags) );
+        XAMetadataExtractionItfAdapt_FillTagList( (XAAdaptationGstCtx*)impl->adaptCtx, &(impl->currentTags) );
         if(impl->tagmatchesfilter)
         {
             free(impl->tagmatchesfilter);
@@ -525,14 +648,14 @@ void XAMetadataExtractionItfImp_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event 
     DEBUG_API("<-XAMetadataExtractionItfImp_AdaptCb");
 }
 
-#endif
+
 /* For given index over filtered array, return index over whole array
  */
 XAresult CheckAndUnfilterIndex(XAMetadataExtractionItfImpl *impl,
                                XAuint32 oldidx, XAuint32 *newidx)
 {
     DEBUG_API("->CheckAndUnfilterIndex");
-#ifdef _GSTREAMER_BACKEND_  
+ 
     if( impl->filteringOn )
     {
         XAint16 i=-1;
@@ -568,7 +691,7 @@ XAresult CheckAndUnfilterIndex(XAMetadataExtractionItfImpl *impl,
         }
         *newidx=oldidx;
     }
-#endif
+
     DEBUG_API("<-CheckAndUnfilterIndex");
     return XA_RESULT_SUCCESS;
 }

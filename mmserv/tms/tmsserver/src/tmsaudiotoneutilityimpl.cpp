@@ -25,6 +25,7 @@ using namespace TMS;
 //
 TMSAudioToneUtilityImpl::TMSAudioToneUtilityImpl()
     {
+    iToneUtility = NULL;
     }
 
 // ---------------------------------------------------------------------------

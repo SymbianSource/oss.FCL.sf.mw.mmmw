@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xasnapshotitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XASnapShotItfAdaptation.h"
-#endif
+
+#include "xasnapshotitfadaptation.h"
+
 #include "xathreadsafety.h"
 #include "xaplayitf.h"
 #include "xaglobals.h"
@@ -84,65 +84,73 @@ XAresult XASnapshotItfImpl_InitiateSnapshot(XASnapshotItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    XASnapshotItfAdaptation_GetBurstFPSRange(impl->adapCtx,&minF,&maxF);
-    XASnapshotItfAdaptation_GetMaxPicsPerBurst(impl->adapCtx,&maxP);
-#endif
-    /*Check attributes and initialize local variables*/
-    /*NOTE: bug in spec? - should sink attribute be a pointer?*/
-    if( numberOfPictures > maxP ||
-        (numberOfPictures!=1 && !(sink.pLocator) ) )
-    {
-        /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
-        DEBUG_ERR("XASnapshotItfImpl_InitiateSnapshot -"
-                        "XA_RESULT_PARAMETER_INVALID (numberOfPictures)");
-        DEBUG_API("<-XASnapshotItfImpl_InitiateSnapshot");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-    if( numberOfPictures!=1 && (fps<minF || fps>maxF) )
-    {
-        /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
-        DEBUG_ERR("XASnapshotItfImpl_InitiateSnapshot -"
-                        "XA_RESULT_PARAMETER_INVALID (fps)");
-        DEBUG_API("<-XASnapshotItfImpl_InitiateSnapshot");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-
-    impl->numberofpictures = numberOfPictures;
-    impl->usercontext = pContext;
-    impl->initcallback = initiatedCallback;
-    impl->takencallback = takenCallback;
-    impl->cbPtrToSelf = self;
-    impl->freezevf = freezeViewFinder;
-
-#ifdef _GSTREAMER_BACKEND_
-
-    if( impl->initongoing ||
-        impl->initialized ||
-        impl->snapshotongoing )
-    {
-        res = XASnapshotItfAdaptation_CancelSnapshot(impl->adapCtx);
-        impl->initongoing = XA_BOOLEAN_FALSE;
-        impl->snapshotongoing = XA_BOOLEAN_FALSE;
-    }
-
-    /* Initialize snapshot to adaptation */
-    if( impl->adapCtx )
-    {
-        impl->initongoing = XA_BOOLEAN_TRUE;
-        res = XASnapshotItfAdaptation_InitiateSnapshot(impl->adapCtx,
-                                                       numberOfPictures,
-                                                       fps,
-                                                       freezeViewFinder,
-                                                       &sink);
-    }
+    if(impl->adapCtx && impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        XASnapshotItfAdaptation_GetBurstFPSRange((XAAdaptationGstCtx*)impl->adapCtx,&minF,&maxF);
+        XASnapshotItfAdaptation_GetMaxPicsPerBurst((XAAdaptationGstCtx*)impl->adapCtx,&maxP);
+    
+        /*Check attributes and initialize local variables*/
+        /*NOTE: bug in spec? - should sink attribute be a pointer?*/
+        if( numberOfPictures > maxP ||
+            (numberOfPictures!=1 && !(sink.pLocator) ) )
+        {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
+            DEBUG_ERR("XASnapshotItfImpl_InitiateSnapshot -"
+                            "XA_RESULT_PARAMETER_INVALID (numberOfPictures)");
+            DEBUG_API("<-XASnapshotItfImpl_InitiateSnapshot");
+            return XA_RESULT_PARAMETER_INVALID;
+        }
+        if( numberOfPictures!=1 && (fps<minF || fps>maxF) )
+        {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
+            DEBUG_ERR("XASnapshotItfImpl_InitiateSnapshot -"
+                            "XA_RESULT_PARAMETER_INVALID (fps)");
+            DEBUG_API("<-XASnapshotItfImpl_InitiateSnapshot");
+            return XA_RESULT_PARAMETER_INVALID;
+        }
+    
+        impl->numberofpictures = numberOfPictures;
+        impl->usercontext = pContext;
+        impl->initcallback = initiatedCallback;
+        impl->takencallback = takenCallback;
+        impl->cbPtrToSelf = self;
+        impl->freezevf = freezeViewFinder;
+    
+    
+        if( impl->initongoing ||
+            impl->initialized ||
+            impl->snapshotongoing )
+        {
+            res = XASnapshotItfAdaptation_CancelSnapshot((XAAdaptationGstCtx*)impl->adapCtx);
+            impl->initongoing = XA_BOOLEAN_FALSE;
+            impl->snapshotongoing = XA_BOOLEAN_FALSE;
+        }
+    
+        /* Initialize snapshot to adaptation */
+        if( impl->adapCtx )
+            {
+            impl->initongoing = XA_BOOLEAN_TRUE;
+            res = XASnapshotItfAdaptation_InitiateSnapshot((XAAdaptationGstCtx*)impl->adapCtx,
+                                                           numberOfPictures,
+                                                           fps,
+                                                           freezeViewFinder,
+                                                           &sink);
+            }
+        else
+            {
+            res = XA_RESULT_INTERNAL_ERROR;
+            }
+    
+        }
     else
-    {
-        res = XA_RESULT_INTERNAL_ERROR;
-    }
-#endif
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XASnapshotItfImpl_InitiateSnapshot");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;      
+        }
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
     DEBUG_API_A1("<-XASnapshotItfImpl_InitiateSnapshot (%d)", (int)res);
     return res;
@@ -169,45 +177,53 @@ XAresult XASnapshotItfImpl_TakeSnapshot(XASnapshotItf self)
         res = XA_RESULT_PARAMETER_INVALID;
     }
 
-    if( impl->initongoing ||
-        impl->snapshotongoing ||
-        !impl->initialized )
-    {
-        XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
-        DEBUG_ERR("XASnapshotItfImpl_TakeSnapshot -"
-                        "XA_RESULT_PRECONDITIONS_VIOLATED");
-        DEBUG_API("<-XASnapshotItfImpl_TakeSnapshot");
-        return XA_RESULT_PRECONDITIONS_VIOLATED;
-    }
-
-    if( impl->numberofpictures == 0 )
-    {
-        if( impl->takencallback )
+    if(impl->adapCtx && impl->adapCtx->fwtype == FWMgrFWGST)
         {
-            impl->takencallback(impl->cbPtrToSelf, impl->usercontext,
-                                impl->numberofpictures, NULL);
+        if( impl->initongoing ||
+            impl->snapshotongoing ||
+            !impl->initialized )
+            {
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
+            DEBUG_ERR("XASnapshotItfImpl_TakeSnapshot -"
+                            "XA_RESULT_PRECONDITIONS_VIOLATED");
+            DEBUG_API("<-XASnapshotItfImpl_TakeSnapshot");
+            return XA_RESULT_PRECONDITIONS_VIOLATED;
+            }
+    
+        if( impl->numberofpictures == 0 )
+            {
+            if( impl->takencallback )
+                {
+                impl->takencallback(impl->cbPtrToSelf, impl->usercontext,
+                                    impl->numberofpictures, NULL);
+                }
+            res = XA_RESULT_SUCCESS;
+            }
+        /*Inform adaptation to take snapshot*/
+        else if( impl->adapCtx )
+            {
+            impl->snapshotongoing = XA_BOOLEAN_TRUE;
+            res = XASnapshotItfAdaptation_TakeSnapshot((XAAdaptationGstCtx*)impl->adapCtx);
+            if( res!=XA_RESULT_SUCCESS )
+                {
+                DEBUG_ERR_A1("Adaptation returns error %d taking snapshot!", (int)res);
+                impl->snapshotongoing = XA_BOOLEAN_FALSE;
+                }
+            }
+        else
+            {
+            res = XA_RESULT_INTERNAL_ERROR;
+            DEBUG_ERR("XASnapshotItfImpl_TakeSnapshot"
+                    "-XA_RESULT_INTERNAL_ERROR ");
+            }
+    
         }
-        res = XA_RESULT_SUCCESS;
-    }
-#ifdef _GSTREAMER_BACKEND_
-    /*Inform adaptation to take snapshot*/
-    else if( impl->adapCtx )
-    {
-        impl->snapshotongoing = XA_BOOLEAN_TRUE;
-        res = XASnapshotItfAdaptation_TakeSnapshot(impl->adapCtx);
-        if( res!=XA_RESULT_SUCCESS )
-        {
-            DEBUG_ERR_A1("Adaptation returns error %d taking snapshot!", (int)res);
-            impl->snapshotongoing = XA_BOOLEAN_FALSE;
-        }
-    }
-#endif    
     else
-    {
-        res = XA_RESULT_INTERNAL_ERROR;
-        DEBUG_ERR("XASnapshotItfImpl_TakeSnapshot"
-                "-XA_RESULT_INTERNAL_ERROR ");
-    }
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XASnapshotItfImpl_TakeSnapshot");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;      
+        }
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
     DEBUG_API("<-XASnapshotItfImpl_TakeSnapshot");
@@ -235,26 +251,33 @@ XAresult XASnapshotItfImpl_CancelSnapshot(XASnapshotItf self)
         /* invalid parameter */
         res = XA_RESULT_PARAMETER_INVALID;
     }
-
-    if( impl->initongoing ||
-        impl->snapshotongoing ||
-        impl->initialized )
-    {
-#ifdef _GSTREAMER_BACKEND_
-        if( impl->adapCtx )
+    if(impl->adapCtx && impl->adapCtx->fwtype == FWMgrFWGST)
         {
-            res = XASnapshotItfAdaptation_CancelSnapshot(impl->adapCtx);
+        if( impl->initongoing ||
+            impl->snapshotongoing ||
+            impl->initialized )
+            {
+            if( impl->adapCtx )
+                {
+                res = XASnapshotItfAdaptation_CancelSnapshot((XAAdaptationGstCtx*)impl->adapCtx);
+                }
+            else
+                {
+                DEBUG_ERR("No adaptation context!!");
+                res = XA_RESULT_INTERNAL_ERROR;
+                }
+            impl->initongoing = XA_BOOLEAN_FALSE;
+            impl->snapshotongoing = XA_BOOLEAN_FALSE;
+            impl->initialized = XA_BOOLEAN_FALSE;
+            }
+    
         }
-        else
+    else
         {
-            DEBUG_ERR("No adaptation context!!");
-            res = XA_RESULT_INTERNAL_ERROR;
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XASnapshotItfImpl_CancelSnapshot");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;         
         }
-#endif        
-        impl->initongoing = XA_BOOLEAN_FALSE;
-        impl->snapshotongoing = XA_BOOLEAN_FALSE;
-        impl->initialized = XA_BOOLEAN_FALSE;
-    }
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
     DEBUG_API_A1("<-XASnapshotItfImpl_CancelSnapshot (%d)", (int)res);
@@ -277,24 +300,34 @@ XAresult XASnapshotItfImpl_ReleaseBuffers(XASnapshotItf self,
         /* invalid parameter */
         res =  XA_RESULT_PARAMETER_INVALID;
     }
-    if( image && (image->pLocator) &&
-        *((XAuint32*)(image->pLocator)) == XA_DATALOCATOR_ADDRESS )
-    {
-        if( ((XADataLocator_Address*)(image->pLocator))->pAddress )
+    if(impl->adapCtx && impl->adapCtx->fwtype == FWMgrFWGST)
         {
-            free(((XADataLocator_Address*)(image->pLocator))->pAddress);
+        if( image && (image->pLocator) &&
+        *((XAuint32*)(image->pLocator)) == XA_DATALOCATOR_ADDRESS )
+            {
+            if( ((XADataLocator_Address*)(image->pLocator))->pAddress )
+                {
+                free(((XADataLocator_Address*)(image->pLocator))->pAddress);
+                }
+            image->pLocator = NULL;
+            image->pFormat = NULL;
+            DEBUG_API("<-XASnapshotItfImpl_ReleaseBuffers- buffers released");
+            res = XA_RESULT_SUCCESS;
+            }
+        else
+            {
+            DEBUG_ERR_A1("<-XASnapshotItfImpl_ReleaseBuffers- "
+                    "INVALID XADataSink at 0x%x", (int)image);
+            res = XA_RESULT_PARAMETER_INVALID;
+            }
         }
-        image->pLocator = NULL;
-        image->pFormat = NULL;
-        DEBUG_API("<-XASnapshotItfImpl_ReleaseBuffers- buffers released");
-        res = XA_RESULT_SUCCESS;
-    }
     else
-    {
-        DEBUG_ERR_A1("<-XASnapshotItfImpl_ReleaseBuffers- "
-                "INVALID XADataSink at 0x%x", (int)image);
-        res = XA_RESULT_PARAMETER_INVALID;
-    }
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XASnapshotItfImpl_ReleaseBuffers");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;     
+        }
+    
     DEBUG_API("<-XASnapshotItfImpl_ReleaseBuffers");
     return res;
 }
@@ -319,19 +352,26 @@ XAresult XASnapshotItfImpl_GetMaxPicsPerBurst(XASnapshotItf self,
         DEBUG_API("<-XASnapshotItfImpl_GetMaxPicsPerBurst");
         return XA_RESULT_PARAMETER_INVALID;
     }
-
-#ifdef _GSTREAMER_BACKEND_
-    if( impl->adapCtx )
-    {
-        res = XASnapshotItfAdaptation_GetMaxPicsPerBurst(impl->adapCtx, maxNumberOfPictures);
-    }
+    if(impl->adapCtx && impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        if( impl->adapCtx )
+            {
+            res = XASnapshotItfAdaptation_GetMaxPicsPerBurst((XAAdaptationGstCtx*)impl->adapCtx, maxNumberOfPictures);
+            }
+        else
+            {
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
+            DEBUG_API("<-XASnapshotItfImpl_GetMaxPicsPerBurst");
+            return XA_RESULT_INTERNAL_ERROR;
+            }
+        }
     else
-    {
-        XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
         DEBUG_API("<-XASnapshotItfImpl_GetMaxPicsPerBurst");
-        return XA_RESULT_INTERNAL_ERROR;
-    }
-#endif
+        res = XA_RESULT_FEATURE_UNSUPPORTED;     
+        }
+    
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
     DEBUG_API("<-XASnapshotItfImpl_GetMaxPicsPerBurst");
     return res;
@@ -361,18 +401,25 @@ XAresult XASnapshotItfImpl_GetBurstFPSRange(XASnapshotItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    if( impl->adapCtx )
-    {
-        res = XASnapshotItfAdaptation_GetBurstFPSRange(impl->adapCtx,minFPS,maxFPS);
-    }
+    if(impl->adapCtx && impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        if( impl->adapCtx )
+            {
+            res = XASnapshotItfAdaptation_GetBurstFPSRange((XAAdaptationGstCtx*)impl->adapCtx,minFPS,maxFPS);
+            }
+        else
+            {
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
+            DEBUG_API("<-XASnapshotItfImpl_GetBurstFPSRange");
+            return XA_RESULT_INTERNAL_ERROR;
+            }
+        }
     else
-    {
-        XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
         DEBUG_API("<-XASnapshotItfImpl_GetBurstFPSRange");
-        return XA_RESULT_INTERNAL_ERROR;
-    }
-#endif
+        res = XA_RESULT_FEATURE_UNSUPPORTED; 
+        }
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
     DEBUG_API("<-XASnapshotItfImpl_GetBurstFPSRange");
     return res;
@@ -397,14 +444,21 @@ XAresult XASnapshotItfImpl_SetShutterFeedback(XASnapshotItf self,
         res = XA_RESULT_PARAMETER_INVALID;
     }
     impl->shutterfeedback = enabled;
+    if(impl->adapCtx && impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        if( impl->adapCtx )
+            {
+            /*Inform adaptation about shutter feedback */
+            res = XASnapshotItfAdaptation_SetShutterFeedback((XAAdaptationGstCtx*)impl->adapCtx, enabled);
+            }           
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XASnapshotItfImpl_GetBurstFPSRange");
+        res = XA_RESULT_FEATURE_UNSUPPORTED; 
+        }
     
-#ifdef _GSTREAMER_BACKEND_
-    if( impl->adapCtx )
-    {
-        /*Inform adaptation about shutter feedback */
-        res = XASnapshotItfAdaptation_SetShutterFeedback(impl->adapCtx, enabled);
-    }
-#endif
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
     DEBUG_API("<-XASnapshotItfImpl_SetShutterFeedback");
     return res;
@@ -441,14 +495,12 @@ XAresult XASnapshotItfImpl_GetShutterFeedback(XASnapshotItf self,
  * XASnapshotItfImpl* XASnapshotItfImpl_Create()
  * Description: Allocate and initialize SnapshotItfImpl
  **/
-XASnapshotItfImpl* XASnapshotItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adaptCtx
-#endif
-        )
+XASnapshotItfImpl* XASnapshotItfImpl_Create(XAMediaRecorderImpl* impl)
 {
     XASnapshotItfImpl* self = (XASnapshotItfImpl*)
         calloc(1,sizeof(XASnapshotItfImpl));
+    
+   
     DEBUG_API("->XASnapshotItfImpl_Create");
     if( self )
     {
@@ -463,17 +515,13 @@ XASnapshotItfImpl* XASnapshotItfImpl_Create(
         self->itf.TakeSnapshot = XASnapshotItfImpl_TakeSnapshot;
 
         /* init variables */
-#ifdef _GSTREAMER_BACKEND_
-        self->adapCtx = adapCtx;
-#endif
+        self->adapCtx = impl->adaptationCtx;
         self->self = self;
         self->cbPtrToSelf = NULL;
     }
 
-#ifdef _GSTREAMER_BACKEND_
     /* Add call back function to eventhandler. */
-    XAAdaptationBase_AddEventHandler( adapCtx, &XASnapshotItfImpl_AdaptCb, XA_SNAPSHOTITFEVENTS, self );
-#endif
+    XAAdaptationBase_AddEventHandler( impl->adaptationCtx, &XASnapshotItfImpl_AdaptCb, XA_SNAPSHOTITFEVENTS, self );
     DEBUG_API("<-XASnapshotItfImpl_Create");
     return self;
 }
@@ -489,17 +537,12 @@ void XASnapshotItfImpl_Free(XASnapshotItfImpl* self)
     /*
      * Free all resources reserved at XASnapshotItfImpl_Create
      */
-#ifdef _GSTREAMER_BACKEND_
-    if( self->adapCtx )
-    {
-        XASnapshotItfAdaptation_CancelSnapshot(self->adapCtx);
-    }
+    self->itf.CancelSnapshot(self->cbPtrToSelf);
     XAAdaptationBase_RemoveEventHandler( self->adapCtx, &XASnapshotItfImpl_AdaptCb );
-#endif    
     free( self );
     DEBUG_API("<-XASnapshotItfImpl_Free");
 }
-#ifdef _GSTREAMER_BACKEND_
+
 /* void XASnapshotItfImpl_AdaptCb
  * Description:
  * Listen adaptation callBacks from camera adaptation
@@ -551,5 +594,4 @@ void XASnapshotItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
     }
     DEBUG_API("<-XASnapshotItfImpl_AdaptCb");
 }
-#endif
 /*End of file*/

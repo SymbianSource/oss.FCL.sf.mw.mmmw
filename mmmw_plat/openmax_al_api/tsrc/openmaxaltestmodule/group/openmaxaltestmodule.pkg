@@ -20,7 +20,7 @@
 &EN
 
 ; Provide value for uid
-#{"STIF"},(0x10207CA4),1,1,0,TYPE=SA
+#{"OpenMAXALTestModule"},(0x10207CA4),1,1,0,TYPE=SA
 
 ; Series60 product id for S60 3.0
 [0x101F7961], 0, 0, 0, {"Series60ProductID"}
@@ -49,17 +49,34 @@
 "\epoc32\release\armv5\udeb\openmaxaltestmodule.dll"                -   "!:\sys\bin\openmaxaltestmodule.dll"
 "..\conf\openmaxaltestmodule_global.cfg"                            -   "!:\testframework\openmaxaltestmodule_global.cfg"
 "..\conf\openmaxaltestmodule_common.cfg"                            -   "!:\testframework\openmaxaltestmodule_common.cfg"
+"..\conf\openmaxaltestmodule_common_noklinvolitf.cfg"               -   "!:\testframework\openmaxaltestmodule_common_noklinvolitf.cfg"
+"..\conf\openmaxaltestmodule_common_nokvolextitf.cfg"               -   "!:\testframework\openmaxaltestmodule_common_nokvolextitf.cfg"
+"..\conf\openmaxaltestmodule_common_volumeitf.cfg"                  -   "!:\testframework\openmaxaltestmodule_common_volumeitf.cfg"
 "..\conf\openmaxaltestmodule_objectitf.cfg"                         -   "!:\testframework\openmaxaltestmodule_objectitf.cfg"
 "..\conf\openmaxaltestmodule_engine_engineitf.cfg"                  -   "!:\testframework\openmaxaltestmodule_engine_engineitf.cfg"
 "..\conf\openmaxaltestmodule_engine_audenccapitf.cfg"               -   "!:\testframework\openmaxaltestmodule_engine_audenccapitf.cfg"
 "..\conf\openmaxaltestmodule_engine_aiodcitf.cfg"                   -   "!:\testframework\openmaxaltestmodule_engine_aiodcitf.cfg"
-"..\conf\openmaxaltestmodule_ro_recorditf.cfg"                      -   "!:\testframework\openmaxaltestmodule_ro_recorditf.cfg"
-"..\conf\openmaxaltestmodule_ro_mdinsertionitf.cfg"                 -   "!:\testframework\openmaxaltestmodule_ro_mdinsertionitf.cfg"
-"..\conf\openmaxaltestmodule_ro_audioencoderitf.cfg"                -   "!:\testframework\openmaxaltestmodule_ro_audioencoderitf.cfg"
-
+"..\conf\openmaxaltestmodule_mr.cfg"                      			-   "!:\testframework\openmaxaltestmodule_mr.cfg"
+"..\conf\openmaxaltestmodule_mr_recorditf.cfg"                      -   "!:\testframework\openmaxaltestmodule_mr_recorditf.cfg"
+"..\conf\openmaxaltestmodule_mr_mdinsertionitf.cfg"                 -   "!:\testframework\openmaxaltestmodule_mr_mdinsertionitf.cfg"
+"..\conf\openmaxaltestmodule_mr_audioencoderitf.cfg"                -   "!:\testframework\openmaxaltestmodule_mr_audioencoderitf.cfg"
+"..\conf\openmaxaltestmodule_mp.cfg"                                -   "!:\testframework\openmaxaltestmodule_mp.cfg"
+"..\conf\openmaxaltestmodule_mo.cfg"                                -   "!:\testframework\openmaxaltestmodule_mo.cfg"
+"..\conf\openmaxaltestmodule_mp_objectitf.cfg"                      -   "!:\testframework\openmaxaltestmodule_mp_objectitf.cfg"
+"..\conf\openmaxaltestmodule_mp_playitf.cfg"                        -   "!:\testframework\openmaxaltestmodule_mp_playitf.cfg"
+"..\conf\openmaxaltestmodule_mp_seekitf.cfg"                        -   "!:\testframework\openmaxaltestmodule_mp_seekitf.cfg"
+"..\conf\openmaxaltestmodule_common_dynsrcitf.cfg"                      -   "!:\testframework\openmaxaltestmodule_common_dynsrcitf.cfg"
+"..\conf\openmaxaltestmodule_mp_strminfoitf.cfg"                    -   "!:\testframework\openmaxaltestmodule_mp_strminfoitf.cfg"
+"..\conf\openmaxaltestmodule_mp_preemption.cfg"                     -   "!:\testframework\openmaxaltestmodule_mp_preemption.cfg"
+"..\conf\openmaxaltestmodule_mo_mdextractionitf.cfg"                -   "!:\testframework\openmaxaltestmodule_mo_mdextractionitf.cfg"
+"..\conf\openmaxaltestmodule_mp_mdextractionitf.cfg"                -   "!:\testframework\openmaxaltestmodule_mp_mdextractionitf.cfg"
+"..\conf\openmaxaltestmodule_mp_variousformats.cfg"                 -   "!:\testframework\openmaxaltestmodule_mp_variousformats.cfg"
 ;data files
 "..\data\c\omxaltestdata\test.wav"                                  -   "!:\testing\data\omxaltestdata\test.wav"
-
+"..\data\c\omxaltestdata\test.mp3"                                  -  "!:\testing\data\omxaltestdata\test.mp3"
+"..\data\c\omxaltestdata\test.3gp"                                  -  "!:\testing\data\omxaltestdata\test.3gp"
+"..\data\c\omxaltestdata\JapJap.mp3"                                -   "!:\testing\data\omxaltestdata\JapJap.mp3"
+"..\data\c\omxaltestdata\testmp4.mp4"                               -   "!:\testing\data\omxaltestdata\testmp4.mp4"
 ; Embedded SIS 
 ; None
 

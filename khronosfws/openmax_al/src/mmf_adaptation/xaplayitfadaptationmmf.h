@@ -18,8 +18,8 @@
 #ifndef XAPLAYITFADAPTATIONMMF_H
 #define XAPLAYITFADAPTATIONMMF_H
 
-#include "xaadaptationcontextbasemmf.h"
-#include "xadebug.h"
+#include "xaadaptationmmf.h"
+
 
 #ifdef _DEBUG
 /*parse state names for debug prints*/
@@ -35,10 +35,14 @@ static const char* playstatenamemmf[3] =
 
 /* FUNCTIONS */
 
-XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseMMFCtx *bCtx, XAuint32 state);
-XAresult XAPlayItfAdaptMMF_GetDuration(XAAdaptationBaseMMFCtx *bCtx, XAmillisecond *pMsec);
-XAresult XAPlayItfAdaptMMF_GetPosition(XAAdaptationBaseMMFCtx *bCtx, XAmillisecond *pMsec);
-XAresult XAPlayItfAdaptMMF_EnablePositionTracking(XAAdaptationBaseMMFCtx *bCtx, XAboolean enable);
-
+XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseCtx *bCtx, XAuint32 state);
+XAresult XAPlayItfAdaptMMF_GetPlayState(XAAdaptationBaseCtx *bCtx, XAuint32 *pState);
+XAresult XAPlayItfAdaptMMF_GetDuration(XAAdaptationBaseCtx *bCtx, XAmillisecond *pMsec);
+XAresult XAPlayItfAdaptMMF_GetPosition(XAAdaptationBaseCtx *bCtx, XAmillisecond *pMsec);
+XAresult XAPlayItfAdaptMMF_RegisterCallback(XAAdaptationBaseCtx *bCtx, xaPlayCallback callback);
+XAresult XAPlayItfAdaptMMF_SetCallbackEventsMask(XAAdaptationBaseCtx *bCtx, XAuint32 eventFlags);
+XAresult XAPlayItfAdaptMMF_SetMarkerPosition(XAAdaptationBaseCtx *bCtx, XAmillisecond mSec);
+XAresult XAPlayItfAdaptMMF_ClearMarkerPosition(XAAdaptationBaseCtx *bCtx);
+XAresult XAPlayItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationBaseCtx *bCtx, XAmillisecond mSec);
 
 #endif /* XAPLAYITFADAPTATIONMMF_H */

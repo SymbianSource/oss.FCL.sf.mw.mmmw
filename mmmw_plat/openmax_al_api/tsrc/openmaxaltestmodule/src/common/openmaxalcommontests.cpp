@@ -20,6 +20,7 @@
 #include <StifParser.h>
 #include <StifTestInterface.h>
 #include "openmaxaltestmodule.h"
+#include <coedef.h>
 
 // EXTERNAL DATA STRUCTURES
 //extern  ?external_data;
@@ -92,11 +93,19 @@ TInt COpenMAXALTestModule::al_SetDataSink( CStifItemParser& aItem )
             case XA_DATALOCATOR_ADDRESS:
             case XA_DATALOCATOR_IODEVICE:
                 {
-                commonSink.pLocator = &m_IODevice;
+                m_SinkIODevice.locatorType = XA_DATALOCATOR_IODEVICE;
+                commonSink.pLocator = &m_SinkIODevice;
                 }
-            case XA_DATALOCATOR_OUTPUTMIX:
-            case XA_DATALOCATOR_NATIVEDISPLAY:
                 break;
+            case XA_DATALOCATOR_NATIVEDISPLAY:
+                {
+                m_NativeDisplay.locatorType = XA_DATALOCATOR_NATIVEDISPLAY;
+                m_NativeDisplay.hWindow = (void*)&iRWindow;
+                m_NativeDisplay.hDisplay = (void*)&iRwSession;
+                commonSink.pLocator = &m_NativeDisplay;
+                }
+                break;
+            case XA_DATALOCATOR_OUTPUTMIX:
             default:
                 status = KErrGeneral;
                 break;
@@ -106,22 +115,33 @@ TInt COpenMAXALTestModule::al_SetDataSink( CStifItemParser& aItem )
     if(!status)
         {
         status = aItem.GetNextInt(formattype);
-        
-        switch(formattype)
-            {
-            case XA_DATAFORMAT_MIME:
+        if (type == XA_DATALOCATOR_IODEVICE)
+            { /* Sink IO device can only be audio output*/
+            if (formattype == 6)
                 {
-                commonSink.pFormat = &m_Mime;
+                m_SinkIODevice.deviceType = formattype;
                 }
-                break;
-            case XA_DATAFORMAT_PCM:
-            case XA_DATAFORMAT_RAWIMAGE:
-                break;
-            default:
+            else
+                {
                 status = KErrGeneral;
-                break;
+                }
             }
-
+        else
+            {
+            switch(formattype)
+                {
+                case XA_DATAFORMAT_MIME:
+                    {
+                    commonSink.pFormat = &m_Mime;
+                    }
+                    break;
+                case XA_DATAFORMAT_PCM:
+                case XA_DATAFORMAT_RAWIMAGE:
+                    break;
+                default:
+                    break;
+                }
+            }
         }
 
     if(!status)
@@ -176,7 +196,7 @@ TInt COpenMAXALTestModule::al_SetDataSource( CStifItemParser& aItem )
             case XA_DATALOCATOR_ADDRESS:
             case XA_DATALOCATOR_IODEVICE:
                 {
-                commonSource.pLocator = &m_IODevice;
+                commonSource.pLocator = &m_SrcIODevice;
                 }
             case XA_DATALOCATOR_OUTPUTMIX:
             case XA_DATALOCATOR_NATIVEDISPLAY:
@@ -203,7 +223,6 @@ TInt COpenMAXALTestModule::al_SetDataSource( CStifItemParser& aItem )
                 case XA_DATAFORMAT_RAWIMAGE:
                     break;
                 default:
-                    status = KErrGeneral;
                     break;
                 }
             }
@@ -226,6 +245,10 @@ TInt COpenMAXALTestModule::al_SetDataSource( CStifItemParser& aItem )
                 case 3:
                     m_MOMetadataExtractorSource = commonSource;
                     break;
+                case 4:
+                    m_DynamicSource = commonSource;
+                    break;
+                    
                 default:
                     status = KErrGeneral;
                     break;
@@ -280,9 +303,27 @@ TInt COpenMAXALTestModule::al_SetDataLocator( CStifItemParser& aItem )
                 status = aItem.GetNextInt(deviceId);
                 if(!status)
                     {
-                    m_IODevice.deviceID = deviceId;
-                    m_IODevice.deviceType = devicetype;
-                    m_IODevice.locatorType = XA_DATALOCATOR_IODEVICE;
+                    TInt srcsinktype(0);
+                    status = aItem.GetNextInt(srcsinktype);
+                    if(!status)
+                        {
+                        if(srcsinktype == 1)
+                            {
+                            m_SrcIODevice.deviceID = deviceId;
+                            m_SrcIODevice.deviceType = devicetype;
+                            m_SrcIODevice.locatorType = XA_DATALOCATOR_IODEVICE;                    
+                            }
+                        else
+                            {
+                            m_SinkIODevice.deviceID = deviceId;
+                            m_SinkIODevice.deviceType = devicetype;
+                            m_SinkIODevice.locatorType = XA_DATALOCATOR_IODEVICE;                    
+                            }
+                        }
+                    else
+                        {
+                        status = KErrGeneral;
+                        }
                     }
                 else
                     {
@@ -357,3 +398,76 @@ TInt COpenMAXALTestModule::al_SetDataFormat( CStifItemParser& aItem )
     return status;   
     }
 
+TInt COpenMAXALTestModule::al_CreateWindow( CStifItemParser& aItem )
+    {
+    TInt status(KErrNone);
+    if (iRwSession.Handle())
+        User::Leave(KErrAlreadyExists);
+
+    TInt topX;
+    TInt topY ;
+    TInt bottomX;
+    TInt bottomY;
+    TInt posX;
+    TInt posY;
+    
+    status = aItem.GetNextInt(posX);
+    RET_ERR_IF_ERR(status);
+    status = aItem.GetNextInt(posY);
+    RET_ERR_IF_ERR(status);
+
+    status = aItem.GetNextInt(topX);
+    RET_ERR_IF_ERR(status);
+    status = aItem.GetNextInt(topY);
+    RET_ERR_IF_ERR(status);
+    status = aItem.GetNextInt(bottomX);
+    RET_ERR_IF_ERR(status);
+    status = aItem.GetNextInt(bottomY);
+    RET_ERR_IF_ERR(status);
+
+    /* Create resources needed for video play back*/
+    status = iRwSession.Connect();
+    RET_ERR_IF_ERR(status);
+
+    TInt groupId = iRwSession.GetFocusWindowGroup();
+    iRwGroup = RWindowGroup(iRwSession);
+    status = iRwGroup.Construct(groupId, ETrue);
+    RET_ERR_IF_ERR(status);
+    _LIT(KXASTIFWindowGroupName,"XASTIF");
+    iRwGroup.SetName(KXASTIFWindowGroupName);
+    iRwGroup.SetOrdinalPosition(0, ECoeWinPriorityAlwaysAtFront);
+
+    iRWindow = RWindow(iRwSession);
+    status = iRWindow.Construct(iRwGroup, (TUint32) this + 1);
+    RET_ERR_IF_ERR(status);
+
+    TPoint point(posX, posY);
+    iRWindow.SetPosition(point);
+    TRect rect(topX, topY, bottomX, bottomY);
+    TSize size(rect.Size());
+    iRWindow.SetSize(size);
+    iRWindow.Activate();
+    iRWindow.SetVisible(ETrue);
+    iRwSession.Flush();
+    iDevice = NULL;
+    iDevice = new CWsScreenDevice(iRwSession);
+    if (!iDevice)
+        {
+        status = KErrNoMemory;
+        }
+    RET_ERR_IF_ERR(status);
+
+    status = iDevice->Construct(0);
+    return status;
+    }
+
+TInt COpenMAXALTestModule::al_DeleteWindow( CStifItemParser& /*aItem*/ )
+    {
+    delete iDevice;
+    iDevice = NULL;
+    iRWindow.SetVisible(EFalse);
+    iRWindow.Close();
+    iRwGroup.Close();
+    iRwSession.Close();
+    return KErrNone;
+    }

@@ -21,13 +21,11 @@
 
 #include "xaseekitf.h"
 
-#ifdef _GSTREAMER_BACKEND_
-#include "XASeekItfAdaptation.h"
-#include "XAPlayItfAdaptation.h"
-#endif
+#include "xaseekitfadaptation.h"
+#include "xaplayitfadaptation.h"
 #include "xathreadsafety.h"
-
-
+#include "xaplayitfadaptationmmf.h"
+#include "xaseekitfadaptationmmf.h"
 /**
  * XASeekItfImpl* GetImpl(XASeekItf self)
  * Description: Validate interface pointer and cast it to implementation pointer.
@@ -72,44 +70,80 @@ XAresult XASeekItfImpl_SetPosition(XASeekItf self, XAmillisecond pos,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    /* Get duration of the content */
-    if(XAPlayItfAdapt_GetDuration(impl->adapCtx, &duration) != XA_RESULT_SUCCESS)
-    {
-        /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("<-XASeekItfImpl_SetPosition");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-#endif
+
+    if(impl->adapCtx->fwtype == FWMgrFWMMF)
+        {
+        /* Get duration of the content */
+        if(XAPlayItfAdaptMMF_GetDuration((XAAdaptationBaseCtx*)impl->adapCtx, &duration) != XA_RESULT_SUCCESS)
+            {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XASeekItfImpl_SetPosition");
+            return XA_RESULT_PARAMETER_INVALID;
+            }
+        if(pos > duration)
+            {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XASeekItfImpl_SetPosition");
+            return XA_RESULT_PARAMETER_INVALID;
+            }
     
-    if(pos > duration)
-    {
-        /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("<-XASeekItfImpl_SetPosition");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-
-    if(seekMode != XA_SEEKMODE_FAST && seekMode != XA_SEEKMODE_ACCURATE)
-    {
-        /* seek mode unsupported */
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
-        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
-        DEBUG_API("<-XASeekItfImpl_SetPosition");
-        return XA_RESULT_FEATURE_UNSUPPORTED;
-    }
-
-#ifdef _GSTREAMER_BACKEND_
-    ret = XASeekItfAdapt_SetPosition(impl->adapCtx, pos, seekMode);
-#endif
-    if(ret == XA_RESULT_SUCCESS)
-    {
-        impl->playbackPosition = pos;
-        impl->seekMode = seekMode;
-    }
+        if(seekMode != XA_SEEKMODE_FAST && seekMode != XA_SEEKMODE_ACCURATE)
+            {
+            /* seek mode unsupported */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+            DEBUG_API("<-XASeekItfImpl_SetPosition");
+            return XA_RESULT_FEATURE_UNSUPPORTED;
+            }
+    
+        ret = XASeekItfAdaptMMF_SetPosition(impl->adapCtx, pos, seekMode);
+        if(ret == XA_RESULT_SUCCESS)
+            {
+            impl->playbackPosition = pos;
+            impl->seekMode = seekMode;
+            }
+        }
+    else
+        {
+        /* Get duration of the content */
+        if(XAPlayItfAdaptGST_GetDuration((XAAdaptationGstCtx*)impl->adapCtx, &duration) != XA_RESULT_SUCCESS)
+            {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XASeekItfImpl_SetPosition");
+            return XA_RESULT_PARAMETER_INVALID;
+            }
+        if(pos > duration)
+            {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XASeekItfImpl_SetPosition");
+            return XA_RESULT_PARAMETER_INVALID;
+            }
+    
+        if(seekMode != XA_SEEKMODE_FAST && seekMode != XA_SEEKMODE_ACCURATE)
+            {
+            /* seek mode unsupported */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+            DEBUG_API("<-XASeekItfImpl_SetPosition");
+            return XA_RESULT_FEATURE_UNSUPPORTED;
+            }
+    
+        ret = XASeekItfAdapt_SetPosition((XAAdaptationGstCtx*)impl->adapCtx, pos, seekMode);
+        if(ret == XA_RESULT_SUCCESS)
+            {
+            impl->playbackPosition = pos;
+            impl->seekMode = seekMode;
+            }
+    
+        }
 
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
     DEBUG_API("<-XASeekItfImpl_SetPosition");
@@ -139,35 +173,63 @@ XAresult XASeekItfImpl_SetLoop(XASeekItf self, XAboolean loopEnable,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    /* Get duration of the content */
-    if(XAPlayItfAdapt_GetDuration(impl->adapCtx, &duration) != XA_RESULT_SUCCESS)
-    {
-        /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("<-XASeekItfImpl_SetLoop");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-#endif
-    if(endPos > duration && endPos != XA_TIME_UNKNOWN)
-    {
-        /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("<-XASeekItfImpl_SetLoop");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-
-#ifdef _GSTREAMER_BACKEND_
-    ret = XASeekItfAdapt_SetLoop(impl->adapCtx, loopEnable, startPos, endPos);
-#endif
-    if(ret == XA_RESULT_SUCCESS)
-    {
-        impl->loopEnable = loopEnable;
-        impl->startPos = startPos;
-        impl->endPos = endPos;
-    }
+    if(impl->adapCtx->fwtype == FWMgrFWMMF)
+        {
+        /* Get duration of the content */
+        if(XAPlayItfAdaptMMF_GetDuration((XAAdaptationBaseCtx*)impl->adapCtx, &duration) != XA_RESULT_SUCCESS)
+            {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XASeekItfImpl_SetLoop");
+            return XA_RESULT_PARAMETER_INVALID;
+            }
+        if(endPos > duration && endPos != XA_TIME_UNKNOWN)
+            {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XASeekItfImpl_SetLoop");
+            return XA_RESULT_PARAMETER_INVALID;
+            }
+    
+        ret = XASeekItfAdaptMMF_SetLoop(impl->adapCtx, loopEnable, startPos, endPos);
+        if(ret == XA_RESULT_SUCCESS)
+            {
+            impl->loopEnable = loopEnable;
+            impl->startPos = startPos;
+            impl->endPos = endPos;
+            }    
+        }
+    else
+        {
+        /* Get duration of the content */
+        if(XAPlayItfAdaptGST_GetDuration((XAAdaptationGstCtx*)impl->adapCtx, &duration) != XA_RESULT_SUCCESS)
+            {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XASeekItfImpl_SetLoop");
+            return XA_RESULT_PARAMETER_INVALID;
+            }
+        if(endPos > duration && endPos != XA_TIME_UNKNOWN)
+            {
+            /* invalid parameter */
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XASeekItfImpl_SetLoop");
+            return XA_RESULT_PARAMETER_INVALID;
+            }
+    
+        ret = XASeekItfAdapt_SetLoop((XAAdaptationGstCtx*)impl->adapCtx, loopEnable, startPos, endPos);
+        if(ret == XA_RESULT_SUCCESS)
+            {
+            impl->loopEnable = loopEnable;
+            impl->startPos = startPos;
+            impl->endPos = endPos;
+            }
+    
+        }
 
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
     DEBUG_API("<-XASeekItfImpl_SetLoop");
@@ -208,13 +270,12 @@ XAresult XASeekItfImpl_GetLoop(XASeekItf self, XAboolean *pLoopEnabled,
 /**
  * XASeekItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_
 
 /**
  * XASeekItfImpl* XASeekItfImpl_Create()
  * Description: Allocate and initialize SeekItfImpl.
  **/
-XASeekItfImpl* XASeekItfImpl_Create( XAAdaptationBaseCtx *adapCtx )
+XASeekItfImpl* XASeekItfImpl_Create(  XAMediaPlayerImpl* impl )
 {
     XASeekItfImpl *self = (XASeekItfImpl*)
         calloc(1,sizeof(XASeekItfImpl));
@@ -233,14 +294,14 @@ XASeekItfImpl* XASeekItfImpl_Create( XAAdaptationBaseCtx *adapCtx )
         self->startPos = 0;
         self->endPos = 0;
 
-        self->adapCtx = adapCtx;
+        self->adapCtx = impl->curAdaptCtx;
 
         self->self = self;
     }
     DEBUG_API("<-XASeekItfImpl_Create");
     return self;
 }
-#endif
+
 /**
  * void XASeekItfImpl_Free(XASeekItfImpl* self)
  * Description: Free all resources reserved at XASeekItfImpl_Create.

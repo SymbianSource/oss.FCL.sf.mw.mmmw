@@ -18,11 +18,7 @@
 #ifndef XACONFIGEXTENSIONSITF_H
 #define XACONFIGEXTENSIONSITF_H
 
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
+#include "xaadptbasectx.h"
 
 /** MACROS **/
 
@@ -40,10 +36,10 @@ typedef struct XAConfigExtensionsItfImpl_
     struct XAConfigExtensionsItfImpl_* self;
     /* variables */
     XAuint8 testbufferconf;
-#ifdef _GSTREAMER_BACKEND_    
+   
     /*Adaptation variables*/
     XAAdaptationBaseCtx *ctx;
-#endif    
+  
 } XAConfigExtensionsItfImpl;
 
 /* Base interface XAConfigExtensionsItf implementation */
@@ -58,9 +54,9 @@ XAresult XAConfigExtensionsItfImpl_GetConfiguration(
                             const XAchar* configKey,
                             XAuint32* pValueSize,
                             void* pConfigValue);
-#ifdef _GSTREAMER_BACKEND_
+
 XAresult XAConfigExtensionsItfImpl_SetContext(XAConfigExtensionsItfImpl* self,XAAdaptationBaseCtx* ctx);
-#endif
+
 /* XAConfigExtensionsItfImpl -specific methods */
 XAConfigExtensionsItfImpl* XAConfigExtensionsItfImpl_Create(void);
 void XAConfigExtensionsItfImpl_Free(XAConfigExtensionsItfImpl* self);

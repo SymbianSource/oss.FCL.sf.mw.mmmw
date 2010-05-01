@@ -21,9 +21,7 @@
 #include "openmaxalwrapper.h"
 #include "xaobjectitf.h"
 #include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "../adaptation/XACameraAdaptCtx.h"
-#endif
+#include "xaadptbasectx.h"
 /** MACROS **/
 
 
@@ -53,9 +51,9 @@ typedef struct XACameraDeviceImpl_
 
     /* variables */
     XAuint32 deviceID;
-#ifdef _GSTREAMER_BACKEND_
+
     XAAdaptationBaseCtx* adaptationCtx;
-#endif    
+  
 } XACameraDeviceImpl;
 
 

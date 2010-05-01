@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xacameraitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XACameraItfAdaptation.h"
-#endif
+
+#include "xacameraitfadaptation.h"
+
 #include "xathreadsafety.h"
 
 /* XACameraItfImpl* GetImpl(XACameraItf self)
@@ -98,10 +98,16 @@ XAresult XACameraItfImpl_SetFlashMode( XACameraItf self, XAuint32 flashMode )
     /* check is flash mode changed */
     if( impl->flashMode != flashMode )
     {
-#ifdef _GSTREAMER_BACKEND_    
-        ret = XACameraItfAdapt_SetFlashMode( impl->adapCtx, flashMode );
-#endif        
-        if ( ret == XA_RESULT_SUCCESS )
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetFlashMode( (XAAdaptationGstCtx*)impl->adapCtx, flashMode );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }    
+    if ( ret == XA_RESULT_SUCCESS )
         {
             impl->flashMode = flashMode;
         }
@@ -189,10 +195,16 @@ XAresult XACameraItfImpl_SetFocusMode( XACameraItf self, XAuint32 focusMode,
     /* check is focus mode changed */
     if( impl->focusMode != focusMode )
     {
-#ifdef _GSTREAMER_BACKEND_       
-        ret = XACameraItfAdapt_SetFocusMode( impl->adapCtx, focusMode, manualSetting, macroEnabled  );
-#endif        
-        if ( ret == XA_RESULT_SUCCESS )
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetFocusMode( (XAAdaptationGstCtx*)impl->adapCtx, focusMode, manualSetting, macroEnabled  );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }    
+    if ( ret == XA_RESULT_SUCCESS )
         {
             impl->focusMode = focusMode;
             impl->focusManualSetting = manualSetting;
@@ -271,10 +283,16 @@ XAresult XACameraItfImpl_SetFocusRegionPattern( XACameraItf self,
     /* check is focus pattern changed */
     if( focusPattern == impl->focusPattern )
     {
-#ifdef _GSTREAMER_BACKEND_   
-        ret = XACameraItfAdapt_SetFocusRegionPattern( impl->adapCtx, focusPattern, activePoints1, activePoints2 );
-#endif
-        if (ret == XA_RESULT_SUCCESS)
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetFocusRegionPattern( (XAAdaptationGstCtx*)impl->adapCtx, focusPattern, activePoints1, activePoints2 );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }     
+    if (ret == XA_RESULT_SUCCESS)
         {
             impl->focusPattern = focusPattern;
             if( !(impl->focusMode & XA_CAMERA_FOCUSMODE_MANUAL) )
@@ -349,11 +367,16 @@ XAresult XACameraItfImpl_GetFocusRegionPositions( XACameraItf self,
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-
-#ifdef _GSTREAMER_BACKEND_       
-    ret = XACameraItfAdapt_GetFocusRegionPositions( impl->adapCtx, pNumPositionEntries,
-                                                    pFocusPosition );
-#endif
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_GetFocusRegionPositions( (XAAdaptationGstCtx*)impl->adapCtx, pNumPositionEntries,
+                                                            pFocusPosition );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }  
     DEBUG_API("<-XACameraItfImpl_GetFocusRegionPositions");
     return ret;
 }
@@ -407,9 +430,15 @@ XAresult XACameraItfImpl_SetMeteringMode( XACameraItf self, XAuint32 meteringMod
         DEBUG_API("<-XACameraItfImpl_SetMeteringMode");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_   
-    ret = XACameraItfAdapt_SetMeteringMode( impl->adapCtx, meteringMode );
-#endif
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetMeteringMode( (XAAdaptationGstCtx*)impl->adapCtx, meteringMode );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }    
     if ( ret == XA_RESULT_SUCCESS )
     {
         impl->meteringMode = meteringMode;
@@ -470,10 +499,16 @@ XAresult XACameraItfImpl_SetExposureMode( XACameraItf self, XAuint32 exposure,
     /* check is focus mode changed */
     if( impl->exposureMode != exposure || impl->compensation != compensation )
     {
-#ifdef _GSTREAMER_BACKEND_   
-    ret = XACameraItfAdapt_SetExposureMode( impl->adapCtx, exposure, exposure );
-#endif
-        if ( ret == XA_RESULT_SUCCESS )
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetExposureMode( (XAAdaptationGstCtx*)impl->adapCtx, exposure, exposure );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }
+    if ( ret == XA_RESULT_SUCCESS )
         {
             impl->exposureMode = exposure;
             impl->compensation = compensation;
@@ -539,10 +574,16 @@ XAresult XACameraItfImpl_SetISOSensitivity( XACameraItf self, XAuint32 isoSensit
     /* check is focus mode changed */
     if( impl->isoSensitivity != isoSensitivity || impl->isoManualSetting != manualSetting )
     {
-#ifdef _GSTREAMER_BACKEND_   
-    ret = XACameraItfAdapt_SetISOSensitivity( impl->adapCtx, isoSensitivity, manualSetting );
-#endif
-        if ( ret == XA_RESULT_SUCCESS )
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetISOSensitivity((XAAdaptationGstCtx*)impl->adapCtx, isoSensitivity, manualSetting );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }
+    if ( ret == XA_RESULT_SUCCESS )
         {
             impl->isoSensitivity = isoSensitivity;
             impl->isoManualSetting = manualSetting;
@@ -616,10 +657,16 @@ XAresult XACameraItfImpl_SetAperture( XACameraItf self, XAuint32 aperture,
     /* check is aperture mode or value changed */
     if( impl->aperture != aperture || impl->apertureManualSetting != manualSetting )
     {
-#ifdef _GSTREAMER_BACKEND_   
-        ret = XACameraItfAdapt_SetAperture( impl->adapCtx, aperture, manualSetting );
-#endif
-        if ( ret == XA_RESULT_SUCCESS )
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetAperture( (XAAdaptationGstCtx*)impl->adapCtx, aperture, manualSetting );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }
+    if ( ret == XA_RESULT_SUCCESS )
         {
             impl->aperture = aperture;
             impl->apertureManualSetting = manualSetting;
@@ -689,10 +736,15 @@ XAresult XACameraItfImpl_SetShutterSpeed( XACameraItf self, XAuint32 shutterSpee
         DEBUG_API("<-XACameraItfImpl_SetShutterSpeed");
         return XA_RESULT_PARAMETER_INVALID;
     }
-
-#ifdef _GSTREAMER_BACKEND_   
-    ret = XACameraItfAdapt_SetShutterSpeed( impl->adapCtx, shutterSpeed, manualSetting );
-#endif
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetShutterSpeed( (XAAdaptationGstCtx*)impl->adapCtx, shutterSpeed, manualSetting );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }
     if ( ret == XA_RESULT_SUCCESS )
     {
         impl->shutterManualSetting = manualSetting;
@@ -766,10 +818,16 @@ XAresult XACameraItfImpl_SetWhiteBalance( XACameraItf self, XAuint32 whiteBalanc
     /* check is whitebalance mode or value changed */
     if( impl->whiteBalance != whiteBalance || impl->whiteBalManualSetting != manualSetting )
     {
-#ifdef _GSTREAMER_BACKEND_   
-        ret = XACameraItfAdapt_SetWhiteBalance( impl->adapCtx, whiteBalance, manualSetting );
-#endif
-        if ( ret == XA_RESULT_SUCCESS )
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetWhiteBalance( (XAAdaptationGstCtx*)impl->adapCtx, whiteBalance, manualSetting );
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }
+    if ( ret == XA_RESULT_SUCCESS )
         {
             impl->whiteBalance = whiteBalance;
             impl->whiteBalManualSetting = manualSetting;
@@ -836,9 +894,17 @@ XAresult XACameraItfImpl_SetAutoLocks( XACameraItf self, XAuint32 locks )
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_   
-    ret = XACameraItfAdapt_SetAutoLocks( impl->adapCtx, locks );
-#endif
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetAutoLocks( (XAAdaptationGstCtx*)impl->adapCtx, locks );
+
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }
+    
     if ( ret == XA_RESULT_SUCCESS )
     {
         impl->locks = locks;
@@ -899,10 +965,17 @@ XAresult XACameraItfImpl_SetZoom( XACameraItf self, XApermille zoom,
         DEBUG_API("<-XACameraItfImpl_SetZoom");
         return XA_RESULT_PARAMETER_INVALID;
     }
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XACameraItfAdapt_SetZoom( (XAAdaptationGstCtx*)impl->adapCtx, zoom, digitalEnabled, speed, async );
 
-#ifdef _GSTREAMER_BACKEND_   
-    ret = XACameraItfAdapt_SetZoom( impl->adapCtx, zoom, digitalEnabled, speed, async );
-#endif
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        ret = XA_RESULT_FEATURE_UNSUPPORTED;
+        }
+    
     if ( ret == XA_RESULT_SUCCESS )
     {
         impl->zoom = zoom;
@@ -952,7 +1025,6 @@ XAresult XACameraItfImpl_GetZoom( XACameraItf self, XApermille *pZoom,
 /* XACameraItfImpl* XACameraItfImpl_Create()
  * Description: Allocate and initialize CameraItfImpl
  */
-#ifdef _GSTREAMER_BACKEND_   
 
 XACameraItfImpl* XACameraItfImpl_Create( XAAdaptationBaseCtx *adapCtx )
 {
@@ -994,9 +1066,7 @@ XACameraItfImpl* XACameraItfImpl_Create( XAAdaptationBaseCtx *adapCtx )
         self->flashReady = XA_BOOLEAN_TRUE;
         self->adapCtx = adapCtx;
         self->cbPtrToSelf = NULL;
-#ifdef _GSTREAMER_BACKEND_
         XAAdaptationBase_AddEventHandler( adapCtx, &XACameraItfImp_AdaptCb, XA_CAMERAITFEVENTS, self );
-#endif
         self->self = self;
     }
 
@@ -1004,7 +1074,7 @@ XACameraItfImpl* XACameraItfImpl_Create( XAAdaptationBaseCtx *adapCtx )
     return self;
 }
 
-#endif
+
 /* void XACameraItfImpl_Free(XACameraItfImpl* self)
  * Description: Free all resources reserved at XACameraItfImpl_Create
  */
@@ -1012,14 +1082,11 @@ void XACameraItfImpl_Free(XACameraItfImpl* self)
 {
     DEBUG_API("->XACameraItfImpl_Free");
     assert( self==self->self );
-#ifdef _GSTREAMER_BACKEND_   
     XAAdaptationBase_RemoveEventHandler( self->adapCtx, &XACameraItfImp_AdaptCb );
-#endif
     free( self );
     DEBUG_API("<-XACameraItfImpl_Free");
 }
 
-#ifdef _GSTREAMER_BACKEND_
 /* void XACameraItfAdapt_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
  * @param void *pHandlerCtx - pointer to cb context (XACameraItfImpl)
  * @param XAAdaptEvent *event  - Event
@@ -1070,4 +1137,3 @@ void XACameraItfImp_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
     DEBUG_API("<-XACameraItfImp_AdaptCb");
 }
 
-#endif

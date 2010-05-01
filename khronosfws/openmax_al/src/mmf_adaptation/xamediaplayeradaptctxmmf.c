@@ -22,6 +22,9 @@
 #include "xaobjectitf.h"
 #include "cmmfbackendengine.h"
 
+#include "cmetadatautilityitf.h"
+
+
 
 /*
  * XAMediaPlayerAdaptationMMFCtx* XAMediaPlayerAdapt_Create()
@@ -32,7 +35,7 @@
  * @param XADataSink *pImageVideoSnk - pointer to OMX-AL image and video sink definition
  * @returns XAMediaPlayerAdaptationMMFCtx* - Pointer to created context, NULL if error occurs.
  */
-XAAdaptationBaseMMFCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc, XADataSource *pBankSrc,
+XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc, XADataSource *pBankSrc,
                                                       XADataSink *pAudioSnk, XADataSink *pImageVideoSnk,
                                                       XADataSink *pVibra, XADataSink *pLEDArray)
 {
@@ -44,8 +47,8 @@ XAAdaptationBaseMMFCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc, XAD
     pSelf = calloc(1, sizeof(XAMediaPlayerAdaptationMMFCtx));
     if ( pSelf)
     {
-#ifdef _GSTREAMER_BACKEND_          
-        if( XAAdaptationBaseMMF_Init(&(pSelf->baseObj),0)
+          
+        if( XAAdaptationBaseMMF_Init(&(pSelf->baseObj),XAMediaPlayerAdaptation)
             != XA_RESULT_SUCCESS )
         {
             DEBUG_ERR("Failed to init base context!!!");
@@ -53,8 +56,9 @@ XAAdaptationBaseMMFCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc, XAD
             pSelf = NULL;
         }
         else
-#endif            
+            
         {
+            pSelf->baseObj.baseObj.fwtype = FWMgrFWMMF;
             pSelf->xaSource = pDataSrc;
             pSelf->xaBankSrc = pBankSrc;
             pSelf->xaAudioSink = pAudioSnk;
@@ -79,31 +83,41 @@ XAAdaptationBaseMMFCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc, XAD
 		}
     }
     
-    if(pSelf)
+    else
         {
-        res = mmf_backend_engine_init(&(pSelf->mmfContext));
-        if(pSelf->mmfContext && res == XA_RESULT_SUCCESS)
-            {
-            XADataLocator_URI*   tempUri;
-            XADataFormat_MIME* tempFormat;
-            tempUri = (XADataLocator_URI*)(pSelf->xaSource->pLocator);
-            tempFormat = (XADataFormat_MIME*)(pSelf->xaSource->pFormat);
-            mmf_set_player_uri(pSelf->mmfContext, (char *)(tempUri->URI), tempFormat->containerType);       
-            if(pImageVideoSnk)
-              {
-              mmf_setup_native_display(pSelf->mmfContext, pImageVideoSnk);
-              }
-            }
-        else
-            {
-             DEBUG_ERR("Failed to init mmf context!!!");
-             free(pSelf);
-             pSelf = NULL; 
-            }
+        DEBUG_ERR("Failed to create XAMediaPlayerAdaptationMMFCtx !!!");
+        return NULL;
         }
+    if(pSelf)
+    {
+	    res = mmf_backend_engine_init(&(pSelf->mmfContext));
+        if(!(pSelf->mmfContext) || (res != XA_RESULT_SUCCESS))
+        {
+            /* TODO Check to make sure there is no undeleted MMF objects here*/
+            DEBUG_ERR("Failed to init mmf context!!!");
+            free(pSelf);
+            pSelf = NULL;
+            return NULL;
+        }
+		res = mmf_set_play_adapt_context(pSelf->mmfContext, &(pSelf->baseObj));
+		if(pDataSrc)
+		    {
+             pSelf->mmfMetadataContext = mmf_metadata_utility_init((char *)(( (XADataLocator_URI*)(pDataSrc->pLocator))->URI));
+             if(!pSelf->mmfMetadataContext)
+                {
+                    DEBUG_ERR("Failed to init mmf metadata context!!!");
+                    pSelf->mmfMetadataContext = NULL;			
+                }
+		    }
+		else
+        	{
+        	DEBUG_ERR("Failed to create XAMediaPlayerAdaptationMMFCtx !!!");
+        	return NULL;
+        	}	
+    }
 
     DEBUG_API("<-XAMediaPlayerAdaptMMF_Create");
-    return (XAAdaptationBaseMMFCtx*)pSelf;
+    return (XAAdaptationBaseCtx*)(&pSelf->baseObj.baseObj);
 }
 
 
@@ -114,9 +128,29 @@ XAAdaptationBaseMMFCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc, XAD
  * @param XAMediaPlayerAdaptationMMFCtx* ctx - pointer to Media Player adaptation context
  * @return XAresult - Success value
  */
-XAresult XAMediaPlayerAdaptMMF_PostInit( XAAdaptationBaseMMFCtx* bCtx )
+XAresult XAMediaPlayerAdaptMMF_PostInit( XAAdaptationMMFCtx* bCtx )
 {
-  XAresult ret = XA_RESULT_SUCCESS;
+    XAresult ret = XA_RESULT_PRECONDITIONS_VIOLATED;
+    XAMediaPlayerAdaptationMMFCtx *pSelf = (XAMediaPlayerAdaptationMMFCtx*)bCtx;
+
+    DEBUG_API("->XAMediaPlayerAdaptMMF_PostInit");
+    
+    XAAdaptationBaseMMF_PostInit(bCtx);
+    
+    if(pSelf->mmfContext)
+    {
+        XADataLocator_URI* tempUri = (XADataLocator_URI*)(pSelf->xaSource->pLocator);
+        XADataFormat_MIME* tempFormat = (XADataFormat_MIME*)(pSelf->xaSource->pFormat);
+        ret = XA_RESULT_SUCCESS;
+        if(pSelf->xaVideoSink)
+          {
+          ret = mmf_setup_native_display(pSelf->mmfContext, pSelf->xaVideoSink);
+          }
+        if (ret == XA_RESULT_SUCCESS)
+        {
+            ret = mmf_set_player_uri(pSelf->mmfContext, (char *)(tempUri->URI), tempFormat->containerType);
+        }
+    }
     DEBUG_API("<-XAMediaPlayerAdaptMMF_PostInit");
     return ret;
 }
@@ -126,7 +160,7 @@ XAresult XAMediaPlayerAdaptMMF_PostInit( XAAdaptationBaseMMFCtx* bCtx )
  * Destroys Media Player Adaptation Context
  * @param ctx - Media Player Adaptation context to be destroyed
  */
-void XAMediaPlayerAdaptMMF_Destroy( XAAdaptationBaseMMFCtx* bCtx )
+void XAMediaPlayerAdaptMMF_Destroy( XAAdaptationMMFCtx* bCtx )
 {
     XAMediaPlayerAdaptationMMFCtx* ctx = NULL;
 
@@ -140,9 +174,18 @@ void XAMediaPlayerAdaptMMF_Destroy( XAAdaptationBaseMMFCtx* bCtx )
     }
     ctx = (XAMediaPlayerAdaptationMMFCtx*)bCtx;
 
-#ifdef _GSTREAMER_BACKEND_  
-    XAAdaptationBase_Free( bCtx );
-#endif    
+    if(ctx->mmfContext)
+        {
+        mmf_backend_engine_deinit(ctx->mmfContext);
+        }
+
+	if(ctx->mmfMetadataContext)
+	{
+		mmf_metadata_utility_destroy(ctx->mmfMetadataContext);		
+	}
+	
+    XAAdaptationBaseMMF_Free( bCtx );
+    
     free(ctx);
     ctx = NULL;
 

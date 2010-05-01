@@ -20,7 +20,8 @@
 
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
-
+#include "xaframeworkmgr.h"
+#include "xacapabilitiesmgr.h"
 /** MACROS **/
 
 /** TYPES **/
@@ -36,6 +37,13 @@ typedef struct XAEngineItfImpl_
     /* pointer to self */
     struct XAEngineItfImpl_* self;
     /* variables */
+    /*Not Owned*/
+    struct FrameworkMap_* mapper;
+    /*Not Owned*/
+    struct XACapabilities_* capabilities;
+    
+    int xyz;
+    
 } XAEngineItfImpl;
 
 /** METHODS **/
@@ -152,7 +160,7 @@ XAresult XAEngineItfImpl_IsExtensionSupported(XAEngineItf self,
                                               XAboolean *pSupported);
 
 /* XAEngineItfImpl -specific methods */
-XAEngineItfImpl* XAEngineItfImpl_Create(void);
+XAEngineItfImpl* XAEngineItfImpl_Create(FrameworkMap* fwkmapper, XACapabilities* capabilities);
 void XAEngineItfImpl_Free(XAEngineItfImpl *self);
 
 #endif /* XAENGINEITF_H */

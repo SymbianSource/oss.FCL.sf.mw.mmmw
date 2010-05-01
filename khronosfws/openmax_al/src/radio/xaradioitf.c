@@ -20,9 +20,9 @@
 #include <assert.h>
 #include <string.h>
 #include "xaradioitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XARadioItfAdaptation.h"
-#endif
+
+#include "xaradioitfadaptation.h"
+
 #include "xathreadsafety.h"
 
 /**
@@ -54,9 +54,9 @@ static XARadioItfImpl* GetImpl(XARadioItf self)
 XAresult XARadioItfImpl_SetFreqRange(XARadioItf self, XAuint8 range)
 {
     XAresult ret = XA_RESULT_SUCCESS;
-#ifdef _GSTREAMER_BACKEND_
+
     XAboolean isSupported = XA_BOOLEAN_FALSE;
-#endif
+
     XARadioItfImpl* impl = GetImpl(self);
 
     DEBUG_API("->XARadioItfImpl_SetFreqRange");
@@ -72,14 +72,14 @@ XAresult XARadioItfImpl_SetFreqRange(XARadioItf self, XAuint8 range)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_IsFreqRangeSupported(impl->adapCtx, range, &isSupported);
+
+    ret = XARadioItfAdapt_IsFreqRangeSupported((XAAdaptationGstCtx*)impl->adapCtx, range, &isSupported);
 
     if ( ret == XA_RESULT_SUCCESS && isSupported == XA_BOOLEAN_TRUE )
     {
-        ret = XARadioItfAdapt_SetFreqRange(impl->adapCtx, range);
+        ret = XARadioItfAdapt_SetFreqRange((XAAdaptationGstCtx*)impl->adapCtx, range);
     }
-#endif
+
     
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_SetFreqRange");
@@ -106,9 +106,9 @@ XAresult XARadioItfImpl_GetFreqRange(XARadioItf self, XAuint8 * pRange)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_GetFreqRange( impl->adapCtx, pRange);
-#endif
+
+    ret = XARadioItfAdapt_GetFreqRange( (XAAdaptationGstCtx*)impl->adapCtx, pRange);
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_GetFreqRange");
     return ret;
@@ -138,9 +138,9 @@ XAresult XARadioItfImpl_IsFreqRangeSupported(XARadioItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_IsFreqRangeSupported( impl->adapCtx, range, pSupported );
-#endif
+
+    ret = XARadioItfAdapt_IsFreqRangeSupported( (XAAdaptationGstCtx*)impl->adapCtx, range, pSupported );
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_IsFreqRangeSupported");
     return ret;
@@ -176,9 +176,9 @@ XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
         DEBUG_API("<-XARadioItfImpl_GetFreqRangeProperties");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_IsFreqRangeSupported( impl->adapCtx, range, &isSupported );
-#endif
+
+    ret = XARadioItfAdapt_IsFreqRangeSupported( (XAAdaptationGstCtx*)impl->adapCtx, range, &isSupported );
+
     if (isSupported != XA_BOOLEAN_TRUE || ret != XA_RESULT_SUCCESS)
     {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
@@ -188,10 +188,10 @@ XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_GetFreqRangeProperties( impl->adapCtx,
+
+    ret = XARadioItfAdapt_GetFreqRangeProperties( (XAAdaptationGstCtx*)impl->adapCtx,
             range, pMinFreq, pMaxFreq, pFreqInterval );
-#endif
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_GetFreqRangeProperties");
     return ret;
@@ -220,9 +220,9 @@ XAresult XARadioItfImpl_SetFrequency(XARadioItf self, XAuint32 freq)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_SetFrequency( impl->adapCtx, freq );
-#endif
+
+    ret = XARadioItfAdapt_SetFrequency( (XAAdaptationGstCtx*)impl->adapCtx, freq );
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_SetFrequency");
     return ret;
@@ -251,9 +251,9 @@ XAresult XARadioItfImpl_CancelSetFrequency(XARadioItf self)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_CancelSetFrequency( impl->adapCtx );
-#endif
+
+    ret = XARadioItfAdapt_CancelSetFrequency( (XAAdaptationGstCtx*)impl->adapCtx );
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_CancelSetFrequency");
     return ret;
@@ -279,9 +279,9 @@ XAresult XARadioItfImpl_GetFrequency(XARadioItf self, XAuint32 * pFreq)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_GetFrequency( impl->adapCtx, pFreq);
-#endif
+
+    ret = XARadioItfAdapt_GetFrequency( (XAAdaptationGstCtx*)impl->adapCtx, pFreq);
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_GetFrequency");
     return ret;
@@ -309,9 +309,9 @@ XAresult XARadioItfImpl_SetSquelch(XARadioItf self, XAboolean squelch)
 
     if (impl->squelch != squelch)
     {
-#ifdef _GSTREAMER_BACKEND_
-        ret = XARadioItfAdapt_SetSquelch( impl->adapCtx, squelch );
-#endif
+
+        ret = XARadioItfAdapt_SetSquelch( (XAAdaptationGstCtx*)impl->adapCtx, squelch );
+
         if ( ret == XA_RESULT_SUCCESS )
         {
             impl->squelch = squelch;
@@ -368,9 +368,9 @@ XAresult XARadioItfImpl_SetStereoMode(XARadioItf self, XAuint32 mode)
 
     if ( impl->stereoMode != mode)
     {
-#ifdef _GSTREAMER_BACKEND_
-        ret = XARadioItfAdapt_SetStereoMode( impl->adapCtx, mode );
-#endif
+
+        ret = XARadioItfAdapt_SetStereoMode( (XAAdaptationGstCtx*)impl->adapCtx, mode );
+
         if ( ret == XA_RESULT_SUCCESS )
         {
             impl->stereoMode = mode;
@@ -426,9 +426,9 @@ XAresult XARadioItfImpl_GetSignalStrength(XARadioItf self, XAuint32 * pStrength)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_GetSignalStrength( impl->adapCtx, pStrength );
-#endif
+
+    ret = XARadioItfAdapt_GetSignalStrength( (XAAdaptationGstCtx*)impl->adapCtx, pStrength );
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_GetSignalStrength");
     return ret;
@@ -458,9 +458,9 @@ XAresult XARadioItfImpl_Seek(XARadioItf self, XAboolean upwards)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_Seek( impl->adapCtx, upwards );
-#endif
+
+    ret = XARadioItfAdapt_Seek( (XAAdaptationGstCtx*)impl->adapCtx, upwards );
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_Seek");
     return ret;
@@ -488,9 +488,9 @@ XAresult XARadioItfImpl_StopSeeking(XARadioItf self)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XARadioItfAdapt_StopSeeking( impl->adapCtx );
-#endif
+
+    ret = XARadioItfAdapt_StopSeeking( (XAAdaptationGstCtx*)impl->adapCtx );
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_StopSeeking");
     return ret;
@@ -579,7 +579,7 @@ XAresult XARadioItfImpl_SetPreset(XARadioItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
+
     
     free(impl->presets[preset].name);
 
@@ -588,7 +588,7 @@ XAresult XARadioItfImpl_SetPreset(XARadioItf self,
     impl->presets[preset].stereoMode = mode;
     impl->presets[preset].name = calloc(1, RADIO_PRESET_NAME_MAX_LENGTH+1);
     strncpy( impl->presets[preset].name, (char*)name, RADIO_PRESET_NAME_MAX_LENGTH );
-#endif
+
     DEBUG_API("<-XARadioItfImpl_SetPreset");
     return ret;
 }
@@ -633,7 +633,7 @@ XAresult XARadioItfImpl_GetPreset(XARadioItf self,
             DEBUG_API("<-XARadioItfImpl_GetPreset");
             return XA_RESULT_PARAMETER_INVALID;
         }
-#ifdef _GSTREAMER_BACKEND_
+
         *pFreq = impl->presets[preset].freq;
         *pRange = impl->presets[preset].range;
         *pMode = impl->presets[preset].stereoMode;
@@ -646,7 +646,7 @@ XAresult XARadioItfImpl_GetPreset(XARadioItf self,
         {
             strncpy( (char*)pName, impl->presets[preset].name, RADIO_PRESET_NAME_MAX_LENGTH );
         }
-#endif        
+        
     }
     /*Just adding some meaninful value, when supporting new spec this must be fetch the system*/
     *pNameLength = RADIO_PRESET_NAME_MAX_LENGTH;
@@ -688,7 +688,6 @@ XAresult XARadioItfImpl_RegisterRadioCallback(XARadioItf self,
 /**
  * XARadioItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_
 
 /**
  * XARadioItfImplImpl* XARadioItfImpl_Create()
@@ -756,18 +755,18 @@ XARadioItfImpl* XARadioItfImpl_Create(XAAdaptationBaseCtx *adapCtx)
     DEBUG_API("<-XARadioItfImpl_Create");
     return self;
 }
-#endif
+
 /**
  * void XARadioItfImpl_Free(XARadioItfImpl* self)
  * Description: Free all resources reserved at XARadioItfImpl_Create
  **/
 void XARadioItfImpl_Free(XARadioItfImpl* self)
 {
-    
+    XAuint16 index = 0;
     DEBUG_API("->XARadioItfImpl_Free");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS(XATSRadio);
-#ifdef _GSTREAMER_BACKEND_
-    XAuint16 index = 0;
+
+    
     XAAdaptationBase_RemoveEventHandler( self->adapCtx, &XARadioItfImpl_AdaptCb );
 
     XARadioItfAdapt_Free(self->adapCtx);
@@ -776,14 +775,14 @@ void XARadioItfImpl_Free(XARadioItfImpl* self)
     {
         free(self->presets[index].name);
     }
-#endif
+
     assert(self==self->self);
     free(self);
 
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_Free");
 }
-#ifdef _GSTREAMER_BACKEND_
+
 /* void XARadioItfimpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
  * Description: Event handler for adaptation events
  */
@@ -821,5 +820,5 @@ void XARadioItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
     }
     DEBUG_API("<-XARadioItfimpl_AdaptCb");
 }
-#endif
+
 

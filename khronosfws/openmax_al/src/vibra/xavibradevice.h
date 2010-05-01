@@ -18,12 +18,8 @@
 #ifndef XAVIBRADEVICE_H
 #define XAVIBRADEVICE_H
 
-#include "openmaxalwrapper.h"
 #include "xaobjectitf.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "../adaptation/XAVibraAdaptCtx.h"
-#endif
+#include "xaadptbasectx.h"
 /** MACROS **/
 
 
@@ -51,9 +47,8 @@ typedef struct XAVibraDeviceImpl_
     /* variables */
     XAuint32 deviceID;
 
-#ifdef _GSTREAMER_BACKEND_
     XAAdaptationBaseCtx* adaptationCtx;
-#endif
+
 } XAVibraDeviceImpl;
 
 /** METHODS **/

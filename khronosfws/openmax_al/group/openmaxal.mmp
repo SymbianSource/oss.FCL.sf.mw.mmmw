@@ -31,47 +31,53 @@ EpocAllowDllData
 CAPABILITY ALL -TCB
 
 MACRO   USE_NGA_SURFACES
-//MACRO   _GSTREAMER_BACKEND_
+//MACRO 	MARKERPOSITIONTIMERLOG
+//MACRO		POSITIONUPDATETIMERLOG
+//MACRO 	USE_LOCAL_WINDOW_RESOURCES
+//MACRO           PROFILE_TIME
+//MACRO           PRINT_TO_CONSOLE_TIME_DIFF
 
-#ifdef _GSTREAMER_BACKEND_
-SOURCEPATH      ../Src/adaptation
-SOURCE	XAAdaptationContextBase.c
-SOURCE	XAAudioEncoderItfAdaptation.c
-SOURCE	XACameraAdaptCtx.c
-SOURCE	XACameraItfAdaptation.c
-SOURCE	XADeviceVolumeItfAdaptation.c
-SOURCE	XADynamicSourceItfAdaptation.c
-SOURCE	XAEngineAdaptCtx.c
-SOURCE	XAEqualizerItfAdaptation.c
-SOURCE	XAImageControlsItfAdaptation.c
-SOURCE	XAImageEffectsItfAdaptation.c
-SOURCE	XAImageEncoderItfAdaptation.c
-SOURCE	XALEDArrayAdaptCtx.c
-SOURCE	XALEDArrayItfAdaptation.c
-SOURCE	XAMediaPlayerAdaptCtx.c
-SOURCE	XAMediaRecorderAdaptCtx.c
-SOURCE	XAMetadataAdaptation.c
-SOURCE	XAMetadataAdaptCtx.c
-SOURCE	XAOutputMixAdaptCtx.c
-SOURCE	XAOutputMixItfAdaptation.c
-SOURCE	XAPlaybackRateItfAdaptation.c
-SOURCE	XAPlayItfAdaptation.c
-SOURCE	XARadioAdaptCtx.c
-SOURCE	XARadioItfAdaptation.c
-SOURCE	XARDSItfAdaptation.c
-SOURCE	XARecordItfAdaptation.c
-SOURCE	XASeekItfAdaptation.c
-SOURCE	XASnapShotItfAdaptation.c
-SOURCE	XAStaticCameraCapsAdaptation.c
-SOURCE	XAStaticCapsAdaptation.c
-SOURCE	XAVibraAdaptCtx.c
-SOURCE	XAVibraItfAdaptation.c
-SOURCE	XAVideoEncoderItfAdaptation.c
-SOURCE	XAVideoPostProsessingItfAdaptation.c
-SOURCE	XAVolumeItfAdaptation.c
-// 9.2 only (Exclude on other platforms)
-SOURCE  XANGAVideoSink.cpp
-#endif
+SOURCEPATH      ../src/gst_adaptation
+SOURCE	        xaadaptationgst.c
+SOURCE 	        xagstcapabilitiesmgr.c
+SOURCE	        xaaudioencoderitfadaptation.c
+SOURCE	        xacameraadaptctx.c
+SOURCE	        xacameraitfadaptation.c
+SOURCE	        xadevicevolumeitfadaptation.c
+SOURCE	        xadynamicsourceitfadaptation.c
+SOURCE	        xaengineadaptctx.c
+SOURCE	        xaequalizeritfadaptation.c
+SOURCE	        xaimagecontrolsitfadaptation.c
+SOURCE	        xaimageeffectsitfadaptation.c
+SOURCE	        xaimageencoderitfadaptation.c
+SOURCE	        xaledarrayadaptctx.c
+SOURCE	        xaledarrayitfadaptation.c
+SOURCE	        xamediaplayeradaptctx.c
+SOURCE	        xamediarecorderadaptctx.c
+SOURCE	        xametadataadaptation.c
+SOURCE	        xametadataadaptctx.c
+SOURCE	        xaoutputmixadaptctx.c
+SOURCE	        xaoutputmixitfadaptation.c
+SOURCE	        xaplaybackrateitfadaptation.c
+SOURCE	        xaplayitfadaptation.c
+SOURCE	        xaradioadaptctx.c
+SOURCE	        xaradioitfadaptation.c
+SOURCE	        xardsitfadaptation.c
+SOURCE	        xarecorditfadaptation.c
+SOURCE	        xaseekitfadaptation.c
+SOURCE	        xasnapshotitfadaptation.c
+SOURCE	        xastaticcameracapsadaptation.c
+SOURCE	        xavibraadaptctx.c
+SOURCE	        xavibraitfadaptation.c
+SOURCE	        xavideoencoderitfadaptation.c
+SOURCE	        xavideopostprosessingitfadaptation.c
+SOURCE	        xavolumeitfadaptation.c
+SOURCE 	        xastreaminformationitfadaptation.c
+
+SOURCEPATH ../src/adptcommon
+SOURCE 	        xaframeworkmgr.c
+SOURCE 	        xacapabilitiesmgr.c
+SOURCE 	        xaadptbasectx.c
 
 SOURCEPATH      ../src/camera
 SOURCE          xacameradevice.c
@@ -93,6 +99,11 @@ SOURCE          xaplatform.c
 SOURCE          xathreadsafety.c
 SOURCE          xavideopostprocessingitf.c
 SOURCE          xavolumeitf.c
+SOURCE 		xastreaminformationitf.c
+SOURCE          xanokialinearvolume_iid.c
+SOURCE          xanokiavolumeext_iid.c
+SOURCE          xanokialinearvolumeitf.c
+SOURCE          xanokiavolumeextitf.c
 
 SOURCEPATH      ../src/engine
 SOURCE          xaaudiodecodercapabilitiesitf.c
@@ -133,34 +144,45 @@ SOURCE          xametadataextractor.c
 
 SOURCEPATH      ../src/outputmix
 SOURCE          xaoutputmix.c
-SOURCE		    xaoutputmixitf.c
+SOURCE		xaoutputmixitf.c
 
 SOURCEPATH      ../src/radio
 SOURCE          xaradiodevice.c
-SOURCE		    xaradioitf.c
-SOURCE		    xardsitf.c
+SOURCE		xaradioitf.c
+SOURCE		xardsitf.c
 
 SOURCEPATH      ../src/vibra
 SOURCE          xavibradevice.c
-SOURCE		    xavibraitf.c
+SOURCE		xavibraitf.c
 
 SOURCEPATH      ../src/mmf_adaptation
-SOURCE	xaengineadaptctxmmf.c
-SOURCE	xamediaplayeradaptctxmmf.c
-SOURCE	xaplayitfadaptationmmf.c
-SOURCE	xaadaptationcontextbasemmf.c
-SOURCE  cmmfbackendengine.cpp
-SOURCE  xamediarecorderadaptctxmmf.c
-SOURCE  xarecorditfadaptationmmf.c
-SOURCE 	sfmrlocaltimer.cpp
+//	Removing below file since currently there is no Engine related
+// 	mmf adaptation
+//SOURCE          xaengineadaptctxmmf.c
+SOURCE	        xamediaplayeradaptctxmmf.c
+SOURCE	        xaplayitfadaptationmmf.c
+SOURCE	        xaadaptationmmf.c
+SOURCE          cmmfbackendengine.cpp
+SOURCE          xamediarecorderadaptctxmmf.c
+SOURCE          xarecorditfadaptationmmf.c
+SOURCE 	        sfmrlocaltimer.cpp
+SOURCE          xanokialinearvolumeitfadaptationmmf.c
+SOURCE          xanokiavolumeextitfadaptationmmf.c
+SOURCE 	        xammfcapabilitiesmgr.c
+//SOURCE          xangavideosink.cpp
+SOURCE          markerpositiontimer.cpp
+SOURCE          positionupdatetimer.cpp 
+SOURCE          xaseekitfadaptationmmf.c
+SOURCE          xadynamicsourceitfadaptationmmf.c
+SOURCE 	        xastreaminformationitfadaptationmmf.c
+SOURCE  	cmetadatautilityitf.cpp
+SOURCE		xametadataadaptctxmmf.c
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../src
 USERINCLUDE     ../src/khronos
 USERINCLUDE     ../src/mmf_adaptation
-#ifdef _GSTREAMER_BACKEND_
-USERINCLUDE     ../Src/adaptation
-#endif
+USERINCLUDE     ../src/gst_adaptation
 USERINCLUDE     ../src/camera
 USERINCLUDE     ../src/common
 USERINCLUDE     ../src/engine
@@ -170,19 +192,18 @@ USERINCLUDE     ../src/mediarecorder
 USERINCLUDE     ../src/outputmix
 USERINCLUDE     ../src/radio
 USERINCLUDE     ../src/vibra
+USERINCLUDE	../src/adptcommon
 
 MW_LAYER_SYSTEMINCLUDE
 OS_LAYER_LIBC_SYSTEMINCLUDE
 OS_LAYER_GLIB_SYSTEMINCLUDE
 SYSTEMINCLUDE /epoc32/include/platform/mw/khronos 
-// 9.2
-#ifdef _GSTREAMER_BACKEND_
+
 SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer
 SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer/gst
 SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer/gst/interfaces
 SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer/gst/app
 SYSTEMINCLUDE  	/sf/mw/gstreamer/include/gstreamer/gst/video
-#endif
 
 LIBRARY         euser.lib
 LIBRARY         libc.lib
@@ -191,23 +212,21 @@ LIBRARY         libpthread.lib
 
 LIBRARY         mediaclientvideodisplay.lib
 LIBRARY         ws32.lib
-LIBRARY			inetprotutil.lib
+LIBRARY		inetprotutil.lib
 LIBRARY         mediaclientaudio.lib
 LIBRARY         MMFControllerFramework.lib
 LIBRARY         mediaclientvideo.lib
-
-#ifdef _GSTREAMER_BACKEND_
+LIBRARY         AudioInputRouting.lib
 LIBRARY         libgmodule.lib
 LIBRARY         libgobject.lib
 LIBRARY         libgstreamer.lib
 LIBRARY         libgstapp.lib
-LIBRARY		    libgstphotography.lib
-LIBRARY 	    libgstinterfaces.lib 
-LIBRARY		    libgstvideo.lib
-LIBRARY 	    libgstbase.lib
-LIBRARY 	    libgstcoreelements.lib
-LIBRARY		    libgstcoreindexers.lib
-#endif 
-
-
+LIBRARY		libgstphotography.lib
+LIBRARY 	libgstinterfaces.lib 
+LIBRARY		libgstvideo.lib
+LIBRARY 	libgstbase.lib
+LIBRARY 	libgstcoreelements.lib
+LIBRARY		libgstcoreindexers.lib
+LIBRARY 	MetaDataUtility.lib
+STATICLIBRARY   hxmetadatautil.lib
 

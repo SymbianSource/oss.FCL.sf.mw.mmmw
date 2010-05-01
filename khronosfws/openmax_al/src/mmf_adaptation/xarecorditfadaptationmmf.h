@@ -18,7 +18,7 @@
 #ifndef XARECORDITFADAPTATIONMMF_H
 #define XARECORDITFADAPTATIONMMF_H
 
-#include "xaadaptationcontextbasemmf.h"
+#include "xaadaptationmmf.h"
 #include "xadebug.h"
 #include <glib.h>
 
@@ -40,10 +40,10 @@ gboolean XARecordItfAdaptMMF_PositionUpdate(gpointer ctx, XAuint64 position);
 
 /* FUNCTIONS */
 
-XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationBaseMMFCtx *ctx, XAuint32 state );
-XAresult XARecordItfAdaptMMF_GetPosition( XAAdaptationBaseMMFCtx *ctx, XAmillisecond *pMsec );
-XAresult XARecordItfAdaptMMF_GetRecordState(XAAdaptationBaseMMFCtx *bCtx, XAuint32 *state);
-XAresult XARecordItfAdaptMMF_EnablePositionTracking(XAAdaptationBaseMMFCtx *ctx, XAboolean enable);
-XAresult XARecordItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationBaseMMFCtx *ctx, XAmillisecond pMsec);
+XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationMMFCtx *ctx, XAuint32 state );
+XAresult XARecordItfAdaptMMF_GetPosition( XAAdaptationMMFCtx *ctx, XAmillisecond *pMsec );
+XAresult XARecordItfAdaptMMF_GetRecordState(XAAdaptationMMFCtx *bCtx, XAuint32 *state);
+XAresult XARecordItfAdaptMMF_EnablePositionTracking(XAAdaptationMMFCtx *ctx, XAboolean enable);
+XAresult XARecordItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationMMFCtx *ctx, XAmillisecond pMsec);
 
 #endif /* XARECORDITFADAPTATIONMMF_H */

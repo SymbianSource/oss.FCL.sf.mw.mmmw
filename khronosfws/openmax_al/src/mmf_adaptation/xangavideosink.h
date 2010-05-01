@@ -35,7 +35,7 @@ Shy Ward
 #include <mediaclientvideodisplay.h>
 #endif
 
-class CNgaVideoSink : public CBase,
+NONSHARABLE_CLASS(CNgaVideoSink) : public CBase,
                       public CActive
     {
 public:
@@ -50,7 +50,7 @@ public:
     virtual void RunL();
     virtual void DoCancel();
     void Activate();
-
+    void RemoveWindow();
     void CompleteRequest(TInt status = KErrNone);    
     
 private:

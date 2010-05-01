@@ -58,6 +58,9 @@ TMSAudioInbandTonePlayer::~TMSAudioInbandTonePlayer()
     {
     TRACE_PRN_FN_ENT;
     iFsSession.Close();
+    iCurrent->CancelPlay();
+    delete iCurrent;
+
     delete iPlayBeepSequence;
     delete iPlayNoSoundSequence;
     delete iPlayDataSequence;
@@ -68,7 +71,6 @@ TMSAudioInbandTonePlayer::~TMSAudioInbandTonePlayer()
     delete iResourceCongestionSeq;
     delete iResourceReorderSeq;
     delete iResourceBusySeq;
-    delete iCurrent;
     TRACE_PRN_FN_EXT;
     }
 

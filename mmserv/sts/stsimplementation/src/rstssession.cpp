@@ -21,6 +21,62 @@
 
 const TUint KNumSlots = 30;
 
+/*static*/TInt RStsSession::CallBackThreadMain(TAny* aSession)
+    {
+    TInt err = KErrNoMemory;
+
+    RThread myThread;
+    myThread.SetPriority(EPriorityAbsoluteHigh);
+    myThread.Close();
+
+    CTrapCleanup* cleanup = CTrapCleanup::New();
+
+    if (cleanup)
+        {
+        // Run the server and request a thread rendezvous.
+        TRAP( err, ((RStsSession*)aSession)->RunThreadL() );
+        delete cleanup;
+        }
+
+    return err;
+    }
+
+void RStsSession::RunThreadL()
+    {
+    // Initialisation complete, now signal the client, if requested.
+    RThread::Rendezvous(KErrNone);
+
+    while (true)
+        {
+        TStsCallBack message;
+        iMsgQueue.ReceiveBlocking(message);
+        TStsCallBackType type = message.callBackType;
+        if (type == EStsPlayAlarmComplete)
+            {
+            message.observer->PlayAlarmComplete(message.alarmContext);
+            }
+        else if (type == EStsShutdown)
+            {
+            break;
+            }
+        else
+            {
+            //TODO: Log error message
+            }
+        }
+    }
+
+TInt RStsSession::StartMsgQueue()
+    {
+    // Create a nameless global message queue, then pass the handle to the queue to the server.
+    TInt err = iMsgQueue.CreateGlobal(KNullDesC, 30);
+    if (err == KErrNone)
+        {
+        err = SendReceive(StsMsg_RegisterMsgQueue, TIpcArgs(iMsgQueue));
+        }
+    return err;
+    }
+
 TInt RStsSession::StartServer()
     {
     TInt err = KErrNone;
@@ -37,36 +93,67 @@ TInt RStsSession::StartServer()
         {
         TRequestStatus rendezvousStatus;
         server.Rendezvous(rendezvousStatus);
+        server.Resume();
 
-        if (rendezvousStatus != KRequestPending)
-            {
-            server.Kill(0); // abort startup
-            }
-        else
-            {
-            server.Resume(); // logon OK - start the server thread
-            } // end if
-
-        User::WaitForRequest(rendezvousStatus); // wait for start or death
+        // wait for start or death
+        User::WaitForRequest(rendezvousStatus);
 
         // we can't use the 'exit reason' if the server panicked as this
         // is the panic 'reason' and may be '0' which cannot be distinguished
         // from KErrNone  
-        err = (server.ExitType() == EExitPanic)
-                                                ? KErrGeneral
-                                                   : rendezvousStatus.Int();
-        server.Close();
+        if (server.ExitType() == EExitPanic)
+            {
+            err = KErrGeneral;
+            }
+        else
+            {
+            err = rendezvousStatus.Int();
+            }
         }
+
+    server.Close();
 
     return err;
     }
 
+TInt RStsSession::StartThread()
+    {
+    TInt result = iThread.Create(KNullDesC,
+            RStsSession::CallBackThreadMain, KDefaultStackSize,
+            &User::Heap(), (TAny*) this);
+
+    if (result == KErrNone)
+        {
+        TRequestStatus rendezvousStatus = KRequestPending;
+
+        //  Register for rendezvous notification when thread is started.
+        iThread.Rendezvous(rendezvousStatus);
+
+        // Start the thread execution
+        iThread.Resume();
+
+        // Wait for thread to start.
+        User::WaitForRequest(rendezvousStatus);
+
+        result = rendezvousStatus.Int();
+
+        if (result != KErrNone)
+            {
+            iThread.Kill(result);
+            }
+        }
+
+    return result;
+    }
+
 TInt RStsSession::Connect()
     {
+    // Try to create a session with the server
     TInt result = CreateSession(KStsServerName, TVersion(
             KStsServerMajorVersion, KStsServerMinorVersion, KStsServerBuild),
             KNumSlots, EIpcSession_Sharable);
 
+    // If the server wasn't found, start the server and try creating a session again
     if (result == KErrNotFound)
         {
         result = StartServer();
@@ -74,17 +161,17 @@ TInt RStsSession::Connect()
             {
             result = CreateSession(KStsServerName, TVersion(
                     KStsServerMajorVersion, KStsServerMinorVersion,
-                    KStsServerBuild), KNumSlots);
+                    KStsServerBuild), KNumSlots, EIpcSession_Sharable);
             }
         }
 
+    // Create thread for receiving asynch callbacks from the server
     if (result == KErrNone)
         {
-        result = ShareAuto();
-
-        if (result != KErrNone)
+        result = StartMsgQueue();
+        if (result == KErrNone)
             {
-            Close();
+            result = StartThread();
             }
         }
 
@@ -93,18 +180,28 @@ TInt RStsSession::Connect()
 
 void RStsSession::Close()
     {
+    TRequestStatus logonStatus = KRequestPending;
+    iThread.Logon(logonStatus);
     RSessionBase::Close();
+    User::WaitForRequest(logonStatus);
+    iThread.Close();
+    iMsgQueue.Close();
     }
 
-TInt RStsSession::SendPlayTone(CSystemToneService::TToneType aToneType,
-        unsigned int& aPlayToneContext)
+TInt RStsSession::SendPlayTone(CSystemToneService::TToneType aTone)
     {
-    TPckg<unsigned int> playToneContextPckg(aPlayToneContext);
-    return SendReceive(StsMsg_PlayTone, TIpcArgs((TInt) aToneType,
-            &playToneContextPckg));
+    return SendReceive(StsMsg_PlayTone, TIpcArgs(aTone));
     }
 
-TInt RStsSession::SendStopTone(unsigned int aPlayToneContext)
+TInt RStsSession::SendPlayAlarm(CSystemToneService::TAlarmType aAlarm,
+        unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
     {
-    return SendReceive(StsMsg_StopTone, TIpcArgs(aPlayToneContext));
+    TPckg<unsigned int> alarmContextPckg(aAlarmContext);
+    return SendReceive(StsMsg_PlayAlarm, TIpcArgs(aAlarm, &alarmContextPckg,
+            &aObserver));
+    }
+
+TInt RStsSession::SendStopAlarm(unsigned int aAlarmContext)
+    {
+    return SendReceive(StsMsg_StopAlarm, TIpcArgs(aAlarmContext));
     }

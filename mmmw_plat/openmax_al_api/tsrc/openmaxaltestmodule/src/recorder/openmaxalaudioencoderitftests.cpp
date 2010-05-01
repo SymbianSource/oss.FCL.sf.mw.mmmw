@@ -77,54 +77,62 @@ TInt COpenMAXALTestModule::al_audioencoderitf_SetEncoderSettings( CStifItemParse
     XAAudioEncoderSettings setting;
     TUint value(0);
     TInt i(0);
+    TInt numItems;
     
-    while(aItem.GetNextInt(value) == KErrNone)
+    status = aItem.GetNextInt(numItems);
+    
+    while((numItems != 0) && (status == KErrNone))
         {
-        switch(i)
+        status = aItem.GetNextInt(value);
+        if(!status)
             {
-            case 0:
-                setting.encoderId = value;
-                break;
-            case 1:
-                setting.channelsIn = value;
-                break;
-            case 2:
-                setting.channelsOut = value;
-                break;
-            case 3:
-                setting.sampleRate = value;
-                break;
-            case 4:
-                setting.bitRate = value;
-                break;
-            case 5:
-                setting.bitsPerSample = value;
-                break;
-            case 6:
-                setting.rateControl = value;
-                break;
-            case 7:
-                setting.profileSetting = value;
-                break;
-            case 8:
-                setting.levelSetting = value;
-                break;
-            case 9:
-                setting.channelMode = value;
-                break;
-            case 10:
-                setting.streamFormat = value;
-                break;
-            case 11:
-                setting.encodeOptions = value;
-                break;
-            case 12:
-                setting.blockAlignment = value;
-                break;
-            default:
-                break;
+            switch(i)
+                {
+                case 0:
+                    setting.encoderId = value;
+                    break;
+                case 1:
+                    setting.channelsIn = value;
+                    break;
+                case 2:
+                    setting.channelsOut = value;
+                    break;
+                case 3:
+                    setting.sampleRate = value;
+                    break;
+                case 4:
+                    setting.bitRate = value;
+                    break;
+                case 5:
+                    setting.bitsPerSample = value;
+                    break;
+                case 6:
+                    setting.rateControl = value;
+                    break;
+                case 7:
+                    setting.profileSetting = value;
+                    break;
+                case 8:
+                    setting.levelSetting = value;
+                    break;
+                case 9:
+                    setting.channelMode = value;
+                    break;
+                case 10:
+                    setting.streamFormat = value;
+                    break;
+                case 11:
+                    setting.encodeOptions = value;
+                    break;
+                case 12:
+                    setting.blockAlignment = value;
+                    break;
+                default:
+                    break;
+                }
             }
         i++;
+        numItems--;
         }
 
     if(m_AudEncItf)

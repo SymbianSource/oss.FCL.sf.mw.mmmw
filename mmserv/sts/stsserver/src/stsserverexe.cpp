@@ -15,26 +15,27 @@
  * The file containt the main method of the STS Server.
  */
 
+#include <ecom/ecom.h>
 #include "stsserver.h"
-#include "stsclientservercommon.h"
 
 TInt E32Main()
     {
+    __UHEAP_MARK;
     TInt returnValue = KErrNoMemory;
 
     RThread myThread;
     myThread.SetPriority(EPriorityAbsoluteRealTime1);
-
-    __UHEAP_MARK;
-
+    myThread.Close();
+    
     CTrapCleanup* cleanup = CTrapCleanup::New();
 
     if (cleanup)
         {
         // Run the server and request a process rendezvous.
-        TRAP( returnValue, CStsServer::RunServerL( ETrue ) );
+        TRAP( returnValue, CStsServer::RunServerL() );
         delete cleanup;
         }
+    REComSession::FinalClose();
     __UHEAP_MARKEND;
 
     return returnValue;

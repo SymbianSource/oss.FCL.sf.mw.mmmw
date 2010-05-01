@@ -18,11 +18,7 @@
 #ifndef XAIMAGEENCODERITF_H
 #define XAIMAGEENCODERITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xamediarecorder.h"
 /** MACROS **/
 
 /** TYPES **/
@@ -37,10 +33,9 @@ typedef struct XAImageEncoderItfImpl_
     struct XAImageEncoderItf_ itf;
     /* pointer to self */
     struct XAImageEncoderItfImpl_* self;
-#ifdef _GSTREAMER_BACKEND_
     /* variables */
     XAAdaptationBaseCtx *adaptCtx;
-#endif
+
 } XAImageEncoderItfImpl;
 
 /** METHODS **/
@@ -59,13 +54,7 @@ XAresult XAImageEncoderItfImpl_GetSizeEstimate(XAImageEncoderItf self,
 
 
 /* XAImageEncoderItfImpl -specific methods */
-XAImageEncoderItfImpl* XAImageEncoderItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adaptCtx,
-#endif
-        void
-        );
-
+XAImageEncoderItfImpl* XAImageEncoderItfImpl_Create(XAMediaRecorderImpl* impl);
 void XAImageEncoderItfImpl_Free(XAImageEncoderItfImpl* self);
 
 #endif /* XAIMAGEENCODERITF_H */

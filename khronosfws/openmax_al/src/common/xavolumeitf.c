@@ -20,9 +20,9 @@
 #include <assert.h>
 
 #include "xavolumeitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAVolumeItfAdaptation.h"
-#endif
+ 
+#include "xavolumeitfadaptation.h"
+#include "xanokiavolumeextitfadaptationmmf.h"
 /**
  * XAVolumeItfImpl* GetImpl(XAVolumeItf self)
  * Description: Validated interface pointer and cast it to implementations pointer.
@@ -73,23 +73,29 @@ XAresult XAVolumeItfImpl_SetVolumeLevel(XAVolumeItf self, XAmillibel level)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAVolumeItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAVolumeItfImpl_SetVolumeLevel");
         return ret;
     }
-
-    ret = XAVolumeItfAdapt_SetVolumeLevel(impl->adapCtx,  level);
-
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XAVolumeItfAdapt_SetVolumeLevel((XAAdaptationGstCtx*)impl->adapCtx,  level);
+        }
+    else
+        {
+        impl->volumeLevel = level;
+        }
+    
     if(ret == XA_RESULT_SUCCESS)
     {
         impl->volumeLevel = level;
     }
 
-    XAVolumeItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAVolumeItfImpl_SetVolumeLevel");
     return ret ;
 }
@@ -136,18 +142,25 @@ XAresult XAVolumeItfImpl_GetMaxVolumeLevel(XAVolumeItf  self, XAmillibel *pMaxLe
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAVolumeItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAVolumeItfImpl_GetMaxVolumeLevel");
         return ret;
     }
-    ret = XAVolumeItfAdapt_GetMaxVolumeLevel(impl->adapCtx,
-                                             pMaxLevel);
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XAVolumeItfAdapt_GetMaxVolumeLevel((XAAdaptationGstCtx*)impl->adapCtx,
+                                                 pMaxLevel);
+        }
+    else
+        {
+        *pMaxLevel = MAX_SUPPORT_VOLUME_LEVEL;
+        }
 
-    XAVolumeItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAVolumeItfImpl_GetMaxVolumeLevel");
     return ret;
 }
@@ -170,8 +183,8 @@ XAresult XAVolumeItfImpl_SetMute(XAVolumeItf self, XAboolean mute)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAVolumeItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAVolumeItfImpl_SetMute");
@@ -180,7 +193,14 @@ XAresult XAVolumeItfImpl_SetMute(XAVolumeItf self, XAboolean mute)
     /* check is mute state changed */
     if(mute != impl->mute)
     {
-        ret = XAVolumeItfAdapt_SetMute(impl->adapCtx,  mute);
+        if(impl->adapCtx->fwtype == FWMgrFWMMF)
+            {
+            ret = XANokiaVolumeExtItfAdapt_SetMute((XAAdaptationMMFCtx*)impl->adapCtx,  mute);
+            }
+        else
+            {
+            ret = XAVolumeItfAdapt_SetMute((XAAdaptationGstCtx*)impl->adapCtx,  mute);
+            }
 
         if(ret == XA_RESULT_SUCCESS)
         {
@@ -188,8 +208,8 @@ XAresult XAVolumeItfImpl_SetMute(XAVolumeItf self, XAboolean mute)
         }
     }
 
-    XAVolumeItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAVolumeItfImpl_SetMute");
     return ret;
 }
@@ -236,8 +256,8 @@ XAresult XAVolumeItfImpl_EnableStereoPosition(XAVolumeItf self, XAboolean enable
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAVolumeItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAVolumeItfImpl_EnableStereoPosition");
@@ -246,17 +266,24 @@ XAresult XAVolumeItfImpl_EnableStereoPosition(XAVolumeItf self, XAboolean enable
     /* Check is stereo position state changed */
     if(enable != impl->enableStereoPos)
     {
-        ret = XAVolumeItfAdapt_EnableStereoPosition(impl->adapCtx,
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XAVolumeItfAdapt_EnableStereoPosition((XAAdaptationGstCtx*)impl->adapCtx,
                                                     enable);
-
+        }
+    else
+        {
+        ret = XANokiaVolumeExtItfAdapt_EnableStereoPosition((XAAdaptationMMFCtx*)impl->adapCtx,
+                                                    enable);    
+        }
         if(ret == XA_RESULT_SUCCESS)
         {
             impl->enableStereoPos = enable;
         }
     }
 
-    XAVolumeItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAVolumeItfImpl_EnableStereoPosition");
     return ret;
 }
@@ -310,8 +337,8 @@ XAresult XAVolumeItfImpl_SetStereoPosition(XAVolumeItf self,
 
     impl->stereoPosition = stereoPosition;
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAVolumeItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAVolumeItfImpl_SetStereoPosition");
@@ -320,12 +347,20 @@ XAresult XAVolumeItfImpl_SetStereoPosition(XAVolumeItf self,
     /* check is stereo position effect enabled if is then handle effect */
     if(impl->enableStereoPos)
     {
-        ret = XAVolumeItfAdapt_SetStereoPosition(impl->adapCtx,
+    if(impl->adapCtx->fwtype == FWMgrFWGST)
+        {
+        ret = XAVolumeItfAdapt_SetStereoPosition((XAAdaptationGstCtx*)impl->adapCtx,
                                                  stereoPosition);
+        }
+    else
+        {
+        ret = XANokiaVolumeExtItfAdapt_SetStereoPosition((XAAdaptationMMFCtx*)impl->adapCtx,
+                                                 stereoPosition);    
+        }
     }
 
-    XAVolumeItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAVolumeItfImpl_SetStereoPosition");
     return ret;
 }
@@ -359,7 +394,7 @@ XAresult XAVolumeItfImpl_GetStereoPosition(XAVolumeItf self,
 /**
  * XAVolumeItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_  
+
 
 /**
  * XAVolumeItfImpl* XAVolumeItfImpl_Create()
@@ -398,7 +433,7 @@ XAVolumeItfImpl* XAVolumeItfImpl_Create(XAAdaptationBaseCtx *adapCtx )
     DEBUG_API("<-XAVolumeItfImpl_Create");
     return self;
 }
-#endif
+
 /**
  * void XAVolumeItfImpl_Free(XAVolumeItfImpl* self)
  * Description: Free all resources reserved at XAVolumeItfImpl_Create

@@ -29,13 +29,9 @@ class TMSBuffer;
 class TMSBufferImpl
     {
 public:
-    ~TMSBufferImpl();
     IMPORT_C static gint Create(TMSBufferType ctype, guint size,
             TMSBuffer*& tmsbuffer);
     IMPORT_C static gint Delete(TMSBuffer*& tmsbuffer);
-
-private:
-    TMSBufferImpl();
     };
 
 } //namespace TMS

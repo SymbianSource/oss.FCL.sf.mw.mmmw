@@ -22,7 +22,7 @@
 #include "xavibraitf.h"
 #include "xaconfigextensionsitf.h"
 #include "xadynintmgmtitf.h"
-
+#include "xavibraadaptctx.h"
 
 /* Static mapping of enumeration XAVibraDeviceInterfaces to interface iids */
 static const XAInterfaceID* XAVibraDeviceItfIIDs[VIBRA_ITFCOUNT]=
@@ -41,7 +41,8 @@ static const XAInterfaceID* XAVibraDeviceItfIIDs[VIBRA_ITFCOUNT]=
  * XAresult XAVibraDeviceImpl_CreateVibraDevice
  * Description: Create object
  */
-XAresult XAVibraDeviceImpl_CreateVibraDevice(XAObjectItf* pDevice,
+XAresult XAVibraDeviceImpl_CreateVibraDevice(FrameworkMap* mapper,
+                                             XAObjectItf* pDevice,
                                              XAuint32 deviceID,
                                              XAuint32 numInterfaces,
                                              const XAInterfaceID * pInterfaceIds,
@@ -116,23 +117,22 @@ XAresult XAVibraDeviceImpl_CreateVibraDevice(XAObjectItf* pDevice,
         }
     }
 
-    /* Initialize XAVibraDeviceImpl variables */
-    pImpl->deviceID = deviceID;
-
-#ifdef _GSTREAMER_BACKEND_
-    pImpl->adaptationCtx = XAVibraAdapt_Create(pImpl->deviceID);
-#endif
-    
     /* This code is put here to return Feature Not Supported since adaptation is not present*/
     /*************************************************/
-    XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
     DEBUG_ERR("Required interface not found - abort creation!");
+    XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
     DEBUG_API("<-XAVibraDeviceImpl_CreateVibraDevice");
     return XA_RESULT_FEATURE_UNSUPPORTED;
     /*************************************************/
     
-    /* Set ObjectItf to point to newly created object */
-/*    *pDevice = (XAObjectItf)&(pBaseObj->self);
+/*    // Initialize XAVibraDeviceImpl variables 
+    pImpl->deviceID = deviceID;
+
+
+    pImpl->adaptationCtx = XAVibraAdapt_Create(pImpl->deviceID);
+
+     //Set ObjectItf to point to newly created object 
+    *pDevice = (XAObjectItf)&(pBaseObj->self);
 
     DEBUG_API("<-XAVibraDeviceImpl_Create");
     return XA_RESULT_SUCCESS;*/
@@ -205,9 +205,9 @@ XAresult XAVibraDeviceImpl_DoRealize(XAObjectItf self)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
+
     ret = XAVibraAdapt_PostInit( pObjImpl->adaptationCtx );
-#endif
+
     if( ret != XA_RESULT_SUCCESS )
     {
         DEBUG_API("<-XAVibraDeviceImpl_DoRealize");
@@ -224,9 +224,9 @@ XAresult XAVibraDeviceImpl_DoRealize(XAObjectItf self)
             switch( itfIdx )
             {
                 case VIBRA_VIBRAITF:
-#ifdef _GSTREAMER_BACKEND_
+
                     pItf = XAVibraItfImpl_Create(pObjImpl->adaptationCtx);
-#endif
+
                     break;
                 case VIBRA_CONFIGEXTENSIONITF:
                     pItf = XAConfigExtensionsItfImpl_Create();
@@ -272,18 +272,18 @@ XAresult XAVibraDeviceImpl_DoResume(XAObjectItf self)
 void XAVibraDeviceImpl_FreeResources(XAObjectItf self)
 {
     XAObjectItfImpl* pObj = (XAObjectItfImpl*) (*self);
-    
+    XAVibraDeviceImpl* pImpl = (XAVibraDeviceImpl*) (*self);
     XAuint8 itfIdx = 0;
     DEBUG_API("->XAVibraDeviceImpl_FreeResources");
-#ifdef _GSTREAMER_BACKEND_
-    XAVibraDeviceImpl* pImpl = (XAVibraDeviceImpl*) (*self);
+
+    
     assert( pObj && pImpl && pObj == pObj->self );
     if (pImpl->adaptationCtx != NULL)
     {
         XAVibraAdapt_Destroy(pImpl->adaptationCtx);
         pImpl->adaptationCtx = NULL;
     }
-#endif
+
     /* free all allocated interfaces */
     for (itfIdx = 0; itfIdx < VIBRA_ITFCOUNT; itfIdx++)
     {

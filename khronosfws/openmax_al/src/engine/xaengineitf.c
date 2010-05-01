@@ -21,13 +21,26 @@
 #include "xaengineitf.h"
 #include "xavibraitf.h"
 #include "xaledarrayitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAStaticCapsAdaptation.h"
-#endif
-
+#include "xaobjects.h"
+#include "xacapabilitiesmgr.h"
 /*static XAchar implementationText[] = "Implementation does not conform to AL Spec";*/
 
-
+/**
+ * XAEngineItfImpl* GetImpl(XAEngineItf self)
+ * Description: Validate interface pointer and cast it to implementation pointer.
+ **/
+static XAEngineItfImpl* GetImpl(XAEngineItf self)
+{
+    if( self )
+    {
+        XAEngineItfImpl* impl = (XAEngineItfImpl*)(*self);
+        if( impl && (impl == impl->self) )
+        {
+            return impl;
+        }
+    }
+    return NULL;
+}
 /**
  * Base interface XAEngineItf implementation
  */
@@ -38,8 +51,10 @@ XAresult XAEngineItfImpl_CreateCameraDevice(XAEngineItf self,
                                             const XAInterfaceID *pInterfaceIds,
                                             const XAboolean *pInterfaceRequired)
 {
-    return XACameraDeviceImpl_CreateCameraDevice( pDevice, deviceID,numInterfaces,
-                                                  pInterfaceIds, pInterfaceRequired );
+    XAEngineItfImpl* impl = GetImpl(self);
+    return XACameraDeviceImpl_CreateCameraDevice( impl->mapper,impl->capabilities,
+                                                    pDevice, deviceID,numInterfaces,
+                                                    pInterfaceIds, pInterfaceRequired );
 }
 
 XAresult XAEngineItfImpl_CreateRadioDevice(XAEngineItf self,
@@ -48,7 +63,8 @@ XAresult XAEngineItfImpl_CreateRadioDevice(XAEngineItf self,
                                             const XAInterfaceID *pInterfaceIds,
                                             const XAboolean *pInterfaceRequired)
 {
-    return XARadioDeviceImpl_CreateRadioDevice( pDevice, numInterfaces,
+    return XARadioDeviceImpl_CreateRadioDevice( ((XAEngineItfImpl*)self)->mapper,
+                                                pDevice, numInterfaces,
                                                 pInterfaceIds, pInterfaceRequired );
 }
 
@@ -59,8 +75,9 @@ XAresult XAEngineItfImpl_CreateLEDDevice(XAEngineItf self,
                                          const XAInterfaceID *pInterfaceIds,
                                          const XAboolean *pInterfaceRequired)
 {
-    return XALEDArrayDeviceImpl_CreateLEDArrayDevice( pDevice, deviceID, numInterfaces,
-                                                      pInterfaceIds, pInterfaceRequired );
+    return XALEDArrayDeviceImpl_CreateLEDArrayDevice( ((XAEngineItfImpl*)self)->mapper,
+                                                        pDevice, deviceID, numInterfaces,
+                                                        pInterfaceIds, pInterfaceRequired );
 }
 
 XAresult XAEngineItfImpl_CreateVibraDevice(XAEngineItf self,
@@ -70,7 +87,8 @@ XAresult XAEngineItfImpl_CreateVibraDevice(XAEngineItf self,
                                            const XAInterfaceID *pInterfaceIds,
                                            const XAboolean *pInterfaceRequired)
 {
-    return XAVibraDeviceImpl_CreateVibraDevice( pDevice, deviceID, numInterfaces,
+    return XAVibraDeviceImpl_CreateVibraDevice( ((XAEngineItfImpl*)self)->mapper,
+                                                pDevice, deviceID, numInterfaces,
                                                 pInterfaceIds, pInterfaceRequired);
 }
 
@@ -86,7 +104,9 @@ XAresult XAEngineItfImpl_CreateMediaPlayer(XAEngineItf self,
                                            const XAInterfaceID *pInterfaceIds,
                                            const XAboolean *pInterfaceRequired)
 {
-    return XAMediaPlayerImpl_CreateMediaPlayer(pPlayer, pDataSrc, pBankSrc, pAudioSnk,
+    XAEngineItfImpl* impl = GetImpl(self);
+    return XAMediaPlayerImpl_CreateMediaPlayer(impl->mapper,impl->capabilities, pPlayer, 
+                                             pDataSrc, pBankSrc, pAudioSnk,
                                              pImageVideoSnk, pVibra, pLEDArray,
                                              numInterfaces, pInterfaceIds, pInterfaceRequired);
 }
@@ -99,9 +119,17 @@ XAresult XAEngineItfImpl_CreateMediaRecorder(XAEngineItf self,
                                              XAuint32 numInterfaces,
                                              const XAInterfaceID * pInterfaceIds,
                                              const XAboolean * pInterfaceRequired)
-{
-    return XAMediaRecorderImpl_CreateMediaRecorder(pRecorder, pAudioSrc, pImageVideoSrc, pDataSnk,
-                                                   numInterfaces, pInterfaceIds, pInterfaceRequired);
+{    
+    XAEngineItfImpl* impl = GetImpl(self);
+    return XAMediaRecorderImpl_CreateMediaRecorder(impl->mapper,
+                                                   impl->capabilities,
+                                                   pRecorder,
+                                                   pAudioSrc,
+                                                   pImageVideoSrc,
+                                                   pDataSnk,
+                                                   numInterfaces,
+                                                   pInterfaceIds,
+                                                   pInterfaceRequired);
 }
 
 XAresult XAEngineItfImpl_CreateOutputMix(XAEngineItf self,
@@ -110,8 +138,10 @@ XAresult XAEngineItfImpl_CreateOutputMix(XAEngineItf self,
                                          const XAInterfaceID *pInterfaceIds,
                                          const XAboolean *pInterfaceRequired)
 {
-    return XAOMixImpl_CreateOutputMix(pMix, numInterfaces,
-                                      pInterfaceIds, pInterfaceRequired);
+    XAEngineItfImpl* impl = GetImpl(self);
+    return XAOMixImpl_CreateOutputMix(impl->mapper,impl->capabilities,
+                                        pMix, numInterfaces,
+                                        pInterfaceIds, pInterfaceRequired);
 }
 
 XAresult XAEngineItfImpl_CreateMetadataExtractor(XAEngineItf self,
@@ -121,8 +151,10 @@ XAresult XAEngineItfImpl_CreateMetadataExtractor(XAEngineItf self,
                                                  const XAInterfaceID *pInterfaceIds,
                                                  const XAboolean *pInterfaceRequired)
 {
-    return XAMetadataExtractorImpl_Create(pMetadataExtractor, pDataSource,
-                                          numInterfaces, pInterfaceIds, pInterfaceRequired);
+    XAEngineItfImpl* impl = GetImpl(self);
+    return XAMetadataExtractorImpl_Create(impl->mapper, impl->capabilities,
+                                            pMetadataExtractor, pDataSource,
+                                            numInterfaces, pInterfaceIds, pInterfaceRequired);
 }
 
 XAresult XAEngineItfImpl_CreateExtensionObject(XAEngineItf self,
@@ -312,9 +344,9 @@ XAresult XAEngineItfImpl_QueryLEDCapabilities(XAEngineItf self,
                                               XAuint32 *pLEDDeviceID,
                                               XALEDDescriptor *pDescriptor)
 {
-#ifdef _GSTREAMER_BACKEND_  
+  
     XALEDDescriptor descriptor;
-#endif    
+    
     DEBUG_API("->XAEngineItfImpl_QueryLEDCapabilities");
 
     if( !pDescriptor )
@@ -330,7 +362,7 @@ XAresult XAEngineItfImpl_QueryLEDCapabilities(XAEngineItf self,
     }
     else
     {   
-#ifdef _GSTREAMER_BACKEND_  
+  
         /* query device capabilities */
         if( pIndex )
         {
@@ -359,7 +391,7 @@ XAresult XAEngineItfImpl_QueryLEDCapabilities(XAEngineItf self,
             descriptor.primaryLED = PRIMARY_LED;
             *pDescriptor = descriptor;
         }
-#endif        
+        
     }
     DEBUG_API("<-XAEngineItfImpl_QueryLEDCapabilities");
     return XA_RESULT_SUCCESS;
@@ -370,9 +402,9 @@ XAresult XAEngineItfImpl_QueryVibraCapabilities(XAEngineItf self,
                                                 XAuint32 *pVibraDeviceID,
                                                 XAVibraDescriptor *pDescriptor)
 {
-#ifdef _GSTREAMER_BACKEND_  
+  
     XAVibraDescriptor descriptor;
-#endif
+
     DEBUG_API("->XAEngineItfImpl_QueryVibraCapabilities");
 
     if( !pDescriptor  )
@@ -388,7 +420,7 @@ XAresult XAEngineItfImpl_QueryVibraCapabilities(XAEngineItf self,
     }
     else
     {   
-#ifdef _GSTREAMER_BACKEND_  
+  
         /* query device capabilities */
         if( pIndex )
         {
@@ -419,7 +451,7 @@ XAresult XAEngineItfImpl_QueryVibraCapabilities(XAEngineItf self,
             descriptor.supportsIntensity = XA_BOOLEAN_TRUE;
             *pDescriptor = descriptor;
         }
-#endif        
+        
     }
 
     DEBUG_API("<-XAEngineItfImpl_QueryVibraCapabilities");
@@ -474,7 +506,7 @@ XAresult XAEngineItfImpl_IsExtensionSupported(XAEngineItf self,
 /**
  * XAEngineItfImpl -specific methods
  **/
-XAEngineItfImpl* XAEngineItfImpl_Create()
+XAEngineItfImpl* XAEngineItfImpl_Create(FrameworkMap* fwkmapper, XACapabilities* capabilities)
 {
     XAEngineItfImpl* self = (XAEngineItfImpl*)
         calloc(1,sizeof(XAEngineItfImpl));
@@ -501,6 +533,9 @@ XAEngineItfImpl* XAEngineItfImpl_Create()
         self->itf.QueryNumSupportedExtensions = XAEngineItfImpl_QueryNumSupportedExtensions;
         self->itf.QuerySupportedExtension = XAEngineItfImpl_QuerySupportedExtension;
         self->itf.IsExtensionSupported = XAEngineItfImpl_IsExtensionSupported;
+        self->mapper = fwkmapper;
+        self->capabilities = capabilities;
+        self->xyz = 50;
         self->self = self;
     }
     DEBUG_API("<-XAEngineItfImpl_Create");

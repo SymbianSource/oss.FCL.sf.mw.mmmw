@@ -1,7 +1,7 @@
 EXPORTS
-	?Delete@CSystemToneService@@SAXPAV1@@Z @ 1 NONAME ; void CSystemToneService::Delete(class CSystemToneService *)
-	?StopTone@CSystemToneService@@QAEXI@Z @ 2 NONAME ; void CSystemToneService::StopTone(unsigned int)
-	?PlayTone@CSystemToneService@@QAEXW4TToneType@1@AAI@Z @ 3 NONAME ; void CSystemToneService::PlayTone(enum CSystemToneService::TToneType, unsigned int &)
+	?StopAlarm@CSystemToneService@@QAEXI@Z @ 1 NONAME ; void CSystemToneService::StopAlarm(unsigned int)
+	?Delete@CSystemToneService@@SAXPAV1@@Z @ 2 NONAME ; void CSystemToneService::Delete(class CSystemToneService *)
+	?PlayAlarm@CSystemToneService@@QAEXW4TAlarmType@1@AAIAAVMStsPlayAlarmObserver@@@Z @ 3 NONAME ; void CSystemToneService::PlayAlarm(enum CSystemToneService::TAlarmType, unsigned int &, class MStsPlayAlarmObserver &)
 	?Create@CSystemToneService@@SAPAV1@XZ @ 4 NONAME ; class CSystemToneService * CSystemToneService::Create(void)
 	?PlayTone@CSystemToneService@@QAEXW4TToneType@1@@Z @ 5 NONAME ; void CSystemToneService::PlayTone(enum CSystemToneService::TToneType)
 

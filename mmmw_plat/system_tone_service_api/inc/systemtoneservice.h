@@ -20,14 +20,35 @@
  *
  */
 
-#ifndef __SYSTEMTONESERVICE_H__
-#define __SYSTEMTONESERVICE_H__
+#ifndef SYSTEMTONESERVICE_H_
+#define SYSTEMTONESERVICE_H_
 
 // System includes
 #include <e32base.h>
 
 // Forward declarations
 NONSHARABLE_CLASS( CStsImplementation);
+
+//Observer declaration
+/**
+ *  Play Alarm Observer API definition.
+ *  This defines the interface that must be implemented by Play Alarm
+ *  Observers.
+ *
+ */
+class MStsPlayAlarmObserver
+    {
+public:
+    /**
+     * Informs the observer when the play alarm as indicated by the alarm
+     * context is complete.  This method will not be called when this alarm
+     * associated with the alarm context has been stopped with the StopAlarm
+     * method.
+     *
+     * @param aAlarmContext The context of the alarm that has completed.
+     */
+    virtual void PlayAlarmComplete(unsigned int aAlarmContext) = 0;
+    };
 
 // Class declaration
 /**
@@ -44,11 +65,11 @@ NONSHARABLE_CLASS( CStsImplementation);
  *       ...
  *       sts->PlayTone(CSystemToneService::EWarningTone);
  *       ...
- *       sts->Playtone(CSystemToneService::ECalendarAlarm, &calendarAlarmContext);
+ *       sts->PlayAlarm(CSystemToneService::ECalendarAlarm, &calendarAlarmContext);
+ *       ...
+ *       sts->StopAlarm(calendarAlarmContext);
  *       ...
  *   }
- *   ...
- *   sts->StopTone(calendarAlarmContext);
  *   ...
  *   CSystemToneService::Delete(sts);
  *  @endcode
@@ -68,59 +89,65 @@ public:
     /** The type of System Tones that are supported by this API. */
     enum TToneType
         {
-        // Calendar Tones
-        ECalendarAlarm = 0x0001,
-        EClockAlarm = 0x0002,
-        EToDoAlarm = 0x0003,
-
         // Capture Tones
-        EBurstMode = 0x1001,
-        ECapture = 0x1002,
-        ECallRecording = 0x1003,
-        ERecordingStart = 0x1004,
-        ERecordingStop = 0x1005,
-        ESelfTimer = 0x1006,
+        EBurstMode = 0x0001,
+        ECapture = 0x0002,
+        ECallRecording = 0x0003,
+        ERecordingStart = 0x0004,
+        ERecordingStop = 0x0005,
+        ESelfTimer = 0x0006,
 
         // General Tones
-        EConfirmationBeep = 0x2001,
-        EDefaultBeep = 0x2002,
-        EErrorBeep = 0x2003,
-        EInformationBeep = 0x2004,
-        EWarningBeep = 0x2005,
-        EIntegratedHandsFreeActivated = 0x2006,
+        EConfirmationBeep = 0x0101,
+        EDefaultBeep = 0x0102,
+        EErrorBeep = 0x0103,
+        EInformationBeep = 0x0104,
+        EWarningBeep = 0x0105,
+        EIntegratedHandsFreeActivated = 0x0106,
 
         // Key Tones
-        ETouchScreen = 0x3001,
+        ETouchScreen = 0x0201,
 
         // Location Tones
-        ELocationRequest = 0x4001,
+        ELocationRequest = 0x0301,
 
         // Messaging Tones
-        EChatAlert = 0x5001,
-        EEmailAlert = 0x5002,
-        EMmsAlert = 0x5003,
-        ESmsAlert = 0x5004,
-        EDeliveryReport = 0x5005,
-        EMessageSendFailure = 0x5006,
+        EChatAlert = 0x0401,
+        EEmailAlert = 0x0402,
+        EMmsAlert = 0x0403,
+        ESmsAlert = 0x0404,
+        EDeliveryReport = 0x0405,
+        EMessageSendFailure = 0x0406,
 
         // Power Tones
-        EBatteryLow = 0x6001,
-        EBatteryRecharged = 0x6002,
-        EPowerOn = 0x6003,
-        EPowerOff = 0x6004,
-        EWakeUp = 0x6005,
-        EWrongCharger = 0x6006,
+        EBatteryLow = 0x0501,
+        EBatteryRecharged = 0x0502,
+        EPowerOn = 0x0503,
+        EPowerOff = 0x0504,
+        EWakeUp = 0x0505,
+        EWrongCharger = 0x0506,
 
         // Telephony Tones
-        EIncomingCall = 0x7001,
-        EIncomingCallLine2 = 0x7002,
-        EIncomingDataCall = 0x7003,
-        EAutomaticRedialComplete = 0x7004,
+        EAutomaticRedialComplete = 0x0604,
 
         // Voice Recognition Tones
-        EVoiceStart = 0x8001,
-        EVoiceError = 0x8002,
-        EVoiceAbort = 0x8003
+        EVoiceStart = 0x0701,
+        EVoiceError = 0x0702,
+        EVoiceAbort = 0x0703
+        };
+
+    /** The type of System Alarms that are supported by this API. */
+    enum TAlarmType
+        {
+        // Calendar Alarms
+        ECalendarAlarm = 0x8001,
+        EClockAlarm = 0x8002,
+        EToDoAlarm = 0x8003,
+
+        // Telephony Alarms
+        EIncomingCall = 0x8101,
+        EIncomingCallLine2 = 0x8102,
+        EIncomingDataCall = 0x8103
         };
 
     /**
@@ -129,30 +156,28 @@ public:
      * to play to completion and do not need to be stopped by the client.
      *
      * @param aTone An input parameter that indicates the type of tone to play.
-     * @return description
      */
     IMPORT_C void PlayTone(TToneType aTone);
 
     /**
-     * Plays the specified tone.  If the tone type is not recognized a default tone will
-     * be played.  This method is used for tones that may not be fixed duration such as
-     * infinitely looping tones, or for tones that can be manually stopped by the client.
+     * Plays the specified alarm.  If the alarm type is not recognized a default alarm will
+     * be played.  Alarms are tones that are not fixed duration such as a calendar alarm
+     * that can be manually stopped by the client, or the client needs to know when the alarm
+     * has completed playing.
      *
-     * @param aTone An input parameter that indicates the type of tone to play.
-     * @param aPlayToneContext An output parameter that provides back a unique context to
-     *  the client for this tone play that can be used for stopping the playback.
-     * @return description
+     * @param aAlarn An input parameter that indicates the type of alarm to play.
+     * @param aAlarmContext An output parameter that provides back a unique context to
+     *  the client for this alarm that can be used for stopping the alarm.
      */
-    IMPORT_C void PlayTone(TToneType aTone, unsigned int& aPlayToneContext);
+    IMPORT_C void PlayAlarm(TAlarmType aAlarm, unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 
     /**
-     * Stops the specified tone playback.  If the playback has already completed or the
-     * context is not recognized, this method does nothing.
+     * Stops the specified alarm playback.  If the playback has already completed or the
+     * context is not valid, this method does nothing.
      *
-     * @param aPlayToneContext The context to the Tone Playing that is to be stopped.
-     * @return description
+     * @param aAlarmContext The context to the alarm that is to be stopped.
      */
-    IMPORT_C void StopTone(unsigned int aPlayToneContext);
+    IMPORT_C void StopAlarm(unsigned int aAlarmContext);
 
 protected:
     // Protected constructors and destructors
@@ -167,4 +192,4 @@ protected:
     CStsImplementation& iImplementation;
     };
 
-#endif  // __SYSTEMTONESERVICE_H__
+#endif  // SYSTEMTONESERVICE_H_

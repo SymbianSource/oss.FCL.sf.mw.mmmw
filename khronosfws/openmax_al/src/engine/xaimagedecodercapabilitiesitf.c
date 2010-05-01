@@ -22,9 +22,9 @@
 
 #include "xaglobals.h"
 #include "xaimagedecodercapabilitiesitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAStaticCapsAdaptation.h"
-#endif
+  
+#include "xacapabilitiesmgr.h"
+
 /* XAImageDecoderCapabilitiesItfImpl* GetImpl
  * Description: Validate interface pointer and cast it to implementation pointer.
  */
@@ -72,19 +72,20 @@ XAresult XAImageDecoderCapabilitiesItfImpl_GetImageDecoderCapabilities(
         else
         {
             /* query capabilities from adaptation using codec id */
-#ifdef _GSTREAMER_BACKEND_  
-            XAStaticCapsData temp;
+  
+            XACapabilities temp;
             memset(pDescriptor,0,sizeof(XAImageCodecDescriptor));
             /* here pEncoderId refers to index rather than codec id */
-            res = XAStaticCapsAdapt_GetCapsByIdx(XACAP_DECODER|XACAP_IMAGE, *pDecoderId, &temp);
+            res = XACapabilitiesMgr_GetCapsByIdx(NULL, (XACapsType)(XACAP_DECODER|XACAP_IMAGE), *pDecoderId, &temp);
             if( res == XA_RESULT_SUCCESS )
             {
+                XAImageCodecDescriptor* desc = (XAImageCodecDescriptor*)(&temp.pEntry);
                 /* map applicable values to XAAudioCodecCapabilities */
                 pDescriptor->codecId = temp.xaid;
-                pDescriptor->maxWidth = temp.maxW;
-                pDescriptor->maxHeight = temp.maxH;
+                pDescriptor->maxWidth = desc->maxWidth;
+                pDescriptor->maxHeight = desc->maxHeight;
             }
-#endif
+
         }
     }
 
@@ -112,9 +113,9 @@ XAresult XAImageDecoderCapabilitiesItfImpl_QueryColorFormats(
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-        res = XAStaticCapsAdapt_QueryColorFormats(pIndex, pColorFormats);
-#endif        
+
+        res = XACapabilitiesMgr_QueryColorFormats(NULL, pIndex, pColorFormats);
+        
     }
     DEBUG_API("<-XAImageDecoderCapabilitiesItfImpl_QueryColorFormats");
     return res;
@@ -141,11 +142,11 @@ XAImageDecoderCapabilitiesItfImpl* XAImageDecoderCapabilitiesItfImpl_Create()
         self->itf.QueryColorFormats =
             XAImageDecoderCapabilitiesItfImpl_QueryColorFormats;
 
-#ifdef _GSTREAMER_BACKEND_  
+  
         /* init variables */
-        assert( XAStaticCapsAdapt_GetCapsCount( XACAP_DECODER|XACAP_IMAGE,
+        assert( XACapabilitiesMgr_GetCapsCount( NULL, (XACapsType)(XACAP_DECODER|XACAP_IMAGE),
                                   &(self->numCodecs) ) == XA_RESULT_SUCCESS );
-#endif
+
         self->self = self;
     }
     DEBUG_API("<-XAImageDecoderCapabilitiesItfImpl_Create");

@@ -40,29 +40,24 @@ typedef enum {
     XA_RADIOITFEVENTS = 0x80,
     XA_RDSITFEVENTS = 0x100,
     XA_METADATAEVENTS = 0x200,
-    XA_ADDMORETYPES  = 0x400
+    XA_VOLUMEITFEVENTS = 0x400,
+    XA_NOKIALINEARVOLITFEVENTS = 0x800,
+    XA_NOKIAEXTVOLITFEVENTS = 0x1000,        
+    XA_ADDMORETYPES  = 0x2000    
 }XAAdaptEventTypes;
 
-#define XA_ADAPT_PU_INTERVAL 50                     /* position update interval */
-#define XA_ADAPT_ASYNC_TIMEOUT 3000                 /* timeout to wait async events */
-#define XA_ADAPT_ASYNC_TIMEOUT_SHORT 1000           /* timeout to wait async events */
-#define XA_ADAPT_ASYNC_TIMEOUT_SHORT_NSEC 1000000   /* timeout to wait async events */
 
-#define XA_ADAPT_POSITION_UPDATE_EVT 0xf0           /* position update event */
-#define XA_ADAPT_SNAPSHOT_TAKEN 0xf1                /* snapshot taken event */
-#define XA_ADAPT_SNAPSHOT_INITIATED 0xf2            /* snapshot intitiated event */
-#define XA_ADAPT_MDE_TAGS_AVAILABLE 0xf3            /* metadata taglist changed */
-#define XA_ADAPT_OMIX_DEVICESET_CHANGED 0xf4        /* Output mix device changed event */
-#define XA_ADAPT_RADIO_FREQUENCY_CHANGED 0xf6       /* Radio frequency changed event */
-#define XA_ADAPT_RADIO_FREQUENCY_RANGE_CHANGED 0xf7 /* Radio frequency range changed event */
-#define XA_ADAPT_RADIO_SEEK_COMPLETE 0xf8           /* Radio seek complete changed event */
-#define XA_ADAPT_RDS_GET_ODA_GROUP_DONE 0xf9        /* RDS get oda group done event */
-#define XA_ADAPT_BUFFERING 0xfa
-#define XA_ADAPT_MDE_TAGS_WRITTEN 0xfb
-/* TYPEDEFS */
+typedef enum
+{
+    XACAP_DECODER  = 0x1,
+    XACAP_ENCODER  = 0x2,
+    XACAP_DEVSNK   = 0x4,
+    XACAP_DEVSRC   = 0x8,
 
-#define RADIO_DEFAULT_FREQ_RANGE XA_FREQRANGE_FMEUROAMERICA
-#define RADIO_DEFAULT_FREQ 88000000
+    XACAP_AUDIO    = 0x10,
+    XACAP_VIDEO    = 0x20,
+    XACAP_IMAGE    = 0x40
+} XACapsType;
 
 
 typedef enum
@@ -83,142 +78,31 @@ typedef enum
 } XAMediaType;
 
 #define CPCONFIGKEY "TestAppPipeConfig"
+
+#define XA_RECMODE_STREAM 1
+#define XA_RECMODE_STILL 2
+
+#define XA_IMPL_SUPPORTED_AUDIO_OUT_NUM 3
+#define XA_IMPL_OMIX_MAX_CONNECTED_MEDIAPLAYERS 10
+
+/* Max volume level is implementation-dependent but must be at least 0mB
+ * now used max volume 10 mB
+ */
+#define MAX_PERCENTAGE_VOLUME 100
+#define MIN_VOLUME_LEVEL 0
+#define MAX_SUPPORT_VOLUME_LEVEL 9000
+
+/* Stereo position range is -1000 to 1000 permille. -1000 permille is fully left
+ * and 1000 permille is fully right. 0 permille is center.
+ */
+#define STEREO_POSITION_RIGHT 1000
+#define STEREO_POSITION_LEFT -1000
+#define STEREO_POSITION_CENTER 0
+
 /**
  * GLOBAL METHODS
  */
 
-
-/*
- * Engine
- */
-XAresult XAEngineImpl_Create(XAObjectItf *pEngine,
-                             XAuint32 numOptions,
-                             const XAEngineOption *pEngineOptions,
-                             XAuint32 numInterfaces,
-                             const XAInterfaceID *pInterfaceIds,
-                             const XAboolean *pInterfaceRequired);
-
-XAresult XAEngineImpl_QueryNumSupportedInterfaces(XAuint32 *pNumSupportedInterfaces);
-
-XAresult XAEngineImpl_QuerySupportedInterfaces(XAuint32 index,
-                                               XAInterfaceID *pInterfaceId);
-
-/*
- * Media Player
- */
-XAresult XAMediaPlayerImpl_CreateMediaPlayer(XAObjectItf *pPlayer,
-                                           XADataSource *pDataSrc,
-                                           XADataSource *pBankSrc,
-                                           XADataSink *pAudioSnk,
-                                           XADataSink *pImageVideoSnk,
-                                           XADataSink *pVibra,
-                                           XADataSink *pLEDArray,
-                                           XAuint32 numInterfaces,
-                                           const XAInterfaceID *pInterfaceIds,
-                                           const XAboolean *pInterfaceRequired);
-
-XAresult XAMediaPlayerImpl_QueryNumSupportedInterfaces(XAuint32 *pNumSupportedInterfaces);
-
-XAresult XAMediaPlayerImpl_QuerySupportedInterfaces(XAuint32 index,
-                                                  XAInterfaceID *pInterfaceId);
-
-/*
- * Metadata Extractor
- */
-XAresult XAMetadataExtractorImpl_Create(XAObjectItf *pMetadataExtractor,
-                                           XADataSource *pDataSource,
-                                           XAuint32 numInterfaces,
-                                           const XAInterfaceID *pInterfaceIds,
-                                           const XAboolean *pInterfaceRequired);
-
-XAresult XAMetadataExtractorImpl_QueryNumSupportedInterfaces(XAuint32 *pNumSupportedInterfaces);
-
-XAresult XAMetadataExtractorImpl_QuerySupportedInterfaces(XAuint32 index,
-                                            XAInterfaceID *pInterfaceId);
-
-/*
- * Output Mix
- */
-XAresult XAOMixImpl_CreateOutputMix(XAObjectItf *pMix,
-                                    XAuint32 numInterfaces,
-                                    const XAInterfaceID *pInterfaceIds,
-                                    const XAboolean *pInterfaceRequired);
-
-XAresult XAOMixImpl_QueryNumSupportedInterfaces(XAuint32 *pNumSupportedInterfaces);
-
-XAresult XAOMixImpl_QuerySupportedInterfaces(XAuint32 index,
-                                             XAInterfaceID *pInterfaceId);
-
-/*
- * Media Recorder
- */
-XAresult XAMediaRecorderImpl_CreateMediaRecorder(XAObjectItf* pRecorder,
-                                                 XADataSource* pAudioSrc,
-                                                 XADataSource* pImageVideoSrc,
-                                                 XADataSink* pDataSnk,
-                                                 XAuint32 numInterfaces,
-                                                 const XAInterfaceID *pInterfaceIds,
-                                                 const XAboolean *pInterfaceRequired);
-
-XAresult XAMediaRecorderImpl_QueryNumSupportedInterfaces(XAuint32 *pNumSupportedInterfaces);
-
-XAresult XAMediaRecorderImpl_QuerySupportedInterfaces(XAuint32 index,
-                                                      XAInterfaceID *pInterfaceId);
-
-/*
- * Camera Device
- */
-XAresult XACameraDeviceImpl_CreateCameraDevice(XAObjectItf* pDevice,
-                                               XAuint32 deviceID,
-                                               XAuint32 numInterfaces,
-                                               const XAInterfaceID * pInterfaceIds,
-                                               const XAboolean * pInterfaceRequired);
-
-XAresult XACameraDeviceImpl_QueryNumSupportedInterfaces(XAuint32 *pNumSupportedInterfaces);
-
-XAresult XACameraDeviceImpl_QuerySupportedInterfaces(XAuint32 index,
-                                                     XAInterfaceID *pInterfaceId);
-
-/*
- * Radio Device
- */
-XAresult XARadioDeviceImpl_CreateRadioDevice(XAObjectItf* pDevice,
-                                             XAuint32 numInterfaces,
-                                             const XAInterfaceID * pInterfaceIds,
-                                             const XAboolean * pInterfaceRequired);
-
-XAresult XARadioDeviceImpl_QueryNumSupportedInterfaces(XAuint32 *pNumSupportedInterfaces);
-
-XAresult XARadioDeviceImpl_QuerySupportedInterfaces(XAuint32 index,
-                                                    XAInterfaceID *pInterfaceId);
-
-/*
- * Vibra Device
- */
-XAresult XAVibraDeviceImpl_CreateVibraDevice(XAObjectItf* pDevice,
-                                             XAuint32 deviceID,
-                                             XAuint32 numInterfaces,
-                                             const XAInterfaceID * pInterfaceIds,
-                                             const XAboolean * pInterfaceRequired);
-
-XAresult XAVibraDeviceImpl_QueryNumSupportedInterfaces(XAuint32 *pNumSupportedInterfaces);
-
-XAresult XAVibraDeviceImpl_QuerySupportedInterfaces(XAuint32 index,
-                                                    XAInterfaceID *pInterfaceId);
-
-/*
- * LED Array
- */
-XAresult XALEDArrayDeviceImpl_CreateLEDArrayDevice(XAObjectItf* pDevice,
-                                                   XAuint32 deviceID,
-                                                   XAuint32 numInterfaces,
-                                                   const XAInterfaceID * pInterfaceIds,
-                                                   const XAboolean * pInterfaceRequired);
-
-XAresult XALEDArrayDeviceImpl_QueryNumSupportedInterfaces(XAuint32 *pNumSupportedInterfaces);
-
-XAresult XALEDArrayDeviceImpl_QuerySupportedInterfaces(XAuint32 index,
-                                                    XAInterfaceID *pInterfaceId);
 
 
 /*

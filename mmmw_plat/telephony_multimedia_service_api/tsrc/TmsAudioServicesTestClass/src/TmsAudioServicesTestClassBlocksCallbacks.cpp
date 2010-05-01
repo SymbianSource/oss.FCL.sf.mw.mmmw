@@ -144,6 +144,7 @@ void CTmsAudioServicesTestClass::ProcessBuffer(const TMSBuffer* buffer)
 void CTmsAudioServicesTestClass::EffectsEvent(const TMSEffect& tmseffect,
         TMSSignalEvent /*event*/)
     {
+    iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::EffectsEvent"));
     TMSEffectType effecttype;
     const_cast<TMSEffect&>(tmseffect).GetType(effecttype);
     switch (effecttype)
@@ -179,3 +180,71 @@ void CTmsAudioServicesTestClass::GlobalRoutingEvent(
             break;
         }
     }
+
+// From TMSRingToneObserver
+void CTmsAudioServicesTestClass::RingtoneEvent(const TMSRingTone& /*rt*/,
+        TMSSignalEvent event)
+    {
+    iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::RingtoneEvent"));
+    gint reason = event.reason;
+    switch (event.type)
+        {
+        case TMS_EVENT_RINGTONE_OPEN_COMPLETE:
+            iLog->Log(_L("[tms cb]RingtoneEvent ERTInitComplete"));
+            ProcessEvent(ERTInitComplete, KErrNone);
+            break;
+        case TMS_EVENT_RINGTONE_PLAY_COMPLETE:
+            iLog->Log(_L("[tms cb]RingtoneEvent ERTPlayComplete"));
+            ProcessEvent(ERTPlayComplete, KErrNone);
+            break;
+        case TMS_EVENT_RINGTONE_DEINIT_COMPLETE:
+            iLog->Log(_L("[tms cb]RingtoneEvent ERTDeinitComplete"));
+            ProcessEvent(ERTDeinitComplete, KErrNone);
+            break;
+        default:
+            break;
+        }
+    }
+
+// From TMSDTMFObserver
+void CTmsAudioServicesTestClass::DTMFEvent(const TMSDTMF& /*dtmf*/,
+        TMSSignalEvent event)
+    {
+    iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::DTMFEvent"));
+    gint reason = event.reason;
+    switch (event.type)
+        {
+        case TMS_EVENT_DTMF_TONE_STARTED:
+            //ProcessEvent(EDTMFToneStarted, KErrNone);
+            iLog->Log(_L("DTMF Tone Started"));
+            break;
+        case TMS_EVENT_DTMF_TONE_STOPPED:
+            ProcessEvent(EDTMFToneStopped, KErrNone);
+            iLog->Log(_L("DTMF Tone Stopped"));
+            break;
+        default:
+            break;
+        }
+    }
+
+// From TMSInbandToneObserver
+void CTmsAudioServicesTestClass::InbandToneEvent(
+        const TMSInbandTone& /*inbandtone*/, TMSSignalEvent event)
+    {
+    iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::InbandToneEvent"));
+    gint reason = event.reason;
+    switch (event.type)
+        {
+        case TMS_EVENT_INBAND_TONE_STARTED:
+            //ProcessEvent(EInbToneStarted, KErrNone);
+            iLog->Log(_L("Inband Tone Started"));
+            break;
+        case TMS_EVENT_INBAND_TONE_STOPPED:
+            //ProcessEvent(EInbToneStopped, KErrNone);
+            iLog->Log(_L("Inband Tone Stopped"));
+            break;
+        default:
+            break;
+        }
+    }
+

@@ -23,18 +23,6 @@
 
 using namespace TMS;
 
-TMSSourceImpl::TMSSourceImpl()
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-TMSSourceImpl::~TMSSourceImpl()
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
 EXPORT_C gint TMSSourceImpl::Create(TMSSourceType sourcetype,
         TMSSource*& tmssource)
     {

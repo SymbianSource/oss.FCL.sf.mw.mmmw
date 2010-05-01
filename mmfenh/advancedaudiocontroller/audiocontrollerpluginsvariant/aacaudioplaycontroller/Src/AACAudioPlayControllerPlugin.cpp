@@ -111,6 +111,18 @@ CAACAudioPlayControllerPlugin::~CAACAudioPlayControllerPlugin()
 void CAACAudioPlayControllerPlugin::DoAddDataSourceL()
     {
     DP0(_L("CAACAudioPlayControllerPlugin::DoAddDataSourceL"));
+        // ou1cimx1#205863
+    if (iSourceType != KUidMmfFileSource) 
+    	{
+	    DP0(_L("CAACAudioPlayControllerPlugin::DoAddDataSourceL not file source"));        
+	    if (iSharedBufferMaxNum <= 2)
+	        {
+	        	iSharedBufferMaxNum = 3;
+	        }
+		 iSharedBufferMaxSize = iSharedBufferMaxSizeForNonSeekableSrc;
+	    DP2(_L("CAACAudioPlayControllerPlugin::DoAddDataSourceL new iSharedBufferMaxNum[%d] iSharedBufferMaxSize[%d]"), iSharedBufferMaxNum, iSharedBufferMaxSize);
+    	}
+
 	}
 
 // -----------------------------------------------------------------------------

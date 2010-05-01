@@ -24,10 +24,14 @@
 #include "xametadataextractionitf.h"
 #include "xametadatatraversalitf.h"
 #include "xaconfigextensionsitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAMetadataAdaptCtx.h"
-#endif
+
+#include "xametadataadaptctx.h"
+#include "xacapabilitiesmgr.h"
 #include "xathreadsafety.h"
+
+#include "xaadaptationmmf.h"
+#include "xametadataadaptctxmmf.h"
+
 
 /* Static mapping of enumeration XAMetadataInterfaces to interface iids */
 static const XAInterfaceID* xaMetadataExtractorItfIIDs[MDE_ITFCOUNT]=
@@ -49,7 +53,9 @@ static const XAInterfaceID* xaMetadataExtractorItfIIDs[MDE_ITFCOUNT]=
  * Description: Create object
  * Add this method to XAGlobals.h
  */
-XAresult XAMetadataExtractorImpl_Create(XAObjectItf *pMetadataExtractor,
+XAresult XAMetadataExtractorImpl_Create(FrameworkMap* mapper,
+                                        XACapabilities* capabilities,
+                                        XAObjectItf *pMetadataExtractor,
                                         XADataSource *pDataSource,
                                         XAuint32 numInterfaces,
                                         const XAInterfaceID * pInterfaceIds,
@@ -58,6 +64,8 @@ XAresult XAMetadataExtractorImpl_Create(XAObjectItf *pMetadataExtractor,
     XAMetadataExtractorImpl* pImpl = NULL;
     XAObjectItfImpl* pBaseObj = NULL;
     XAuint8 itfIndex = 0;
+    FWMgrFwType fwType;
+    const char *uri = NULL;    
     XAresult res = XA_RESULT_SUCCESS;
 
     DEBUG_API("->XAMetadataExtractorImpl_Create");
@@ -139,29 +147,55 @@ XAresult XAMetadataExtractorImpl_Create(XAObjectItf *pMetadataExtractor,
         }
     }
 
-    /* Mark interfaces that can be handled dynamically */
+   
+    // Mark interfaces that can be handled dynamically 
     pBaseObj->interfaceMap[MDE_CONFIGEXTENSIONITF].isDynamic = XA_BOOLEAN_TRUE;
 
-    /* Set ObjectItf to point to newly created object */
+     //Set ObjectItf to point to newly created object 
     *pMetadataExtractor = (XAObjectItf)&(pBaseObj->self);
 
-#ifdef _GSTREAMER_BACKEND_
-    /* Create metadata adaptation context */
-    pImpl->adaptationCtx = XAMetadataAdaptCtx_Create(pDataSource);
-#endif
+	//store member variables
+	pImpl->dataSrc = pDataSource;
+
+	/* Determine framework type that can handle recording */
+    fwType = (FWMgrFwType)FWMgrMOUnknown;
+    /**/
+    if (pDataSource->pLocator)
+    {
+        XADataLocator_URI* dataLoc = (XADataLocator_URI*)pDataSource->pLocator;
+        if (dataLoc->locatorType == XA_DATALOCATOR_URI)
+        {
+            uri = (char*)dataLoc->URI;
+        }
+    }
+	
+    fwType = XAFrameworkMgr_GetFramework(mapper, uri, FWMgrMOPlayer);
+
+    if (fwType == FWMgrMOUnknown)
+    {
+        XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
+        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+        DEBUG_API("<-XAMetadataExtractorImpl_Create");
+        return XA_RESULT_CONTENT_UNSUPPORTED;
+    }
     
-    /* This code is put here to return Feature Not Supported since adaptation is not present*/
-    /*************************************************/
-    XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
+    if(fwType == FWMgrFWMMF)
+    {    
+        pImpl->adaptationCtxMMF = XAMetadataAdaptCtxMMF_Create(pDataSource);
+        
+        pImpl->curAdaptCtx = pImpl->adaptationCtxMMF;    
+    }
+    else
+    {
+		// Create metadata adaptation context 
+		pImpl->adaptationCtxGst = XAMetadataAdaptCtx_Create(pDataSource);
+       
+       	pImpl->curAdaptCtx   = pImpl->adaptationCtxGst;
+    }
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
-    DEBUG_ERR("Required interface not found - abort creation!");
     DEBUG_API("<-XAMetadataExtractorImpl_Create");
-    return XA_RESULT_FEATURE_UNSUPPORTED;
-    /*************************************************/    
-    
-/*    XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
-    DEBUG_API("<-XAMetadataExtractorImpl_Create");
-    return XA_RESULT_SUCCESS;*/
+    return XA_RESULT_SUCCESS;
 }
 
 /* XAResult XAMetadataExtractorImpl_QueryNumSupportedInterfaces
@@ -258,21 +292,21 @@ XAresult XAMetadataExtractorImpl_DoRealize( XAObjectItf self )
                                       XAMetadataExtractorImpl_DoRemoveItf);
                     }
                     break;
-#ifdef _GSTREAMER_BACKEND_
+
                 case MDE_METADATAEXTRACTIONITF:
-                    pItf = XAMetadataExtractionItfImpl_Create( pObjImpl->adaptationCtx );
+                    pItf = XAMetadataExtractionItfImpl_Create( pObjImpl->curAdaptCtx );
                     break;
                 case MDE_METADATATRAVERSALITF:
-                    pItf = XAMetadataTraversalItfImpl_Create( pObjImpl->adaptationCtx );
+                    pItf = XAMetadataTraversalItfImpl_Create( pObjImpl->curAdaptCtx );
                     break;
                 case MDE_CONFIGEXTENSIONITF:
                     pItf = XAConfigExtensionsItfImpl_Create();
-                    XAConfigExtensionsItfImpl_SetContext( pItf, pObjImpl->adaptationCtx );
+                    XAConfigExtensionsItfImpl_SetContext( pItf, pObjImpl->curAdaptCtx );
                     break;
                 case MDE_DYNAMICSOURCEITF:
-                    pItf = XADynamicSourceItfImpl_Create( pObjImpl->adaptationCtx );
+                    pItf = XADynamicSourceItfImpl_Create( pObjImpl->curAdaptCtx );
                     break;
-#endif
+
                 default:
                     break;
             }
@@ -292,9 +326,16 @@ XAresult XAMetadataExtractorImpl_DoRealize( XAObjectItf self )
     }
     /*Initialize adaptation context*/
     /* init adaptation */
-#ifdef _GSTREAMER_BACKEND_
-    ret = XAMetadataAdaptCtx_PostInit( pObjImpl->adaptationCtx );
-#endif
+
+    if(pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+       ret = XAMetadataAdaptCtxMMF_PostInit( (XAAdaptationMMFCtx*)pObjImpl->adaptationCtxMMF );
+    }
+    else
+    {
+	    ret = XAMetadataAdaptCtx_PostInit( (XAAdaptationGstCtx*)pObjImpl->adaptationCtxGst );
+    }
+
     if ( ret != XA_RESULT_SUCCESS )
     {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
@@ -328,12 +369,13 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
     
     XAuint8 itfIdx = 0;
     void *pItf = NULL;
+    XAMetadataExtractorImpl* pImpl = (XAMetadataExtractorImpl*)(*self);
     DEBUG_API("->XAMetadataExtractorImpl_FreeResources");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS(XATSMediaPlayer);
-#ifdef _GSTREAMER_BACKEND_
-    XAMetadataExtractorImpl* pImpl = (XAMetadataExtractorImpl*)(*self);
+
+    
     assert( pObj && pImpl && pObj == pObj->self );
-#endif
+
     for(itfIdx = 0; itfIdx < MDE_ITFCOUNT; itfIdx++)
     {
         pItf = pObj->interfaceMap[itfIdx].pItf;
@@ -360,13 +402,23 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
             pObj->interfaceMap[itfIdx].pItf = NULL;
         }
     }
-#ifdef _GSTREAMER_BACKEND_
-    if ( pImpl->adaptationCtx != NULL )
-    {
-        XAMetadataAdaptCtx_Destroy( pImpl->adaptationCtx );
-        pImpl->adaptationCtx = NULL;
-    }
-#endif
+	
+	if(pImpl->curAdaptCtx)
+	{
+		if(pImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+		{
+			XAMetadataAdaptCtxMMF_Destroy( (XAAdaptationMMFCtx*)pImpl->adaptationCtxMMF );
+			pImpl->adaptationCtxMMF = NULL;
+		}
+		else
+		{
+			XAMetadataAdaptCtx_Destroy( (XAAdaptationGstCtx*)pImpl->adaptationCtxGst );
+			pImpl->adaptationCtxGst = NULL;
+		}
+	}
+	
+	pImpl->curAdaptCtx = NULL;
+
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS(XATSMediaPlayer);
     DEBUG_API("<-XAMetadataExtractorImpl_FreeResources");
     return;
@@ -381,10 +433,10 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
  */
 XAresult XAMetadataExtractorImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry  )
 {
-#ifdef _GSTREAMER_BACKEND_
+
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XAMetadataExtractorImpl* pImpl = (XAMetadataExtractorImpl*)(pObj);
-#endif
+
     XAresult ret = XA_RESULT_SUCCESS;
     DEBUG_API("->XAMetadataExtractorImpl_DoAddItf");
 
@@ -394,9 +446,9 @@ XAresult XAMetadataExtractorImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *ma
         {
             case MDE_CONFIGEXTENSIONITF:
                 mapEntry->pItf = XAConfigExtensionsItfImpl_Create();
-#ifdef _GSTREAMER_BACKEND_
-                XAConfigExtensionsItfImpl_SetContext( mapEntry->pItf, pImpl->adaptationCtx);
-#endif
+
+                XAConfigExtensionsItfImpl_SetContext( mapEntry->pItf, pImpl->adaptationCtxGst);
+
                 break;
             default:
                 DEBUG_ERR("XAMetadataExtractorImpl_DoAddItf unknown id");

@@ -20,6 +20,7 @@
 #include <StifParser.h>
 #include <StifTestInterface.h>
 #include "openmaxaltestmodule.h"
+#include "profileutilmacro.h"
 
 // EXTERNAL DATA STRUCTURES
 //extern  ?external_data;
@@ -284,8 +285,7 @@ TInt COpenMAXALTestModule::al_engitf_CreateVibraDevice( CStifItemParser& aItem )
 TInt COpenMAXALTestModule::al_engitf_CreateMediaPlayer( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
-    XADataSource* audioSource(NULL);
-    XADataSource* videoSource(NULL);
+    XADataSource* dataSource(NULL);
     XADataSink* audioSink(NULL);
     XADataSink* videoSink(NULL);
     XADataSink* ledSink(NULL);
@@ -321,14 +321,14 @@ TInt COpenMAXALTestModule::al_engitf_CreateMediaPlayer( CStifItemParser& aItem )
             }
         }
     
-    if(m_AudioSource.pFormat && m_AudioSource.pLocator)
+    /*pFormat is not mandatory for RadioSrc*/
+    if(/*m_AudioSource.pFormat &&*/ m_AudioSource.pLocator)
         {
-        audioSource = &m_AudioSource;
+        dataSource = &m_AudioSource;
         }
-    
-    if(m_VideoSource.pFormat && m_VideoSource.pLocator)
+    else if(m_VideoSource.pFormat && m_VideoSource.pLocator)
         {
-        videoSource = &m_VideoSource;
+        dataSource = &m_VideoSource;
         }
     
     if(m_VibraSink.pFormat && m_VibraSink.pLocator)
@@ -340,23 +340,26 @@ TInt COpenMAXALTestModule::al_engitf_CreateMediaPlayer( CStifItemParser& aItem )
         {
         ledSink = &m_LEDSink;
         }
-    
-    if(m_AudioSink.pFormat && m_AudioSink.pLocator)
+    /*pFormat is not mandatory for IODevice*/
+    if(/*m_AudioSink.pFormat && */m_AudioSink.pLocator)
         {
         audioSink = &m_AudioSink;
         }
-    
-    if(m_VideoSink.pFormat && m_VideoSink.pLocator)
+    /*pFormat is not mandatory for NativeDisplay*/
+    if(/*m_VideoSink.pFormat && */m_VideoSink.pLocator)
         {
         videoSink = &m_VideoSink;
         }    
     
     if(m_EngineItf)
         {
+        TAG_TIME_PROFILING_BEGIN;
         res = (*m_EngineItf)->CreateMediaPlayer(
-                m_EngineItf, &m_MOPlayer, audioSource, videoSource,
+                m_EngineItf, &m_MOPlayer, dataSource, NULL,
                 audioSink,videoSink, ledSink, vibraSink,
                 numInterfaces, iidArray, required);
+        TAG_TIME_PROFILING_END;
+        PRINT_TO_CONSOLE_TIME_DIFF;
         status = res;
         }
     else

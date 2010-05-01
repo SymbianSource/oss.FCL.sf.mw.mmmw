@@ -20,9 +20,9 @@
 #include <assert.h>
 
 #include "xametadatatraversalitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAMetadataAdaptation.h"
-#endif
+
+#include "xametadataadaptation.h"
+
 /* XAMetadataTraversalImpl* GetImpl(XAMetadataTraversalItf self)
  * Description: Validate interface pointer and cast it to implementation pointer.
  */
@@ -64,9 +64,9 @@ XAresult XAMetadataTraversalItfImpl_SetMode(XAMetadataTraversalItf self,
     }
     else if(impl->traversemode != mode)
     {
-#ifdef _GSTREAMER_BACKEND_  
-        res =XAMetadataTraversalItfAdapt_SetMode(impl->adaptCtx, mode);
-#endif
+
+        res =XAMetadataTraversalItfAdapt_SetMode((XAAdaptationGstCtx*)impl->adaptCtx, mode);
+
         if( res == XA_RESULT_SUCCESS )
         {
             impl->traversemode = mode;
@@ -107,9 +107,9 @@ XAresult XAMetadataTraversalItfImpl_GetChildCount(XAMetadataTraversalItf self,
         }
         else
         {
-#ifdef _GSTREAMER_BACKEND_  
-            res = XAMetadataTraversalItfAdapt_GetChildCount(impl->adaptCtx, pCount);
-#endif
+
+            res = XAMetadataTraversalItfAdapt_GetChildCount((XAAdaptationGstCtx*)impl->adaptCtx, pCount);
+
         }
     }
 
@@ -125,9 +125,9 @@ XAresult XAMetadataTraversalItfImpl_GetChildMIMETypeSize(XAMetadataTraversalItf 
                                                          XAuint32 *pSize)
 {
     XAMetadataTraversalImpl *impl = NULL;
-#ifdef _GSTREAMER_BACKEND_  
+
     XAuint32 chCount = 0;
-#endif    
+  
     XAresult res = XA_RESULT_SUCCESS;
 
     DEBUG_API("->XAMetadataTraversalItfImpl_GetChildMIMETypeSize");
@@ -140,15 +140,15 @@ XAresult XAMetadataTraversalItfImpl_GetChildMIMETypeSize(XAMetadataTraversalItf 
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_  
-        res = XAMetadataTraversalItfAdapt_GetChildCount(impl->adaptCtx, &chCount);
+
+        res = XAMetadataTraversalItfAdapt_GetChildCount((XAAdaptationGstCtx*)impl->adaptCtx, &chCount);
         if(index >= chCount || res != XA_RESULT_SUCCESS)
         {
             /* out of bounds */
             res = XA_RESULT_PARAMETER_INVALID;
         }
-        res = XAMetadataTraversalItfAdapt_GetChildMIMETypeSize(impl->adaptCtx, index, pSize);
-#endif
+        res = XAMetadataTraversalItfAdapt_GetChildMIMETypeSize((XAAdaptationGstCtx*)impl->adaptCtx, index, pSize);
+
     }
 
     DEBUG_API("<-XAMetadataTraversalItfImpl_GetChildMIMETypeSize");
@@ -166,9 +166,9 @@ XAresult XAMetadataTraversalItfImpl_GetChildInfo(XAMetadataTraversalItf self,
                                                  XAchar *pMimeType)
 {
     XAMetadataTraversalImpl *impl = NULL;
-#ifdef _GSTREAMER_BACKEND_  
+
     XAuint32 chCount = 0;
-#endif
+
     XAresult res = XA_RESULT_SUCCESS;
 
     DEBUG_API("->XAMetadataTraversalItfImpl_GetChildInfo");
@@ -180,8 +180,8 @@ XAresult XAMetadataTraversalItfImpl_GetChildInfo(XAMetadataTraversalItf self,
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_  
-        res = XAMetadataTraversalItfAdapt_GetChildCount(impl->adaptCtx, &chCount);
+
+        res = XAMetadataTraversalItfAdapt_GetChildCount((XAAdaptationGstCtx*)impl->adaptCtx, &chCount);
         if(index >= chCount || res != XA_RESULT_SUCCESS)
         {
             /* out of bounds */
@@ -189,9 +189,9 @@ XAresult XAMetadataTraversalItfImpl_GetChildInfo(XAMetadataTraversalItf self,
             DEBUG_API("<-XAMetadataTraversalItfImpl_GetChildInfo");
             return XA_RESULT_PARAMETER_INVALID;
         }
-        res = XAMetadataTraversalItfAdapt_GetChildInfo(impl->adaptCtx, index,
+        res = XAMetadataTraversalItfAdapt_GetChildInfo((XAAdaptationGstCtx*)impl->adaptCtx, index,
                                                 pNodeID, pType, size, pMimeType);
-#endif
+
     }
 
     DEBUG_API("<-XAMetadataTraversalItfImpl_GetChildInfo");
@@ -205,9 +205,9 @@ XAresult XAMetadataTraversalItfImpl_SetActiveNode(XAMetadataTraversalItf self,
                                                   XAuint32 index)
 {
     XAMetadataTraversalImpl *impl = NULL;
-#ifdef _GSTREAMER_BACKEND_  
+
     XAuint32 chCount = 0;
-#endif
+
     XAresult res = XA_RESULT_SUCCESS;
 
     DEBUG_API("->XAMetadataTraversalItfImpl_SetActiveNode");
@@ -219,8 +219,8 @@ XAresult XAMetadataTraversalItfImpl_SetActiveNode(XAMetadataTraversalItf self,
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_  
-        res = XAMetadataTraversalItfAdapt_GetChildCount(impl->adaptCtx, &chCount);
+
+        res = XAMetadataTraversalItfAdapt_GetChildCount((XAAdaptationGstCtx*)impl->adaptCtx, &chCount);
         if( res == XA_RESULT_SUCCESS )
         {
             if((impl->nodedepth==0 && index==XA_NODE_PARENT) ||
@@ -232,7 +232,7 @@ XAresult XAMetadataTraversalItfImpl_SetActiveNode(XAMetadataTraversalItf self,
             else
             {
                 /* update node and childs */
-                res = XAMetadataTraversalItfAdapt_SetActiveNode(impl->adaptCtx, index);
+                res = XAMetadataTraversalItfAdapt_SetActiveNode((XAAdaptationGstCtx*)impl->adaptCtx, index);
                 if( res == XA_RESULT_SUCCESS )
                 {
                     if(index==XA_NODE_PARENT)
@@ -252,7 +252,7 @@ XAresult XAMetadataTraversalItfImpl_SetActiveNode(XAMetadataTraversalItf self,
             DEBUG_API("<-XAMetadataTraversalItfImpl_SetActiveNode");
             return XA_RESULT_INTERNAL_ERROR;
         }
-#endif        
+      
     }
 
     DEBUG_API("<-XAMetadataTraversalItfImpl_SetActiveNode");
@@ -262,7 +262,6 @@ XAresult XAMetadataTraversalItfImpl_SetActiveNode(XAMetadataTraversalItf self,
 /*****************************************************************************
  * XAMetadataTraversalImpl -specific methods
  *****************************************************************************/
-#ifdef _GSTREAMER_BACKEND_  
 
 /* XAMetadataTraversalImpl* XAMetadataTraversalItfImpl_Create()
  * Description: Allocate and initialize XAMetadataTraversalImpl
@@ -291,7 +290,7 @@ XAMetadataTraversalImpl* XAMetadataTraversalItfImpl_Create( XAAdaptationBaseCtx 
     DEBUG_API("<-XAMetadataTraversalItfImpl_Create");
     return self;
 }
-#endif
+
 /* void XAMetadataTraversalItfImpl_Free(XAMetadataTraversalImpl* self)
  * Description: Free all resources reserved at XAMetadataTraversalItfImpl_Create
  */

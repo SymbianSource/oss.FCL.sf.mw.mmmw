@@ -20,9 +20,9 @@
 #include <assert.h>
 
 #include "xaplayitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAPlayItfAdaptation.h"
-#endif
+
+#include "xaplayitfadaptation.h"
+
 #include "xaplayitfadaptationmmf.h"
 #include "xathreadsafety.h"
 #include <string.h>
@@ -58,46 +58,43 @@ XAresult XAPlayItfImpl_SetPlayState(XAPlayItf self, XAuint32 state)
     XAresult ret = XA_RESULT_SUCCESS;
     XAPlayItfImpl* impl = GetImpl(self);
     DEBUG_API_A1("->XAPlayItfImpl_SetPlayState %s",PLAYSTATENAME(state));
-    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
 
     if( !impl || state < XA_PLAYSTATE_STOPPED || state > XA_PLAYSTATE_PLAYING )
     {
         /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XAPlayItfImpl_SetPlayState");
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-    /* check is play state changed, if not do nothing */
-    if(state != impl->playbackState)
-    {
-        if(state == XA_PLAYSTATE_PLAYING)
-        {
-#ifdef _GSTREAMER_BACKEND_
-        XAPlayItfAdapt_GetPosition(impl->adapCtx, &(impl->lastPosition));
-#endif        
-        }
-        if(impl->isMMFPlayback)
-        {
-           ret = XAPlayItfAdaptMMF_SetPlayState(impl->adaptCtxMMF, state);    
-        }
-        else
-        {
-#ifdef _GSTREAMER_BACKEND_
-        ret = XAPlayItfAdapt_SetPlayState(impl->adapCtx, state);
-#endif        
-        }
+    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
 
-        if(ret == XA_RESULT_SUCCESS)
-        {
-            impl->playbackState = state;
-            if(state == XA_PLAYSTATE_STOPPED || state == XA_PLAYSTATE_PAUSED)
-            {
-                impl->isMarkerPosCbSend = XA_BOOLEAN_FALSE;
-                impl->lastPosition = 0;
-            }
-        }
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+        ret = XAPlayItfAdaptMMF_SetPlayState(impl->pObjImpl->curAdaptCtx, state);
+        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+        DEBUG_API("<-XAPlayItfImpl_SetPlayState");
+        return ret;		    
+    }
+
+	/* check is play state changed, if not do nothing */
+    if(state != impl->playbackState)
+	{
+    	if(state == XA_PLAYSTATE_PLAYING)
+    	{
+        	XAPlayItfAdaptGST_GetPosition((XAAdaptationGstCtx*)impl->adapCtx, &(impl->lastPosition));
+    	}
+		ret = XAPlayItfAdaptGST_SetPlayState(impl->adapCtx, state);
+
+		if(ret == XA_RESULT_SUCCESS)
+		    {
+		    impl->playbackState = state;
+		    if(state == XA_PLAYSTATE_STOPPED || state == XA_PLAYSTATE_PAUSED)
+		        {
+		        impl->isMarkerPosCbSend = XA_BOOLEAN_FALSE;
+		        impl->lastPosition = 0;
+		        }
+		    }
     }
 
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
@@ -113,6 +110,7 @@ XAresult XAPlayItfImpl_GetPlayState(XAPlayItf self, XAuint32 *pState)
 {
     XAresult ret = XA_RESULT_SUCCESS;
     XAPlayItfImpl* impl = GetImpl(self);
+
     DEBUG_API("->XAPlayItfImpl_GetPlayState");
 
     if(!impl || !pState)
@@ -123,7 +121,18 @@ XAresult XAPlayItfImpl_GetPlayState(XAPlayItf self, XAuint32 *pState)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-    *pState = impl->playbackState;
+    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
+
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+        ret = XAPlayItfAdaptMMF_GetPlayState(impl->pObjImpl->curAdaptCtx, pState);    
+    }
+    else
+    {
+        *pState = impl->playbackState;
+    }
+
+    XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
 
     DEBUG_API_A1("<-XAPlayItfImpl_GetPlayState: %s",PLAYSTATENAME(impl->playbackState));
     return ret;
@@ -138,20 +147,28 @@ XAresult XAPlayItfImpl_GetDuration(XAPlayItf self, XAmillisecond *pMsec)
     XAresult ret = XA_RESULT_SUCCESS;
     XAPlayItfImpl* impl = GetImpl(self);
     DEBUG_API("->XAPlayItfImpl_GetDuration");
-    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
 
     if(!impl || !pMsec)
     {
         /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XAPlayItfImpl_GetDuration");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_
-    ret = XAPlayItfAdapt_GetDuration(impl->adapCtx, pMsec);
-#endif
+
+    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
+
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+        ret = XAPlayItfAdaptMMF_GetDuration(impl->pObjImpl->curAdaptCtx, pMsec);
+    }
+    else
+    {
+        ret = XAPlayItfAdaptGST_GetDuration((XAAdaptationGstCtx*)impl->adapCtx, pMsec);
+    }
+    
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+
     DEBUG_API("<-XAPlayItfImpl_GetDuration");
     return ret;
 }
@@ -165,27 +182,36 @@ XAresult XAPlayItfImpl_GetPosition(XAPlayItf self, XAmillisecond *pMsec)
 {
     XAresult ret = XA_RESULT_SUCCESS;
     XAPlayItfImpl* impl = GetImpl(self);
+ 
     DEBUG_API("->XAPlayItfImpl_GetPosition");
-    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
+
     if(!impl || !pMsec)
     {
         /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XAPlayItfImpl_GetPosition");
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-    if ( impl->playbackState == XA_PLAYSTATE_STOPPED )
+    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
+
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
     {
-    	*pMsec = 0;
-    	DEBUG_API("<-XAPlayItfImpl_GetPosition");
-      XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );    	
-    	return XA_RESULT_SUCCESS;
+        ret = XAPlayItfAdaptMMF_GetPosition(impl->pObjImpl->curAdaptCtx, pMsec);
     }
-#ifdef _GSTREAMER_BACKEND_
-    ret = XAPlayItfAdapt_GetPosition(impl->adapCtx, pMsec);
-#endif
+    else
+    {
+
+        if ( impl->playbackState == XA_PLAYSTATE_STOPPED )
+        {
+    	    *pMsec = 0;
+    	    DEBUG_API("<-XAPlayItfImpl_GetPosition");
+            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );    	
+    	    return XA_RESULT_SUCCESS;
+        }
+        ret = XAPlayItfAdaptGST_GetPosition((XAAdaptationGstCtx*)impl->adapCtx, pMsec);
+	}
+
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
     DEBUG_API("<-XAPlayItfImpl_GetPosition");
     return ret;
@@ -216,6 +242,15 @@ XAresult XAPlayItfImpl_RegisterCallback(XAPlayItf self, xaPlayCallback callback,
     impl->cbcontext = pContext;
     impl->cbPtrToSelf = self;
 
+    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
+
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+        ret = XAPlayItfAdaptMMF_RegisterCallback(impl->pObjImpl->curAdaptCtx, callback);
+    }
+
+    XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+
     DEBUG_API("<-XAPlayItfImpl_RegisterCallback");
     return ret;
 }
@@ -230,25 +265,34 @@ XAresult XAPlayItfImpl_SetCallbackEventsMask(XAPlayItf self, XAuint32 eventFlags
     XAPlayItfImpl* impl = GetImpl(self);
 
     DEBUG_API("->XAPlayItfImpl_SetCallbackEventsMask");
-    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
 
     if(!impl || ( eventFlags > (XA_PLAYEVENT_HEADATEND | XA_PLAYEVENT_HEADATMARKER |
                   XA_PLAYEVENT_HEADATNEWPOS | XA_PLAYEVENT_HEADMOVING | XA_PLAYEVENT_HEADSTALLED) ) )
     {
         /* invalid parameter */
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XAPlayItfImpl_SetCallbackEventsMask");
         return XA_RESULT_PARAMETER_INVALID;
     }
 
+    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
+
     impl->eventFlags = eventFlags;
-#ifdef _GSTREAMER_BACKEND_
+
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+        ret = XAPlayItfAdaptMMF_SetCallbackEventsMask(impl->pObjImpl->curAdaptCtx, eventFlags);
+
+	    XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+	    DEBUG_API("<-XAPlayItfImpl_SetCallbackEventsMask");
+	    return ret;
+    }
+
     /* enable position tracking if client wants so */
     if( (eventFlags & (XA_PLAYEVENT_HEADATMARKER | XA_PLAYEVENT_HEADATNEWPOS))
         &&  impl->adapCtx && !impl->positionupdateOn)
-    {
-        ret = XAPlayItfAdapt_EnablePositionTracking(impl->adapCtx, XA_BOOLEAN_TRUE);
+        {
+        ret = XAPlayItfAdapt_EnablePositionTracking((XAAdaptationGstCtx*)impl->adapCtx, XA_BOOLEAN_TRUE);
         if( ret == XA_RESULT_SUCCESS )
         {
             impl->positionupdateOn = XA_BOOLEAN_TRUE;
@@ -257,13 +301,13 @@ XAresult XAPlayItfImpl_SetCallbackEventsMask(XAPlayItf self, XAuint32 eventFlags
     else if( !(eventFlags & (XA_PLAYEVENT_HEADATMARKER | XA_PLAYEVENT_HEADATNEWPOS))
             &&  impl->adapCtx && impl->positionupdateOn)
     {
-        ret = XAPlayItfAdapt_EnablePositionTracking(impl->adapCtx, XA_BOOLEAN_FALSE);
+        ret = XAPlayItfAdapt_EnablePositionTracking((XAAdaptationGstCtx*)impl->adapCtx, XA_BOOLEAN_FALSE);
         if( ret == XA_RESULT_SUCCESS )
         {
             impl->positionupdateOn = XA_BOOLEAN_FALSE;
         }
     }
-#endif
+
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
     DEBUG_API("<-XAPlayItfImpl_SetCallbackEventsMask");
     return ret;
@@ -301,10 +345,10 @@ XAresult XAPlayItfImpl_SetMarkerPosition(XAPlayItf self, XAmillisecond mSec)
 {
     XAresult ret = XA_RESULT_SUCCESS;
     XAmillisecond duration = 0;
-    XAPlayItfImpl* impl = NULL;
-
+    XAPlayItfImpl* impl = GetImpl(self);
 
     DEBUG_API_A1("->XAPlayItfImpl_SetMarkerPosition: %lu ms", mSec);
+
     /* Get duration of the content */
     if(XAPlayItfImpl_GetDuration(self, &duration) != XA_RESULT_SUCCESS)
     {
@@ -314,7 +358,6 @@ XAresult XAPlayItfImpl_SetMarkerPosition(XAPlayItf self, XAmillisecond mSec)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-    impl = GetImpl(self);
 
     if(!impl || mSec > duration)
     {
@@ -323,8 +366,18 @@ XAresult XAPlayItfImpl_SetMarkerPosition(XAPlayItf self, XAmillisecond mSec)
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
+
     impl->markerPosition = mSec;
     impl->isMarkerPosCbSend = XA_BOOLEAN_FALSE;
+
+    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
+
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+        ret = XAPlayItfAdaptMMF_SetMarkerPosition(impl->pObjImpl->curAdaptCtx, mSec);
+    }
+
+    XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
 
     DEBUG_API("<-XAPlayItfImpl_SetMarkerPosition");
     return ret;
@@ -347,8 +400,18 @@ XAresult XAPlayItfImpl_ClearMarkerPosition(XAPlayItf self)
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
+
     impl->isMarkerPosCbSend = XA_BOOLEAN_FALSE;
     impl->markerPosition = NO_POSITION;
+
+    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
+
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+        ret = XAPlayItfAdaptMMF_ClearMarkerPosition(impl->pObjImpl->curAdaptCtx);
+    }
+
+    XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
 
     DEBUG_API("<-XAPlayItfImpl_ClearMarkerPosition");
     return ret;
@@ -405,6 +468,15 @@ XAresult XAPlayItfImpl_SetPositionUpdatePeriod(XAPlayItf self, XAmillisecond mSe
     }
     impl->positionUpdatePeriod = mSec;
 
+    XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
+
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+        ret = XAPlayItfAdaptMMF_SetPositionUpdatePeriod(impl->pObjImpl->curAdaptCtx, mSec);
+    }
+
+    XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+
     DEBUG_API("<-XAPlayItfImpl_SetPositionUpdatePeriod");
     return ret;
 }
@@ -442,11 +514,7 @@ XAresult XAPlayItfImpl_GetPositionUpdatePeriod(XAPlayItf self, XAmillisecond *pM
  * XAPlayItfImpl* XAPlayItfImpl_Create()
  * Description: Allocate and initialize PlayItfImpl
  **/
-XAPlayItfImpl* XAPlayItfImpl_Create( 
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adapCtx,
-#endif        
-        XAAdaptationBaseMMFCtx *adaptationCtxMMF )
+XAPlayItfImpl* XAPlayItfImpl_Create( XAMediaPlayerImpl *impl )
 {
     XAPlayItfImpl *self;
 
@@ -476,16 +544,13 @@ XAPlayItfImpl* XAPlayItfImpl_Create(
         self->markerPosition = NO_POSITION;
         self->positionUpdatePeriod = PLAYITF_DEFAULT_UPDATE_PERIOD;
         self->lastPosition = START_POSITION;
-#ifdef _GSTREAMER_BACKEND_
-        self->adapCtx = adapCtx;
-#endif        
-        self->adaptCtxMMF = adaptationCtxMMF;
+        /*self->adapCtx = impl->curAdaptCtx;*/
+        self->pObjImpl = impl;
         self->cbPtrToSelf = NULL;
         self->isMarkerPosCbSend = XA_BOOLEAN_FALSE;
-
-#ifdef _GSTREAMER_BACKEND_  
-        XAAdaptationBase_AddEventHandler( adapCtx, &XAPlayItfImpl_AdaptCb, XA_PLAYITFEVENTS, self );
-#endif
+        
+/*        XAAdaptationBase_AddEventHandler( self->adapCtx, &XAPlayItfImpl_AdaptCb, XA_PLAYITFEVENTS, self );*/
+        XAAdaptationBase_AddEventHandler( self->pObjImpl->curAdaptCtx, &XAPlayItfImpl_AdaptCb, XA_PLAYITFEVENTS, self );
 
         self->self = self;
     }
@@ -501,14 +566,11 @@ void XAPlayItfImpl_Free(XAPlayItfImpl* self)
 {
     DEBUG_API("->XAPlayItfImpl_Free");
     assert(self==self->self);
-#ifdef _GSTREAMER_BACKEND_   
-    XAAdaptationBase_RemoveEventHandler( self->adapCtx, &XAPlayItfImpl_AdaptCb );
-#endif    
+/*    XAAdaptationBase_RemoveEventHandler( self->adapCtx, &XAPlayItfImpl_AdaptCb );*/
+    XAAdaptationBase_RemoveEventHandler( self->pObjImpl->curAdaptCtx, &XAPlayItfImpl_AdaptCb );
     free(self);
     DEBUG_API("<-XAPlayItfImpl_Free");
 }
-
-#ifdef _GSTREAMER_BACKEND_  
 
 /* void XAPlayItfImpl_AdaptCb
  * Description: Listen changes in adaptation
@@ -528,6 +590,15 @@ void XAPlayItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
         return;
     }
     assert(event);
+
+    if(impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+    {
+        impl->callback(impl->cbPtrToSelf, impl->cbcontext, event->eventid);
+        DEBUG_API("<-XAPlayItfImpl_AdaptCb");
+        XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
+        return;
+    }
+
     /* check position update events */
     if( event->eventid == XA_ADAPT_POSITION_UPDATE_EVT )
     {
@@ -592,7 +663,14 @@ void XAPlayItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
     else if( event->eventid == XA_PLAYEVENT_HEADSTALLED )
     {
         impl->playbackState = XA_PLAYSTATE_PAUSED;
-        XAPlayItfAdapt_GetPosition(impl->adapCtx, &(impl->lastPosition));
+        if(impl->adapCtx->fwtype == FWMgrFWMMF)
+            {
+            //XAPlayItfAdaptMMF_GetPosition((XAAdaptationGstCtx*)impl->adapCtx, &(impl->lastPosition));
+            }
+        else
+            {
+            XAPlayItfAdaptGST_GetPosition((XAAdaptationGstCtx*)impl->adapCtx, &(impl->lastPosition));
+            }        
         /* send callback if needed */
         if( (XA_PLAYEVENT_HEADSTALLED & impl->eventFlags) && impl->callback )
         {
@@ -616,32 +694,4 @@ void XAPlayItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
     DEBUG_API("<-XAPlayItfImpl_AdaptCb");
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
 }
-#endif
 
-XAresult XAPlayItfImpl_DeterminePlaybackEngine(XAPlayItf self, XADataLocator_URI *uri)
-{
-
-  XAresult ret = XA_RESULT_SUCCESS;
-  
-  char* tempPtr = NULL;
-  char extension[5];
-  
-  XAPlayItfImpl* impl = (XAPlayItfImpl*)(self);
-  DEBUG_API("->XAPlayItfImpl_DeterminePlaybackEngine");
-    
-  //need to move to configuration file and add more in final class
-  
-  impl->isMMFPlayback = XA_BOOLEAN_TRUE;
-	
-  tempPtr = strchr((char*)(uri->URI), '.');
-  strcpy(extension, tempPtr);
-	
-  if(!strcmp(extension, ".wav"))
-  {
-     impl->isMMFPlayback = XA_BOOLEAN_FALSE;
-  }
-
-  return ret;  
-  
-  DEBUG_API("<-XAPlayItfImpl_DeterminePlaybackEngine");
-}

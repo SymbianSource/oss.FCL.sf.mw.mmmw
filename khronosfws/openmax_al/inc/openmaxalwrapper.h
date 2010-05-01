@@ -23,5 +23,7 @@
 #define XA_API __declspec(dllexport)
  
 #include <OpenMAXAL.h>
+#include <xanokiavolumeextitf.h>
+#include <xanokialinearvolumeitf.h>
 
 #endif

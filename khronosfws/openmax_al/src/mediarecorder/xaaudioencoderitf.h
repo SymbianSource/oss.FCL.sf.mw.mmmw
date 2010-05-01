@@ -18,12 +18,6 @@
 #ifndef XAAUDIOENCODERITF_H
 #define XAAUDIOENCODERITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
-
 #include "xamediarecorder.h"
 
 /** MACROS **/
@@ -43,10 +37,9 @@ typedef struct XAAudioEncoderItfImpl_
     
     XAMediaRecorderImpl* pObjImpl;
     
-#ifdef _GSTREAMER_BACKEND_
     /* variables */
     XAAdaptationBaseCtx    *adapCtx;
-#endif
+
 } XAAudioEncoderItfImpl;
 
 /** METHODS **/
@@ -61,12 +54,7 @@ XAresult XAAudioEncoderItfImpl_GetEncoderSettings( XAAudioEncoderItf self,
                                                    XAAudioEncoderSettings *pSettings );
 
 /* XAAudioEncoderItfImpl -specific methods */
-XAAudioEncoderItfImpl* XAAudioEncoderItfImpl_Create( 
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adapCtx, 
-#endif
-        XAMediaRecorderImpl* impl 
-        );
+XAAudioEncoderItfImpl* XAAudioEncoderItfImpl_Create( XAMediaRecorderImpl* impl );
 void XAAudioEncoderItfImpl_Free( XAAudioEncoderItfImpl* self );
 
 #endif /* XAAUDIOENCODERITF_H */

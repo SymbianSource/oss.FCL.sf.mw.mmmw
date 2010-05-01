@@ -42,7 +42,6 @@
 #include <StreamControl.h>
 #include <ControlObserver.h>
 #include <Events.h>
-#include <ProgDLSource.h>
 #include <DataBufferSource.h>
 #include <FileSource.h>
 #include <DataBuffer.h>
@@ -109,7 +108,6 @@ class CAudioOutputControlUtility;
 
 using multimedia::MStreamControl;
 using multimedia::MControlObserver;
-using multimedia::MProgDLSource;
 using multimedia::MDataBufferSource;
 using multimedia::MDescriptorSource;
 using multimedia::MDataBuffer;
