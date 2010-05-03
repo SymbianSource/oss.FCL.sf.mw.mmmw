@@ -77,7 +77,8 @@ gint TMSGainEffectImpl::SetProxy(TMSCallProxy* aProxy, gpointer queuehandler)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSGainEffectBodyImpl*) this->iBody)->SetProxy(aProxy, queuehandler);
+        static_cast<TMSGainEffectBodyImpl*>(this->iBody)->SetProxy(aProxy,
+                queuehandler);
         }
     else
         {
@@ -91,7 +92,7 @@ gint TMSGainEffectImpl::SetParent(TMSEffect*& parent)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSGainEffectBodyImpl*) this->iBody)->SetParent(parent);
+        static_cast<TMSGainEffectBodyImpl*>(this->iBody)->SetParent(parent);
         }
     else
         {

@@ -69,20 +69,20 @@ EXPORT_C gint TMSSourceImpl::Delete(TMSSource*& tmssource)
     switch (sourcetype)
         {
         case TMS_SOURCE_CLIENT:
-            delete (TMSClientSourceImpl*) (tmssource);
+            delete (static_cast<TMSClientSourceImpl*>(tmssource));
             tmssource = NULL;
             ret = TMS_RESULT_SUCCESS;
             break;
         case TMS_SOURCE_MODEM:
             {
-            delete (TMSModemSourceImpl*) (tmssource);
+            delete (static_cast<TMSModemSourceImpl*>(tmssource));
             tmssource = NULL;
             ret = TMS_RESULT_SUCCESS;
             }
             break;
         case TMS_SOURCE_MIC:
             {
-            delete (TMSMicSourceImpl*) (tmssource);
+            delete (static_cast<TMSMicSourceImpl*>(tmssource));
             tmssource = NULL;
             ret = TMS_RESULT_SUCCESS;
             }

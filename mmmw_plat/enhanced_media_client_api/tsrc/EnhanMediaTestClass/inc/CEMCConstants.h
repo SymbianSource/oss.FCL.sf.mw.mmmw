@@ -273,7 +273,7 @@ enum eEMCSTIFCommands
 	EMC_LLLocationSphericalL,
 	EMC_LLSetLocationCartesianL,
 	EMC_LLSetLocationSphericalL,
-
+	EMC_ER_DelayMaxMax,
     EMC_NoCommand
 
 };

@@ -1,0 +1,41 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+* 
+* Description:
+*
+*/
+
+PRJ_PLATFORMS
+DEFAULT
+
+PRJ_TESTEXPORTS
+../conf/openmaxaltestmodule_common.cfg              /epoc32/winscw/c/testframework/openmaxaltestmodule_common.cfg
+../conf/openmaxaltestmodule_objectitf.cfg           /epoc32/winscw/c/testframework/openmaxaltestmodule_objectitf.cfg
+../conf/openmaxaltestmodule_ro_mdinsertionitf.cfg   /epoc32/winscw/c/testframework/openmaxaltestmodule_ro_mdinsertionitf.cfg
+../conf/openmaxaltestmodule_ro_recorditf.cfg        /epoc32/winscw/c/testframework/openmaxaltestmodule_ro_recorditf.cfg
+../conf/openmaxaltestmodule_ro_audioencoderitf.cfg  /epoc32/winscw/c/testframework/openmaxaltestmodule_ro_audioencoderitf.cfg
+../conf/openmaxaltestmodule_engine_audenccapitf.cfg /epoc32/winscw/c/testframework/openmaxaltestmodule_engine_audenccapitf.cfg
+../conf/openmaxaltestmodule_global.cfg              /epoc32/winscw/c/testframework/openmaxaltestmodule_global.cfg
+../conf/openmaxaltestmodule_engine_engineitf.cfg    /epoc32/winscw/c/testframework/openmaxaltestmodule_engine_engineitf.cfg
+../conf/openmaxaltestmodule_engine_aiodcitf.cfg     /epoc32/winscw/c/testframework/openmaxaltestmodule_engine_aiodcitf.cfg
+../data/c/omxaltestdata/test.wav                    /epoc32/winscw/c/testing/data/omxaltestdata/test.wav
+../init/testframework.ini                           /epoc32/winscw/c/testframework/testframework.ini
+
+PRJ_EXPORTS
+
+PRJ_TESTMMPFILES
+openmaxaltestmodule.mmp
+
+PRJ_MMPFILES
+
+//  End of File

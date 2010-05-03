@@ -76,7 +76,7 @@ EXPORT_C gint TMSInbandToneImpl::Delete(TMSInbandTone*& inbandtone)
     {
     gint ret(TMS_RESULT_SUCCESS);
     TRACE_PRN_FN_ENT;
-    delete (TMSInbandToneImpl*) (inbandtone);
+    delete (static_cast<TMSInbandToneImpl*>(inbandtone));
     inbandtone = NULL;
     TRACE_PRN_FN_EXT;
     return ret;
@@ -87,7 +87,7 @@ gint TMSInbandToneImpl::SetParent(TMSInbandTone*& parent)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSInbandToneBodyImpl*) this->iBody)->SetParent(parent);
+        static_cast<TMSInbandToneBodyImpl*>(this->iBody)->SetParent(parent);
         }
     else
         {

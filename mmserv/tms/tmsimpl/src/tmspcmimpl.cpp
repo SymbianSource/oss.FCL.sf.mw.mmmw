@@ -44,7 +44,7 @@ gint TMSPCMFormatImpl::PostConstruct()
     if (ret == TMS_RESULT_SUCCESS)
         {
         this->iBody = bodyimpl;
-        this->iFormatBody = (TMSPCMFormatBodyImpl*) bodyimpl;
+        this->iFormatBody = static_cast<TMSPCMFormatBodyImpl*>(bodyimpl);
         }
     TRACE_PRN_FN_EXT;
     return ret;
@@ -76,7 +76,8 @@ gint TMSPCMFormatImpl::SetProxy(TMSGlobalContext* context,
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSPCMFormatBodyImpl*) this->iBody)->SetProxy(context, queuehandler);
+        static_cast<TMSPCMFormatBodyImpl*>(this->iBody)->SetProxy(context,
+                queuehandler);
         }
     else
         {

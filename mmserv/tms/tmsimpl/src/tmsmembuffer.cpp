@@ -74,7 +74,7 @@ gint TMSMemBuffer::PostConstruct(guint size)
     {
     gint ret(TMS_RESULT_SUCCESS);
     TRACE_PRN_FN_ENT;
-    iDataPtr = (guint8*) malloc(size);
+    iDataPtr = static_cast<guint8*>(malloc(size));
     if (!iDataPtr)
         {
         ret = TMS_RESULT_INSUFFICIENT_MEMORY;

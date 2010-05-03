@@ -27,6 +27,7 @@ PRJ_MMPFILES
 #include "../callaudiocontrol/group/bld.inf"
 #include "../metadatautility/Group/bld.inf"
 #include "../radioutility/group/bld.inf"
+#include "../sts/group/bld.inf"
 #include "../thumbnailengine/Group/bld.inf"
 #include "../tms/group/bld.inf"
 #include "../voipaudioservices/group/bld.inf"

@@ -127,8 +127,8 @@ void CVoIPAudioServerSession::ConstructL()
     iShared.iMainThreadID = tID;
     iAO = new (ELeave) CVoIPServerAO(this, tID);
     iShared.iMnThreadStatus = &(this->iAO->iStatus);
-    iShared.iMutex.Signal();
     iShared.iCodecSettings.iG711FrameRate = TVoIPCodecSettings::E20MS;
+    iShared.iMutex.Signal();
     iAO->Request();
     iSessionType = ENone;
 

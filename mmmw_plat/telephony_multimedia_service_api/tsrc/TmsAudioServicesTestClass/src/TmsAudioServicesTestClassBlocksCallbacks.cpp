@@ -19,11 +19,11 @@
 #include "TmsAudioServicesTestClass.h"
 #include "debug.h"
 
-void CTmsAudioServicesTestClass::TMSStreamEvent(TMSStream* stream,
+void CTmsAudioServicesTestClass::TMSStreamEvent(const TMSStream& stream,
         TMSSignalEvent event)
     {
     iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::TMSStreamEvent"));
-    switch (stream->GetStreamType())
+    switch (const_cast<TMSStream&>(stream).GetStreamType())
         {
         case TMS_STREAM_UPLINK:
             {
@@ -36,26 +36,22 @@ void CTmsAudioServicesTestClass::TMSStreamEvent(TMSStream* stream,
                         {
                         case TMS_STREAM_INITIALIZED:
                             iUpLinkStatus = INITIALIZED;
-                            iLog->Log(
-                                    _L("[tms cb]TMSStreamEvent EOpenUplinkComplete"));
+                            iLog->Log(_L("[tms cb]TMSStreamEvent EOpenUplinkComplete"));
                             ProcessEvent(EOpenUplinkComplete, KErrNone);
                             break;
                         case TMS_STREAM_UNINITIALIZED:
                             iUpLinkStatus = UNINITIALIZED;
-                            iLog->Log(
-                                    _L("[tms cb]TMSStreamEvent EUplinkClosed"));
+                            iLog->Log(_L("[tms cb]TMSStreamEvent EUplinkClosed"));
                             ProcessEvent(EUplinkClosed, KErrNone);
                             break;
                         case TMS_STREAM_PAUSED:
                             iUpLinkStatus = PAUSED;
-                            iLog->Log(
-                                    _L("[tms cb]TMSStreamEvent EStreamPaused"));
+                            iLog->Log(_L("[tms cb]TMSStreamEvent EStreamPaused"));
                             ProcessEvent(EStreamPaused, KErrNone);
                             break;
                         case TMS_STREAM_STARTED:
                             iUpLinkStatus = STARTED;
-                            iLog->Log(
-                                    _L("[tms cb]TMSStreamEvent EStreamStarted"));
+                            iLog->Log(_L("[tms cb]TMSStreamEvent EStreamStarted"));
                             ProcessEvent(EStreamStarted, KErrNone);
                             break;
                         default:
@@ -78,26 +74,22 @@ void CTmsAudioServicesTestClass::TMSStreamEvent(TMSStream* stream,
                         {
                         case TMS_STREAM_INITIALIZED:
                             iDnLinkStatus = INITIALIZED;
-                            iLog->Log(
-                                    _L("[tms cb]TMSStreamEvent EOpenDownlinkComplete"));
+                            iLog->Log(_L("[tms cb]TMSStreamEvent EOpenDownlinkComplete"));
                             ProcessEvent(EOpenDownlinkComplete, KErrNone);
                             break;
                         case TMS_STREAM_UNINITIALIZED:
                             iDnLinkStatus = UNINITIALIZED;
-                            iLog->Log(
-                                    _L("[tms cb]TMSStreamEvent EDownlinkClosed"));
+                            iLog->Log(_L("[tms cb]TMSStreamEvent EDownlinkClosed"));
                             ProcessEvent(EDownlinkClosed, KErrNone);
                             break;
                         case TMS_STREAM_PAUSED:
                             iDnLinkStatus = PAUSED;
-                            iLog->Log(
-                                    _L("[tms cb]TMSStreamEvent EStreamPaused"));
+                            iLog->Log(_L("[tms cb]TMSStreamEvent EStreamPaused"));
                             ProcessEvent(EStreamPaused, KErrNone);
                             break;
                         case TMS_STREAM_STARTED:
                             iDnLinkStatus = STARTED;
-                            iLog->Log(
-                                    _L("[tms cb]TMSStreamEvent EStreamStarted"));
+                            iLog->Log(_L("[tms cb]TMSStreamEvent EStreamStarted"));
                             ProcessEvent(EStreamStarted, KErrNone);
                             break;
                         default:
@@ -128,32 +120,32 @@ void CTmsAudioServicesTestClass::FillBuffer(TMSBuffer& buffer)
         }
     }
 
-void CTmsAudioServicesTestClass::BufferProcessed(TMSBuffer* /*buffer*/,
+void CTmsAudioServicesTestClass::BufferProcessed(const TMSBuffer* /*buffer*/,
         gint /*reason*/)
     {
     iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::BufferProcessed"));
     }
 
 //From TMSClientSinkObserver
-void CTmsAudioServicesTestClass::ProcessBuffer(TMSBuffer* buffer)
+void CTmsAudioServicesTestClass::ProcessBuffer(const TMSBuffer* buffer)
     {
     iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::ProcessBuffer"));
     ProcessEvent(EEmptyBuffer, KErrNone);
     iRecBufReady = ETrue;
-    iRecBuf = buffer;
+    iRecBuf = const_cast<TMSBuffer*>(buffer);
     if (iUpLinkStatus == STARTED)
         {
         // Process recorded buffer here.
         DoLoopback();
-        //  ((TMSClientSink*)iTmsSink)->BufferProcessed(iRecBuf);
+        //static_cast<TMSClientSink*>(iTmsSink)->BufferProcessed(iRecBuf);
         }
     }
 
-void CTmsAudioServicesTestClass::EffectsEvent(TMSEffect* tmseffect,
+void CTmsAudioServicesTestClass::EffectsEvent(const TMSEffect& tmseffect,
         TMSSignalEvent /*event*/)
     {
     TMSEffectType effecttype;
-    tmseffect->GetType(effecttype);
+    const_cast<TMSEffect&>(tmseffect).GetType(effecttype);
     switch (effecttype)
         {
         case TMS_EFFECT_VOLUME:
@@ -166,7 +158,7 @@ void CTmsAudioServicesTestClass::EffectsEvent(TMSEffect* tmseffect,
 
 // From TMSGlobalRoutingObserver
 void CTmsAudioServicesTestClass::GlobalRoutingEvent(
-        TMSGlobalRouting* /*routing*/, TMSSignalEvent event,
+        const TMSGlobalRouting& /*routing*/, TMSSignalEvent event,
         TMSAudioOutput /*output*/)
     {
     iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::GlobalRoutingEvent"));

@@ -61,7 +61,7 @@ EXPORT_C gint TMSBufferImpl::Delete(TMSBuffer*& tmsbuffer)
     switch (buffertype)
         {
         case TMS_BUFFER_MEMORY:
-            delete (TMSMemBuffer*) (tmsbuffer);
+            delete (static_cast<TMSMemBuffer*>(tmsbuffer));
             tmsbuffer = NULL;
             ret = TMS_RESULT_SUCCESS;
             break;

@@ -43,3 +43,4 @@
 #include "../thumbnail_engine_api/group/bld.inf"
 #include "../telephony_multimedia_service_api/group/bld.inf"
 #include "../openmax_al_api/group/bld.inf"
+#include "../system_tone_service_api/group/bld.inf"

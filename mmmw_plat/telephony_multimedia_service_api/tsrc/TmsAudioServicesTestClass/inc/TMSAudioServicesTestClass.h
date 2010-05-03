@@ -211,20 +211,20 @@ public:
     void HandleTimeout(TInt error);
 
     //From TMSStreamObserver
-    void TMSStreamEvent(TMSStream* stream, TMSSignalEvent event);
+    void TMSStreamEvent(const TMSStream& stream, TMSSignalEvent event);
 
     //From TMSClientSourceObserver
     void FillBuffer(TMSBuffer& buffer);
-    void BufferProcessed(TMSBuffer* buffer, gint reason);
+    void BufferProcessed(const TMSBuffer* buffer, gint reason);
 
     //From TMSClientSinkObserver
-    void ProcessBuffer(TMSBuffer* buffer);
+    void ProcessBuffer(const TMSBuffer* buffer);
 
     //From TMSClientSinkObserver starts
-    void EffectsEvent(TMSEffect* tmseffect, TMSSignalEvent event);
+    void EffectsEvent(const TMSEffect& tmseffect, TMSSignalEvent event);
 
     // from TMSGlobalRoutingObserver
-    void GlobalRoutingEvent(TMSGlobalRouting* /*routing*/,
+    void GlobalRoutingEvent(const TMSGlobalRouting& /*routing*/,
             TMSSignalEvent event, TMSAudioOutput output);
 
 private:

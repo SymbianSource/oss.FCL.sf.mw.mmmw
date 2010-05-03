@@ -150,29 +150,21 @@ void TMSGainEffectBodyImpl::SetProxy(TMSCallProxy* aProxy,
     iProxy = aProxy;
     if (queuehandler)
         {
-        ((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_EFFECT_GAIN);
+        static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
+                TMS_EFFECT_GAIN);
         }
     }
 
 void TMSGainEffectBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         void* /*user_data*/)
     {
-    TMSSignalEvent event;
+    TMSSignalEvent event = {}; //all elements initialized to zeros
     event.type = TMS_EVENT_EFFECT_GAIN_CHANGED;
     event.reason = aError;
 
-    switch (aEventType)
+    if (iObserver && iParent && aEventType == TMS_EVENT_EFFECT_GAIN_CHANGED)
         {
-        case TMS_EVENT_EFFECT_GAIN_CHANGED:
-            {
-            if (iObserver && iParent)
-                {
-                iObserver->EffectsEvent(iParent, event);
-                }
-            }
-            break;
-        default:
-            break;
+        iObserver->EffectsEvent(*iParent, event);
         }
     }
 

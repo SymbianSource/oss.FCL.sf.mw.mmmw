@@ -21,7 +21,6 @@
 
 using namespace TMS;
 
-
 EXPORT_C TMSInbandTone::TMSInbandTone(void) :
     iBody(NULL)
     {
@@ -32,7 +31,8 @@ EXPORT_C TMSInbandTone::~TMSInbandTone(void)
     delete iBody;
     }
 
-EXPORT_C gint TMSInbandTone::AddObserver(TMSInbandToneObserver& obsrvr, gpointer user_data)
+EXPORT_C gint TMSInbandTone::AddObserver(TMSInbandToneObserver& obsrvr,
+        gpointer user_data)
     {
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (iBody)

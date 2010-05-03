@@ -116,7 +116,7 @@ EXPORT_C gint TMSRingToneImpl::Delete(TMSRingTone*& rt)
     {
     TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_SUCCESS);
-    delete (TMSRingToneImpl*) (rt);
+    delete (static_cast<TMSRingToneImpl*>(rt));
     rt = NULL;
     TRACE_PRN_FN_EXT;
     return ret;
@@ -127,7 +127,7 @@ gint TMSRingToneImpl::SetParent(TMSRingTone*& parent)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSRingToneBodyImpl*) this->iBody)->SetParent(parent);
+        static_cast<TMSRingToneBodyImpl*>(this->iBody)->SetParent(parent);
         }
     else
         {

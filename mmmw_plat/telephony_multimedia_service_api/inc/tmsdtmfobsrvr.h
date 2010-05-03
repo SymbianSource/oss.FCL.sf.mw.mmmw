@@ -11,8 +11,7 @@
  *
  * Contributors:
  *
- * Description: Telephony Multimedia Service
- * This class provides callback mechanism for TMSDTMF listeners.
+ * Description: This class provides callback mechanism for TMSDTMF listeners.
  *
  */
 
@@ -54,12 +53,12 @@ public:
      *  TMS_EVENT_DTMF_TONE_STOPPED
 
      * @param  dtmf
-     *      Pointer to the object that is being signaled.
+     *      Reference to the object that is being signaled.
      *
      * @param  event
      *      Event descriptor.
      */
-    virtual void DTMFEvent(TMSDTMF* dtmf, TMSSignalEvent event) = 0;
+    virtual void DTMFEvent(const TMSDTMF& dtmf, TMSSignalEvent event) = 0;
     };
 
 } //namespace TMS

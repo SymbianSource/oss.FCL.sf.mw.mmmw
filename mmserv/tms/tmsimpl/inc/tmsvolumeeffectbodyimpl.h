@@ -46,7 +46,7 @@ public:
     virtual gint GetType(TMSEffectType& effecttype);
 
     // From MQueueHandlerObserver
-    virtual void QueueEvent(TInt aEventType, TInt aError, void* user_data);
+    virtual void QueueEvent(TInt aEventType, TInt aError, void* event_data);
 
     void SetParent(TMSEffect*& parent);
     void SetProxy(TMSCallProxy* aProxy, gpointer queuehandler);

@@ -11,7 +11,8 @@
  *
  * Contributors:
  *
- * Description: Telephony Multimedia Service
+ * Description: This class provides callback mechanism for TMSRingTone
+ * listeners.
  *
  */
 
@@ -45,13 +46,14 @@ public:
      *  TMS_EVENT_RINGTONE_PLAY_COMPLETE
      *
      * @param  rt
-     *      Pointer to the object that is being signaled.
+     *      Reference to the object that is being signaled.
      *
      * @param  event
      *      Event descriptor.
      *
      */
-    virtual void RingtoneEvent(TMSRingTone* rt, TMSSignalEvent event) = 0;
+    virtual void RingtoneEvent(const TMSRingTone& rt,
+            TMSSignalEvent event) = 0;
     };
 
 } //namespace TMS

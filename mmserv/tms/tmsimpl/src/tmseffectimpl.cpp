@@ -73,19 +73,19 @@ EXPORT_C gint TMSEffectImpl::Delete(TMSEffect*& tmseffect)
     switch (effecttype)
         {
         case TMS_EFFECT_VOLUME:
-            delete (TMSVolumeEffectImpl*) (tmseffect);
+            delete (static_cast<TMSVolumeEffectImpl*>(tmseffect));
             tmseffect = NULL;
             break;
         case TMS_EFFECT_GAIN:
-            delete (TMSGainEffectImpl*) (tmseffect);
+            delete (static_cast<TMSGainEffectImpl*>(tmseffect));
             tmseffect = NULL;
             break;
         case TMS_EFFECT_GLOBAL_VOL:
-            delete (TMSGlobalVolEffectImpl*) (tmseffect);
+            delete (static_cast<TMSGlobalVolEffectImpl*>(tmseffect));
             tmseffect = NULL;
             break;
         case TMS_EFFECT_GLOBAL_GAIN:
-            delete (TMSGlobalGainEffectImpl*) (tmseffect);
+            delete (static_cast<TMSGlobalGainEffectImpl*>(tmseffect));
             tmseffect = NULL;
             break;
         default:

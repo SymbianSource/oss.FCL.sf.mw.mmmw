@@ -437,7 +437,9 @@ NONSHARABLE_CLASS(CEnhanMediaTestClass) : public CScriptBase,
 	    TInt HandleAudioEffectEnableL(CStifItemParser& aItem);
 	    TInt HandleAudioEffectDisableL(CStifItemParser& aItem);
 	    TInt AudioEffectIsEnforced (CStifItemParser& aItem);
-
+//added
+	    TInt  AudioCreateEffect (CStifItemParser& aItem);
+	    
 	    TInt AudioEffectUid (CStifItemParser& aItem);
 	    TInt AudioEffectHaveUpdateRights (CStifItemParser& aItem);
 	    TInt AudioEffectEnforce (CStifItemParser& aItem);
@@ -472,6 +474,7 @@ NONSHARABLE_CLASS(CEnhanMediaTestClass) : public CScriptBase,
 	    TInt HandleReverbSetRoomLevelL(CStifItemParser& aItem);
 	    TInt HandleReverbDelayMaxL(CStifItemParser& aItem);
 
+	    TInt HandleDelayMaxL(CStifItemParser& aItem);
 
 	    TInt HandleSWIsContinuousLevelSupportedL(CStifItemParser& aItem);
 	    TInt HandleSWSetStereoWideningLevelL(CStifItemParser& aItem);

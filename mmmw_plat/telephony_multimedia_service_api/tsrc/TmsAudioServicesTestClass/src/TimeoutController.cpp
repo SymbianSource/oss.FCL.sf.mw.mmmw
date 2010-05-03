@@ -175,7 +175,7 @@ void CSimpleTimeout::Start(TTimeIntervalMicroSeconds aTimeout)
     miliseconds /= 1000;
 
     TBuf<30> dateString;
-    TRAPD(ignore, endTime.FormatL(dateString, KFormatTimeStamp));
+    TRAP_IGNORE(endTime.FormatL(dateString, KFormatTimeStamp));
     iLog->Log(_L("Timer=%LD ms, EndTime=%S"), miliseconds, &dateString);
 
     // Store absolute timeout
@@ -248,9 +248,7 @@ void CSimpleTimeout::RunL()
         {
         if (iTestCaseTimeout > timeout)
             {
-            RDebug::Print(
-                    _L("Absolute timer still valid. Restaring timer. iStatus: %d"),
-                    iStatus.Int());
+            RDebug::Print(_L("Absolute timer still valid. Restaring timer. iStatus: %d"), iStatus.Int());
             // Start new timer
             iStatus = KErrNone; // reset value
             iTimer.At(iStatus, iTestCaseTimeout); // restart timer

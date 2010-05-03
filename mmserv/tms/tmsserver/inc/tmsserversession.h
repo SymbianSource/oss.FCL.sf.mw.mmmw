@@ -45,7 +45,9 @@ public:
     // Destructor
     ~TMSServerSession();
 
-    void HandleGlobalEffectChange(TInt globalevent);
+    void HandleGlobalEffectChange(TInt globalevent, TInt level,
+            TBool output_change = EFalse,
+            TMSAudioOutput output = TMS_AUDIO_OUTPUT_PRIVATE);
     void HandleRoutingChange(TRoutingMsgBufPckg routinginfo);
 
     // Send notifications to clients

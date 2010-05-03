@@ -82,7 +82,7 @@ TMSServer::~TMSServer()
     iUplCodecs.Reset();
     iUplCodecs.Close();
     delete iEffectSettings;
-    CancelRoutingNotifier();
+    delete iTarHandler;
     CancelCenRepHandler();
     CancelDTMFNotifier();
     DeinitRingTonePlayer();
@@ -136,8 +136,13 @@ void TMSServer::ConstructL()
     iTarHandler = NULL;
     iAudioCenRepHandler = NULL;
     iDTMFHandler = NULL;
-    iCurrentRouting = TMS_AUDIO_OUTPUT_NONE;
-    InitRingTonePlayerL();
+    iCurrentRouting = TMS_AUDIO_OUTPUT_PRIVATE;
+
+    //TODO: EUnit fails to initialize ProfileEngine in RT in eshell mode
+    TRAP_IGNORE(InitRingTonePlayerL());
+
+    // We need it running for global volume change updates
+    StartRoutingNotifierL();
 
     TRACE_PRN_FN_EXT;
     }
@@ -341,7 +346,7 @@ void TMSServer::StartRoutingNotifierL()
 //
 void TMSServer::CancelRoutingNotifier()
     {
-    if (--iTarHandlerCount <= 0)
+    if (--iTarHandlerCount < 1)
         {
         delete iTarHandler;
         iTarHandler = NULL;
@@ -670,7 +675,8 @@ TInt TMSServer::SetLevel(CSession2* /*sid*/, TBool tmsclient, TInt level)
         while (serverSession != NULL)
             {
             serverSession->HandleGlobalEffectChange(
-                    TMS_EVENT_EFFECT_VOL_CHANGED);
+                    TMS_EVENT_EFFECT_VOL_CHANGED, level, EFalse,
+                    iCurrentRouting);
 
             serverSession = static_cast<TMSServerSession*> (iSessionIter++);
             }
@@ -745,7 +751,7 @@ TInt TMSServer::SetGain(CSession2* /*sid*/, TInt level)
         while (serverSession != NULL)
             {
             serverSession->HandleGlobalEffectChange(
-                    TMS_EVENT_EFFECT_GAIN_CHANGED);
+                    TMS_EVENT_EFFECT_GAIN_CHANGED, level);
             serverSession = static_cast<TMSServerSession*> (iSessionIter++);
             }
         }
@@ -864,19 +870,37 @@ TInt TMSServer::NotifyTarClients(TRoutingMsgBufPckg routingpckg)
     {
     TRACE_PRN_FN_ENT;
 
+    TInt vol;
     iCurrentRouting = routingpckg().iOutput;
+    if (iCurrentRouting == TMS_AUDIO_OUTPUT_PUBLIC ||
+            iCurrentRouting == TMS_AUDIO_OUTPUT_LOUDSPEAKER)
+        {
+        iEffectSettings->GetLoudSpkrVolume(vol);
+        }
+    else
+        {
+        iEffectSettings->GetEarPieceVolume(vol);
+        }
+
+    TInt status = SendMessageToCallServ(TMS_EFFECT_GLOBAL_VOL_SET, vol);
+
     iSessionIter.SetToFirst();
     TMSServerSession* serverSession =
             static_cast<TMSServerSession*> (iSessionIter++);
-
     while (serverSession != NULL)
         {
-        serverSession->HandleRoutingChange(routingpckg);
+        // Send only if there is a subscriber to TMS routing notifications.
+        if (iTarHandlerCount > 1)
+            {
+            serverSession->HandleRoutingChange(routingpckg);
+            }
+        serverSession->HandleGlobalEffectChange(TMS_EVENT_EFFECT_VOL_CHANGED,
+                vol, ETrue, iCurrentRouting);
         serverSession = static_cast<TMSServerSession*> (iSessionIter++);
         }
 
     TRACE_PRN_FN_EXT;
-    return TMS_RESULT_SUCCESS;
+    return status;
     }
 
 // -----------------------------------------------------------------------------

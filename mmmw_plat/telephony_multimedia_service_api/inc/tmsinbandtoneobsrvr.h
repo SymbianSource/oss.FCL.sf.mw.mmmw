@@ -11,7 +11,8 @@
  *
  * Contributors:
  *
- * Description: Telephony Multimedia Service
+ * Description: This class provides callback mechanism for TMSInbandTone
+ * listeners.
  *
  */
 
@@ -44,6 +45,7 @@ class TMSInbandTone;
  * @lib tmsapi.lib
  *
  */
+
 class TMSInbandToneObserver
     {
 public:
@@ -53,12 +55,13 @@ public:
      *  TMS_EVENT_INBAND_TONE_STOPPED
 
      * @param  inbandtone
-     *      Pointer to the object that is being signaled.
+     *      Reference to the object that is being signaled.
      *
      * @param  event
      *      Event descriptor.
      */
-    virtual void InbandToneEvent(TMSInbandTone* inbandtone, TMSSignalEvent event) = 0;
+    virtual void InbandToneEvent(const TMSInbandTone& inbandtone,
+            TMSSignalEvent event) = 0;
     };
 
 } //namespace TMS

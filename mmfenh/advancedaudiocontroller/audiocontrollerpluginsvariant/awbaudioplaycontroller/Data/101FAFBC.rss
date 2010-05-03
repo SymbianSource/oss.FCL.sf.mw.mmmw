@@ -46,7 +46,7 @@ RESOURCE REGISTRY_INFO theInfo
 					version_no = 1;
 					display_name = "AWB Audio Play Controller Plugin";
 					default_data = "?";
-					opaque_data = "<s>Nokia<i>0x101F5D07<p>0x101FAFBE<d>";
+					opaque_data = "<s>Nokia<i>0x101F5D07<p>0x101FAFBE<a>0x200000<d>";
                                         rom_only = 0;					
 					}
 				};

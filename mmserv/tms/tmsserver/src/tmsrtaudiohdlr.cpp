@@ -99,10 +99,14 @@ void TMSRtAudioHdlr::ConstructTtsL(const TDesC& aTtsText, TUint aPriority,
     iTtsPlayer = NULL;
     iTtsPlayer = CMdaAudioPlayerUtility::NewL(*this, aPriority, aPreference);
 
+    __ASSERT_DEBUG(iTtsPlayer, PANIC(TMS_RESULT_UNINITIALIZED_OBJECT));
+
     delete iTtsText;
     iTtsText = NULL;
     // UTF-8 strings can take up to 4 bytes per character
     iTtsText = HBufC8::NewL(aTtsText.Length() << KUTF8Multiply);
+
+    __ASSERT_DEBUG(iTtsText, PANIC(TMS_RESULT_UNINITIALIZED_OBJECT));
 
     TPtr8 refText = iTtsText->Des();
     User::LeaveIfError(CnvUtfConverter::ConvertFromUnicodeToUtf8(refText,
@@ -534,6 +538,7 @@ void TMSRtAudioHdlr::SetRingingTypeProperties()
     TInt rampTime(0);
     if (iFormat == EFormatTone)
         {
+        __ASSERT_DEBUG(iTonePlayer, PANIC(TMS_RESULT_UNINITIALIZED_OBJECT));
         switch (iRingType)
             {
             case ETypeRinging:
@@ -604,6 +609,7 @@ void TMSRtAudioHdlr::SetRingingTypeProperties()
         }
     else if (iFormat == EFormatTts)
         {
+        __ASSERT_DEBUG(iTtsPlayer, PANIC(TMS_RESULT_UNINITIALIZED_OBJECT));
         switch (iRingType)
             {
             case ETypeRinging:
@@ -628,6 +634,7 @@ void TMSRtAudioHdlr::SetRingingTypeProperties()
         }
     else
         {
+        __ASSERT_DEBUG(iSamplePlayer, PANIC(TMS_RESULT_UNINITIALIZED_OBJECT));
         switch (iRingType)
             {
             case ETypeRinging:
@@ -707,20 +714,29 @@ void TMSRtAudioHdlr::SetNewVolumeAndRamptime(TInt aVolume, TInt aRamptime)
     // Check that volume is in a valid range.
     TInt volume = aVolume < 1 ? 1 : aVolume;
 
-    if (iFormat == EFormatTone && iTonePlayer)
+    if (iFormat == EFormatTone)
         {
-        iTonePlayer->SetVolumeRamp(TTimeIntervalMicroSeconds(aRamptime));
-        iTonePlayer->SetVolume(ConvertVolume(volume));
+        if (iTonePlayer)
+            {
+            iTonePlayer->SetVolumeRamp(TTimeIntervalMicroSeconds(aRamptime));
+            iTonePlayer->SetVolume(ConvertVolume(volume));
+            }
         }
-    else if (iFormat == EFormatTts && iTtsPlayer)
+    else if (iFormat == EFormatTts)
         {
-        iTtsPlayer->SetVolumeRamp(TTimeIntervalMicroSeconds(aRamptime));
-        iTtsPlayer->SetVolume(ConvertVolume(volume));
+        if (iTtsPlayer)
+            {
+            iTtsPlayer->SetVolumeRamp(TTimeIntervalMicroSeconds(aRamptime));
+            iTtsPlayer->SetVolume(ConvertVolume(volume));
+            }
         }
     else
         {
-        iSamplePlayer->SetVolumeRamp(TTimeIntervalMicroSeconds(aRamptime));
-        iSamplePlayer->SetVolume(ConvertVolume(volume));
+        if (iSamplePlayer)
+            {
+            iSamplePlayer->SetVolumeRamp(TTimeIntervalMicroSeconds(aRamptime));
+            iSamplePlayer->SetVolume(ConvertVolume(volume));
+            }
         }
     }
 
@@ -734,15 +750,24 @@ TInt TMSRtAudioHdlr::ConvertVolume(TInt aVolume)
 
     if (iFormat == EFormatTone)
         {
-        result = iTonePlayer->MaxVolume() * aVolume / KMaxVolumeLevel;
+        if (iTonePlayer)
+            {
+            result = iTonePlayer->MaxVolume() * aVolume / KMaxVolumeLevel;
+            }
         }
     else if (iFormat == EFormatTts)
         {
-        result = iTtsPlayer->MaxVolume() * aVolume / KMaxVolumeLevel;
+        if (iTtsPlayer)
+            {
+            result = iTtsPlayer->MaxVolume() * aVolume / KMaxVolumeLevel;
+            }
         }
     else
         {
-        result = iSamplePlayer->MaxVolume() * aVolume / KMaxVolumeLevel;
+        if (iSamplePlayer)
+            {
+            result = iSamplePlayer->MaxVolume() * aVolume / KMaxVolumeLevel;
+            }
         }
 
     // If user selected minimum volume level set HW volume 1
@@ -772,15 +797,24 @@ void TMSRtAudioHdlr::MutePlaying()
         {
         if (iFormat == EFormatTone)
             {
-            iTonePlayer->SetVolume(0);
+            if (iTonePlayer)
+                {
+                iTonePlayer->SetVolume(0);
+                }
             }
-        else if (iFormat == EFormatTts)
+        else if (iFormat == EFormatTts && iTtsPlayer)
             {
-            iTtsPlayer->SetVolume(0);
+            if (iTtsPlayer)
+                {
+                iTtsPlayer->SetVolume(0);
+                }
             }
         else // EFormatSample
             {
-            iSamplePlayer->SetVolume(0);
+            if (iSamplePlayer)
+                {
+                iSamplePlayer->SetVolume(0);
+                }
             }
         }
     else

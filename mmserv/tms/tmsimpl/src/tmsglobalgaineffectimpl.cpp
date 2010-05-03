@@ -77,7 +77,8 @@ gint TMSGlobalGainEffectImpl::SetParent(TMSEffect*& parent)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSGlobalGainEffectBodyImpl*) this->iBody)->SetParent(parent);
+        static_cast<TMSGlobalGainEffectBodyImpl*>(this->iBody)->SetParent(
+                parent);
         }
     else
         {

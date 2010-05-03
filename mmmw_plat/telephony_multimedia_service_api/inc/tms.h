@@ -182,8 +182,7 @@ typedef gint TMSInbandToneType;
 #define TMS_INBAND_NO_SEQUENCE                  ((gint)8)
 #define TMS_INBAND_BEEP_SEQUENCE                ((gint)9)
 
-
-// TMSSignalEvent structure for callback notifications
+// Structure signalling callback notifications
 struct TMSSignalEvent
     {
     guint type;
@@ -194,12 +193,12 @@ struct TMSSignalEvent
     gint prev_state;
     };
 
-// TMSRTPStreamDescription for RTP
-struct TMSRTPStreamDescription
+// Structure for global volume effect change event
+struct TMSVolumeEventChangeData
     {
-    gint filler1;
-    gint filler2;
-    gint filler3;
+    guint level;
+    TMSAudioOutput output;
+    gboolean output_changed;
     };
 
 } //namespace TMS

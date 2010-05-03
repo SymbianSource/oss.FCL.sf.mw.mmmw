@@ -296,7 +296,8 @@ TInt CEnhanMediaTestClass::RunMethodL(
 
 		ENTRY( "AttachReverb",CEnhanMediaTestClass::AttachReverb ),
 		ENTRY( "DetachReverb",CEnhanMediaTestClass::DetachReverb ),
-
+	  //added
+		ENTRY( "ER_DelayMaxMax",CEnhanMediaTestClass::HandleDelayMaxL ),
 
         };
 
@@ -3171,12 +3172,16 @@ TInt CEnhanMediaTestClass::BalGetBalance(CStifItemParser& /*aItem*/)
 
     iLog->Log(_L("CEnhanMediaTestClass::BalGetBalance "));
 	TInt status(KErrNone);
+	TInt status1(KErrNone);
+	TInt status2(KErrNone);
 	TInt balance=0;
 	if(!iMBalanceControl)
 	    {
 	    return status = KErrNotReady;
 	    }
-	status = iMBalanceControl->GetBalance(balance);
+	status1 = iMBalanceControl->GetBalance(balance);
+	status2=iMBalanceControl->SetBalance(balance);
+	status = status1 || status2;
     iLog->Log(_L("CEnhanMediaTestClass::BalGetBalance [%d]"),balance);
     return status;
 	}
@@ -4399,6 +4404,30 @@ TInt CEnhanMediaTestClass::AudioEffectIsEnabled (CStifItemParser& /*aItem*/)
 	return status;
 	}
 
+///*TInt CEnhanMediaTestClass::AudioCreateEffect (CStifItemParser& /*aItem*/)
+ /*  {
+    TInt status(KErrNone);
+    TBool enabled;
+
+    if(!iEffectControl)
+        {
+        status = KErrNotReady;
+        }
+   // CEqualizerEffect *ptr=iEffectControl;
+    //status = static_cast<MControl*>(iEffectControl);
+   // status = ptr->CreateEffectProxy();
+    if (status == KErrNone)
+        {
+        iLog->Log(_L("AudioEffectIsEnabled status = %d"), status);
+        }
+    else
+        {
+        iLog->Log(_L("AudioEffectIsEnabled ERROR = [%d]"), status);
+        }
+
+    return status;
+    }
+*/
 TInt CEnhanMediaTestClass::AudioEffectIsEnforced (CStifItemParser& /*aItem*/)
 	{
 	TInt status(KErrNone);
@@ -4863,6 +4892,7 @@ TInt CEnhanMediaTestClass::HandleReverbReflectionsDelayL(CStifItemParser& /*aIte
 	return status;
     }
 
+
 TInt CEnhanMediaTestClass::HandleReverbReflectionsDelayMaxL(CStifItemParser& /*aItem*/)
 	{
 
@@ -5202,6 +5232,21 @@ TInt CEnhanMediaTestClass::HandleReverbDelayMaxL(CStifItemParser& /*aItem*/)
 	return status;
 	}
 
+TInt CEnhanMediaTestClass::HandleDelayMaxL(CStifItemParser& /*aItem*/)
+    {
+    iLog->Log(_L("CEnhanMediaTestClass::HandleReverbDelayMaxL"));
+    TInt status(KErrNone);
+    //status = aItem.GetNextInt(controltype);
+    TUint value;
+    if(!iEffectControl)
+        {
+        return status = KErrNotReady;
+        }
+    status = static_cast<MReverbControl*>(iEffectControl)->DelayMax(value);
+    iLog->Log(_L("CEnhanMediaTestClass::HandleDelayMaxL value = [%d]"),value);
+    return status;
+    }
+
 TInt CEnhanMediaTestClass::HandleSWIsContinuousLevelSupportedL(CStifItemParser& /*aItem*/)
 	{
     iLog->Log(_L("CEnhanMediaTestClass::HandleReverbDelayMaxL"));
@@ -5248,7 +5293,9 @@ TInt CEnhanMediaTestClass::HandleSWStereoWideningLevelL(CStifItemParser& /*aItem
 
 TInt CEnhanMediaTestClass::LO_OrientationL (CStifItemParser& aItem)
 	{
-	TInt status(KErrNone);
+    TInt status(KErrNone);
+	TInt status1(KErrNone);
+	TInt status2(KErrNone);
 
 	if(!iEffectControl)
 	    {
@@ -5264,13 +5311,15 @@ TInt CEnhanMediaTestClass::LO_OrientationL (CStifItemParser& aItem)
 
    if (TControl(control) == ELISTORIENTCONTROL)
 	   {
-	   status = static_cast<MListenerOrientationControl*>(iEffectControl)->Orientation(a,b,c);
+	   status1 = static_cast<MListenerOrientationControl*>(iEffectControl)->Orientation(a,b,c);
+	   status2=static_cast<MListenerOrientationControl*>(iEffectControl)->SetOrientation(a,b,c);
 	   }
    else if (TControl(control) == ESOURORIENTCONTROL)
 	   {
-	   status = static_cast<MSourceOrientationControl*>(iEffectControl)->Orientation(a,b,c);
+	   status1 = static_cast<MSourceOrientationControl*>(iEffectControl)->Orientation(a,b,c);
+	   status2= static_cast<MSourceOrientationControl*>(iEffectControl)->SetOrientation(a,b,c);
 	   }
-
+    status=status1 || status2;
     if (status == KErrNone)
     	{
     	iLog->Log(_L("LO_OrientationL status = %d"), status);
@@ -5286,6 +5335,8 @@ TInt CEnhanMediaTestClass::LO_OrientationL (CStifItemParser& aItem)
 TInt CEnhanMediaTestClass::LO_OrientationVectorsL (CStifItemParser& aItem)
 	{
 	TInt status(KErrNone);
+	TInt status1(KErrNone);
+	TInt status2(KErrNone);
 
 	if(!iEffectControl)
 	    {
@@ -5298,13 +5349,15 @@ TInt CEnhanMediaTestClass::LO_OrientationVectorsL (CStifItemParser& aItem)
     status = aItem.GetNextInt(control);
     if (TControl(control) == ELISTORIENTCONTROL)
  	   {
- 	    status = static_cast<MListenerOrientationControl*>(iEffectControl)->OrientationVectors(a,b,c,d,e,f);
+ 	    status1 = static_cast<MListenerOrientationControl*>(iEffectControl)->OrientationVectors(a,b,c,d,e,f);
+ 	    status2=  static_cast<MListenerOrientationControl*>(iEffectControl)->SetOrientationVectors(a,b,c,d,e,f);
  	   }
     else if (TControl(control) == ESOURORIENTCONTROL)
  	   {
-	    status = static_cast<MSourceOrientationControl*>(iEffectControl)->OrientationVectors(a,b,c,d,e,f);
+	    status1 = static_cast<MSourceOrientationControl*>(iEffectControl)->OrientationVectors(a,b,c,d,e,f);
+	    status2=  static_cast<MSourceOrientationControl*>(iEffectControl)->SetOrientationVectors(a,b,c,d,e,f);
  	   }
-
+    status = status1 || status2;
 
     if (status == KErrNone)
     	{
@@ -5377,6 +5430,8 @@ TInt CEnhanMediaTestClass::HandleDADistanceAttenuationL(CStifItemParser& /*aItem
     TUint d,e;
     status = static_cast<MDistanceAttenuationControl*>(iEffectControl)->DistanceAttenuation(a,b,c,d,e);
     iLog->Log(_L("CEnhanMediaTestClass::HandleDADistanceAttenuationL a = [%d] - b = [%d] - c = [%d] - d = [%d]- e = [%d]"),a,b,c,d,e);
+    //added
+    status=static_cast<MDistanceAttenuationControl*>(iEffectControl)->SetDistanceAttenuation(a,b,c,d,e);
 	return status;
 	}
 TInt CEnhanMediaTestClass::HandleDARollOffFactorMaxL(CStifItemParser& /*aItem*/)
@@ -6118,11 +6173,13 @@ TInt CEnhanMediaTestClass::HandleSDSetSphericalVelocityL(CStifItemParser& aItem)
 
     if (TControl(control) == ELISTDOPPCONTROL)
     	{
-        status = static_cast<MListenerDopplerControl*>(iEffectControl)->SetCartesianVelocity(a,b,c);
+    
+        status = static_cast<MListenerDopplerControl*>(iEffectControl)->SetSphericalVelocity(a,b,c);
     	}
     if (TControl(control) == ESOURDOPPCONTROL)
     	{
-        status = static_cast<MSourceDopplerControl*>(iEffectControl)->SetCartesianVelocity(a,b,c);
+    
+        status = static_cast<MSourceDopplerControl*>(iEffectControl)->SetSphericalVelocity(a,b,c);
     	}
     iLog->Log(_L("CEnhanMediaTestClass::HandleSDSetSphericalVelocityL END"));
 	return status;

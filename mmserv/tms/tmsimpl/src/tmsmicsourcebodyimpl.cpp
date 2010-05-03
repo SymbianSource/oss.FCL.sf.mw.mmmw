@@ -64,7 +64,7 @@ void TMSMicSourceBodyImpl::SetProxy(TMSCallProxy* aProxy,
         gpointer /*queuehandler*/)
     {
     iProxy = aProxy;
-    //((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_SOURCE_MIC);
+    //static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this, TMS_SOURCE_MIC);
     }
 
 // End of file

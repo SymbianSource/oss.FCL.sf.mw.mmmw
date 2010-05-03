@@ -77,7 +77,7 @@ EXPORT_C gint TMSDTMFImpl::Delete(TMSDTMF*& dtmf)
     {
     gint ret(TMS_RESULT_SUCCESS);
     TRACE_PRN_FN_ENT;
-    delete (TMSDTMFImpl*) (dtmf);
+    delete (static_cast<TMSDTMFImpl*>(dtmf));
     dtmf = NULL;
     TRACE_PRN_FN_EXT;
     return ret;
@@ -88,7 +88,7 @@ gint TMSDTMFImpl::SetParent(TMSDTMF*& parent)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSDTMFBodyImpl*) this->iBody)->SetParent(parent);
+        static_cast<TMSDTMFBodyImpl*>(this->iBody)->SetParent(parent);
         }
     else
         {

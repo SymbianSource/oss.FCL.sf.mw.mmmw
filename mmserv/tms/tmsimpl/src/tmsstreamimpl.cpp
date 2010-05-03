@@ -71,7 +71,7 @@ gint TMSStreamImpl::Delete(TMSStream*& strm)
     {
     TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_SUCCESS);
-    delete (TMSStreamImpl*) (strm);
+    delete (static_cast<TMSStreamImpl*>(strm));
     strm = NULL;
     TRACE_PRN_FN_EXT;
     return ret;

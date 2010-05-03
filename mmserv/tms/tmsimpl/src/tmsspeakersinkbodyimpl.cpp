@@ -64,7 +64,7 @@ void TMSSpeakerSinkBodyImpl::SetProxy(TMSCallProxy* aProxy,
         gpointer /*queuehandler*/)
     {
     iProxy = aProxy;
-    //((TMSQueueHandler*) queuehandler)->AddObserver(*this, TMS_SINK_SPEAKER);
+    //static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this, TMS_SINK_SPEAKER);
     }
 
 // End of file

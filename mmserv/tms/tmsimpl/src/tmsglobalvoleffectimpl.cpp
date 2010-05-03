@@ -77,7 +77,8 @@ gint TMSGlobalVolEffectImpl::SetParent(TMSEffect*& parent)
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        ((TMSGlobalVolEffectBodyImpl*) this->iBody)->SetParent(parent);
+        static_cast<TMSGlobalVolEffectBodyImpl*>(this->iBody)->SetParent(
+                parent);
         }
     else
         {

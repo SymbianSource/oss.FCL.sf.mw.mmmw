@@ -301,7 +301,7 @@ void TMSQueueHandler::DoFillBuffer(gint aBufLen, gint aStatus,
         if (!iBuffer)
             {
             TMSMemBuffer::Create((guint) aBufLen,
-                    const_cast<guint8*> (iChunkDataPtr.Ptr()), iBuffer);
+                    const_cast<guint8*>(iChunkDataPtr.Ptr()), iBuffer);
             }
         iBuffer->SetDataSize(aBufLen);
 
@@ -362,7 +362,7 @@ void TMSQueueHandler::DoEmptyBuffer(gint aBufLen, gint aStatus,
         if (!iBuffer)
             {
             TMSMemBuffer::Create((guint) aBufLen,
-                    const_cast<guint8*> (iChunkDataPtr.Ptr()), iBuffer);
+                    const_cast<guint8*>(iChunkDataPtr.Ptr()), iBuffer);
             }
         iBuffer->SetDataSize(aBufLen);
         gint index = iClientList.Find(TMS_SINK_CLIENT);

@@ -42,7 +42,7 @@ public MProEngProfileActivationObserver,
 public MProEngActiveProfileObserver
 	{
 public:
-	IMPORT_C static CProfileSettingsMonitorServerImpl* NewL(); 
+	static CProfileSettingsMonitorServerImpl* NewL(); 
 	~CProfileSettingsMonitorServerImpl();
 	
 	//MProEngProfileActivationObserver

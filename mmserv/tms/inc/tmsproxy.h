@@ -116,7 +116,7 @@ public:
             gpointer obsrvr);
 
     // From MQueueHandlerObserver
-    virtual void QueueEvent(gint aEventType, gint aError, void* user_data);
+    virtual void QueueEvent(gint aEventType, gint aError, void* event_data);
 
 private:
     void PopulateArrayL(TMSClientServerRequest aRequest,

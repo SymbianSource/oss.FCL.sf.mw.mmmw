@@ -109,6 +109,7 @@ void C3GPAudioPlayControllerPlugin::DoAddDataSourceL()
     delete iAudioUtility; // see 3gp
     delete iAacUtil;
     iAudioUtility = NULL;
+    iAacUtil = NULL;
 	iDataSourceAdapter = C3gpDataSourceAdapter::NewL();
 	iSharedBufferMaxNum = 1;
 	iSharedBufferMaxSize = KFirstBufferSize;

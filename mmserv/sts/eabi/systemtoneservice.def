@@ -1,0 +1,7 @@
+EXPORTS
+	_ZN18CSystemToneService6CreateEv @ 1 NONAME
+	_ZN18CSystemToneService6DeleteEPS_ @ 2 NONAME
+	_ZN18CSystemToneService8PlayToneENS_9TToneTypeE @ 3 NONAME
+	_ZN18CSystemToneService8PlayToneENS_9TToneTypeERj @ 4 NONAME
+	_ZN18CSystemToneService8StopToneEj @ 5 NONAME
+

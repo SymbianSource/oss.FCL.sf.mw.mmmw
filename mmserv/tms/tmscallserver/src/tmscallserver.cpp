@@ -16,7 +16,7 @@
  */
 
 #include "tmscallserver.h"
-#include "delaytimer.h"
+#include "tmsdelaytimer.h"
 #include "tmsutility.h"
 #include "tmscallsession.h"
 

@@ -37,7 +37,6 @@ MW_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE	/epoc32/include/mmf/server
 SYSTEMINCLUDE	/epoc32/include/kernel
 SYSTEMINCLUDE	/epoc32/include/mmf/common
-SYSTEMINCLUDE   /epoc32/include/mm
 SYSTEMINCLUDE   /epoc32/include/caf
 
 SOURCEPATH   	../src

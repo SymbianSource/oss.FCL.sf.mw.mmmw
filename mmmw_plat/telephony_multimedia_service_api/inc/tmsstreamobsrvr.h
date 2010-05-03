@@ -11,7 +11,7 @@
  *
  * Contributors:
  *
- * Description: Telephony Multimedia Service
+ * Description: This class provides callback mechanism for TMSStream listeners.
  *
  */
 
@@ -64,13 +64,14 @@ public:
      *
      *
      * @param  stream
-     *      Pointer to the object that is being signaled.
+     *      Reference to the object that is being signaled.
      *
      * @param  event
      *      Event descriptor.
      *
      */
-    virtual void TMSStreamEvent(TMSStream* stream, TMSSignalEvent event) = 0;
+    virtual void TMSStreamEvent(const TMSStream& stream,
+            TMSSignalEvent event) = 0;
     };
 
 } //namespace TMS

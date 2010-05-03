@@ -37,7 +37,8 @@ class TMSGlobalContext;
 class MQueueHandlerObserver
     {
 public:
-    virtual void QueueEvent(gint aEventType, gint aError, void* user_data) = 0;
+    virtual void QueueEvent(gint aEventType, gint aError,
+	        void* event_data) = 0;
     };
 
 /**

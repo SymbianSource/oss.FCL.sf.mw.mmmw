@@ -64,7 +64,10 @@ gint TMSDTMFBodyImpl::Create(TMSStreamType streamtype, TMSDTMFBody*& bodyimpl)
             delete self;
             self = NULL;
             }
-        self->iStreamType = streamtype;
+        else
+            {
+            self->iStreamType = streamtype;
+            }
         }
     bodyimpl = self;
     return ret;
@@ -91,8 +94,7 @@ gint TMSDTMFBodyImpl::PostConstruct()
     return ret;
     }
 
-gint TMSDTMFBodyImpl::AddObserver(TMSDTMFObserver& obsrvr,
-        gpointer user_data)
+gint TMSDTMFBodyImpl::AddObserver(TMSDTMFObserver& obsrvr, gpointer user_data)
     {
     gint ret(TMS_RESULT_SUCCESS);
     if (!iObserver)
