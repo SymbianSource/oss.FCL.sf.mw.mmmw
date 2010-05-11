@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef CSPDEVSOUND_H
-#define CSPDEVSOUND_H
+#ifndef TMSCSDEVSOUND_H
+#define TMSCSDEVSOUND_H
 
 #include <sounddevice.h>
 
@@ -161,4 +161,4 @@ protected:
 
 } //namespace TMS
 
-#endif // CSPDEVSOUND_H
+#endif // TMSCSDEVSOUND_H

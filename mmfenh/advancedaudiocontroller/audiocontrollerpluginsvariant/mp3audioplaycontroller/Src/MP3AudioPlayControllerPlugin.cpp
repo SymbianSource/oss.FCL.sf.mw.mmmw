@@ -102,6 +102,18 @@ CMP3AudioPlayControllerPlugin::~CMP3AudioPlayControllerPlugin()
 void CMP3AudioPlayControllerPlugin::DoAddDataSourceL()
     {
     DP0(_L("CMP3AudioPlayControllerPlugin::DoAddDataSourceL"));
+    // ou1cimx1#205863
+    if (iSourceType != KUidMmfFileSource) 
+    	{
+	    DP0(_L("CMP3AudioPlayControllerPlugin::DoAddDataSourceL not file source"));        
+	    if (iSharedBufferMaxNum <= 2)
+	        {
+	        	iSharedBufferMaxNum = 3;
+	        }
+		 iSharedBufferMaxSize = iSharedBufferMaxSizeForNonSeekableSrc;
+	    DP2(_L("CMP3AudioPlayControllerPlugin::DoAddDataSourceL new iSharedBufferMaxNum[%d] iSharedBufferMaxSize[%d]"), iSharedBufferMaxNum, iSharedBufferMaxSize);
+    	}
+
     }
 
 // -----------------------------------------------------------------------------

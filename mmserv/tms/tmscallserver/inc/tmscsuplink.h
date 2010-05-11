@@ -15,11 +15,11 @@
  *
  */
 
-#ifndef CS_UPLINK_H
-#define CS_UPLINK_H
+#ifndef TMSCSUPLINK_H
+#define TMSCSUPLINK_H
 
 #include <glib.h>
-#include "cspdevsound.h"
+#include "tmscsdevsound.h"
 
 namespace TMS {
 
@@ -101,4 +101,4 @@ protected:
 
 } //namespace TMS
 
-#endif // CSUplink_H
+#endif // TMSCSUPLINK_H

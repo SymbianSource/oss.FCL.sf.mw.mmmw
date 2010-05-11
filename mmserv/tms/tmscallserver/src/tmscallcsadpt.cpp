@@ -19,13 +19,13 @@
 #include <S60FourCC.h>
 #include <AudioPreference.h>
 #include <TelephonyAudioRouting.h>
-#include "csuplink.h"
-#include "csdownlink.h"
-#include "callcsadpt.h"
+#include "tmscsuplink.h"
+#include "tmscsdownlink.h"
+#include "tmscallcsadpt.h"
 #include "tmsutility.h"
 #include "tmsshared.h"
 #include "tmsclientserver.h"
-#include "tarsettings.h"
+#include "tmstarsettings.h"
 
 using namespace TMS;
 
@@ -41,6 +41,7 @@ TMSCallCSAdpt::TMSCallCSAdpt()
     iCSDownlink = NULL;
     iCSUplink = NULL;
     iRouting = NULL;
+    iTarSettings = NULL;
 
     TRACE_PRN_FN_EXT;
     }

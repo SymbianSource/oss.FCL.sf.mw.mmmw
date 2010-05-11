@@ -30,15 +30,9 @@ class TMSCallProxy;
 class TMSFormatImpl : public TMSFormat
     {
 public:
-    virtual ~TMSFormatImpl();
     IMPORT_C static gint Create(TMSFormatType formattype,
             TMSFormat*& tmsformat);
     IMPORT_C static gint Delete(TMSFormat*& tmsformat);
-
-    gint SetProxy(TMSCallProxy* aProxy, gpointer queuehandler);
-
-private:
-    TMSFormatImpl();
     };
 
 } //namespace TMS

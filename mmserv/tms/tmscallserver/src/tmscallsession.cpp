@@ -17,7 +17,7 @@
 
 #include "tmsutility.h"
 #include "tmsutility.h"
-#include "calladpt.h"
+#include "tmscalladpt.h"
 #include "tmscallserver.h"
 #include "tmscallclisrv.h"
 #include "tmscallsession.h"

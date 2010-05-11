@@ -18,8 +18,8 @@
 #include <AudioPreference.h>
 #include <glib.h>
 #include <S60FourCC.h>
-#include "cspdevsound.h"
-#include "mcspdevsoundobserver.h"
+#include "tmscsdevsound.h"
+#include "tmscsdevsoundobserver.h"
 
 using namespace TMS;
 

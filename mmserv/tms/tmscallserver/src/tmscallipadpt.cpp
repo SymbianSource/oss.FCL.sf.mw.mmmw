@@ -19,8 +19,8 @@
 #include "tmsutility.h"
 #include "tmsclientserver.h"
 #include "tmsshared.h"
-#include "ipcallstream.h"
-#include "callipadpt.h"
+#include "tmsipcallstream.h"
+#include "tmscallipadpt.h"
 
 using namespace TMS;
 

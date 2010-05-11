@@ -15,33 +15,30 @@
  *
  */
 
-#ifndef CALLCSADPT_H
-#define CALLCSADPT_H
+#ifndef __CALLIPADAPT_H
+#define __CALLIPADAPT_H
 
-#include <TelephonyAudioRouting.h>
-#include <MTelephonyAudioRoutingObserver.h>
+// INCLUDES
 #include <e32msgqueue.h>
+#include <mmcccodecinformation.h>
 #include "tmsclientserver.h"
-#include "calladpt.h"
-#include "mcspdevsoundobserver.h"
+#include "tmsshared.h"
+#include "tmscalladpt.h"
 
 namespace TMS {
 
 // FORWARD DECLARATIONS
-class TMSCSUplink;
-class TMSCSDownlink;
-class TMSTarSettings;
+class TMSIPDownlink;
+class TMSIPUplink;
 
-/*
- * CallCSAdapt class
- */
-class TMSCallCSAdpt : public TMSCallAdpt,
-                      public TMSCSPDevSoundObserver,
-                      public MTelephonyAudioRoutingObserver
+// TMSCallIPAdpt class
+class TMSCallIPAdpt : public TMSCallAdpt
     {
 public:
-    TMSCallCSAdpt();
-    virtual ~TMSCallCSAdpt();
+    // Constractor
+    static TMSCallIPAdpt* NewL();
+
+    virtual ~TMSCallIPAdpt();
     virtual gint PostConstruct();
 
     virtual gint CreateStream(TMSCallType callType, TMSStreamType strmType,
@@ -65,6 +62,7 @@ public:
     virtual gint GetDataXferBufferHndl(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId,
             const guint32 key, RChunk& chunk);
+
     virtual gint GetMaxVolume(guint& volume);
     virtual gint SetVolume(const guint volume);
     virtual gint GetVolume(guint& volume);
@@ -96,48 +94,64 @@ public:
     virtual gint SetOutput(TMSAudioOutput output);
     virtual gint GetOutput(TMSAudioOutput& output);
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
-    virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer);
+    virtual gint GetAvailableOutputsL(TInt& count, CBufFlat*& outputsbuffer);
 
-    void NotifyClient(const gint strmId, const gint aCommand,
-            const gint aStatus = KErrNone, const gint64 aInt64 = TInt64(0));
+    gint SetIlbcCodecMode(const gint mode, const TMSStreamType strmtype);
+    gint GetIlbcCodecMode(gint& mode, const TMSStreamType strmtype);
+    gint SetG711CodecMode(const gint mode, const TMSStreamType strmtype);
+    gint GetG711CodecMode(gint& mode, const TMSStreamType strmtype);
+    gint FrameModeRqrdForEC(gboolean& frmodereq);
+    gint SetFrameMode(const gboolean frmode);
+    gint GetFrameMode(gboolean& frmode);
+    gint ConcealErrorForNextBuffer();
+    gint BadLsfNextBuffer();
 
-    //From TMSCSPDevSoundObserver
-    void DownlinkInitCompleted(TInt status);
-    void UplinkInitCompleted(TInt status);
-    void UplinkActivatedSuccessfully();
-    void DownlinkActivatedSuccessfully();
-    void UplinkActivationFailed();
-    void DownlinkActivationFailed();
+    gint OpenDownlinkL(const RMessage2& aMessage);
+    gint OpenUplinkL(const RMessage2& aMessage);
+    void SetFormat(const gint strmId, const TUint32 aFormat);
 
-protected:
-    void AvailableOutputsChanged(
-            CTelephonyAudioRouting& aTelephonyAudioRouting);
-    void OutputChanged(CTelephonyAudioRouting& aTelephonyAudioRouting);
-    void SetOutputComplete(CTelephonyAudioRouting& aTelephonyAudioRouting,
-            gint aError);
+    void BufferFilledL(TUint dataSize);
+    void BufferEmptiedL();
+    gint GetDataXferChunkHndl(const TMSStreamType strmType,
+            const TUint32 key, RChunk& chunk);
+
+private:
+    void ConstructL();
+    TMSCallIPAdpt();
+
+    void NotifyClient(const gint strmId, const TInt aCommand,
+            const TInt aStatus = KErrNone, const TInt64 aInt64 = TInt64(0));
+    //void DetermineG711FrameRateL(); //G711 10/20ms
     void GetSupportedBitRatesL(CBufFlat*& brbuffer);
 
 private:
     gint iNextStreamId;
-
-    TMSCSUplink* iCSUplink;
-    TMSCSDownlink* iCSDownlink;
-    CTelephonyAudioRouting* iRouting;
-    TMSTarSettings* iTarSettings;
-    TMSStreamType iStrmtype;
-
-    RMsgQueue<TmsMsgBuf> iMsgQueueUp;
-    RMsgQueue<TmsMsgBuf> iMsgQueueDn;
-    TmsMsgBuf iMsgBuffer;
-
     gboolean iUplinkInitialized;
     gint iUplinkStreamId;
     gboolean iDnlinkInitialized;
     gint iDnlinkStreamId;
+
+    TMSIPDownlink* iIPDownlink;
+    TMSIPUplink* iIPUplink;
+
+    // Message queues for communication and data transfer back to the client
+    RMsgQueue<TmsMsgBuf> iMsgQueueUp;
+    RMsgQueue<TmsMsgBuf> iMsgQueueDn;
+
+    TmsMsgBuf iMsgBuffer;
+    TMMFPrioritySettings iPriority;
+    TUint32 iUpFourCC;
+    TUint32 iDnFourCC;
+    TInt iMaxVolume;
+    TInt iMaxGain;
+    RArray<TUint> iArrBitrates;
+    RArray<TFourCC> iCodecs;
+    TInt iCodecsCount;
+
     };
 
 } //namespace TMS
 
-#endif // CALLCSADPT_H
+#endif //__CALLIPADAPT_H
 
 // End of file

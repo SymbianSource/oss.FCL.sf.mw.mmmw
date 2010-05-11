@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef MCSPDEVSOUNDOBSERVER_H
-#define MCSPDEVSOUNDOBSERVER_H
+#ifndef TMSCSDEVSOUNDOBSERVER_H
+#define TMSCSDEVSOUNDOBSERVER_H
 
 namespace TMS {
 
@@ -28,8 +28,8 @@ namespace TMS {
 class TMSCSPDevSoundObserver
     {
 public:
-    virtual void DownlinkInitCompleted(TInt x) = 0;
-    virtual void UplinkInitCompleted(TInt x) = 0;
+    virtual void DownlinkInitCompleted(TInt status) = 0;
+    virtual void UplinkInitCompleted(TInt status) = 0;
 
     /**
      * Notification that Mic has been activated successfully
@@ -58,4 +58,4 @@ public:
 
 } //namespace TMS
 
-#endif // MCSPDEVSOUNDOBSERVER_H
+#endif // TMSCSDEVSOUNDOBSERVER_H

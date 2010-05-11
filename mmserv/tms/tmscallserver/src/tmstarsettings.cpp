@@ -16,7 +16,7 @@
  */
 
 // INCLUDE FILES
-#include "tarsettings.h"
+#include "tmstarsettings.h"
 #include "tmsclientserver.h"
 #include "tmsutility.h"
 

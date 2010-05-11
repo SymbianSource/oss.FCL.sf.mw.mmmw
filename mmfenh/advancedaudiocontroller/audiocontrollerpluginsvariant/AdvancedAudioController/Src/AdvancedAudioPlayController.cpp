@@ -841,17 +841,6 @@ EXPORT_C void CAdvancedAudioPlayController::AddDataSourceL(
 
     // we need to block this until duration is calculated if using mmfplayutility
     iBlockDuration = EFalse;
-// ou1cimx1#205863
-    if (!iDataSourceAdapter->IsLocalPlayback()) 
-    	{
-	    DP0(_L("CAdvancedAudioPlayController::AddDataSourceL not file source"));        
-	    if (iSharedBufferMaxNum <= 2)
-	        {
-	        	iSharedBufferMaxNum = 3;
-	        }
-		 iSharedBufferMaxSize = iSharedBufferMaxSizeForNonSeekableSrc;
-	    DP2(_L("CAdvancedAudioPlayController::AddDataSourceL new iSharedBufferMaxNum[%d] iSharedBufferMaxSize[%d]"), iSharedBufferMaxNum, iSharedBufferMaxSize);
-    	}
     
     if ((!iEventsEnabled) && (!iDataSourceAdapter->OnlyHeaderPresent()))
         {
@@ -997,11 +986,6 @@ EXPORT_C void CAdvancedAudioPlayController::RemoveDataSinkL(
     {
     DP0(_L("CAdvancedAudioPlayController::RemoveDataSinkL"));
 
-    if (!iDataSink)
-		{
-        User::Leave(KErrNotReady);
-		}
-
     if (iDataSink != &aDataSink)
 		{
         User::Leave(KErrArgument);
@@ -1011,9 +995,12 @@ EXPORT_C void CAdvancedAudioPlayController::RemoveDataSinkL(
 		{
         User::Leave(KErrNotReady);
 		}
-
-    iDataSink->SinkStopL();         // should always stop source before logoff
-	iDataSink->SinkThreadLogoff();
+		
+   if (iDataSink)
+   	{
+       iDataSink->SinkStopL();         // should always stop source before logoff
+	     iDataSink->SinkThreadLogoff();
+	  }
 
     // dereference Decoder from Utility before deleting AudioOutput (which took ownership of decoder)
     if (iAudioUtility)
@@ -1021,8 +1008,8 @@ EXPORT_C void CAdvancedAudioPlayController::RemoveDataSinkL(
         iAudioUtility->DeReferenceDecoder();
     	}
     
-	delete iAudioOutput;
-	iAudioOutput = NULL;
+    delete iAudioOutput;
+	  iAudioOutput = NULL;
     iDataSink = NULL;
     iDecoderExists = EFalse;
     }
@@ -1036,7 +1023,12 @@ EXPORT_C void CAdvancedAudioPlayController::ResetL()
     DP0(_L("CAdvancedAudioPlayController::ResetL"));
 
     RemoveDataSourceL(*iDataSource);
-    RemoveDataSinkL(*iDataSink);
+    
+    if (iDataSink)
+    	{
+    		  DP0(_L("CAdvancedAudioPlayController::ResetL, calling RemoveDataSinkL"));
+          RemoveDataSinkL(*iDataSink);
+      }
     }
 
 // -----------------------------------------------------------------------------

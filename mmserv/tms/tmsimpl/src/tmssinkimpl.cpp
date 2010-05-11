@@ -23,18 +23,6 @@
 
 using namespace TMS;
 
-TMSSinkImpl::TMSSinkImpl()
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-TMSSinkImpl::~TMSSinkImpl()
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
 EXPORT_C gint TMSSinkImpl::Create(TMSSinkType sinktype, TMSSink*& tmssink)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);

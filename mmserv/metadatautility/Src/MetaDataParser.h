@@ -26,13 +26,14 @@
 #include <MetaDataField.hrh>
 #include <f32file.h>
 #include <charconv.h>
-#include "MetaDataID3v1Genre.h"
 #include <barsc.h>
 #include <barsread.h>
 
+#include "MetaDataID3v1Genre.h"
 
 // FORWARD DECLARATION
 class CMetaDataFieldContainer;
+class CMetaDataSourceFile;
 
 // CONSTANTS
 const TInt KUnicodeBOMNotFound		= 0;
@@ -97,7 +98,7 @@ class CMetaDataParser : public CBase
         * @since 3.0
         * @return void
         */
-		void MapID3GenreToStringL(TInt aNum, TDes& aGenrePtr);
+		void MapID3GenreToStringL( TInt aNum, TDes& aGenrePtr );
 
 		/**
         * Maps ID3v2 genre integer to string
@@ -107,11 +108,33 @@ class CMetaDataParser : public CBase
         * @return void
         */
 
-		void MapID3GenreToStringL(TInt aNum, TDes8& aGenrePtr);
+		void MapID3GenreToStringL( TInt aNum, TDes8& aGenrePtr );
 		void GenerateTopCharacterSetsL();
-		void SelectCharacterSetsForLanguageL(TInt aLanguage);
-		void ReadCharacterSetResourceL(TInt aResourceId);
-		TBool IsInTopCharacterSet(TUint aCharacterSetId);
+		void SelectCharacterSetsForLanguageL( TInt aLanguage );
+		void ReadCharacterSetResourceL( TInt aResourceId );
+		TBool IsInTopCharacterSet( TUint aCharacterSetId );
+
+		/**
+        * Parses the common metadata, the metadata fields are
+        * inserted into the container.
+        * @since 9.2
+        * @param aSource a Metadata source file.
+        * @param aWantedFields An array of TMetaDataFieldId's. Empty array is interpreted as all fields.
+        * @param aContainer On return, metadata found in aSource is stored here
+        * @return void
+        */
+        void CommonParseL( CMetaDataSourceFile* aSource,
+                const RArray<TMetaDataFieldId>& aWantedFields, 
+                CMetaDataFieldContainer& aContainer );
+
+        /**
+        * Append DRM Protected data to the container.
+        * @param aSource a Metadata source file.
+        * @param aContainer On return, metadata ptotected data is stored here
+        * @return void
+        */
+		void GetProtectedL( CMetaDataSourceFile* aSource,
+		        CMetaDataFieldContainer& aContainer );
 
     protected:
 
@@ -121,8 +144,8 @@ class CMetaDataParser : public CBase
         * @param aDesc The original descriptor
         * @return Pointer to descriptor without whitespace
         */
-        TPtrC8 StripTrailingZeroes( const TDesC8& aDesc, TInt encoding = 0);
-        TPtrC StripTrailingZeroes( const TDesC& aDesc);
+        TPtrC8 StripTrailingZeroes( const TDesC8& aDesc, TInt encoding = 0 );
+        TPtrC StripTrailingZeroes( const TDesC& aDesc );
 
         /**
         * Returns BOM indication in the provided unicode.

@@ -175,6 +175,8 @@ void CMP3AudioControllerUtility::ScanHeaderL(
 	TInt frameBytes = 0;
 	TInt avgFrameLen = 0;
 	TInt frames = 0;
+	TInt scaling=0;
+	TInt round=0;
 	// We could have used the bitrate found above for CBR MP3 content and not continue to average
 	// the bitrate. However, some users can manipulated the file and append other bitrate content.
 	// Since it is not too difficult, we can update the bitrate above with an averaged bitrate.
@@ -203,6 +205,12 @@ void CMP3AudioControllerUtility::ScanHeaderL(
 			frames++;    	        	
 			}	
 		avgFrameLen = frameBytes / frames; // frames is always non-zero here
+		scaling = frameBytes*10/frames;
+		round = scaling%10;
+		if(round > 5)
+		    {
+		     ++avgFrameLen;
+		    }
 		}
 	iBitRate = (avgFrameLen * 8 * iSamplingRate) / iSamplesPerFrame;
 	}

@@ -19,7 +19,7 @@
 #include <mmcccodecinformation.h>
 #include "tmsutility.h"
 #include "tmsshared.h"
-#include "ipcallstream.h"
+#include "tmsipcallstream.h"
 
 using namespace TMS;
 

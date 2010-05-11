@@ -22,7 +22,7 @@
 #include <G729EncoderIntfc.h>
 #include <SpeechEncoderConfig.h>
 #include "tmsutility.h"
-#include "ipcallstream.h"
+#include "tmsipcallstream.h"
 
 using namespace TMS;
 

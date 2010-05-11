@@ -58,12 +58,6 @@ private:  // Functions from base classes
 
 	/**
 	 * From CTimer
-	 * Cancel the shutdown timer.
-	 */
-	void DoCancel();
-
-	/**
-	 * From CTimer
 	 * Timer has expired, stop the RadioServer.
 	 **/
 	void RunL();

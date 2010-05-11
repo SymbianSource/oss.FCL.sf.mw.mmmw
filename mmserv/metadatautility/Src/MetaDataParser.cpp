@@ -19,12 +19,15 @@
 
 
 // INCLUDE FILES
-#include "MetaDataParser.h"
 #include <syslangutil.h>
 #include <languages.hrh>
 #include <TopCharacterSet.rsg>
 #include <data_caging_path_literals.hrh>
 #include <bautils.h>
+
+#include "MetaDataParser.h"
+#include "MetaDataSourceFile.h"
+#include "MetaDataFieldContainer.h"
 
 _LIT(KCharacterSetRscFile, "TopCharacterSet.rsc");
 
@@ -121,6 +124,10 @@ TPtrC CMetaDataParser::StripTrailingZeroes(
 TInt CMetaDataParser::UnicodeBOM(
 	const TDesC8& aUnicode )
 	{
+#ifdef _DEBUG
+     RDebug::Print(_L("CMetaDataParser::UnicodeBOM"));
+#endif
+    
 	TPtrC8 bomData( aUnicode.Left( 2 ) );
 
 	TBuf8<2> BEbom; // Big endian BOM
@@ -162,6 +169,10 @@ TID3Version CMetaDataParser::ID3Version()
 //
 void CMetaDataParser::MapID3GenreToStringL(TInt aNum, TDes& aGenrePtr)
 {
+#ifdef _DEBUG
+     RDebug::Print(_L("CMetaDataParser::MapID3GenreToStringL"));
+#endif
+    
 	if(aNum < 0 || aNum > 125 && aNum != 199)
 		{
 		return;
@@ -560,6 +571,10 @@ void CMetaDataParser::MapID3GenreToStringL(TInt aNum, TDes& aGenrePtr)
 //
 void CMetaDataParser::MapID3GenreToStringL(TInt aNum, TDes8& aGenrePtr)
 {
+#ifdef _DEBUG
+     RDebug::Print(_L("CMetaDataParser::MapID3GenreToStringL"));
+#endif
+
 	if(aNum < 0 || aNum > 125 && aNum != 199)
 		{
 		return;
@@ -1242,4 +1257,46 @@ TBool CMetaDataParser::IsInTopCharacterSet(TUint aCharacterSetId)
 		}
 	return EFalse;
 	}
+
+
+// -----------------------------------------------------------------------------
+// CMetaDataParser::CommonParseL
+// -----------------------------------------------------------------------------
+//
+void CMetaDataParser::CommonParseL(
+    CMetaDataSourceFile* aSource,
+    const RArray<TMetaDataFieldId>& aWantedFields,
+    CMetaDataFieldContainer& aContainer )
+    {
+#ifdef _DEBUG
+     RDebug::Print(_L("CMetaDataParser::CommonParseL"));
+#endif
+
+    GetProtectedL(aSource, aContainer);
+    ParseL(aWantedFields, aContainer);
+    }
+
+// -----------------------------------------------------------------------------
+// CMetaDataParser::GetProtectedL
+// -----------------------------------------------------------------------------
+//
+void CMetaDataParser::GetProtectedL( CMetaDataSourceFile* aSource,
+        CMetaDataFieldContainer& aContainer )
+    {
+#ifdef _DEBUG
+     RDebug::Print(_L("CMetaDataParser::GetProtectedL"));
+#endif
+
+    TBool fileProtected = aSource->FileProtected();
+    TBuf16<5> desc16;
+    desc16.AppendNum(fileProtected);
+
+    aContainer.AppendL( EMetaDataProtected, desc16 );
+    
+#ifdef _DEBUG
+     RDebug::Print(_L("CMetaDataParser::GetProtectedL, Protected=%S "), &desc16);
+#endif
+    
+    }
+
 //  End of File

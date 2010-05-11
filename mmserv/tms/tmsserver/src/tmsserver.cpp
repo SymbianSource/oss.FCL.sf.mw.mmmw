@@ -80,7 +80,7 @@ TMSServer::~TMSServer()
     iUplCodecs.Close();
     delete iEffectSettings;
     delete iTarHandler;
-    CancelCenRepHandler();
+    delete iAudioCenRepHandler;
 
     TRACE_PRN_FN_EXT;
     }

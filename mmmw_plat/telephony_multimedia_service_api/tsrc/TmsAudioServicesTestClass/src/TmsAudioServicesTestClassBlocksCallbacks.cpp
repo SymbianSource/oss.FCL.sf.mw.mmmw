@@ -144,6 +144,7 @@ void CTmsAudioServicesTestClass::ProcessBuffer(const TMSBuffer* buffer)
 void CTmsAudioServicesTestClass::EffectsEvent(const TMSEffect& tmseffect,
         TMSSignalEvent /*event*/)
     {
+    iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::EffectsEvent"));
     TMSEffectType effecttype;
     const_cast<TMSEffect&>(tmseffect).GetType(effecttype);
     switch (effecttype)

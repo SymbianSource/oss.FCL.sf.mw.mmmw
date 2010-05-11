@@ -148,8 +148,7 @@ void CTmsAudioServicesTestClass::Delete()
 //
 TInt CTmsAudioServicesTestClass::RunMethodL(CStifItemParser& aItem)
     {
-    static TStifFunctionInfo const
-    KFunctions[] =
+    static TStifFunctionInfo const KFunctions[] =
         {
         // Copy this line for every implemented function.
         // First string is the function name used in TestScripter script file.
@@ -180,12 +179,12 @@ TInt CTmsAudioServicesTestClass::RunMethodL(CStifItemParser& aItem)
         ENTRY( "OpenDownlink", CTmsAudioServicesTestClass::OpenDownlink ),
         ENTRY( "OpenUplink", CTmsAudioServicesTestClass::OpenUplink ),
         ENTRY( "Gain", CTmsAudioServicesTestClass::Gain ),
-        ENTRY( "AddGlobleGainEffectToStream", CTmsAudioServicesTestClass::AddGlobleGainEffectToStream),
-        ENTRY( "RemoveGlobleGainEffectToStream", CTmsAudioServicesTestClass::RemoveGlobleGainEffectToStream),
+        ENTRY( "AddGlobalGainEffectToStream", CTmsAudioServicesTestClass::AddGlobalGainEffectToStream),
+        ENTRY( "RemoveGlobalGainEffectToStream", CTmsAudioServicesTestClass::RemoveGlobalGainEffectToStream),
         ENTRY( "Volume", CTmsAudioServicesTestClass::Volume ),
-        ENTRY( "AddGlobleVolumeEffectToStream", CTmsAudioServicesTestClass::AddGlobleVolumeEffectToStream),
-        ENTRY( "RemoveGlobleVolumeEffectToStream", CTmsAudioServicesTestClass::RemoveGlobleVolumeEffectToStream),
-        ENTRY( "CreateGlobleGainEffect", CTmsAudioServicesTestClass::CreateGlobleGainEffect),
+        ENTRY( "AddGlobalVolumeEffectToStream", CTmsAudioServicesTestClass::AddGlobalVolumeEffectToStream),
+        ENTRY( "RemoveGlobalVolumeEffectToStream", CTmsAudioServicesTestClass::RemoveGlobalVolumeEffectToStream),
+        ENTRY( "CreateGlobalGainEffect", CTmsAudioServicesTestClass::CreateGlobalGainEffect),
         ENTRY( "Close", CTmsAudioServicesTestClass::Close ),
         ENTRY( "Start", CTmsAudioServicesTestClass::Start ),
         ENTRY( "Pause", CTmsAudioServicesTestClass::Pause ),
@@ -675,8 +674,8 @@ TInt CTmsAudioServicesTestClass::CreateEffect(CStifItemParser& aItem)
                 break;
             case TMS_EFFECT_GLOBAL_VOL:
                 {
-                error = CreateVolumeGlobleEffect();
-                //       AddGlobleVolumeEffectToStream();
+                error = CreateVolumeGlobalEffect();
+                //       AddGlobalVolumeEffectToStream();
                 }
                 break;
             case TMS_EFFECT_GAIN:
@@ -687,8 +686,8 @@ TInt CTmsAudioServicesTestClass::CreateEffect(CStifItemParser& aItem)
                 break;
             case TMS_EFFECT_GLOBAL_GAIN:
                 {
-                error = CreateGlobleGainEffect();
-                //        AddGlobleGainEffectToStream();
+                error = CreateGlobalGainEffect();
+                //        AddGlobalGainEffectToStream();
                 }
                 break;
             default:
@@ -1034,7 +1033,8 @@ TInt CTmsAudioServicesTestClass::DeleteSink(CStifItemParser& /*aItem */)
     return error;
     }
 
-TInt CTmsAudioServicesTestClass::CreateDownlinkStream(CStifItemParser& /*aItem*/)
+TInt CTmsAudioServicesTestClass::CreateDownlinkStream(
+        CStifItemParser& /*aItem*/)
     {
     FTRACE(FPrint(_L("CTmsAudioServicesTestClass::CreateDownlinkStream")));
     iLog->Log(_L("CTmsAudioServicesTestClass::CreateDownlinkStream"));
@@ -1196,8 +1196,7 @@ TInt CTmsAudioServicesTestClass::SetDownlinkFormat(CStifItemParser& /*aItem */)
 
         if (error != KErrNone)
             {
-            iLog->Log(_L("CTmsAudioServicesTestClass::SetDownlinkFormat - failed, return error = %d" ),
-                    error);
+            iLog->Log(_L("CTmsAudioServicesTestClass::SetDownlinkFormat - failed, return error = %d" ), error);
             return error;
             }
         }
@@ -1221,8 +1220,7 @@ TInt CTmsAudioServicesTestClass::ReSetDownlinkFormat(CStifItemParser& /*aItem */
         error = iTmsDnlink->ResetFormat(iTmsFormatDn);
         if (error != KErrNone)
             {
-            iLog->Log(_L("CTmsAudioServicesTestClass::ReSetDownlinkFormat - failed, return error = %d" ),
-                    error);
+            iLog->Log(_L("CTmsAudioServicesTestClass::ReSetDownlinkFormat - failed, return error = %d" ), error);
             return error;
             }
         }
@@ -1273,8 +1271,7 @@ TInt CTmsAudioServicesTestClass::SetUplinkFormat(CStifItemParser& /*aItem */)
         {
         if (iTmsFormatUp)
             {
-            iLog->Log(
-                    _L("CTmsAudioServicesTestClass::SetUplinkFormat - iTmsFormatUp"));
+            iLog->Log(_L("CTmsAudioServicesTestClass::SetUplinkFormat - iTmsFormatUp"));
             error = iTmsUplink->SetFormat(iTmsFormatUp);
             }
         else
@@ -1285,8 +1282,7 @@ TInt CTmsAudioServicesTestClass::SetUplinkFormat(CStifItemParser& /*aItem */)
 
         if (error != KErrNone)
             {
-            iLog->Log(_L("CTmsAudioServicesTestClass::SetUplinkFormat - failed, return error = %d" ),
-                    error);
+            iLog->Log(_L("CTmsAudioServicesTestClass::SetUplinkFormat - failed, return error = %d" ), error);
             return error;
             }
         }
@@ -1397,6 +1393,7 @@ TInt CTmsAudioServicesTestClass::Close(CStifItemParser& aItem)
             iRecBufReady = EFalse;
             //iUpLinkCodec = ENULL;
             iTmsUplink->Deinit();
+            iTmsUplink->RemoveObserver(*this);
             iUpLinkStatus = UNINITIALIZED;
             iLog->Log(_L("Close Uplink"));
             AddExpectedEvent(EUplinkClosed, KMediumTimeout);
@@ -1405,6 +1402,7 @@ TInt CTmsAudioServicesTestClass::Close(CStifItemParser& aItem)
             {
             //iPlayBufPtr.Set(NULL, 0, 0);
             iTmsDnlink->Deinit();
+            iTmsDnlink->RemoveObserver(*this);
             iDnLinkStatus = UNINITIALIZED;
             iPlayBufReady = EFalse;
             // iDnLinkCodec = ENULL;
@@ -1591,7 +1589,7 @@ TInt CTmsAudioServicesTestClass::Gain(CStifItemParser& aItem)
     if (effecttype == TMS_EFFECT_GAIN)
         {
         RDebug::Printf("[TMS STIF] GAIN, GetMaxLevel");
-        ret = static_cast<TMSGainEffect*>(iTmsUplinkEffect)->GetMaxLevel(
+        ret = static_cast<TMSGainEffect*> (iTmsUplinkEffect)->GetMaxLevel(
                 iMaxGain);
         RDebug::Printf("[TMS STIF] GAIN, GetMaxLevel Level [%d] Ret Err [%d]", iMaxGain, ret);
         RDebug::Printf("[TMS STIF] GAIN, SetLevel to [%d]", iMaxGain);
@@ -1599,7 +1597,7 @@ TInt CTmsAudioServicesTestClass::Gain(CStifItemParser& aItem)
         RDebug::Printf("[TMS STIF] GAIN, SetLevel ret [%d]", ret);
         iLog->Log(_L("SetMaxGain: %d"), iMaxGain);
         RDebug::Printf("[TMS STIF] GAIN, GetLevel");
-        ret = static_cast<TMSGainEffect*>(iTmsUplinkEffect)->GetLevel(iGain);
+        ret = static_cast<TMSGainEffect*> (iTmsUplinkEffect)->GetLevel(iGain);
         RDebug::Printf("[TMS STIF] GAIN, Exp Level [%d] Ret Level [%d] Ret Err [%d]", iMaxGain, iGain, ret);
         if (iGain != iMaxGain)
             {
@@ -1607,9 +1605,9 @@ TInt CTmsAudioServicesTestClass::Gain(CStifItemParser& aItem)
             return KErrUnexpectedValue;
             }
 
-        static_cast<TMSGainEffect*>(iTmsUplinkEffect)->SetLevel(0);
+        static_cast<TMSGainEffect*> (iTmsUplinkEffect)->SetLevel(0);
         iLog->Log(_L("MuteMic"));
-        static_cast<TMSGainEffect*>(iTmsUplinkEffect)->GetLevel(iGain);
+        static_cast<TMSGainEffect*> (iTmsUplinkEffect)->GetLevel(iGain);
 
         if (iGain != 0)
             {
@@ -1620,26 +1618,26 @@ TInt CTmsAudioServicesTestClass::Gain(CStifItemParser& aItem)
     else if (effecttype == TMS_EFFECT_GLOBAL_GAIN)
         {
         RDebug::Printf("[TMS STIF] GLOBAL GAIN, GetMaxLevel");
-        ret = static_cast<TMSGlobalGainEffect*>(iGlobalGain)->GetMaxLevel(
+        ret = static_cast<TMSGlobalGainEffect*> (iGlobalGain)->GetMaxLevel(
                 iMaxGain);
         RDebug::Printf("[TMS STIF] GLOBAL GAIN, GetMaxLevel Level [%d] Ret Err [%d]", iMaxGain, ret);
         RDebug::Printf("[TMS STIF] GLOBAL GAIN, SetLevel to [%d]", iMaxGain);
-        ret = static_cast<TMSGlobalGainEffect*>(iGlobalGain)->SetLevel(
+        ret = static_cast<TMSGlobalGainEffect*> (iGlobalGain)->SetLevel(
                 iMaxGain);
         RDebug::Printf("[TMS STIF] GLOBAL GAIN, SetLevel ret [%d]", ret);
-        iLog->Log(_L("SetGlobleMaxGain: %d"), iMaxGain);
+        iLog->Log(_L("SetGlobalMaxGain: %d"), iMaxGain);
         RDebug::Printf("[TMS STIF] GLOBAL GAIN, GetLevel");
         ret = static_cast<TMSGlobalGainEffect*>(iGlobalGain)->GetLevel(iGain);
         RDebug::Printf("[TMS STIF] GLOBAL GAIN, Exp Level [%d] Ret Level [%d] Ret Err [%d]", iMaxGain, iGain, ret);
         if (iGain != iMaxGain)
             {
-            iLog->Log(_L("GetGain doesn't return expected Globle MaxGain!!! returned Gain = %d"), iGain);
+            iLog->Log(_L("GetGain doesn't return expected Global MaxGain!!! returned Gain = %d"), iGain);
             return KErrUnexpectedValue;
             }
 
-        static_cast<TMSGlobalGainEffect*>(iGlobalGain)->SetLevel(0);
+        static_cast<TMSGlobalGainEffect*> (iGlobalGain)->SetLevel(0);
         iLog->Log(_L("MuteMic"));
-        static_cast<TMSGlobalGainEffect*>(iGlobalGain)->GetLevel(iGain);
+        static_cast<TMSGlobalGainEffect*> (iGlobalGain)->GetLevel(iGain);
 
         if (iGain != 0)
             {
@@ -1665,16 +1663,16 @@ TInt CTmsAudioServicesTestClass::Volume(CStifItemParser& aItem)
     if (effecttype == TMS_EFFECT_VOLUME)
         {
         RDebug::Printf("[TMS STIF] Volume, GetMaxLevel");
-        ret = static_cast<TMSVolumeEffect*>(iTmsDnlinkEffect)->GetMaxLevel(
+        ret = static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->GetMaxLevel(
                 iMaxVolume);
         RDebug::Printf("[TMS STIF] MaxLevel [%d] Ret Error [%d]", iMaxVolume, ret);
         RDebug::Printf("[TMS STIF] Volume, SetLevel to MaxLevel [%d]", iMaxVolume);
-        ret = static_cast<TMSVolumeEffect*>(iTmsDnlinkEffect)->SetLevel(
+        ret = static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->SetLevel(
                 iMaxVolume);
         RDebug::Printf("[TMS STIF] SetLevel Ret Error [%d]", ret);
         iLog->Log(_L("SetMaxVolume: %d"), iMaxVolume);
         RDebug::Printf("[TMS STIF] GetLevel");
-        ret = static_cast<TMSVolumeEffect*>(iTmsDnlinkEffect)->GetLevel(
+        ret = static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->GetLevel(
                 iVolume);
         RDebug::Printf("[TMS STIF] Level [%d] Ret Error [%d]", iVolume, ret);
         if (iVolume != iMaxVolume)
@@ -1684,10 +1682,10 @@ TInt CTmsAudioServicesTestClass::Volume(CStifItemParser& aItem)
             }
 
         RDebug::Printf("[TMS STIF] Volume, SetLevel to 0 ");
-        ret = static_cast<TMSVolumeEffect*>(iTmsDnlinkEffect)->SetLevel(0);
+        ret = static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->SetLevel(0);
         RDebug::Printf("[TMS STIF] SetLevel Ret Error [%d]", ret);
         iLog->Log(_L("Mute Volume"));
-        ret = static_cast<TMSVolumeEffect*>(iTmsDnlinkEffect)->GetLevel(
+        ret = static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->GetLevel(
                 iVolume);
         RDebug::Printf("[TMS STIF] Level [%d] Ret Error [%d]", iVolume, ret);
         if (iVolume != 0)
@@ -1699,34 +1697,34 @@ TInt CTmsAudioServicesTestClass::Volume(CStifItemParser& aItem)
     else if (effecttype == TMS_EFFECT_GLOBAL_VOL)
         {
         RDebug::Printf("[TMS STIF] GLOBAL_VOL, Get Current Level");
-        ret = static_cast<TMSGlobalVolEffect*>(iGlobalVol)->GetLevel(iVolume);
+        ret = static_cast<TMSGlobalVolEffect*> (iGlobalVol)->GetLevel(iVolume);
         RDebug::Printf("[TMS STIF] Current Vol Level [%d] Ret Error [%d]", iVolume, ret);
         RDebug::Printf("[TMS STIF] GLOBAL_VOL, GetMaxLevel");
-        ret = static_cast<TMSGlobalVolEffect*>(iGlobalVol)->GetMaxLevel(
+        ret = static_cast<TMSGlobalVolEffect*> (iGlobalVol)->GetMaxLevel(
                 iMaxVolume);
         RDebug::Printf("[TMS STIF] MaxLevel [%d] Ret Error [%d]", iMaxVolume, ret);
         RDebug::Printf("[TMS STIF] GLOBAL_VOL, SetLevel to [%d]", iMaxVolume);
-        ret = static_cast<TMSGlobalVolEffect*>(iGlobalVol)->SetLevel(
+        ret = static_cast<TMSGlobalVolEffect*> (iGlobalVol)->SetLevel(
                 iMaxVolume);
         RDebug::Printf("[TMS STIF] SetLevel Ret Error [%d]", ret);
-        iLog->Log(_L("SetMaxGlobleVolume: %d"), iMaxVolume);
+        iLog->Log(_L("SetMaxGlobalVolume: %d"), iMaxVolume);
         RDebug::Printf("[TMS STIF] GLOBAL_VOL,GetLevel");
-        ret = static_cast<TMSGlobalVolEffect*>(iGlobalVol)->GetLevel(iVolume);
+        ret = static_cast<TMSGlobalVolEffect*> (iGlobalVol)->GetLevel(iVolume);
         RDebug::Printf("[TMS STIF] Expected Level [%d] Ret Level [%d] Ret Error [%d]", iMaxVolume, iVolume, ret);
-        iLog->Log(_L("GetMaxGlobleVolume: %d"), iVolume);
+        iLog->Log(_L("GetMaxGlobalVolume: %d"), iVolume);
         if (iVolume != iMaxVolume)
             {
-            iLog->Log(_L("GetGlobleVolume doesn't return expected MaxVolume!!! returned Volume = %d"), iVolume);
+            iLog->Log(_L("GetGlobalVolume doesn't return expected MaxVolume!!! returned Volume = %d"), iVolume);
             return KErrUnexpectedValue;
             }
 
-        static_cast<TMSGlobalVolEffect*>(iGlobalVol)->SetLevel(0);
-        iLog->Log(_L("Mute Globle Volume"));
-        static_cast<TMSGlobalVolEffect*>(iGlobalVol)->GetLevel(iVolume);
+        static_cast<TMSGlobalVolEffect*> (iGlobalVol)->SetLevel(0);
+        iLog->Log(_L("Mute Global Volume"));
+        static_cast<TMSGlobalVolEffect*> (iGlobalVol)->GetLevel(iVolume);
 
         if (iVolume != 0)
             {
-            iLog->Log(_L("GetGlobleVolume does not return expected Mute value!!! returned Volume = %d"), iVolume);
+            iLog->Log(_L("GetGlobalVolume does not return expected Mute value!!! returned Volume = %d"), iVolume);
             return KErrUnexpectedValue;
             }
         }
@@ -1808,7 +1806,8 @@ TInt CTmsAudioServicesTestClass::GetStreamState(CStifItemParser& aItem)
     return error;
     }
 
-TInt CTmsAudioServicesTestClass::AddGlobalRoutingObserver(CStifItemParser& /*aItem */)
+TInt CTmsAudioServicesTestClass::AddGlobalRoutingObserver(
+        CStifItemParser& /*aItem */)
     {
     iLog->Log(_L("CTmsAudioServicesTestClass::AddGlobalRoutingObserver"));
     TInt error = KErrNone;
@@ -1825,7 +1824,8 @@ TInt CTmsAudioServicesTestClass::AddGlobalRoutingObserver(CStifItemParser& /*aIt
     return error;
     }
 
-TInt CTmsAudioServicesTestClass::DeleteGlobalRoutingObserver(CStifItemParser& /*aItem*/)
+TInt CTmsAudioServicesTestClass::DeleteGlobalRoutingObserver(
+        CStifItemParser& /*aItem*/)
     {
     iLog->Log(_L("CTmsAu dioServicesTestClass::DeleteGlobalRoutingObserver"));
     TInt error = KErrNone;
@@ -1898,7 +1898,7 @@ TInt CTmsAudioServicesTestClass::SetOutput(CStifItemParser& aItem)
             return error;
             }
 
-        AddExpectedEvent(ESetOutputComplete, KLongTimeout);
+        AddExpectedEvent(ESetOutputComplete, KShortTimeout);
         }
 
     return error;
@@ -2159,8 +2159,7 @@ TInt CTmsAudioServicesTestClass::SetBitrates(CStifItemParser& aItem)
             {
             if (iBitratesVector.size() > 0)
                 {
-                std::vector<guint>::iterator iBitrate =
-                        iBitratesVector.begin();
+                std::vector<guint>::iterator iBitrate = iBitratesVector.begin();
                 error = iTmsFormatUp -> SetBitRate(*iBitrate);
                 iLog->Log(_L("BR set %d"), *iBitrate);
                 }
@@ -2241,13 +2240,16 @@ TInt CTmsAudioServicesTestClass::GetVAD(CStifItemParser& /*aItem*/)
     switch (iUpLinkCodec)
         {
         case TMS_FORMAT_G711:
-            error = static_cast<TMSG711Format*>(iTmsFormatUp)->GetVADMode(aVad);
+            error = static_cast<TMSG711Format*> (iTmsFormatUp)->GetVADMode(
+                    aVad);
             break;
         case TMS_FORMAT_G729:
-            error = static_cast<TMSG729Format*>(iTmsFormatUp)->GetVADMode(aVad);
+            error = static_cast<TMSG729Format*> (iTmsFormatUp)->GetVADMode(
+                    aVad);
             break;
         case TMS_FORMAT_ILBC:
-            error = static_cast<TMSILBCFormat*>(iTmsFormatUp)->GetVADMode(aVad);
+            error = static_cast<TMSILBCFormat*> (iTmsFormatUp)->GetVADMode(
+                    aVad);
             break;
         default:
             break;
@@ -2272,13 +2274,16 @@ TInt CTmsAudioServicesTestClass::ToggleVAD(CStifItemParser & /*aItem*/)
     switch (iUpLinkCodec)
         {
         case TMS_FORMAT_G711:
-            error = static_cast<TMSG711Format*>(iTmsFormatUp)->SetVADMode(iVad);
+            error = static_cast<TMSG711Format*> (iTmsFormatUp)->SetVADMode(
+                    iVad);
             break;
         case TMS_FORMAT_G729:
-            error = static_cast<TMSG729Format*>(iTmsFormatUp)->SetVADMode(iVad);
+            error = static_cast<TMSG729Format*> (iTmsFormatUp)->SetVADMode(
+                    iVad);
             break;
         case TMS_FORMAT_ILBC:
-            error = static_cast<TMSILBCFormat*>(iTmsFormatUp)->SetVADMode(iVad);
+            error = static_cast<TMSILBCFormat*> (iTmsFormatUp)->SetVADMode(
+                    iVad);
             break;
         default:
             break;
@@ -2298,7 +2303,7 @@ TInt CTmsAudioServicesTestClass::GetMode(CStifItemParser& aItem)
         if ((linkType == KTagUplink) && (iUpLinkCodec == TMS_FORMAT_G711))
             {
             TMSG711CodecMode aMode;
-            static_cast<TMSG711Format*>(iTmsFormatUp)->GetMode(aMode);
+            static_cast<TMSG711Format*> (iTmsFormatUp)->GetMode(aMode);
 
             if (aMode == TMS_G711_CODEC_MODE_ALAW)
                 {
@@ -2317,7 +2322,7 @@ TInt CTmsAudioServicesTestClass::GetMode(CStifItemParser& aItem)
                 && (iUpLinkCodec == TMS_FORMAT_ILBC))
             {
             TMSILBCCodecMode aMode;
-            static_cast<TMSILBCFormat*>(iTmsFormatUp)->GetMode(aMode);
+            static_cast<TMSILBCFormat*> (iTmsFormatUp)->GetMode(aMode);
 
             if (aMode == TMS_ILBC_CODEC_MODE_20MS_FRAME)
                 {
@@ -2336,7 +2341,7 @@ TInt CTmsAudioServicesTestClass::GetMode(CStifItemParser& aItem)
                 && (iDnLinkCodec == TMS_FORMAT_G711))
             {
             TMSG711CodecMode aMode;
-            static_cast<TMSG711Format*>(iTmsFormatDn)->GetMode(aMode);
+            static_cast<TMSG711Format*> (iTmsFormatDn)->GetMode(aMode);
 
             if (aMode == TMS_G711_CODEC_MODE_ALAW)
                 {
@@ -2355,7 +2360,7 @@ TInt CTmsAudioServicesTestClass::GetMode(CStifItemParser& aItem)
                 && (iDnLinkCodec == TMS_FORMAT_ILBC))
             {
             TMSILBCCodecMode aMode;
-            static_cast<TMSILBCFormat*>(iTmsFormatDn)->GetMode(aMode);
+            static_cast<TMSILBCFormat*> (iTmsFormatDn)->GetMode(aMode);
 
             if (aMode == TMS_ILBC_CODEC_MODE_20MS_FRAME)
                 {
@@ -2398,56 +2403,56 @@ TInt CTmsAudioServicesTestClass::SetMode(CStifItemParser& aItem)
                 && (mode == KTagALaw))
             {
             iLog->Log(_L("UPL Mode Set: aLaw"));
-            static_cast<TMSG711Format*>(iTmsFormatUp)->SetMode(
+            static_cast<TMSG711Format*> (iTmsFormatUp)->SetMode(
                     TMS_G711_CODEC_MODE_ALAW);
             }
         else if ((linkType == KTagUplink)
                 && (iUpLinkCodec == TMS_FORMAT_G711) && (mode == KTagULaw))
             {
             iLog->Log(_L("UPL Mode Set: uLaw"));
-            static_cast<TMSG711Format*>(iTmsFormatUp)->SetMode(
+            static_cast<TMSG711Format*> (iTmsFormatUp)->SetMode(
                     TMS_G711_CODEC_MODE_MULAW);
             }
         else if ((linkType == KTagUplink)
                 && (iUpLinkCodec == TMS_FORMAT_ILBC) && (mode == KTag20ms))
             {
             iLog->Log(_L("UPL Mode Set: 20ms frame"));
-            static_cast<TMSILBCFormat*>(iTmsFormatUp)->SetMode(
+            static_cast<TMSILBCFormat*> (iTmsFormatUp)->SetMode(
                     TMS_ILBC_CODEC_MODE_20MS_FRAME);
             }
         else if ((linkType == KTagUplink)
                 && (iUpLinkCodec == TMS_FORMAT_ILBC) && (mode == KTag30ms))
             {
             iLog->Log(_L("UPL Mode Set: 30ms frame"));
-            static_cast<TMSILBCFormat*>(iTmsFormatUp)->SetMode(
+            static_cast<TMSILBCFormat*> (iTmsFormatUp)->SetMode(
                     TMS_ILBC_CODEC_MODE_30MS_FRAME);
             }
         else if ((linkType == KTagDnlink)
                 && (iDnLinkCodec == TMS_FORMAT_G711) && (mode == KTagALaw))
             {
             iLog->Log(_L("DNL Mode Set: aLaw"));
-            static_cast<TMSG711Format*>(iTmsFormatDn)->SetMode(
+            static_cast<TMSG711Format*> (iTmsFormatDn)->SetMode(
                     TMS_G711_CODEC_MODE_ALAW);
             }
         else if ((linkType == KTagDnlink)
                 && (iDnLinkCodec == TMS_FORMAT_G711) && (mode == KTagULaw))
             {
             iLog->Log(_L("DNL Mode Set: uLaw"));
-            static_cast<TMSG711Format*>(iTmsFormatDn)->SetMode(
+            static_cast<TMSG711Format*> (iTmsFormatDn)->SetMode(
                     TMS_G711_CODEC_MODE_MULAW);
             }
         else if ((linkType == KTagDnlink)
                 && (iDnLinkCodec == TMS_FORMAT_ILBC) && (mode == KTag20ms))
             {
             iLog->Log(_L("DNL Mode Set: 20ms frame"));
-            static_cast<TMSILBCFormat*>(iTmsFormatDn)->SetMode(
+            static_cast<TMSILBCFormat*> (iTmsFormatDn)->SetMode(
                     TMS_ILBC_CODEC_MODE_20MS_FRAME);
             }
         else if ((linkType == KTagDnlink)
                 && (iDnLinkCodec == TMS_FORMAT_ILBC) && (mode == KTag30ms))
             {
             iLog->Log(_L("DNL Mode Set: 30ms frame"));
-            static_cast<TMSILBCFormat*>(iTmsFormatDn)->SetMode(
+            static_cast<TMSILBCFormat*> (iTmsFormatDn)->SetMode(
                     TMS_ILBC_CODEC_MODE_30MS_FRAME);
             }
         else
@@ -2468,11 +2473,11 @@ TInt CTmsAudioServicesTestClass::GetCNG(CStifItemParser& /*aItem*/)
     switch (iDnLinkCodec)
         {
         case TMS_FORMAT_G711:
-            error = static_cast<TMSG711Format*>(iTmsFormatDn)->GetCNG(aCng);
+            error = static_cast<TMSG711Format*> (iTmsFormatDn)->GetCNG(aCng);
             iLog->Log(_L("CNG: %d"), aCng);
             break;
         case TMS_FORMAT_ILBC:
-            error = static_cast<TMSILBCFormat*>(iTmsFormatDn)->GetCNG(aCng);
+            error = static_cast<TMSILBCFormat*> (iTmsFormatDn)->GetCNG(aCng);
             iLog->Log(_L("CNG: %d"), aCng);
             break;
         default:
@@ -2489,18 +2494,17 @@ TInt CTmsAudioServicesTestClass::GetCNG(CStifItemParser& /*aItem*/)
 
 TInt CTmsAudioServicesTestClass::ToggleCNG(CStifItemParser & /*aItem*/)
     {
-
     iLog ->Log(_L("CTmsAudioServicesTestClass::ToggleCNG"));
     TInt error = KErrNone;
     iCng = (iCng) ? EFalse : ETrue;
     switch (iDnLinkCodec)
         {
         case TMS_FORMAT_G711:
-            static_cast<TMSG711Format*>(iTmsFormatDn)->SetCNG(iCng);
+            static_cast<TMSG711Format*> (iTmsFormatDn)->SetCNG(iCng);
             iLog->Log(_L("CNG set: %d"), iCng);
             break;
         case TMS_FORMAT_ILBC:
-            static_cast<TMSILBCFormat*>(iTmsFormatDn)->SetCNG(iCng);
+            static_cast<TMSILBCFormat*> (iTmsFormatDn)->SetCNG(iCng);
             iLog->Log(_L("CNG set: %d"), iCng);
             break;
         default:
@@ -2516,7 +2520,7 @@ TInt CTmsAudioServicesTestClass::GetPLC(CStifItemParser& /*aItem*/)
     TBool aPlc = EFalse;
     if (iDnLinkCodec == TMS_FORMAT_G711)
         {
-        static_cast<TMSG711Format*>(iTmsFormatDn)->GetPlc(aPlc);
+        static_cast<TMSG711Format*> (iTmsFormatDn)->GetPlc(aPlc);
         iLog->Log(_L("PLC: %d"), aPlc);
         }
 
@@ -2536,7 +2540,7 @@ TInt CTmsAudioServicesTestClass::TogglePLC(CStifItemParser & /*aItem*/)
     iPlc = (iPlc) ? EFalse : ETrue;
     if (iDnLinkCodec == TMS_FORMAT_G711)
         {
-        error = static_cast<TMSG711Format*>(iTmsFormatDn)->SetPlc(iPlc);
+        error = static_cast<TMSG711Format*> (iTmsFormatDn)->SetPlc(iPlc);
         iLog->Log(_L("PLC set: %d"), iPlc);
         }
 
@@ -2560,9 +2564,7 @@ TInt CTmsAudioServicesTestClass::AddClientSrcToDnlStream(CStifItemParser& /*aIte
         {
         error = iTmsDnlink->AddSource(iTmsClientSource);
         }
-    iLog->Log(
-            _L("CTmsAudioServicesTestClass::AddClientSrcToDnlStream Error [%d]"),
-            error);
+    iLog->Log(_L("CTmsAudioServicesTestClass::AddClientSrcToDnlStream Error [%d]"), error);
     return error;
     }
 
@@ -2640,7 +2642,7 @@ TInt CTmsAudioServicesTestClass::AddSourceObserver(CStifItemParser& /*aItem*/)
     TInt error = KErrNone;
     if (iTmsClientSource)
         {
-        error = static_cast<TMSClientSource*>(iTmsClientSource)->AddObserver(
+        error = static_cast<TMSClientSource*> (iTmsClientSource)->AddObserver(
                 *this, NULL);
         }
     return error;
@@ -2653,8 +2655,7 @@ TInt CTmsAudioServicesTestClass::RemoveSourceObserver(
     TInt error = KErrNone;
     if (iTmsClientSource)
         {
-        error = static_cast<TMSClientSource*>(iTmsClientSource)->RemoveObserver(
-                *this);
+        error = static_cast<TMSClientSource*> (iTmsClientSource)->RemoveObserver(*this);
         }
     return error;
     }
@@ -2739,8 +2740,8 @@ TInt CTmsAudioServicesTestClass::AddSinkObserver(CStifItemParser& /*aItem*/)
     TInt error = KErrNone;
     if (iTmsUplink && iTmsClientSink)
         {
-        error = static_cast<TMSClientSink*>(iTmsClientSink)->AddObserver(*this,
-                NULL);
+        error = static_cast<TMSClientSink*> (iTmsClientSink)->AddObserver(
+                *this, NULL);
         }
     return error;
     }
@@ -2751,7 +2752,7 @@ TInt CTmsAudioServicesTestClass::RemoveSinkObserver(CStifItemParser& /*aItem*/)
     TInt error = KErrNone;
     if (iTmsUplink && iTmsClientSink)
         {
-        error = static_cast<TMSClientSink*>(iTmsClientSink)->RemoveObserver(
+        error = static_cast<TMSClientSink*> (iTmsClientSink)->RemoveObserver(
                 *this);
         }
     return error;
@@ -2766,30 +2767,29 @@ gint CTmsAudioServicesTestClass::CreateVolumeEffect()
         status = iFactory->CreateEffect(TMS_EFFECT_VOLUME, iTmsDnlinkEffect);
         if (status == KErrNone)
             {
-            static_cast<TMSVolumeEffect*>(iTmsDnlinkEffect)->AddObserver(*this,
-                    NULL);
+            static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->AddObserver(
+                    *this, NULL);
             }
         }
     RDebug::Printf("[TMS STIF] CreateVolumeEffect Return [%d]", status);
     return status;
     }
 
-gint CTmsAudioServicesTestClass::CreateVolumeGlobleEffect()
+gint CTmsAudioServicesTestClass::CreateVolumeGlobalEffect()
     {
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateVolumeGlobleEffect"));
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateVolumeGlobalEffect"));
     gint status(KErrNone);
     if (iFactory && !iGlobalVol)
         {
         status = iFactory->CreateEffect(TMS_EFFECT_GLOBAL_VOL, iGlobalVol);
-
         if (status == KErrNone)
             {
-            static_cast<TMSGlobalVolEffect*>(iGlobalVol)->AddObserver(*this,
+            static_cast<TMSGlobalVolEffect*> (iGlobalVol)->AddObserver(*this,
                     NULL);
-            iLog->Log(_L("CTmsAudioServicesTestClass::CreateVolumeGlobleEffect - AddObserver"));
+            iLog->Log(_L("CTmsAudioServicesTestClass::CreateVolumeGlobalEffect - AddObserver"));
             }
         }
-    RDebug::Printf("[TMS STIF] CreateVolumeGlobleEffect Return [%d]", status);
+    RDebug::Printf("[TMS STIF] CreateVolumeGlobalEffect Return [%d]", status);
     return status;
     }
 
@@ -2805,10 +2805,10 @@ TInt CTmsAudioServicesTestClass::AddVolumeEffectToStream(
     return error;
     }
 
-TInt CTmsAudioServicesTestClass::AddGlobleVolumeEffectToStream(
+TInt CTmsAudioServicesTestClass::AddGlobalVolumeEffectToStream(
         CStifItemParser& /*aItem*/)
     {
-    iLog->Log(_L("CTmsAudioServicesTestClass::AddGlobleVolumeEffectToStream"));
+    iLog->Log(_L("CTmsAudioServicesTestClass::AddGlobalVolumeEffectToStream"));
     TInt error = KErrNone;
     if (iTmsDnlink && iGlobalVol)
         {
@@ -2817,10 +2817,10 @@ TInt CTmsAudioServicesTestClass::AddGlobleVolumeEffectToStream(
     return error;
     }
 
-TInt CTmsAudioServicesTestClass::RemoveGlobleVolumeEffectToStream(
+TInt CTmsAudioServicesTestClass::RemoveGlobalVolumeEffectToStream(
         CStifItemParser& /*aItem*/)
     {
-    iLog->Log(_L("CTmsAudioServicesTestClass::RemoveGlobleVolumeEffectToStream"));
+    iLog->Log(_L("CTmsAudioServicesTestClass::RemoveGlobalVolumeEffectToStream"));
     TInt error = KErrNone;
     if (iTmsDnlink && iGlobalVol)
         {
@@ -2839,28 +2839,28 @@ gint CTmsAudioServicesTestClass::CreateGainEffect()
         status = iFactory->CreateEffect(TMS_EFFECT_GAIN, iTmsUplinkEffect);
         if (status == KErrNone)
             {
-            static_cast<TMSGainEffect*>(iTmsUplinkEffect)->AddObserver(*this,
-                    NULL);
+            static_cast<TMSGainEffect*> (iTmsUplinkEffect)->AddObserver(
+                    *this, NULL);
             }
         }
     RDebug::Printf("[TMS STIF] CreateGainEffect Return [%d]", status);
     return status;
     }
 
-gint CTmsAudioServicesTestClass::CreateGlobleGainEffect()
+gint CTmsAudioServicesTestClass::CreateGlobalGainEffect()
     {
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateGlobleGainEffect"));
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateGlobalGainEffect"));
     gint status(KErrNone);
     if (iFactory && !iGlobalGain)
         {
         status = iFactory->CreateEffect(TMS_EFFECT_GLOBAL_GAIN, iGlobalGain);
         if (status == KErrNone)
             {
-            static_cast<TMSGlobalGainEffect*>(iGlobalGain)->AddObserver(*this,
-                    NULL);
+            static_cast<TMSGlobalGainEffect*> (iGlobalGain)->AddObserver(
+                    *this, NULL);
             }
         }
-    RDebug::Printf("[TMS STIF] CreateGlobleGainEffect Return [%d]", status);
+    RDebug::Printf("[TMS STIF] CreateGlobalGainEffect Return [%d]", status);
     return status;
     }
 
@@ -2876,10 +2876,10 @@ TInt CTmsAudioServicesTestClass::AddGainEffectToStream(
     return error;
     }
 
-TInt CTmsAudioServicesTestClass::AddGlobleGainEffectToStream(
+TInt CTmsAudioServicesTestClass::AddGlobalGainEffectToStream(
         CStifItemParser& /*aItem*/)
     {
-    iLog->Log(_L("CTmsAudioServicesTestClass::AddGlobleGainEffectToStream"));
+    iLog->Log(_L("CTmsAudioServicesTestClass::AddGlobalGainEffectToStream"));
     TInt error = KErrNone;
     if (iTmsUplink && iGlobalGain)
         {
@@ -2888,10 +2888,10 @@ TInt CTmsAudioServicesTestClass::AddGlobleGainEffectToStream(
     return error;
     }
 
-TInt CTmsAudioServicesTestClass::RemoveGlobleGainEffectToStream(
+TInt CTmsAudioServicesTestClass::RemoveGlobalGainEffectToStream(
         CStifItemParser& /*aItem*/)
     {
-    iLog->Log(_L("CTmsAudioServicesTestClass::RemoveGlobleGainEffectToStream"));
+    iLog->Log(_L("CTmsAudioServicesTestClass::RemoveGlobalGainEffectToStream"));
     TInt error = KErrNone;
     if (iTmsUplink && iGlobalGain)
         {
@@ -2925,12 +2925,12 @@ void CTmsAudioServicesTestClass::DoLoopback()
 
         Mem::Copy(desptr, srcptr, srcsize);
 
-        static_cast<TMSClientSource*>(iTmsClientSource)->BufferFilled(
+        static_cast<TMSClientSource*> (iTmsClientSource)->BufferFilled(
                 *iPlayBuf);
-        static_cast<TMSClientSink*>(iTmsClientSink)->BufferProcessed(iRecBuf);
+        static_cast<TMSClientSink*> (iTmsClientSink)->BufferProcessed(iRecBuf);
 
         iPlayBufReady = EFalse; // buf filled, ready for FillBuffer
-        iRecBufReady = EFalse; // buf consumed, ready for EmptyBuffer
+        iRecBufReady = EFalse;  // buf consumed, ready for EmptyBuffer
         }
 
     iLog->Log(_L("CTmsAudioServicesTestClass::DoLoopback END"));

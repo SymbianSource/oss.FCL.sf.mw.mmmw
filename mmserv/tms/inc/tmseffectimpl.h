@@ -29,13 +29,9 @@ class TMSEffect;
 class TMSEffectImpl
     {
 public:
-    ~TMSEffectImpl();
     IMPORT_C static gint Create(TMSEffectType effecttype,
             TMSEffect*& tmseffect);
     IMPORT_C static gint Delete(TMSEffect*& tmseffect);
-
-private:
-    TMSEffectImpl();
     };
 
 } //namespace TMS

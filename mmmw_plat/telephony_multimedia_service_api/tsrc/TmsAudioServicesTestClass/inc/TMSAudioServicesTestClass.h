@@ -104,8 +104,7 @@ _LIT( KTagPublic, "Public");
 _LIT( KTagPrivate, "Private");
 
 // MACROS
-//#define ?macro ?macro_def
-// Logging path
+
 #ifdef __WINSCW__
 _LIT( KTmsAudioServicesTestClassLogPath, "\\logs\\testframework\\" );
 _LIT16(KTestFile1, "\\testing\\data\\alarm 1.aac");
@@ -332,6 +331,7 @@ private:
     TInt CreateUplinkStream(CStifItemParser& aItem);
     TInt GetUplinkVersion(CStifItemParser& aItem);
     TInt GetSupportedFormats(CStifItemParser& aItem);
+
     TInt IsCallTypeSupported(CStifItemParser& aItem);
     TInt SetDownlinkFormat(CStifItemParser& aItem);
     TInt SetUplinkFormat(CStifItemParser& aItem);
@@ -347,7 +347,6 @@ private:
     TInt Gain(CStifItemParser& aItem);
     TInt Volume(CStifItemParser& aItem);
 
-    TInt GetBufferType(CStifItemParser& aItem);
 
     //  TInt GetSupportedBitrates( CStifItemParser& aItem );
 
@@ -369,6 +368,7 @@ private:
     void DisplayFormat(TMSFormatType aFormat);
     void GetSupportedBitrates(RArray<TUint>& aBrArr);
     void DisplayDevice(TMSAudioOutput device);
+    TInt GetBufferType(CStifItemParser& aItem);
 
     TInt ConfigEncAudDevice(CStifItemParser& aItem);
 
@@ -391,15 +391,15 @@ private:
     TInt RemoveSinkObserver(CStifItemParser& aItem);
 
     gint CreateVolumeEffect();
-    gint CreateVolumeGlobleEffect();
+    gint CreateVolumeGlobalEffect();
     TInt AddVolumeEffectToStream(CStifItemParser& aItem);
-    TInt AddGlobleVolumeEffectToStream(CStifItemParser& aItem);
-    TInt RemoveGlobleVolumeEffectToStream(CStifItemParser& aItem);
+    TInt AddGlobalVolumeEffectToStream(CStifItemParser& aItem);
+    TInt RemoveGlobalVolumeEffectToStream(CStifItemParser& aItem);
     gint CreateGainEffect();
-    gint CreateGlobleGainEffect();
+    gint CreateGlobalGainEffect();
     TInt AddGainEffectToStream(CStifItemParser& aItem);
-    TInt AddGlobleGainEffectToStream(CStifItemParser& aItem);
-    TInt RemoveGlobleGainEffectToStream(CStifItemParser& aItem);
+    TInt AddGlobalGainEffectToStream(CStifItemParser& aItem);
+    TInt RemoveGlobalGainEffectToStream(CStifItemParser& aItem);
     TInt GetStreamType(CStifItemParser& aItem);
     TInt GetStreamState(CStifItemParser& aItem);
 

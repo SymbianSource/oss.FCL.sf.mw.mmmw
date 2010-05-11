@@ -35,23 +35,23 @@ SOURCEPATH      ../src
 
 SOURCE          tmscallserver.cpp
 SOURCE          tmscallsrvrstart.cpp
-SOURCE          delaytimer.cpp
+SOURCE          tmsdelaytimer.cpp
 SOURCE          tmscallsession.cpp
-SOURCE          calladpt.cpp
-SOURCE          callcsadpt.cpp
-SOURCE          callipadpt.cpp
-SOURCE          ipcallstreambase.cpp
+SOURCE          tmscalladpt.cpp
+SOURCE          tmscallcsadpt.cpp
+SOURCE          tmscallipadpt.cpp
+SOURCE          tmsipcallstreambase.cpp
 #ifdef __USE_GSTREAMER__
-SOURCE          ipcalldownlink.cpp
-SOURCE          ipcalluplink.cpp
+SOURCE          tmsipcalldownlink.cpp
+SOURCE          tmsipcalluplink.cpp
 #else //__USE_GSTREAMER__
-SOURCE          ipcalldownlinkds.cpp
-SOURCE          ipcalluplinkds.cpp
+SOURCE          tmsipcalldownlinkds.cpp
+SOURCE          tmsipcalluplinkds.cpp
 #endif //__USE_GSTREAMER__
-SOURCE          cspdevsound.cpp
-SOURCE          csdownlink.cpp
-SOURCE          csuplink.cpp
-SOURCE          tarsettings.cpp
+SOURCE          tmscsdevsound.cpp
+SOURCE          tmscsdownlink.cpp
+SOURCE          tmscsuplink.cpp
+SOURCE          tmstarsettings.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../inc

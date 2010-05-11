@@ -16,9 +16,9 @@
  */
 
 #include <tms.h>
-#include "callipadpt.h"
-#include "callcsadpt.h"
-#include "calladpt.h"
+#include "tmscallipadpt.h"
+#include "tmscallcsadpt.h"
+#include "tmscalladpt.h"
 #include "tmsutility.h"
 
 using namespace TMS;

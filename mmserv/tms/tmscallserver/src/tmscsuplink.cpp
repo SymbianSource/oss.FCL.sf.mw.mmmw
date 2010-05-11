@@ -16,8 +16,8 @@
  */
 
 #include <AudioPreference.h>
-#include "csuplink.h"
-#include "mcspdevsoundobserver.h"
+#include "tmscsuplink.h"
+#include "tmscsdevsoundobserver.h"
 
 using namespace TMS;
 

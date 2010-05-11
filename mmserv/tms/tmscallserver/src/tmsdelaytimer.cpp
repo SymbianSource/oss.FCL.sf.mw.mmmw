@@ -16,7 +16,7 @@
  */
 
 // INCLUDE FILES
-#include "delaytimer.h"
+#include "tmsdelaytimer.h"
 #include "tmsutility.h"
 
 using namespace TMS;

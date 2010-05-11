@@ -23,7 +23,7 @@
 #include <G729DecoderIntfc.h>
 #include <ErrorConcealmentIntfc.h>
 #include "tmsutility.h"
-#include "ipcallstream.h"
+#include "tmsipcallstream.h"
 
 using namespace TMS;
 
