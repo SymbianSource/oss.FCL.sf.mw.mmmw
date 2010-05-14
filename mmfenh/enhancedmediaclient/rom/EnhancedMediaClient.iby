@@ -29,9 +29,7 @@ file=ABI_DIR\BUILD_DIR\DataSourceConfigIntfc.dll            SHARED_LIB_DIR\DataS
 
 
 file=ABI_DIR\BUILD_DIR\EnhancedMediaClient.dll	            SHARED_LIB_DIR\EnhancedMediaClient.dll
-file=ABI_DIR\BUILD_DIR\TransferRateMonitor.dll		        SHARED_LIB_DIR\TransferRateMonitor.dll
 
-ECOM_PLUGIN(ProgDLSource.dll,ProgDLSource.rsc)
 ECOM_PLUGIN(DataBufferSource.DLL,DataBufferSource.rsc)
 ECOM_PLUGIN(FileSource.DLL,FileSource.rsc)
 ECOM_PLUGIN(DescriptorDataSource.DLL,DescriptorDataSource.rsc)

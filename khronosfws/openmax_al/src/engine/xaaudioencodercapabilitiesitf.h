@@ -20,7 +20,7 @@
 
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
-
+#include "xacapabilitiesmgr.h"
 /** MACROS **/
 
 /** TYPES **/
@@ -40,6 +40,7 @@ typedef struct XAAudioEncoderCapabilitiesItfImpl_
     XAmilliHertz sampleRateArray[10];
     XAuint32 bitRateArray[10];
     void* mmfEngine;
+    XACapabilities* capslist;
 } XAAudioEncoderCapabilitiesItfImpl;
 
 /* Base interface XAAudioEncoderCapabilitiesItf implementation */
@@ -55,7 +56,7 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
                             XAAudioCodecDescriptor* pCapabilities);
 
 /* XAAudioEncoderCapabilitiesItfImpl -specific methods */
-XAAudioEncoderCapabilitiesItfImpl* XAAudioEncoderCapabilitiesItfImpl_Create(void);
+XAAudioEncoderCapabilitiesItfImpl* XAAudioEncoderCapabilitiesItfImpl_Create(XACapabilities* caps);
 void XAAudioEncoderCapabilitiesItfImpl_Free(XAAudioEncoderCapabilitiesItfImpl* self);
 
 #endif /* XAAUDIOENCODERCAPABILITIESITF_H */

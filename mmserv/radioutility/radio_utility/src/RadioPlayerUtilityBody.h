@@ -185,14 +185,14 @@ public:
 private:
 
     void ConstructL();
-    CBody();
+    CBody( RRadioSession& aRadioSession, MRadioPlayerObserver& aObserver );
 
 private: // data
 
     // The radio server session
-    RRadioSession* iRadioSession; // not own
+    RRadioSession& iRadioSession;
     // Player utility observer
-    MRadioPlayerObserver* iRadioPlayerUtilityClient; // not own
+    MRadioPlayerObserver& iRadioPlayerUtilityClient;
     };
 
 #endif  // C_RADIOPLAYERUTILITY_H

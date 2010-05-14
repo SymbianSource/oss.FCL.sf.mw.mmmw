@@ -27,27 +27,61 @@ const TInt KFontSize = 15;
 
 const TOperationsPage KKeyMap[KKeyMapPageCount] =
     {
-        {STR("Standard controls"), 5, // default softkey index
-           {
-               // Enter
-               {STR(""),                   KOperation_ExecuteOption},
-               // Up / Down / Left / Right
-               {STR(""),                   KOperation_PreviousOption},
-               {STR(""),                   KOperation_NextOption},
-               {STR(""),                   KOperation_PreviousOptionPage},
-               {STR(""),                   KOperation_NextOptionPage},
-               // 0 - 9
-               {STR("Play Default Beep"),  EOperation_PlayDefaultBeep},
-               {STR("Play Clock Alarm"),   EOperation_PlayClockAlarm},
-               {STR("Stop Clock Alarm"),   EOperation_StopClockAlarm},
-               {STR(""),                   KOperation_None},
-               {STR(""),                   KOperation_None},
-               {STR(""),                   KOperation_None},
-               {STR(""),                   KOperation_None},
-               {STR(""),                   KOperation_None},
-               {STR(""),                   KOperation_None},
-               {STR("Exit"),               KOperation_Exit}
-           }
+        {
+        STR("Standard controls"), 5, // default softkey index
+                    {
+                    // Enter
+                                {
+                                STR(""), KOperation_ExecuteOption
+                                },
+                            // Up / Down / Left / Right
+                                {
+                                STR(""), KOperation_PreviousOption
+                                },
+                                {
+                                STR(""), KOperation_NextOption
+                                },
+                                {
+                                STR(""), KOperation_PreviousOptionPage
+                                },
+                                {
+                                STR(""), KOperation_NextOptionPage
+                                },
+                            // 0 - 9
+                                {
+                                        STR("Play Default Beep"),
+                                        EOperation_PlayDefaultBeep
+                                },
+                                {
+                                        STR("Play Clock Alarm"),
+                                        EOperation_PlayClockAlarm
+                                },
+                                {
+                                        STR("Stop Clock Alarm"),
+                                        EOperation_StopClockAlarm
+                                },
+                                {
+                                STR(""), KOperation_None
+                                },
+                                {
+                                STR(""), KOperation_None
+                                },
+                                {
+                                STR(""), KOperation_None
+                                },
+                                {
+                                STR(""), KOperation_None
+                                },
+                                {
+                                STR(""), KOperation_None
+                                },
+                                {
+                                STR(""), KOperation_None
+                                },
+                                {
+                                STR("Exit"), KOperation_Exit
+                                }
+                    }
         }
     };
 
@@ -67,7 +101,7 @@ CStsTester::CStsTester() :
 
 CStsTester::~CStsTester()
     {
-    CSystemToneService::Delete( iSts);
+    CSystemToneService::Delete(iSts);
     }
 
 void CStsTester::InitL()
@@ -78,15 +112,15 @@ void CStsTester::InitL()
 
 void CStsTester::Main()
     {
-    TRAP_IGNORE( MainL() );
+    TRAP_IGNORE(MainL());
     }
 
 void CStsTester::MainL()
     {
-    _LIT( KPlayDefault, "Play Default Beep" );
-    _LIT( KPlayClockAlarm, "Play Clock Alarm" );
-    _LIT( KStopClockAlarm, "Stop Clock Alarm" );
-    _LIT( KExit, "Exit");
+    _LIT(KPlayDefault, "Play Default Beep");
+    _LIT(KPlayClockAlarm, "Play Clock Alarm");
+    _LIT(KStopClockAlarm, "Stop Clock Alarm");
+    _LIT(KExit, "Exit");
 
     bool done = false;
 
@@ -98,8 +132,8 @@ void CStsTester::MainL()
         operations.Append(&KStopClockAlarm);
         operations.Append(&KExit);
 
-        TInt index = SelectFromListL(TPoint(0, 0), iDisplaySize,
-                _L("Select STS operation to perform:"), operations);
+        TInt index = SelectFromListL(TPoint(0, 0), iDisplaySize, _L(
+                "Select STS operation to perform:"), operations);
 
         operations.Reset();
 
@@ -144,8 +178,8 @@ void CStsTester::ExecuteOperation(TInt aOperation, const TDesC& /*aOperationText
             if (iPlayState != EPlaying)
                 {
                 TAG_TIME_PROFILING_BEGIN;
-                iSts->PlayTone(CSystemToneService::EClockAlarm,
-                        iCurrentContext);
+                iSts->PlayAlarm(CSystemToneService::EClockAlarm,
+                        iCurrentContext, *this);
                 TAG_TIME_PROFILING_END;
                 PRINT_TO_CONSOLE_TIME_DIFF;
                 iPlayState = EPlaying;
@@ -155,7 +189,7 @@ void CStsTester::ExecuteOperation(TInt aOperation, const TDesC& /*aOperationText
         case EOperation_StopClockAlarm:
             {
             TAG_TIME_PROFILING_BEGIN;
-            iSts->StopTone(iCurrentContext);
+            iSts->StopAlarm(iCurrentContext);
             TAG_TIME_PROFILING_END;
             PRINT_TO_CONSOLE_TIME_DIFF;
             iPlayState = EStopped;
@@ -165,5 +199,13 @@ void CStsTester::ExecuteOperation(TInt aOperation, const TDesC& /*aOperationText
             {
             break;
             }
+        }
+    }
+
+void CStsTester::PlayAlarmComplete(unsigned int aAlarmContext)
+    {
+    if (aAlarmContext == iCurrentContext)
+        {
+        iPlayState = EStopped;
         }
     }

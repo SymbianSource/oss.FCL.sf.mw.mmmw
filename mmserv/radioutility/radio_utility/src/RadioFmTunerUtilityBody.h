@@ -233,14 +233,14 @@ public:
 private:
 
     void ConstructL();
-    CBody();
+    CBody( RRadioSession& aRadioSession, MRadioFmTunerObserver& aObserver );
 
 private: // data
 
     // The radio server session
-    RRadioSession* iRadioSession; // not own
+    RRadioSession& iRadioSession;
     // Tuner utility observer
-    MRadioFmTunerObserver* iRadioFmTunerUtilityClient; // not own
+    MRadioFmTunerObserver& iRadioFmTunerUtilityClient;
     };
 
 #endif  // C_RADIOFMTUNERUTILITY_H

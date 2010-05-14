@@ -18,11 +18,8 @@
 #ifndef XADYNAMICSOURCEITF_H
 #define XADYNAMICSOURCEITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_   
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xaadptbasectx.h"
+
 /** MACROS **/
 
 /** TYPES **/
@@ -37,10 +34,9 @@ typedef struct XADynamicSourceItfImpl_
     struct XADynamicSourceItf_ itf;
     /* pointer to self */
     struct XADynamicSourceItfImpl_* self;
-#ifdef _GSTREAMER_BACKEND_   
     /* variables */
     XAAdaptationBaseCtx *adaptCtx;
-#endif
+
 } XADynamicSourceItfImpl;
 
 /** METHODS **/
@@ -51,10 +47,8 @@ typedef struct XADynamicSourceItfImpl_
 XAresult XADynamicSourceItfImpl_SetSource(XADynamicSourceItf self,
                                         XADataSource *pDataSource);
 
-#ifdef _GSTREAMER_BACKEND_   
 /* XADynamicSourceItfImpl -specific methods */
 XADynamicSourceItfImpl* XADynamicSourceItfImpl_Create(XAAdaptationBaseCtx *adaptCtx);
-#endif
 void XADynamicSourceItfImpl_Free(XADynamicSourceItfImpl* self);
 
 #endif /* XADYNAMICSOURCEITF_H */

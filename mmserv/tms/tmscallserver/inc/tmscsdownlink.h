@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef CSDOWNLINK_H
-#define CSDOWNLINK_H
+#ifndef TMSCSDOWNLINK_H
+#define TMSCSDOWNLINK_H
 
 #include <glib.h>
 #include "tmscsdevsound.h"
@@ -89,4 +89,4 @@ protected:
 
 } //namespace TMS
 
-#endif // CSDOWNLINK_H
+#endif // TMSCSDOWNLINK_H

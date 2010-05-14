@@ -21,10 +21,10 @@
 #include <string.h>
 
 #include "xaglobals.h"
+#include "xaadptbasectx.h"
 #include "xaaudioencodercapabilitiesitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAStaticCapsAdaptation.h"
-#endif
+#include "xacapabilitiesmgr.h"
+
 /* XAAudioEncoderCapabilitiesItfImpl* GetImpl
  * Description: Validate interface pointer and cast it to implementation pointer.
  */
@@ -73,16 +73,16 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoders(
             }
             else
             {
-#ifdef _GSTREAMER_BACKEND_  
+  
                 XAuint32 i = 0;
-                XAStaticCapsData temp;
+                XACapabilities temp;
                 for( i=0; i<impl->numCodecs; i++ )
                 {
                     /* query encoder id from adaptation using index value */
-                    XAStaticCapsAdapt_GetCapsByIdx(XACAP_ENCODER|XACAP_AUDIO, i, &temp);
+                    XACapabilitiesMgr_GetCapsByIdx(impl->capslist, (XACapsType)(XACAP_ENCODER|XACAP_AUDIO), i, &temp);
                     pEncoderIds[i] = temp.xaid;
                 }
-#endif
+
             pEncoderIds[0] = XA_AUDIOCODEC_AMR;
             pEncoderIds[1] = XA_AUDIOCODEC_AAC;
             pEncoderIds[2] = XA_AUDIOCODEC_PCM;
@@ -108,9 +108,9 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
     XAAudioEncoderCapabilitiesItfImpl* impl = GetImpl(self);
     XAresult res = XA_RESULT_SUCCESS;
 
-#ifdef _GSTREAMER_BACKEND_  
-    XAStaticCapsData temp;
-#endif
+  
+    XACapabilities temp;
+
     DEBUG_API("->XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities");
 
     /*if( !impl || !pIndex || !pDescriptor )*/
@@ -236,53 +236,54 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
         }
     
     
-#ifdef _GSTREAMER_BACKEND_  
-    res = XAStaticCapsAdapt_GetCapsById(XACAP_ENCODER|XACAP_AUDIO, encoderId, &temp);
+  
+    res = XACapabilitiesMgr_GetCapsById(impl->capslist, (XACapsType)(XACAP_ENCODER|XACAP_AUDIO), encoderId, &temp);
    	if( res == XA_RESULT_SUCCESS )
     {
-   		/* map applicable values to XAAudioCodecCapabilities */
-      pDescriptor->maxChannels=temp.maxCh;
-      pDescriptor->minSampleRate=temp.minSR*1000; /* milliHz */
-      if (temp.maxSR < (0xFFFFFFFF / 1000))
+      XAAudioCodecDescriptor* desc = ((XAAudioCodecDescriptor*)(temp.pEntry));
+      /* map applicable values to XAAudioCodecCapabilities */
+      pDescriptor->maxChannels = desc->maxChannels;
+      pDescriptor->minSampleRate= desc->minSampleRate*1000; /* milliHz */
+      if (desc->maxSampleRate < (0xFFFFFFFF / 1000))
       {
-      	pDescriptor->maxSampleRate = temp.maxSR*1000;
+          pDescriptor->maxSampleRate = desc->maxSampleRate*1000;
       }
       else
       {
-    		pDescriptor->maxSampleRate = 0xFFFFFFFF;
-   		}
-      pDescriptor->minBitsPerSample=temp.minBPS;
-      pDescriptor->maxBitsPerSample=temp.maxBPS;
+          pDescriptor->maxSampleRate = 0xFFFFFFFF;
+      }
+      pDescriptor->minBitsPerSample=desc->minBitsPerSample;
+      pDescriptor->maxBitsPerSample=desc->maxBitsPerSample;
       pDescriptor->isFreqRangeContinuous=XA_BOOLEAN_TRUE;
-      pDescriptor->minBitRate=temp.minBR;
-    	pDescriptor->maxBitRate=temp.maxBR;
-      pDescriptor->numBitratesSupported = temp.numBitrates;
+      pDescriptor->minBitRate=desc->minBitRate;
+      pDescriptor->maxBitRate=desc->maxBitRate;
+      pDescriptor->numBitratesSupported = desc->numBitratesSupported;
       pDescriptor->isBitrateRangeContinuous=XA_BOOLEAN_TRUE;
-      
       if (temp.xaid == XA_AUDIOCODEC_PCM )
       {
-     		pDescriptor->profileSetting=XA_AUDIOPROFILE_PCM;
-        pDescriptor->modeSetting=0;
+          pDescriptor->profileSetting=XA_AUDIOPROFILE_PCM;
+          pDescriptor->modeSetting=0; /* no chanmode for pcm defined */
       }
-    	else if (temp.xaid == XA_ADAPTID_VORBIS) /* for ogg */
+      else if (temp.xaid == XA_ADAPTID_VORBIS) /* for ogg */
       {
-      	if (temp.maxCh == 1)
-        {
-        	pDescriptor->profileSetting=XA_AUDIOPROFILE_MPEG1_L3;
-          pDescriptor->modeSetting=XA_AUDIOCHANMODE_MP3_MONO;
-       	}
-        else
-        {
-       		pDescriptor->profileSetting=XA_AUDIOPROFILE_MPEG2_L3;
-          pDescriptor->modeSetting=XA_AUDIOCHANMODE_MP3_STEREO;
-        }
+          if (desc->maxChannels == 1)
+          {
+              pDescriptor->profileSetting=XA_AUDIOPROFILE_MPEG1_L3;
+              pDescriptor->modeSetting=XA_AUDIOCHANMODE_MP3_MONO;
+          }
+          else
+          {
+              pDescriptor->profileSetting=XA_AUDIOPROFILE_MPEG2_L3;
+              pDescriptor->modeSetting=XA_AUDIOCHANMODE_MP3_STEREO;
+          }
       }
       else
       {
-     		/* Do nothing */
+          /* do nothing */
       }
+      
     }
-#endif   	
+   	
     DEBUG_API("<-XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities");
     return res;
 }
@@ -295,7 +296,7 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
 /* XAAudioEncoderCapabilitiesItfImpl_Create
  * Description: Allocate and initialize XAAudioEncoderCapabilitiesItfImpl
  */
-XAAudioEncoderCapabilitiesItfImpl* XAAudioEncoderCapabilitiesItfImpl_Create()
+XAAudioEncoderCapabilitiesItfImpl* XAAudioEncoderCapabilitiesItfImpl_Create(XACapabilities* caps)
 {
     XAAudioEncoderCapabilitiesItfImpl* self = (XAAudioEncoderCapabilitiesItfImpl*)
         calloc(1,sizeof(XAAudioEncoderCapabilitiesItfImpl));
@@ -309,12 +310,12 @@ XAAudioEncoderCapabilitiesItfImpl* XAAudioEncoderCapabilitiesItfImpl_Create()
             XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoders;
         self->itf.GetAudioEncoderCapabilities =
             XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities;
-
-#ifdef _GSTREAMER_BACKEND_  
+        self->capslist = caps;
+  
         /* init variables */
-        assert( XAStaticCapsAdapt_GetCapsCount( XACAP_ENCODER|XACAP_AUDIO,
+        assert( XACapabilitiesMgr_GetCapsCount( caps, (XACapsType)((XACapsType)(XACAP_ENCODER|XACAP_AUDIO)),
                                   &(self->numCodecs) ) == XA_RESULT_SUCCESS );
-#endif
+
         /*self->mmfEngine = (void*)mmf_capability_engine_init();*/
         self->numCodecs = 3;
         self->self = self;

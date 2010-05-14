@@ -20,10 +20,10 @@
 #include <assert.h>
 #include "xaglobals.h"
 #include "xacameracapabilitiesitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAStaticCapsAdaptation.h"
-#include "XAStaticCameraCapsAdaptation.h"
-#endif
+  
+
+#include "xastaticcameracapsadaptation.h"
+
 
 static XACameraCapabilitiesItfImpl* GetImpl(XACameraCapabilitiesItf self)
 {
@@ -57,9 +57,9 @@ XAresult XACameraCapabilitiesItfImpl_GetCameraCapabilities(
         DEBUG_API("<-XACameraCapabilitiesItfImpl_GetCameraCapabilities");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+  
     ret = XAStaticCameraCaps_GetCameraCapabilities(pIndex,pCameraDeviceID,pDescriptor);
-#endif
+
     DEBUG_API("<-XACameraCapabilitiesItfImpl_GetCameraCapabilities");
     return ret;
 }
@@ -83,10 +83,10 @@ XAresult XACameraCapabilitiesItfImpl_QueryFocusRegionPatterns(
         DEBUG_API("<-XACameraCapabilitiesItfImpl_QueryFocusRegionPatterns");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+  
     ret = XAStaticCameraCaps_QueryFocusRegionPatterns(
             cameraDeviceID, pPatternID, pFocusPattern,pCustomPoints1,pCustomPoints2);
-#endif
+
     DEBUG_API("<-XACameraCapabilitiesItfImpl_QueryFocusRegionPatterns");
     return ret;
 }
@@ -108,10 +108,10 @@ XAresult XACameraCapabilitiesItfImpl_GetSupportedAutoLocks(
         DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedAutoLocks");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+  
     ret = XAStaticCameraCaps_GetSupportedAutoLocks(
                 cameraDeviceID, pNumCombinations, ppLocks);
-#endif
+
     DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedAutoLocks");
     return ret;
 }
@@ -136,10 +136,10 @@ XAresult XACameraCapabilitiesItfImpl_GetSupportedFocusManualSettings(
         DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedFocusManualSettings");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+  
     ret = XAStaticCameraCaps_GetSupportedFocusManualSettings(
             cameraDeviceID, macroEnabled,pMinValue, pMaxValue, pNumSettings, ppSettings);
-#endif
+
     DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedFocusManualSettings");
     return ret;
 }
@@ -163,10 +163,10 @@ XAresult XACameraCapabilitiesItfImpl_GetSupportedISOSensitivitySettings(
         DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedISOSensitivitySettings");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+  
     ret = XAStaticCameraCaps_GetSupportedISOSensitivitySettings(
                 cameraDeviceID, pMinValue, pMaxValue, pNumSettings, ppSettings );
-#endif
+
     DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedISOSensitivitySettings");
     return ret;
 }
@@ -190,10 +190,10 @@ XAresult XACameraCapabilitiesItfImpl_GetSupportedApertureManualSettings(
         DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedApertureManualSettings");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+  
     ret = XAStaticCameraCaps_GetSupportedApertureManualSettings(
                 cameraDeviceID, pMinValue, pMaxValue, pNumSettings, ppSettings );
-#endif
+
     DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedApertureManualSettings");
     return ret;
 }
@@ -217,10 +217,10 @@ XAresult XACameraCapabilitiesItfImpl_GetSupportedShutterSpeedManualSettings(
         DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedShutterSpeedManualSettings");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+  
     ret = XAStaticCameraCaps_GetSupportedShutterSpeedManualSettings(
                 cameraDeviceID, pMinValue, pMaxValue, pNumSettings, ppSettings);
-#endif
+
     DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedShutterSpeedManualSettings");
     return ret;
 }
@@ -244,10 +244,10 @@ XAresult XACameraCapabilitiesItfImpl_GetSupportedWhiteBalanceManualSettings(
         DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedWhiteBalanceManualSettings");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+  
     ret = XAStaticCameraCaps_GetSupportedWhiteBalanceManualSettings(
                 cameraDeviceID, pMinValue, pMaxValue, pNumSettings, ppSettings);
-#endif
+
     DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedWhiteBalanceManualSettings");
     return ret;
 }
@@ -273,20 +273,20 @@ XAresult XACameraCapabilitiesItfImpl_GetSupportedZoomSettings(
         DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedZoomSettings");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
+  
     ret = XAStaticCameraCaps_GetSupportedZoomSettings(
                 cameraDeviceID, digitalEnabled, macroEnabled, pMaxValue,
                 pNumSettings, ppSettings, pSpeedSupported);
-#endif
+
     DEBUG_API("<-XACameraCapabilitiesItfImpl_GetSupportedZoomSettings");
     return ret;
 }
 
-#ifdef _GSTREAMER_BACKEND_  
+  
 /**
  * XACameraCapabilitiesItfImpl -specific methods
  **/
-XACameraCapabilitiesItfImpl* XACameraCapabilitiesItfImpl_Create()
+XACameraCapabilitiesItfImpl* XACameraCapabilitiesItfImpl_Create(void)
 {
     XACameraCapabilitiesItfImpl* self = (XACameraCapabilitiesItfImpl*)
         calloc(1,sizeof(XACameraCapabilitiesItfImpl));
@@ -327,4 +327,4 @@ void XACameraCapabilitiesItfImpl_Free(XACameraCapabilitiesItfImpl* self)
     free(self);
     DEBUG_API("<-XACameraCapabilitiesItfImpl_Free");
 }
-#endif
+

@@ -24,7 +24,7 @@
 #include "xadynintmgmtitf.h"
 #include "xardsitf.h"
 #include "xathreadsafety.h"
-
+#include "xaradioadaptctx.h"
 /* Static mapping of enumeration XARadioDeviceInterfaces to interface iids */
 static const XAInterfaceID* XARadioDeviceItfIIDs[RADIO_ITFCOUNT]=
 {
@@ -42,7 +42,8 @@ static const XAInterfaceID* XARadioDeviceItfIIDs[RADIO_ITFCOUNT]=
 /* XAResult XARadioDeviceImpl_Create
  * Description: Create object
  */
-XAresult XARadioDeviceImpl_CreateRadioDevice(XAObjectItf* pDevice,
+XAresult XARadioDeviceImpl_CreateRadioDevice(FrameworkMap* mapper,
+                                             XAObjectItf* pDevice,
                                              XAuint32 numInterfaces,
                                              const XAInterfaceID * pInterfaceIds,
                                              const XAboolean * pInterfaceRequired)
@@ -53,6 +54,7 @@ XAresult XARadioDeviceImpl_CreateRadioDevice(XAObjectItf* pDevice,
 
     DEBUG_API("->XARadioDeviceImpl_Create");
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSRadio);
+   
     if( !pDevice )
     {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
@@ -118,23 +120,21 @@ XAresult XARadioDeviceImpl_CreateRadioDevice(XAObjectItf* pDevice,
             }
         }
     }
-#ifdef _GSTREAMER_BACKEND_
-    /* Initialize XARadioDeviceImpl variables */
-    pImpl->adaptationCtx = XARadioAdapt_Create();
-#endif
     
     /* This code is put here to return Feature Not Supported since adaptation is not present*/
     /*************************************************/
+    DEBUG_ERR("Required interface not found - abort creation!");
     XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
-    DEBUG_ERR("Required interface not found - abort creation!");
     DEBUG_API("<-XARadioDeviceImpl_CreateRadioDevice");
     return XA_RESULT_FEATURE_UNSUPPORTED;  
     /*************************************************/
     
-    
-    /* Set ObjectItf to point to newly created object */
-/*    *pDevice = (XAObjectItf)&(pBaseObj->self);
+/*    // Initialize XARadioDeviceImpl variables 
+    pImpl->adaptationCtx = XARadioAdapt_Create();
+
+     //Set ObjectItf to point to newly created object 
+    *pDevice = (XAObjectItf)&(pBaseObj->self);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioDeviceImpl_Create");
@@ -215,9 +215,9 @@ XAresult XARadioDeviceImpl_DoRealize( XAObjectItf self )
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
+
     ret = XARadioAdapt_PostInit( pObjImpl->adaptationCtx );
-#endif
+
     if( ret != XA_RESULT_SUCCESS )
     {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
@@ -235,9 +235,9 @@ XAresult XARadioDeviceImpl_DoRealize( XAObjectItf self )
             switch( itfIdx )
             {
                 case RADIO_RADIOITF:
-#ifdef _GSTREAMER_BACKEND_
+
                     pItf = XARadioItfImpl_Create( pObjImpl->adaptationCtx );
-#endif
+
                     break;
                 case RADIO_CONFIGEXTENSIONITF:
                     pItf = XAConfigExtensionsItfImpl_Create();
@@ -246,9 +246,9 @@ XAresult XARadioDeviceImpl_DoRealize( XAObjectItf self )
                     pItf = XADIMItfImpl_Create();
                     break;
                 case RADIO_RDSITF:
-#ifdef _GSTREAMER_BACKEND_
+
                    pItf = XARDSItfImpl_Create( pObjImpl->adaptationCtx );
-#endif
+
                    break;
                 default:
                     break;
@@ -291,14 +291,14 @@ XAresult XARadioDeviceImpl_DoResume(XAObjectItf self)
 void XARadioDeviceImpl_FreeResources(XAObjectItf self)
 {
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
-    
+    XARadioDeviceImpl* pImpl = (XARadioDeviceImpl*)(*self);
     XAuint8 itfIdx = 0;
     DEBUG_API("->XARadioDeviceImpl_FreeResources");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS(XATSRadio);
-#ifdef _GSTREAMER_BACKEND_
-    XARadioDeviceImpl* pImpl = (XARadioDeviceImpl*)(*self);
+
+    
     assert( pObj && pImpl && pObj == pObj->self );
-#endif
+
 
     /* free all allocated interfaces */
     for(itfIdx = 0; itfIdx < RADIO_ITFCOUNT; itfIdx++)
@@ -327,13 +327,13 @@ void XARadioDeviceImpl_FreeResources(XAObjectItf self)
         }
     }
 
-#ifdef _GSTREAMER_BACKEND_
+
     if ( pImpl->adaptationCtx != NULL )
     {
         XARadioAdapt_Destroy( pImpl->adaptationCtx );
         pImpl->adaptationCtx = NULL;
     }
-#endif
+
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS(XATSRadio);
     DEBUG_API("<-XARadioDeviceImpl_FreeResources");
     return;

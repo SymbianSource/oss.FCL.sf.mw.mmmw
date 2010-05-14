@@ -18,12 +18,9 @@
 #ifndef XARADIOITF_H
 #define XARADIOITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#include "XARadioItfAdaptation.h"
-#endif
+#include "xaadptbasectx.h"
+#include "xaradioitfadaptation.h"
+
 /** MACROS **/
 #define RADIO_PRESET_NAME_MAX_LENGTH 20
 
@@ -57,17 +54,14 @@ typedef struct XARadioItfImpl_
     XAuint32    preset;
     XAuint32    numOfPresets;
 
-#ifdef _GSTREAMER_BACKEND_
     RadioPreset presets[RADIO_NUM_OF_PRESETS];
-#endif
+
     XARadioItf         cbPtrToSelf;
     xaRadioCallback    callback;
     void               *context;
 
-#ifdef _GSTREAMER_BACKEND_
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
 } XARadioItfImpl;
 
 /** METHODS **/
@@ -127,12 +121,11 @@ XAresult XARadioItfImpl_GetPreset(XARadioItf self,
 XAresult XARadioItfImpl_RegisterRadioCallback(XARadioItf self,
                                               xaRadioCallback callback,
                                               void * pContext);
-#ifdef _GSTREAMER_BACKEND_
 
 /* XARadioItfImpl -specific methods */
 XARadioItfImpl* XARadioItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
 void XARadioItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
-#endif
+
 void XARadioItfImpl_Free(XARadioItfImpl* self);
 
 #endif /* XARADIOITF_H */

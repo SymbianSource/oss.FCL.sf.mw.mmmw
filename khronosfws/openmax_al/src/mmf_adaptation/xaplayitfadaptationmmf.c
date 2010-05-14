@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -28,43 +28,34 @@ extern XAboolean cameraRealized;
 gboolean XAPlayItfAdapt_PositionUpdate(gpointer ctx);
 
 /*
- * XAresult XAPlayItfAdapt_SetPlayState(XAAdaptationBaseCtx *bCtx, XAuint32 state)
+ * XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseCtx *bCtx, XAuint32 state)
  * Sets play state to GStreamer.
  * @param XAAdaptationBaseCtx *bCtx - Adaptation context, this will be casted to correct type regarding to contextID
  * XAuint32 state - Play state to be set
  * @return XAresult ret - Success value
  */
-XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseMMFCtx *bCtx, XAuint32 state)
+XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseCtx *bCtx, XAuint32 state)
 {
     XAresult ret = XA_RESULT_SUCCESS;
-    
-    XAMediaPlayerAdaptationMMFCtx* mCtx = NULL;
+    XAMediaPlayerAdaptationMMFCtx* mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
 
+    DEBUG_API_A1("->XAPlayItfAdaptMMF_SetPlayState %s",PLAYSTATENAME(state));
 
-    
-    DEBUG_API_A1("->XAPlayItfAdapt_SetPlayState %s",PLAYSTATENAME(state));
-
-    if(!bCtx)
-    {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-
-    mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
+    /* bCtx and parameter pointer validation happens in the calling function.
+     * We don't need to repeat it here*/
     switch ( state )
     {
         case XA_PLAYSTATE_STOPPED:
         {
-            mmf_stop_playback(mCtx->mmfContext);
-            mmf_close(mCtx->mmfContext);
+            ret = mmf_playitf_stop_playback(mCtx->mmfContext);
             break;
         }
         case XA_PLAYSTATE_PAUSED:
-            mmf_pause_playback(mCtx->mmfContext);
+            ret = mmf_playitf_pause_playback(mCtx->mmfContext);
             break;
         case XA_PLAYSTATE_PLAYING:
         {
-            mmf_resume_playback(mCtx->mmfContext);
+            ret = mmf_playitf_resume_playback(mCtx->mmfContext);
             break;
         }
         default:
@@ -72,72 +63,151 @@ XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseMMFCtx *bCtx, XAuint32 s
             break;
     }
 
-   DEBUG_API("<-XAPlayItfAdapt_SetPlayState");
+    DEBUG_API("<-XAPlayItfAdaptMMF_SetPlayState");
     return ret;
 }
 
 /*
- * XAresult XAPlayItfAdapt_GetDuration(XAAdaptationBaseCtx *bCtx, XAmillisecond *pMsec)
+ * XAresult XAPlayItfAdaptMMF_GetPlayState(XAAdaptationBaseCtx *bCtx, XAuint32 *pState)
+ * @param XAAdaptationBaseCtx *bCtx - Adaptation context, this will be casted to correct type regarding to contextID
+ * XAuint32 *state - XAmillisecond *pMsec - Pointer where to store play state
+ * @return XAresult ret - Success value
+ */
+XAresult XAPlayItfAdaptMMF_GetPlayState(XAAdaptationBaseCtx *bCtx, XAuint32 *pState)
+    {
+    XAresult ret = XA_RESULT_SUCCESS;
+    XAMediaPlayerAdaptationMMFCtx* mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
+
+    DEBUG_API("->XAPlayItfAdaptMMF_GetPlayState");
+
+    /* If playhead reaches eof, state will transition to paused.
+     * This object does not have visibility to callback*/
+    ret = mmf_playitf_get_play_state(mCtx->mmfContext, pState);
+
+    DEBUG_API("<-XAPlayItfAdaptMMF_GetPlayState");
+    return ret;
+
+    }
+
+/*
+ * XAresult XAPlayItfAdaptMMF_GetDuration(XAAdaptationBaseCtx *bCtx, XAmillisecond *pMsec)
  * @param XAAdaptationBaseCtx *bCtx - Adaptation context, this will be casted to correct type regarding to contextID
  * XAmillisecond *pMsec - Pointer where to store duration of stream.
  * @return XAresult ret - Success value
  */
-XAresult XAPlayItfAdaptMMF_GetDuration(XAAdaptationBaseMMFCtx *bCtx, XAmillisecond *pMsec)
+XAresult XAPlayItfAdaptMMF_GetDuration(XAAdaptationBaseCtx *bCtx, XAmillisecond *pMsec)
 {
     XAresult ret = XA_RESULT_SUCCESS;
+    XAMediaPlayerAdaptationMMFCtx* mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
 
-    DEBUG_API("->XAPlayItfAdapt_GetDuration");
+    DEBUG_API("->XAPlayItfAdaptMMF_GetDuration");
 
-    if(!bCtx)
-    {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        /* invalid parameter */
-        return XA_RESULT_PARAMETER_INVALID;
-    }
+    ret = mmf_playitf_get_duration(mCtx->mmfContext, pMsec);
 
-
-    DEBUG_API("<-XAPlayItfAdapt_GetDuration");
+    DEBUG_API("<-XAPlayItfAdaptMMF_GetDuration");
     return ret;
 }
 
 /*
- * XAresult XAPlayItfAdapt_GetPosition(XAAdaptationBaseCtx *bCtx, XAmillisecond *pMsec)
+ * XAresult XAPlayItfAdaptMMF_GetPosition(XAAdaptationBaseCtx *bCtx, XAmillisecond *pMsec)
  * @param XAAdaptationBaseCtx *bCtx - Adaptation context, this will be casted to correct type regarding to contextID value
  * XAmillisecond *pMsec - Pointer where to store current position in stream.
  * @return XAresult ret - Success value
  */
-XAresult XAPlayItfAdaptMMF_GetPosition(XAAdaptationBaseMMFCtx *bCtx, XAmillisecond *pMsec)
+XAresult XAPlayItfAdaptMMF_GetPosition(XAAdaptationBaseCtx *bCtx, XAmillisecond *pMsec)
 {
     XAresult ret = XA_RESULT_SUCCESS;
-    
-    DEBUG_API("->XAPlayItfAdapt_GetPosition");
+    XAMediaPlayerAdaptationMMFCtx* mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
 
-    if(!bCtx)
-    {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        /* invalid parameter */
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-    
-    DEBUG_API("<-XAPlayItfAdapt_GetPosition");
+    DEBUG_API("->XAPlayItfAdaptMMF_GetPosition");
+
+    ret = mmf_playitf_get_position(mCtx->mmfContext, pMsec);
+
+    DEBUG_API("<-XAPlayItfAdaptMMF_GetPosition");
     return ret;
 }
 
 /*
- * XAresult XAPlayItfAdapt_EnablePositionTracking
- * Enable/disable periodic position tracking callbacks
+ * XAresult XAPlayItfAdaptMMF_RegisterCallback(XAAdaptationBaseCtx *bCtx, xaPlayCallback callback)
+ * Description: Sets the playback callback function.
  */
-XAresult XAPlayItfAdaptMMF_EnablePositionTracking(XAAdaptationBaseMMFCtx *bCtx, XAboolean enable)
+XAresult XAPlayItfAdaptMMF_RegisterCallback(XAAdaptationBaseCtx *bCtx, xaPlayCallback callback)
 {
-    DEBUG_API_A1("->XAPlayItfAdapt_EnablePositionTracking (enable: %d)", (int)enable);
-    if(!bCtx)
-    {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        /* invalid parameter */
-        return XA_RESULT_PARAMETER_INVALID;
-    }
+    XAresult ret = XA_RESULT_SUCCESS;
+    XAMediaPlayerAdaptationMMFCtx* mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
 
-    DEBUG_API("<-XAPlayItfAdapt_EnablePositionTracking");
-    return XA_RESULT_SUCCESS;
+    DEBUG_API("->XAPlayItfAdaptMMF_RegisterCallback");
+
+    ret = mmf_playitf_register_callback(mCtx->mmfContext, callback);
+
+    DEBUG_API("<-XAPlayItfAdaptMMF_RegisterCallback");
+    return ret;
 }
 
+/**
+ * XAresult XAPlayItfAdaptMMF_SetCallbackEventsMask(XAAdaptationBaseCtx *bCtx, XAuint32 eventFlags)
+ * Description: Enables/disables notification of playback events.
+ **/
+XAresult XAPlayItfAdaptMMF_SetCallbackEventsMask(XAAdaptationBaseCtx *bCtx, XAuint32 eventFlags)
+{
+    XAresult ret = XA_RESULT_SUCCESS;
+    XAMediaPlayerAdaptationMMFCtx* mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
+
+    DEBUG_API("->XAPlayItfAdaptMMF_SetCallbackEventsMask");
+
+    ret = mmf_playitf_set_callback_events_mask(mCtx->mmfContext, eventFlags);
+
+    DEBUG_API("<-XAPlayItfAdaptMMF_SetCallbackEventsMask");
+    return ret;
+}
+
+/**
+ * XAresult XAPlayItfAdaptMMF_SetMarkerPosition(XAAdaptationBaseCtx *bCtx, XAmillisecond mSec)
+ * Description: Sets marker position.
+ **/
+XAresult XAPlayItfAdaptMMF_SetMarkerPosition(XAAdaptationBaseCtx *bCtx, XAmillisecond mSec)
+{
+    XAresult ret = XA_RESULT_SUCCESS;
+    XAMediaPlayerAdaptationMMFCtx* mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
+
+    DEBUG_API("->XAPlayItfAdaptMMF_SetMarkerPosition");
+
+    ret = mmf_playitf_set_marker_position(mCtx->mmfContext, mSec);
+
+    DEBUG_API("<-XAPlayItfAdaptMMF_SetMarkerPosition");
+    return ret;
+}
+
+/**
+ * XAresult XAPlayItfAdaptMMF_SetCallbackEventsMask(XAAdaptationBaseCtx *bCtx, XAuint32 eventFlags)
+ * Description: Clears marker position.
+ **/
+XAresult XAPlayItfAdaptMMF_ClearMarkerPosition(XAAdaptationBaseCtx *bCtx)
+{
+    XAresult ret = XA_RESULT_SUCCESS;
+    XAMediaPlayerAdaptationMMFCtx* mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
+
+    DEBUG_API("->XAPlayItfAdaptMMF_ClearMarkerPosition");
+
+    ret = mmf_playitf_clear_marker_position(mCtx->mmfContext);
+
+    DEBUG_API("<-XAPlayItfAdaptMMF_ClearMarkerPosition");
+    return ret;
+}
+
+/**
+ * XAPlayItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationBaseCtx *bCtx, XAmillisecond mSec)
+ * Description: Sets position update period.
+ **/
+XAresult XAPlayItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationBaseCtx *bCtx, XAmillisecond mSec)
+{
+    XAresult ret = XA_RESULT_SUCCESS;
+    XAMediaPlayerAdaptationMMFCtx* mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
+
+    DEBUG_API("->XAPlayItfAdaptMMF_SetPositionUpdatePeriod");
+
+    ret = mmf_playitf_set_position_update_period(mCtx->mmfContext, mSec);
+
+    DEBUG_API("<-XAPlayItfAdaptMMF_SetPositionUpdatePeriod");
+    return ret;
+}

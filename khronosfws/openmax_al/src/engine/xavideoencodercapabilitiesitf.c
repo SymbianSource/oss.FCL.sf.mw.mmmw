@@ -22,9 +22,9 @@
 
 #include "xaglobals.h"
 #include "xavideoencodercapabilitiesitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAStaticCapsAdaptation.h"
-#endif
+
+#include "xacapabilitiesmgr.h"
+
 /* XAVideoEncoderCapabilitiesItfImpl* GetImpl
  * Description: Validate interface pointer and cast it to implementation pointer.
  */
@@ -74,16 +74,16 @@ XAresult XAVideoEncoderCapabilitiesItfImpl_GetVideoEncoders(
             else
             {
                 
-#ifdef _GSTREAMER_BACKEND_  
+  
                 XAuint32 i = 0;
-                XAStaticCapsData temp;
+                XACapabilities temp;
                 for( i=0; i<impl->numCodecs; i++ )
                 {
                     /* query encoder id from adaptation using index value */
-                    XAStaticCapsAdapt_GetCapsByIdx(XACAP_ENCODER|XACAP_VIDEO, i, &temp);
+                    XACapabilitiesMgr_GetCapsByIdx(NULL, (XACapsType)(XACAP_ENCODER|XACAP_VIDEO), i, &temp);
                     pEncoderIds[i] = temp.xaid;
                 }
-#endif
+
             }
         }
         /* return number of encoders */
@@ -128,25 +128,26 @@ XAresult XAVideoEncoderCapabilitiesItfImpl_GetVideoEncoderCapabilities(
             }
             else
             {
-#ifdef _GSTREAMER_BACKEND_  
+  
                 /* query capabilities from adaptation using codec id */
-                XAStaticCapsData temp;
+                XACapabilities temp;
                 memset(pDescriptor,0,sizeof(XAVideoCodecDescriptor));
-                res = XAStaticCapsAdapt_GetCapsById(XACAP_ENCODER|XACAP_VIDEO, encoderId, &temp);
+                res = XACapabilitiesMgr_GetCapsById(NULL, (XACapsType)(XACAP_ENCODER|XACAP_VIDEO), encoderId, &temp);
                 if( res == XA_RESULT_SUCCESS )
                 {
-                    /* map applicable values to XAAudioCodecCapabilities */
+                    XAVideoCodecDescriptor* desc = (XAVideoCodecDescriptor*)(&temp.pEntry);
+                    /* map applicable values to XAVideoCodecCapabilities */
                     pDescriptor->codecId = temp.xaid;
-                    pDescriptor->maxWidth = temp.maxW;
-                    pDescriptor->maxHeight = temp.maxH;
-                    pDescriptor->maxFrameRate = (temp.maxFR & 0xffff)<<16;
-                    pDescriptor->maxBitRate = temp.maxBR;
+                    pDescriptor->maxWidth = desc->maxWidth;
+                    pDescriptor->maxHeight = desc->maxHeight;
+                    pDescriptor->maxFrameRate = (desc->maxFrameRate & 0xffff)<<16;
+                    pDescriptor->maxBitRate = desc->maxBitRate;
                     /*other caps undefined*/
                     pDescriptor->rateControlSupported = XA_RATECONTROLMODE_CONSTANTBITRATE;
                     pDescriptor->profileSetting = 0; /* unknown for theora or motionjpeg */
                     pDescriptor->levelSetting = 0; /* unknown for theora or motionjpeg */
                 }
-#endif            
+            
             }
         }
     }
@@ -176,11 +177,11 @@ XAVideoEncoderCapabilitiesItfImpl* XAVideoEncoderCapabilitiesItfImpl_Create()
         self->itf.GetVideoEncoderCapabilities =
             XAVideoEncoderCapabilitiesItfImpl_GetVideoEncoderCapabilities;
 
-#ifdef _GSTREAMER_BACKEND_  
+  
         /* init variables */
-        assert( XAStaticCapsAdapt_GetCapsCount( XACAP_ENCODER|XACAP_VIDEO,
+        assert( XACapabilitiesMgr_GetCapsCount( NULL, (XACapsType)(XACAP_ENCODER|XACAP_VIDEO),
                                   &(self->numCodecs) ) == XA_RESULT_SUCCESS );
-#endif
+
         self->self = self;
     }
     DEBUG_API("<-XAVideoEncoderCapabilitiesItfImpl_Create");

@@ -29,6 +29,7 @@ file=ABI_DIR/BUILD_DIR/openmaxal.dll         SHARED_LIB_DIR/openmaxal.dll
 
 //OpenMAX_AL_Stub
 data=ZSYSTEM/install/openmax_al_stub.sis         System/Install/openmax_al_stub.sis
+data=/epoc32/winscw/c/openmaxal/openmaxal.cfg           openmaxal/openmaxal.cfg
 
 #endif //FF_OPENMAX_AL
 

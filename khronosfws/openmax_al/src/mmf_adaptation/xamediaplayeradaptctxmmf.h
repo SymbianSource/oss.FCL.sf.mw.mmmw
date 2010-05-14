@@ -18,18 +18,18 @@
 #ifndef XAMEDIAPLAYERADAPTCTXMMF_H
 #define XAMEDIAPLAYERADAPTCTXMMF_H
 
-#include "xaadaptationcontextbasemmf.h"
+#include "xaadaptationmmf.h"
 
 /* TYPEDEFS */
 
 typedef struct XAMediaPlayerAdaptationMMFCtx_ XAMediaPlayerAdaptationMMFCtx;
 
 /* FUNCTIONS */
-XAAdaptationBaseMMFCtx* XAMediaPlayerAdaptMMF_Create( XADataSource *pDataSrc, XADataSource *pBankSrc,
+XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_Create( XADataSource *pDataSrc, XADataSource *pBankSrc,
                                                        XADataSink *pAudioSnk, XADataSink *pImageVideoSnk,
                                                        XADataSink *pVibra, XADataSink *pLEDArray);
-XAresult XAMediaPlayerAdaptMMF_PostInit( XAAdaptationBaseMMFCtx* bCtx );
-void XAMediaPlayerAdaptMMF_Destroy( XAAdaptationBaseMMFCtx* bCtx );
+XAresult XAMediaPlayerAdaptMMF_PostInit( XAAdaptationMMFCtx* bCtx );
+void XAMediaPlayerAdaptMMF_Destroy( XAAdaptationMMFCtx* bCtx );
 
 //XAresult XAMediaPlayerAdapt_InitContentPipeSrc(XAMediaPlayerAdaptationCtx* ctx);
 #endif /*XAMEDIAPLAYERADAPTCTXMMF_H*/

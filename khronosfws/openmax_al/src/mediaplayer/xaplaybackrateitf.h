@@ -18,11 +18,7 @@
 #ifndef XAPLAYBACKRATEITF_H
 #define XAPLAYBACKRATEITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xamediaplayer.h"
 /** MACROS **/
 
 /** TYPES **/
@@ -38,10 +34,8 @@ typedef struct XAPlaybackRateItfImpl_
     /* pointer to self */
     struct XAPlaybackRateItfImpl_* self;
 
-#ifdef _GSTREAMER_BACKEND_
     /* variables */
     XAAdaptationBaseCtx *adaptCtx;
-#endif
     XApermille currentRate;
 
 } XAPlaybackRateItfImpl;
@@ -70,11 +64,9 @@ XAresult XAPlaybackRateItfImpl_GetRateRange(XAPlaybackRateItf self,
                                               XApermille *pStepSize,
                                               XAuint32 *pCapabilities);
 
-#ifdef _GSTREAMER_BACKEND_
 
 /* XAPlaybackRateItfImpl -specific methods */
-XAPlaybackRateItfImpl* XAPlaybackRateItfImpl_Create( XAAdaptationBaseCtx *adaptCtx );
-#endif
+XAPlaybackRateItfImpl* XAPlaybackRateItfImpl_Create( XAMediaPlayerImpl *impl );
 void XAPlaybackRateItfImpl_Free(XAPlaybackRateItfImpl* self);
 
 #endif /* XAPLAYBACKRATEITF_H */

@@ -26,18 +26,6 @@
 
 using namespace TMS;
 
-TMSFormatImpl::TMSFormatImpl()
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-TMSFormatImpl::~TMSFormatImpl()
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
 EXPORT_C gint TMSFormatImpl::Create(TMSFormatType fmttype, TMSFormat*& tmsfmt)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);

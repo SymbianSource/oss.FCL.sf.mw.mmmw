@@ -20,10 +20,7 @@
 
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
-#include "xaadaptationcontextbasemmf.h"
+
 #include "xamediarecorder.h"
 /** MACROS **/
 #define NO_POSITION XA_TIME_UNKNOWN
@@ -60,12 +57,8 @@ typedef struct XARecordItfImpl_
     void*            context;
     XARecordItf      cbPtrToSelf;
 
-#ifdef _GSTREAMER_BACKEND_
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
-    XAAdaptationBaseMMFCtx *adaptCtxMMF;
-    XAboolean isMMFRecord;    
 
 } XARecordItfImpl;
 
@@ -111,15 +104,9 @@ XAresult XARecordItfImpl_GetPositionUpdatePeriod( XARecordItf self,
                                                   XAmillisecond *pMsec );
 
 /* XARecordItfImpl -specific methods */
-XARecordItfImpl* XARecordItfImpl_Create( 
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adapCtx,
-#endif
-        XAMediaRecorderImpl* impl );
-XAresult XARecordItfImpl_DetermineRecordEngine(XARecordItf self, XADataLocator_URI *uri);
+XARecordItfImpl* XARecordItfImpl_Create( XAMediaRecorderImpl* impl );
 void XARecordItfImpl_Free( XARecordItfImpl* self );
-#ifdef _GSTREAMER_BACKEND_
 void XARecordItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
+
 #endif
-void XARecordItfImplMMF_AdaptCb( void *pHandlerCtx, XAAdaptEventMMF *event );
-#endif /* XARECORDITF_H */
+ /* XARECORDITF_H */

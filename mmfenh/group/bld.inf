@@ -28,8 +28,6 @@ PRJ_MMPFILES
 #include "../enhancedaudioplayerutility/Group/bld.inf"
 #include "../enhancedmediaclient/group/bld.inf"
 #include "../profilesettingsmonitor/group/bld.inf"
-#include "../progressivedownload/group/bld.inf"
-
 
 
 //  End of File

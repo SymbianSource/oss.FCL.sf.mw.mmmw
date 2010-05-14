@@ -18,12 +18,9 @@
 #ifndef XAMETADATAINSERTIONITF_H
 #define XAMETADATAINSERTIONITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#include "XAMetadataAdaptation.h"
-#endif
+
+#include "xametadataadaptation.h"
+#include "xamediarecorder.h"
 /** MACROS **/
 
 /** TYPES **/
@@ -39,11 +36,10 @@ typedef struct XAMetadataInsertionItfImpl_
     /* pointer to self */
     struct XAMetadataInsertionItfImpl_* self;
 
-#ifdef _GSTREAMER_BACKEND_
     /* variables */
     XAAdaptationBaseCtx *adaptCtx;
     XAMetadataImplTagList   currentTags;
-#endif
+
     /*Callback*/
     xaMetadataInsertionCallback callback;
     void    *cbcontext;
@@ -93,16 +89,8 @@ XAresult XAMetadataInsertionItfImpl_RegisterCallback(XAMetadataInsertionItf self
                                                      void *pContext);
 
 /* XAMetadataInsertionItfImpl -specific methods */
-XAMetadataInsertionItfImpl* XAMetadataInsertionItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adaptCtx,
-#else
-        void
-#endif
-        );
-#ifdef _GSTREAMER_BACKEND_
+XAMetadataInsertionItfImpl* XAMetadataInsertionItfImpl_Create(XAMediaRecorderImpl* impl);
 void XAMetadataInsertionItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
-#endif
 void XAMetadataInsertionItfImpl_Free(XAMetadataInsertionItfImpl* self);
 
 #endif /* XAMETADATAINSERTIONITF_H */

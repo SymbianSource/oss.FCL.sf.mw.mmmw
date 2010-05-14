@@ -26,6 +26,9 @@
 #include "xaimageeffectsitf.h"
 #include "xavideopostprocessingitf.h"
 #include "xathreadsafety.h"
+#include "xaframeworkmgr.h"
+#include "xacameraadaptctx.h"
+#include "xacapabilitiesmgr.h"
 
 /* Static mapping of enumeration XACameraDeviceInterfaces to interface iids */
 static const XAInterfaceID* XACameraDeviceItfIIDs[CAMERA_ITFCOUNT]=
@@ -47,7 +50,9 @@ static const XAInterfaceID* XACameraDeviceItfIIDs[CAMERA_ITFCOUNT]=
 /* XAResult XACameraDeviceImpl_Create
  * Description: Create object
  */
-XAresult XACameraDeviceImpl_CreateCameraDevice(XAObjectItf* pDevice,
+XAresult XACameraDeviceImpl_CreateCameraDevice(FrameworkMap* mapper,
+                                                XACapabilities* capabilities,   
+                                               XAObjectItf* pDevice,
                                                XAuint32 deviceID,
                                                XAuint32 numInterfaces,
                                                const XAInterfaceID * pInterfaceIds,
@@ -130,34 +135,26 @@ XAresult XACameraDeviceImpl_CreateCameraDevice(XAObjectItf* pDevice,
     /* Mandated dynamic itfs */
     pBaseObj->interfaceMap[CAMERA_IMAGEEFFECTSITF].isDynamic = XA_BOOLEAN_TRUE;
 
-
-    /* Initialize XACameraDeviceImpl variables */
-    pImpl->deviceID = deviceID;
-#ifdef _GSTREAMER_BACKEND_   
-    pImpl->adaptationCtx = XACameraAdapt_Create(pImpl->deviceID);
-#endif
-    
-    
     /* This code is put here to return Feature Not Supported since adaptation is not present*/
     /*************************************************/
     XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
     XA_IMPL_THREAD_SAFETY_EXIT(XATSCamera);
     DEBUG_ERR("Required interface not found - abort creation!");
     DEBUG_API("<-XACameraDeviceImpl_Create");
-    return XA_RESULT_FEATURE_UNSUPPORTED;    
+    return XA_RESULT_FEATURE_UNSUPPORTED;
     /*************************************************/
+    
+/*     Initialize XACameraDeviceImpl variables 
+    pImpl->deviceID = deviceID;
 
-    
-    
-    
-    /* Set ObjectItf to point to newly created object */
-/*
+    pImpl->adaptationCtx = XACameraAdapt_Create(pImpl->deviceID);
+
+     Set ObjectItf to point to newly created object 
     *pDevice = (XAObjectItf)&(pBaseObj->self);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSCamera);
     DEBUG_API("<-XACameraDeviceImpl_Create");
-    return XA_RESULT_SUCCESS;
-*/
+    return XA_RESULT_SUCCESS;*/
 }
 
 /* XAResult XACameraDeviceImpl_QueryNumSupportedInterfaces
@@ -234,9 +231,9 @@ XAresult XACameraDeviceImpl_DoRealize( XAObjectItf self )
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_   
+ 
     ret = XACameraAdapt_PostInit( pObjImpl->adaptationCtx );
-#endif
+
     if( ret != XA_RESULT_SUCCESS )
     {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSCamera);
@@ -264,7 +261,7 @@ XAresult XACameraDeviceImpl_DoRealize( XAObjectItf self )
                                 XACameraDeviceImpl_DoRemoveItf);
                     }
                     break;
-#ifdef _GSTREAMER_BACKEND_   
+  
                 case CAMERA_CAMERAITF:
                     pItf = XACameraItfImpl_Create( pObjImpl->adaptationCtx );
                     break;
@@ -280,7 +277,7 @@ XAresult XACameraDeviceImpl_DoRealize( XAObjectItf self )
                 case CAMERA_VIDEOPOSTPROCESSINGITF:
                      pItf = XAVideoPostProcessingItfImpl_Create( pObjImpl->adaptationCtx );
                      break;
-#endif                     
+                  
                 default:
                     break;
             }
@@ -323,12 +320,12 @@ void XACameraDeviceImpl_FreeResources(XAObjectItf self)
 {
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XAuint8 itfIdx = 0;
-    DEBUG_API("->XACameraDeviceImpl_FreeResources");
-    XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS(XATSCamera);
-#ifdef _GSTREAMER_BACKEND_ 
     XACameraDeviceImpl* pImpl = (XACameraDeviceImpl*)(*self);
     assert( pObj && pImpl && pObj == pObj->self );
-#endif
+    DEBUG_API("->XACameraDeviceImpl_FreeResources");
+    XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS(XATSCamera);
+    
+
     
 
     /* free all allocated interfaces */
@@ -363,13 +360,13 @@ void XACameraDeviceImpl_FreeResources(XAObjectItf self)
             pObj->interfaceMap[itfIdx].pItf = NULL;
         }
     }
-#ifdef _GSTREAMER_BACKEND_   
+  
     if ( pImpl->adaptationCtx != NULL )
     {
         XACameraAdapt_Destroy( pImpl->adaptationCtx );
         pImpl->adaptationCtx = NULL;
     }
-#endif
+
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS(XATSCamera);
     DEBUG_API("<-XACameraDeviceImpl_FreeResources");
     return;
@@ -384,10 +381,10 @@ void XACameraDeviceImpl_FreeResources(XAObjectItf self)
  */
 XAresult XACameraDeviceImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry  )
 {
-#ifdef _GSTREAMER_BACKEND_
+
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XACameraDeviceImpl* pImpl = (XACameraDeviceImpl*)(pObj);
-#endif
+
     XAresult ret = XA_RESULT_SUCCESS;
     DEBUG_API("->XACameraDeviceImpl_DoAddItf");
     if(mapEntry)
@@ -395,9 +392,7 @@ XAresult XACameraDeviceImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntr
         switch( mapEntry->mapIdx )
         {
         case CAMERA_IMAGEEFFECTSITF:
-#ifdef _GSTREAMER_BACKEND_   
             mapEntry->pItf = XAImageEffectsItfImpl_Create( pImpl->adaptationCtx );
-#endif
             break;
         default:
             DEBUG_ERR("XACameraDeviceImpl_DoAddItf unknown id");

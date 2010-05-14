@@ -24,21 +24,23 @@
 class MStsPlayerObserver
     {
 public:
-    virtual void PlayToneComplete(unsigned int aPlayToneContext) = 0;
+    virtual void PlayComplete(unsigned int aContext) = 0;
     };
 
 class CStsPlayer : private MMdaAudioPlayerCallback
     {
 public:
-    static CStsPlayer* Create(MStsPlayerObserver& aObserver,
-            CSystemToneService::TToneType aToneType, unsigned int aPlayToneContext);
+    static CStsPlayer* CreateTonePlayer(MStsPlayerObserver& aObserver,
+            CSystemToneService::TToneType aTone, unsigned int aContext);
+    static CStsPlayer* CreateAlarmPlayer(MStsPlayerObserver& aObserver,
+            CSystemToneService::TAlarmType aAlarm, unsigned int aContext);
     virtual ~CStsPlayer();
     void Play();
     void Stop();
 
 protected:
     CStsPlayer(MStsPlayerObserver& aObserver, const TDesC& aFileName,
-            int aRepeatNumberOfTimes, unsigned int aPlayToneContext);
+            int aRepeatNumberOfTimes, unsigned int aContext);
     bool Init();
 
 private:
@@ -50,7 +52,7 @@ private:
     CMdaAudioPlayerUtility* iPlayer;
     TPtrC iFileName;
     int iRepeatNumberOfTimes;
-    unsigned int iPlayToneContext;
+    unsigned int iContext;
     };
 
 #endif // STSPLAYER_H_

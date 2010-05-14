@@ -23,6 +23,7 @@
 #include <TestScripterInternal.h>
 #include <StifTestModule.h>
 #include <TestclassAssert.h>
+#include <systemtoneservice.h>
 
 
 // CONSTANTS
@@ -46,7 +47,7 @@ _LIT( KsystemtoneservicestifLogFileWithTitle, "systemtoneservicestif_[%S].txt" )
 // FORWARD DECLARATIONS
 
 class CSystemToneServiceStif;
-class CSystemToneService;
+
 
 enum TPlayState
     {
@@ -63,7 +64,7 @@ _LIT( KFalse, "False");
 *  CSystemToneServiceStif test class for STIF Test Framework TestScripter.
 
 */
-NONSHARABLE_CLASS(CSystemToneServiceStif) : public CScriptBase
+NONSHARABLE_CLASS(CSystemToneServiceStif) : public CScriptBase, MStsPlayAlarmObserver
     {
     public:  // Constructors and destructor
 
@@ -128,15 +129,19 @@ NONSHARABLE_CLASS(CSystemToneServiceStif) : public CScriptBase
       
         virtual TInt  DeleteSystemToneService(  );
         
-        virtual TInt  PlaySystemToneService( CStifItemParser& aItem);
+        virtual TInt  PlayTone( CStifItemParser& aItem);
         
-        virtual TInt  PlaySystemToneServiceWithContext( CStifItemParser& aItem );
+        virtual TInt  PlayAlarm( CStifItemParser& aItem );
         
-        virtual TInt  StopSystemToneService( CStifItemParser& aItem  );
+        virtual TInt  StopAlarm( CStifItemParser& aItem );
 
 
 
-    private:    // Data
+    private:  
+    	 // inherited from MPlayAlarmObserver
+       virtual void PlayAlarmComplete(unsigned int aAlarmContext);
+    	
+    	  // Data
         TPlayState            iPlayState;
         CSystemToneService*   iSts;
         TUint                 iCurrentContext;

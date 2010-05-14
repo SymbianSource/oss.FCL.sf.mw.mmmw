@@ -48,22 +48,6 @@ public:
     virtual gint GetType(TMSSourceType& sourcetype) = 0;
     };
 
-/*class TMSDeviceMic:public TMSSource
-    {
-public:
-    virtual gint GetType(TMSSourceType& sourcetype){return iSourceType};
-private:
-    TMSSourceType iSourceType;
-    };*/
-
-/*class TMSModem:public TMSSource
-    {
-public:
-    virtual gint GetType(TMSSourceType& sourcetype){return iSourceType};
-private:
-    TMSSourceType iSourceType;
-    };*/
-
 } //namespace TMS
 
 #endif //TMS_SOURCE_H

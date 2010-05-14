@@ -18,11 +18,7 @@
 #ifndef XASEEKITF_H
 #define XASEEKITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xamediaplayer.h"
 /** MACROS **/
 
 /** TYPES **/
@@ -45,10 +41,8 @@ typedef struct XASeekItfImpl_
     XAmillisecond startPos;
     XAmillisecond endPos;
 
-#ifdef _GSTREAMER_BACKEND_
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
 }XASeekItfImpl;
 
 /** METHODS **/
@@ -65,10 +59,8 @@ XAresult XASeekItfImpl_GetLoop(XASeekItf self, XAboolean *pLoopEnabled,
                                XAmillisecond *pStartPos,
                                XAmillisecond *pEndPos);
 
-#ifdef _GSTREAMER_BACKEND_
 /* XASeekItfImpl -specific methods */
-XASeekItfImpl* XASeekItfImpl_Create( XAAdaptationBaseCtx *adapCtx );
-#endif
+XASeekItfImpl* XASeekItfImpl_Create( XAMediaPlayerImpl* impl );
 void XASeekItfImpl_Free(XASeekItfImpl* self);
 
 #endif /* XASEEKITF_H */

@@ -63,19 +63,18 @@ bool CStsImplementation::Init()
 
 void CStsImplementation::PlayTone(CSystemToneService::TToneType aTone)
     {
-    unsigned int playToneContext;
-    PlayTone(aTone, playToneContext);
+    iSession->SendPlayTone(aTone);
     }
 
-void CStsImplementation::PlayTone(CSystemToneService::TToneType aTone,
-        unsigned int& aPlayToneContext)
+void CStsImplementation::PlayAlarm(CSystemToneService::TAlarmType aAlarm,
+        unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
     {
     //TODO: Add logging and error checking
-    iSession->SendPlayTone(aTone, aPlayToneContext);
+    iSession->SendPlayAlarm(aAlarm, aAlarmContext, aObserver);
     }
 
-void CStsImplementation::StopTone(unsigned int aPlayToneContext)
+void CStsImplementation::StopAlarm(unsigned int aAlarmContext)
     {
     //TODO: Add logging and error checking
-    iSession->SendStopTone(aPlayToneContext);
+    iSession->SendStopAlarm(aAlarmContext);
     }

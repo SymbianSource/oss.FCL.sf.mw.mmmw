@@ -21,9 +21,8 @@
 #include "openmaxalwrapper.h"
 #include "xaobjectitf.h"
 #include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "../adaptation/XAOutputMixAdaptCtx.h"
-#endif
+#include "xaadptbasectx.h"
+
 /** MACROS **/
 
 
@@ -51,10 +50,9 @@ typedef struct XAOMixImpl_
     /* Parent for XAMediaPlayerImpl */
     XAObjectItfImpl baseObj;
 
-#ifdef _GSTREAMER_BACKEND_
     /* variables */
     XAAdaptationBaseCtx* adaptationCtx;
-#endif
+
 } XAOMixImpl;
 
 

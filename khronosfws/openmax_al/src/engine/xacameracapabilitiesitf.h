@@ -109,9 +109,9 @@ XAresult XACameraCapabilitiesItfImpl_GetSupportedZoomSettings(
                         XAuint32* pNumSettings,
                         XApermille** ppSettings,
                         XAboolean* pSpeedSupported);
-#ifdef _GSTREAMER_BACKEND_  
+ 
 /* XACameraCapabilitiesItfImpl -specific methods */
-XACameraCapabilitiesItfImpl* XACameraCapabilitiesItfImpl_Create();
+XACameraCapabilitiesItfImpl* XACameraCapabilitiesItfImpl_Create(void);
 void XACameraCapabilitiesItfImpl_Free(XACameraCapabilitiesItfImpl* self);
-#endif
+
 #endif /* XACAMERACAPABILITIESITF_H */

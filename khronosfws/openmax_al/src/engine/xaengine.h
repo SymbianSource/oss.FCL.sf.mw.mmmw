@@ -21,10 +21,11 @@
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
 #include "xaobjectitf.h"
-#ifdef _GSTREAMER_BACKEND_   
-#include "XAEngineAdaptCtx.h"
-#endif
+#include "xaengineadaptctx.h"
+
 #include "xaengineadaptctxmmf.h"
+#include "xaframeworkmgr.h"
+#include "xacapabilitiesmgr.h"
 
 /** MACROS **/
 
@@ -40,16 +41,20 @@ typedef enum
     ENGINE_ENGINEITF,
     ENGINE_DIMITF,
     ENGINE_THREADSYNCITF,
+/*
     ENGINE_CONFIGEXTENSIONSITF,
     ENGINE_DEVICEVOLUMEITF,
+*/
     ENGINE_AUDIOIODEVICECAPAITF,
-    ENGINE_AUDIODECODERCAPAITF,
+/*    ENGINE_AUDIODECODERCAPAITF,*/
     ENGINE_AUDIOENCODERCAPAITF,
+/*
     ENGINE_CAMERACAPAITF,
     ENGINE_IMAGEDECODERCAPAITF,
     ENGINE_IMAGEENCODERCAPAITF,
     ENGINE_VIDEODECODERCAPAITF,
     ENGINE_VIDEOENCODERCAPAITF,
+*/
     ENGINE_ITFCOUNT
 } XAEngineInterfaces;
 
@@ -65,8 +70,11 @@ typedef struct XAEngineImpl_
     XAboolean isThreadSafe;
 
     //actual adpatation context can point to either MMF or GST implementations
-    void* adaptationGstCtx;
-    void* adaptationMmfCtx;
+    FrameworkMap *frameworkMap;
+    XACapabilities* capabilities;
+   
+/*    void* adaptationGstCtx;
+    void* adaptationMmfCtx;*/
 } XAEngineImpl;
 
 /** METHODS **/

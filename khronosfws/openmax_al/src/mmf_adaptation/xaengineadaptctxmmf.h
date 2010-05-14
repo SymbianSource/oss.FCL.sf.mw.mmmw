@@ -18,16 +18,16 @@
 #ifndef XAENGINEADAPTCTXMMF_H_
 #define XAENGINEADAPTCTXMMF_H_
 
-#include "xaadaptationcontextbasemmf.h"
-//#include "XAStaticCapsAdaptation.h"
+#include "xaadaptationmmf.h"
+
 
 /* TYPEDEFS */
 
 typedef struct XAEngineAdaptationMMFCtx_ XAEngineAdaptationMMFCtx;
 
 /* FUNCTIONS */
-XAAdaptationBaseMMFCtx* XAEngineAdaptMMF_Create(void);
-XAresult XAEngineAdaptMMF_PostInit(XAAdaptationBaseMMFCtx* bCtx);
-void XAEngineAdaptMMF_Destroy(XAAdaptationBaseMMFCtx* bCtx);
+XAAdaptationMMFCtx* XAEngineAdaptMMF_Create(void);
+XAresult XAEngineAdaptMMF_PostInit(XAAdaptationMMFCtx* bCtx);
+void XAEngineAdaptMMF_Destroy(XAAdaptationMMFCtx* bCtx);
 
 #endif /* XAENGINEADAPTCTXMMF_H_ */

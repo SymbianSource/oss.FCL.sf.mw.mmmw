@@ -11,7 +11,7 @@
 ;
 ; Contributors:
 ;
-; Description: OpenMAX AL - UDEB build
+; Description: OpenMAX AL - UREL build
 ;
 ;File: openmax_al.pkg
 
@@ -31,5 +31,6 @@
 :"Nokia"
 
 ;Files To Copy...<src> <destination>
-"/epoc32/release/armv5/udeb/openmaxal.dll"         -"!:/sys/bin/openmaxal.dll"
+"/epoc32/release/armv5/urel/openmaxal.dll"         -"!:/sys/bin/openmaxal.dll"
+"../data/openmaxal.cfg"                             -   "c:/openmaxal/openmaxal.cfg"
 

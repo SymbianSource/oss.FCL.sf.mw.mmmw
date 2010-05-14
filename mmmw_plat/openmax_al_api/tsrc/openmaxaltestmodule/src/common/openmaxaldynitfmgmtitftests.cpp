@@ -117,7 +117,6 @@ TInt COpenMAXALTestModule::al_dimitf_RemoveInterface( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
-    TInt async(0);
     TInt interface(0);
     XAInterfaceID id(NULL);
 
@@ -132,22 +131,14 @@ TInt COpenMAXALTestModule::al_dimitf_RemoveInterface( CStifItemParser& aItem )
         status = KErrGeneral;
         }
 
-    status = aItem.GetNextInt(async);
-    if(!status)
+    if(m_DIMItf)
         {
-        if(m_DIMItf)
-            {
-            res = (*m_DIMItf)->RemoveInterface(m_DIMItf,id);
-            status = res;
-            }
-        else
-            {
-            status = KErrNotFound;
-            }
+        res = (*m_DIMItf)->RemoveInterface(m_DIMItf,id);
+        status = res;
         }
     else
         {
-        status = KErrGeneral;
+        status = KErrNotFound;
         }
     return status;            
     }

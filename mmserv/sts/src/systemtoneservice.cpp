@@ -58,13 +58,13 @@ EXPORT_C void CSystemToneService::PlayTone(TToneType aTone)
     iImplementation.PlayTone(aTone);
     }
 
-EXPORT_C void CSystemToneService::PlayTone(TToneType aTone,
-        unsigned int& aPlayToneContext)
+EXPORT_C void CSystemToneService::PlayAlarm(TAlarmType aAlarm,
+        unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
     {
-    iImplementation.PlayTone(aTone, aPlayToneContext);
+    iImplementation.PlayAlarm(aAlarm, aAlarmContext, aObserver);
     }
 
-EXPORT_C void CSystemToneService::StopTone(unsigned int aPlayToneContext)
+EXPORT_C void CSystemToneService::StopAlarm(unsigned int aAlarmContext)
     {
-    iImplementation.StopTone(aPlayToneContext);
+    iImplementation.StopAlarm(aAlarmContext);
     }

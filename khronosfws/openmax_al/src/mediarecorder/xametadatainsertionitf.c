@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xametadatainsertionitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAMetadataAdaptation.h"
-#endif
+
+#include "xametadataadaptation.h"
+
 #define MAX_TAGS 255
 /* XAMetadataInsertionItfImpl* GetImpl(XAMetadataInsertionItf self)
  * Description: Validate interface pointer and cast it to implementation pointer.
@@ -65,22 +65,26 @@ XAresult XAMetadataInsertionItfImpl_CreateChildNode(XAMetadataInsertionItf self,
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-        if( impl->adaptCtx )
+
+    if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWGST)
         {
-            ret = XAMetadataInsertionItfAdapt_CreateChildNode(
-                    impl->adaptCtx,parentNodeID,type,mimeType,pChildNodeID);
+        if(impl->adaptCtx)
+            {
+                ret = XAMetadataInsertionItfAdapt_CreateChildNode(
+                        (XAAdaptationGstCtx*)impl->adaptCtx,parentNodeID,type,mimeType,pChildNodeID);
+            }
+            else
+            {
+                ret = XA_RESULT_INTERNAL_ERROR;
+            }
+    
         }
-        else
+    else
         {
-            ret = XA_RESULT_INTERNAL_ERROR;
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XAMetadataInsertionItfImpl_CreateChildNode");
+        return XA_RESULT_FEATURE_UNSUPPORTED; 
         }
-#endif
-    /*******************************************/
-    /****This is being done since mmf does not 
-     * support metadata Insertion
-     *******************************************/
-    ret = XA_RESULT_FEATURE_UNSUPPORTED;    
     }
     DEBUG_API("<-XAMetadataInsertionItfImpl_CreateChildNode");
     return ret;
@@ -109,23 +113,24 @@ XAresult XAMetadataInsertionItfImpl_GetSupportedKeysCount(XAMetadataInsertionItf
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
+    if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
         if( impl->adaptCtx )
-        {
+            {
             ret = XAMetadataInsertionItfAdapt_GetSupportedKeysCount(
-                    impl->adaptCtx,nodeID,pFreeKeys,pKeyCount,pEncodingCount);
-        }
+                    (XAAdaptationGstCtx*)impl->adaptCtx,nodeID,pFreeKeys,pKeyCount,pEncodingCount);
+            }
         else
-        {
+            {
             ret = XA_RESULT_INTERNAL_ERROR;
+            }
         }
-#endif
-    /*******************************************/
-    /****This is being done since mmf does not 
-     * support metadata Insertion
-     *******************************************/
-
-    ret = XA_RESULT_PARAMETER_INVALID;     
+    else
+        {
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAMetadataInsertionItfImpl_GetSupportedKeysCount");
+        return XA_RESULT_PARAMETER_INVALID;     
+        }
     }
     DEBUG_API("<-XAMetadataInsertionItfImpl_GetSupportedKeysCount");
     return ret;
@@ -153,23 +158,25 @@ XAresult XAMetadataInsertionItfImpl_GetKeySize(XAMetadataInsertionItf self,
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-        if( impl->adaptCtx )
+    if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWGST)
         {
-            ret = XAMetadataInsertionItfAdapt_GetKeySize(
-                        impl->adaptCtx, nodeID, keyIndex, pKeySize);
-        }
-        else
-        {
-            ret = XA_RESULT_INTERNAL_ERROR;
-        }
-#endif
-        /*******************************************/
-        /****This is being done since mmf does not 
-         * support metadata Insertion
-         *******************************************/
 
-        ret = XA_RESULT_PARAMETER_INVALID;          
+        if( impl->adaptCtx )
+            {
+            ret = XAMetadataInsertionItfAdapt_GetKeySize(
+                    (XAAdaptationGstCtx*)impl->adaptCtx, nodeID, keyIndex, pKeySize);
+            }
+        else
+            {
+            ret = XA_RESULT_INTERNAL_ERROR;
+            }
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAMetadataInsertionItfImpl_GetKeySize");
+        return XA_RESULT_PARAMETER_INVALID;   
+        }
     }
     DEBUG_API("<-XAMetadataInsertionItfImpl_GetKeySize");
     return ret;
@@ -198,23 +205,26 @@ XAresult XAMetadataInsertionItfImpl_GetKey(XAMetadataInsertionItf self,
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-        if( impl->adaptCtx )
+    if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWGST)
         {
-            ret = XAMetadataInsertionItfAdapt_GetKey(
-                    impl->adaptCtx,nodeID,keyIndex,keySize,pKey);
-        }
-        else
-        {
-            ret = XA_RESULT_INTERNAL_ERROR;
-        }
-#endif
-    /*******************************************/
-    /****This is being done since mmf does not 
-     * support metadata Insertion
-     *******************************************/
 
-    ret = XA_RESULT_PARAMETER_INVALID;         
+        if( impl->adaptCtx )
+            {
+            ret = XAMetadataInsertionItfAdapt_GetKey(
+                    (XAAdaptationGstCtx*)impl->adaptCtx,nodeID,keyIndex,keySize,pKey);
+            }
+        else
+            {
+            ret = XA_RESULT_INTERNAL_ERROR;
+            }
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAMetadataInsertionItfImpl_GetKey");
+        return XA_RESULT_PARAMETER_INVALID;   
+        }    
+
     }
     DEBUG_API("<-XAMetadataInsertionItfImpl_GetKey");
     return ret;
@@ -242,23 +252,25 @@ XAresult XAMetadataInsertionItfImpl_GetFreeKeysEncoding(XAMetadataInsertionItf s
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-        if( impl->adaptCtx )
+    if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWGST)
         {
-            ret = XAMetadataInsertionItfAdapt_GetFreeKeysEncoding(
-                    impl->adaptCtx,nodeID,encodingIndex,pEncoding);
-        }
-        else
-        {
-            ret = XA_RESULT_INTERNAL_ERROR;
-        }
-#endif
-        /*******************************************/
-        /****This is being done since mmf does not 
-         * support metadata Insertion
-         *******************************************/
 
-        ret = XA_RESULT_PARAMETER_INVALID;         
+        if( impl->adaptCtx )
+            {
+            ret = XAMetadataInsertionItfAdapt_GetFreeKeysEncoding(
+                    (XAAdaptationGstCtx*)impl->adaptCtx,nodeID,encodingIndex,pEncoding);
+            }
+        else
+            {
+            ret = XA_RESULT_INTERNAL_ERROR;
+            }
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAMetadataInsertionItfImpl_GetFreeKeysEncoding");
+        return XA_RESULT_PARAMETER_INVALID;   
+        }        
     }
     DEBUG_API("<-XAMetadataInsertionItfImpl_GetFreeKeysEncoding");
     return ret;
@@ -286,27 +298,28 @@ XAresult XAMetadataInsertionItfImpl_InsertMetadataItem(XAMetadataInsertionItf se
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-        if( impl->adaptCtx )
+    if(impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWGST)
         {
+
+        if( impl->adaptCtx )
+            {
             ret = XAMetadataInsertionItfAdapt_InsertMetadataItem(
-                    impl->adaptCtx,nodeID,pKey,pValue,overwrite);
-            /*store pointers for callback*/
+                    (XAAdaptationGstCtx*)impl->adaptCtx,nodeID,pKey,pValue,overwrite);
             impl->currentTags.mdeKeys[impl->currentTags.itemcount] = pKey;
             impl->currentTags.mdeValues[impl->currentTags.itemcount] = pValue;
             impl->currentTags.itemcount++;
-        }
+            }
         else
-        {
+            {
             ret = XA_RESULT_INTERNAL_ERROR;
+            }
         }
-#endif      
-        /*******************************************/
-        /****This is being done since mmf does not 
-         * support metadata Insertion
-         *******************************************/
-
-        ret = XA_RESULT_FEATURE_UNSUPPORTED;         
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XAMetadataInsertionItfImpl_GetFreeKeysEncoding");
+        return XA_RESULT_FEATURE_UNSUPPORTED;   
+        }            
     }
     DEBUG_API("<-XAMetadataInsertionItfImpl_InsertMetadataItem");
     return ret;
@@ -331,20 +344,19 @@ XAresult XAMetadataInsertionItfImpl_RegisterCallback(XAMetadataInsertionItf self
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_
+
     if(callback)
     {
         XAAdaptationBase_AddEventHandler( impl->adaptCtx, &XAMetadataInsertionItfImpl_AdaptCb,
                                           XA_METADATAEVENTS, impl );
+        impl->callback = callback;
+        impl->cbcontext  = pContext;
+        impl->cbPtrToSelf = self;
     }
     else
     {
         XAAdaptationBase_RemoveEventHandler(impl->adaptCtx, &XAMetadataInsertionItfImpl_AdaptCb );
     }
-#endif
-    impl->callback = callback;
-    impl->cbcontext  = pContext;
-    impl->cbPtrToSelf = self;
 
     DEBUG_API("<-XAMetadataInsertionItfImpl_RegisterCallback");
     return XA_RESULT_SUCCESS;
@@ -358,36 +370,35 @@ XAresult XAMetadataInsertionItfImpl_RegisterCallback(XAMetadataInsertionItf self
 /* XAMetadataInsertionItfImpl* XAMetadataInsertionItfImpl_Create()
  * Description: Allocate and initialize MetadataInsertionItfImpl
  */
-XAMetadataInsertionItfImpl* XAMetadataInsertionItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adaptCtx
-#endif
-        )
+XAMetadataInsertionItfImpl* XAMetadataInsertionItfImpl_Create(XAMediaRecorderImpl* impl)
 {
     XAMetadataInsertionItfImpl* self = (XAMetadataInsertionItfImpl*)
         calloc(1,sizeof(XAMetadataInsertionItfImpl));
+    //XAMediaRecorderAdaptationCtx* mCtx = (XAMediaRecorderAdaptationCtx*)(impl->adaptationCtx);
+    
     DEBUG_API("->XAMetadataInsertionItfImpl_Create");
     if( self )
     {
-        /* init itf default implementation */
-        self->itf.CreateChildNode = XAMetadataInsertionItfImpl_CreateChildNode;
-        self->itf.GetFreeKeysEncoding = XAMetadataInsertionItfImpl_GetFreeKeysEncoding;
-        self->itf.GetKey = XAMetadataInsertionItfImpl_GetKey;
-        self->itf.GetKeySize = XAMetadataInsertionItfImpl_GetKeySize;
-        self->itf.GetSupportedKeysCount = XAMetadataInsertionItfImpl_GetSupportedKeysCount;
-        self->itf.InsertMetadataItem = XAMetadataInsertionItfImpl_InsertMetadataItem;
-        self->itf.RegisterCallback = XAMetadataInsertionItfImpl_RegisterCallback;
+        //if(mCtx->fwtype == FWMgrFWGST)
+            {
+            /* init itf default implementation */
+            self->itf.CreateChildNode = XAMetadataInsertionItfImpl_CreateChildNode;
+            self->itf.GetFreeKeysEncoding = XAMetadataInsertionItfImpl_GetFreeKeysEncoding;
+            self->itf.GetKey = XAMetadataInsertionItfImpl_GetKey;
+            self->itf.GetKeySize = XAMetadataInsertionItfImpl_GetKeySize;
+            self->itf.GetSupportedKeysCount = XAMetadataInsertionItfImpl_GetSupportedKeysCount;
+            self->itf.InsertMetadataItem = XAMetadataInsertionItfImpl_InsertMetadataItem;
+            self->itf.RegisterCallback = XAMetadataInsertionItfImpl_RegisterCallback;
+            }
 
         /* init variables*/
         
         self->callback = NULL;
         self->cbcontext = NULL;
         self->cbPtrToSelf = NULL;
-#ifdef _GSTREAMER_BACKEND_
-        self->adaptCtx = adaptCtx;
+        self->adaptCtx = impl->adaptationCtx;
         self->currentTags.mdeKeys = calloc(MAX_TAGS,sizeof(XAMetadataInfo*));
         self->currentTags.mdeValues = calloc(MAX_TAGS,sizeof(XAMetadataInfo*));
-#endif
         self->self = self;
 
     }
@@ -404,17 +415,13 @@ void XAMetadataInsertionItfImpl_Free(XAMetadataInsertionItfImpl* self)
     assert( self==self->self );
     if(self->callback)
     {
-#ifdef _GSTREAMER_BACKEND_
         XAAdaptationBase_RemoveEventHandler(self->adaptCtx, &XAMetadataInsertionItfImpl_AdaptCb );
-#endif        
     }
-#ifdef _GSTREAMER_BACKEND_
     XAMetadataAdapt_FreeImplTagList(&(self->currentTags), XA_BOOLEAN_FALSE);
-#endif
     free( self );
     DEBUG_API("<-XAMetadataInsertionItfImpl_Free");
 }
-#ifdef _GSTREAMER_BACKEND_
+
 /* With this method, adaptation infroms that tags are written to stream
  */
 void XAMetadataInsertionItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
@@ -460,4 +467,3 @@ void XAMetadataInsertionItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event 
     DEBUG_API("<-XAMetadataInsertionItfImpl_AdaptCb");
 }
 
-#endif

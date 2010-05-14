@@ -20,14 +20,13 @@
 #include "xamediarecorderadaptctxmmf.h"
 #include "xaadaptationmmf.h"
 #include "cmmfbackendengine.h"
+#include "xaadptbasectx.h"
 //#include "XAMetadataAdaptation.h"
 //#include "XAStaticCapsAdaptation.h"
 
 
-#define XA_ADAPTID_UNINITED 0
-#ifdef _GSTREAMER_BACKEND_ 
 extern XAboolean cameraRealized;
-#endif
+
 //extern XACameraAdaptationCtx_* cameraCtx;
 
 
@@ -40,7 +39,7 @@ extern XAboolean cameraRealized;
  * @param XADataSink *pDataSnk - pointer to OMX-AL sink
  * @returns XAMediaRecorderAdaptationMMFCtx* - Pointer to created context, NULL if error occurs.
  */
-XAAdaptationBaseMMFCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
+XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
         XADataSource* pImageVideoSrc, XADataSink* pDataSnk, XAuint8 recModes)
     {
     XAMediaRecorderAdaptationMMFCtx *pSelf = NULL;
@@ -49,11 +48,11 @@ XAAdaptationBaseMMFCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
     XADataLocator_IODevice *ioDevice;
     DEBUG_API("->XAMediaRecorderAdaptMMF_Create");
 
-    pSelf = calloc(1, sizeof(XAMediaRecorderAdaptationMMFCtx));
+    pSelf = (XAMediaRecorderAdaptationMMFCtx*)calloc(1, sizeof(XAMediaRecorderAdaptationMMFCtx));
     if (pSelf)
         {            
         if (XAAdaptationBaseMMF_Init(&(pSelf->baseObj),
-                XAMediaRecorderAdaptationMMF) != XA_RESULT_SUCCESS)
+                XAMediaRecorderAdaptation) != XA_RESULT_SUCCESS)
             {
             DEBUG_ERR("Failed to init base context!!!");
             free(pSelf);
@@ -97,9 +96,9 @@ XAAdaptationBaseMMFCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
                 ioDevice
                         = (XADataLocator_IODevice*) (pImageVideoSrc->pLocator);
                 if (ioDevice->deviceType == XA_IODEVICE_CAMERA
-#ifdef _GSTREAMER_BACKEND_ 
+ 
                         && !cameraRealized
-#endif                        
+                        
                         )
                     {
                     DEBUG_ERR("Preconditions violated - Camera object not realized");
@@ -123,7 +122,7 @@ XAAdaptationBaseMMFCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
         }
     
     DEBUG_API("<-XAMediaRecorderAdaptMMF_Create");
-    return (XAAdaptationBaseMMFCtx*) pSelf;
+    return (XAAdaptationBaseCtx*) (&pSelf->baseObj.baseObj);
     }
 
 /*
@@ -132,7 +131,7 @@ XAAdaptationBaseMMFCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
  * @param XAAdaptationBaseCtx* ctx - pointer to Media Recorder adaptation context
  * @return XAresult - Success value
  */
-XAresult XAMediaRecorderAdaptMMF_PostInit(XAAdaptationBaseMMFCtx* bCtx)
+XAresult XAMediaRecorderAdaptMMF_PostInit(XAAdaptationMMFCtx* bCtx)
     {
 
     XAresult ret = XA_RESULT_SUCCESS;
@@ -153,11 +152,11 @@ XAresult XAMediaRecorderAdaptMMF_PostInit(XAAdaptationBaseMMFCtx* bCtx)
     }
 
 /*
- * void XAMediaRecorderAdaptMMF_Destroy( XAAdaptationBaseMMFCtx* bCtx )
+ * void XAMediaRecorderAdaptMMF_Destroy( XAAdaptationMMFCtx* bCtx )
  * Destroys Media Recorder Adaptation Context
  * @param ctx - Media Recorder Adaptation context to be destroyed
  */
-void XAMediaRecorderAdaptMMF_Destroy(XAAdaptationBaseMMFCtx* bCtx)
+void XAMediaRecorderAdaptMMF_Destroy(XAAdaptationMMFCtx* bCtx)
     {
     XAMediaRecorderAdaptationMMFCtx* ctx = NULL;
     
@@ -172,7 +171,7 @@ void XAMediaRecorderAdaptMMF_Destroy(XAAdaptationBaseMMFCtx* bCtx)
 
     if(ctx->mmfContext)
         {
-        mmf_close(ctx->mmfContext);
+        mmf_backend_engine_deinit(ctx->mmfContext);
         }
     XAAdaptationBaseMMF_Free(bCtx);
 

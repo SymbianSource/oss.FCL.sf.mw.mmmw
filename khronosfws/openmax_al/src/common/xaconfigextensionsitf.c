@@ -76,13 +76,13 @@ XAresult XAConfigExtensionsItfImpl_SetConfiguration(
         DEBUG_INFO_A1("CP conf value %d", numValue);
         if(res == XA_RESULT_SUCCESS)
         {
-#ifdef _GSTREAMER_BACKEND_   
+
             /*Inform adaptation*/
             if( impl->ctx )
             {
-                res = XAAdaptationBase_SetCPConfiguration(impl->ctx,impl->testbufferconf);
+/*                res = XAAdaptationBase_SetCPConfiguration(impl->ctx,impl->testbufferconf);*/
             }
-#endif
+
         }
     }
     else
@@ -129,7 +129,7 @@ XAresult XAConfigExtensionsItfImpl_GetConfiguration(
     return res;
 }
 
-#ifdef _GSTREAMER_BACKEND_   
+ 
 XAresult XAConfigExtensionsItfImpl_SetContext(XAConfigExtensionsItfImpl* self,XAAdaptationBaseCtx* adptctx)
     {
     XAresult res = XA_RESULT_SUCCESS;
@@ -147,7 +147,7 @@ XAresult XAConfigExtensionsItfImpl_SetContext(XAConfigExtensionsItfImpl* self,XA
     DEBUG_API("<-XAConfigExtensionsItfImpl_SetContext");
     return res;
     }
-#endif
+
 /**
  * XAConfigExtensionsItfImpl -specific methods
  **/

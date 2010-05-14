@@ -21,6 +21,8 @@
 #include"HXTneclientservercommon.h"
 #include <flogger.h>
 #include <f32file64.h>
+#include <e32math.h> // Sqrt
+#include <stdlib.h> // abs
 static const TInt kDefaultStack = 0x4000;
 
 
@@ -57,7 +59,7 @@ inline static void LogFNull(TRefByValue<const TDesC16> aFmt,...){}
 
 
 
-const TInt KMaxPacketToDecode = 32;
+const TInt KMaxPacketToDecode = 160; // Many clips begin with several seconds of logos / MPAA rating which need to be skipped
 
 //////////////Server///////////////
 
@@ -688,51 +690,126 @@ void CTneSession::EndOfPackets()
         }
 }
 
+/* Determines whether a frame contains sufficient data to be considered an useful frame.
+ * The logic scans a set of pixels to confirm:
+ * too bright or too dark pixels are not taken into account. Only mid brightness pixels will be considered
+ * if less than minSamples valid samples the frame is rejected. 
+ * if the mode is more frequent than maxModePrct% the frame is rejected. This is useful to reject the MPAA rating or other simple logos
+ * if the contrast is too low (max - min) frame is rejected
+ * if the standard deviation is too low frame is rejected.
+ */
+
 TBool CTneSession::IsGoodFrame(TUint8* aYUVDataPtr)
 {
-	
  	TInt i;
+    TInt ySize = iWidth*iHeight; 
+    TUint8 * resetYUVPtr = aYUVDataPtr;
+
+    // only these luminances are taken into account
+    TInt minSamples = 5;
+    TInt tooDark = 30;
+    TInt tooBright = 240;
+
+    // Defines how much data we analyze from the image to analyze its validity
+    TInt pixelSkips = iHeight;  // scans about 1 to 3 pixels per line depending on aspect ratio 
+
+    // average luminance profiling
+    TInt runningSum = 0;
+    TInt numberOfSamples = 0;
+    TInt averageValue = 0;
+
+    // contrast profiling
     TInt minValue = 255;
     TInt maxValue = 0;
+    TInt minMaxDeltaThreshold = 20;
+
+    // mode profiling
+    int mode = 0;
+    int modeSamples = 0;
+    int histogram[255] = {0};
+    int maxModePrct = 69;
+
+    // standard deviation profiling
+    TInt minStdDeviation = 5;
+    TUint32 residualsum = 0;
+    TReal stdDeviation = 0;
+
+    // Exit value
     TBool goodFrame = ETrue;
-    TInt runningSum=0;
-    TInt averageValue=0;
-    TInt pixelSkips = 4;
-    TInt numberOfSamples=0;
-    TInt minMaxDeltaThreshold = 20; 
-    TInt extremeRegionThreshold = 20; 
-    TInt ySize = iWidth*iHeight; 
-    
-    // gather image statistics
-    for(i=0, numberOfSamples=0; i<ySize; i+=pixelSkips, aYUVDataPtr+=pixelSkips, numberOfSamples++)
+
+    for(i=0, numberOfSamples=0; i<ySize; i+=pixelSkips, aYUVDataPtr+=pixelSkips)
     {
-        
-        
-        runningSum += *aYUVDataPtr;
-        if(*aYUVDataPtr > maxValue)
-            maxValue = *aYUVDataPtr;
-        if(*aYUVDataPtr < minValue)
-            minValue = *aYUVDataPtr;
+        if ( (*aYUVDataPtr>tooDark) && (*aYUVDataPtr<tooBright) )
+        {
+            runningSum += *aYUVDataPtr;
+            if(*aYUVDataPtr > maxValue)
+                maxValue = *aYUVDataPtr;
+            if(*aYUVDataPtr < minValue)
+                minValue = *aYUVDataPtr;
+            histogram[*aYUVDataPtr]++;
+            numberOfSamples++;
+        }
     }
-    //VDASSERT(numberOfSamples,10);
-    if (numberOfSamples == 0)
+
+    if (numberOfSamples < minSamples)
     {
-        FLOG(_L("CTneSession::IsGoodFrame numberOfSamples is zero")); 
-    }
-    else 
-    {
-        averageValue = runningSum/numberOfSamples;
-    }
-    
-    // make decision based statistics
-    if((maxValue - minValue) < minMaxDeltaThreshold)
+        //FLOG(_L("CTneSession::IsGoodFrame too few good samples"));
         goodFrame = EFalse;
-    else 
-    {
-        if(averageValue < (minValue + extremeRegionThreshold) || 
-            averageValue > (maxValue - extremeRegionThreshold))
-            goodFrame = EFalse;
     }
+    else
+    {
+        // Find the mode
+        for (i=0; i<255; i++)
+        {
+            if (histogram[i] > modeSamples)
+            {
+                modeSamples = histogram[i];
+                mode = i;
+            }
+        }
+        // Add the mode and most immediate values, as compression may add artifacts that disperse its value
+        for (i = mode-2, modeSamples = 0; i < mode+3; i++)
+        {
+            modeSamples += histogram[i];
+        }
+    
+        if (modeSamples * 100 / numberOfSamples > maxModePrct)
+        {
+            //FLOG(_L("Mode (%d) in over %d%% of the image\n", mode, modeSamples * 100 / numberOfSamples);
+            goodFrame = false;
+        }
+        else 
+        {
+            averageValue = runningSum / numberOfSamples;
+            // Rescan the frame now that we the average value is known
+            aYUVDataPtr = resetYUVPtr;
+    
+    
+            // Calculate the sum of residuals: (pixel - avgpixel)^2
+            for(i=0; i<ySize; i+=pixelSkips, aYUVDataPtr+=pixelSkips)
+            {
+                if ( (*aYUVDataPtr>tooDark) && (*aYUVDataPtr<tooBright) )
+                {
+                    residualsum += (*aYUVDataPtr - averageValue) * (*aYUVDataPtr - averageValue);
+                }
+            }
+    
+            // Get the standard deviation
+            Math::Sqrt(stdDeviation , residualsum / numberOfSamples);
+    
+            if (stdDeviation < minStdDeviation)
+            {
+                //FLOG(_L("CTneSession::IsGoodFrame too low StdDeviation: %f"), stdDeviation);
+                goodFrame = EFalse;
+            }
+            else if((maxValue - minValue) < minMaxDeltaThreshold)
+            {
+                //FLOG(_L("CTneSession::IsGoodFrame too little difference between brightest and darkest pixel"));
+                goodFrame = EFalse;
+            }
+        }
+    }
+
     return goodFrame;
 }
 

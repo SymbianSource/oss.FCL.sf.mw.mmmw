@@ -23,7 +23,7 @@
 #include "xaconfigextensionsitf.h"
 #include "xadynintmgmtitf.h"
 #include "xathreadsafety.h"
-
+#include "xaledarrayadaptctx.h"
 
 /* Static mapping of enumeration XALEDArrayDeviceInterfaces to interface iids */
 static const XAInterfaceID* XALEDArrayDeviceItfIIDs[LEDARRAY_ITFCOUNT]=
@@ -42,7 +42,8 @@ static const XAInterfaceID* XALEDArrayDeviceItfIIDs[LEDARRAY_ITFCOUNT]=
 /* XAResult XALEDArrayDeviceImpl_Create
  * Description: Create object
  */
-XAresult XALEDArrayDeviceImpl_CreateLEDArrayDevice(XAObjectItf* pDevice,
+XAresult XALEDArrayDeviceImpl_CreateLEDArrayDevice(FrameworkMap* mapper,
+                                                   XAObjectItf* pDevice,
                                                    XAuint32 deviceID,
                                                    XAuint32 numInterfaces,
                                                    const XAInterfaceID * pInterfaceIds,
@@ -127,11 +128,6 @@ XAresult XALEDArrayDeviceImpl_CreateLEDArrayDevice(XAObjectItf* pDevice,
         }
     }
 
-    /* Initialize XALEDArrayDeviceImpl variables */
-    pImpl->deviceID = deviceID;
-#ifdef _GSTREAMER_BACKEND_  
-    pImpl->adaptationCtx = XALEDArrayAdapt_Create(pImpl->deviceID);
-#endif
     
     /* This code is put here to return Feature Not Supported since adaptation is not present*/
     /*************************************************/
@@ -140,15 +136,17 @@ XAresult XALEDArrayDeviceImpl_CreateLEDArrayDevice(XAObjectItf* pDevice,
     DEBUG_ERR("Required interface not found - abort creation!");
     DEBUG_API("<-XALEDArrayDeviceImpl_Create");
     return XA_RESULT_FEATURE_UNSUPPORTED;
-    /*************************************************/
+    /*************************************************/    
     
-    /* Set ObjectItf to point to newly created object */
-/*
+/*    // Initialize XALEDArrayDeviceImpl variables 
+    pImpl->deviceID = deviceID;
+    pImpl->adaptationCtx = XALEDArrayAdapt_Create(pImpl->deviceID);
+    
+    // Set ObjectItf to point to newly created object 
     *pDevice = (XAObjectItf)&(pBaseObj->self);
     XA_IMPL_THREAD_SAFETY_EXIT(XATSLEDArray);
     DEBUG_API("<-XALEDArrayDeviceImpl_Create");
-    return XA_RESULT_SUCCESS;
-*/
+    return XA_RESULT_SUCCESS;*/
 }
 
 /* XAResult XALEDArrayDeviceImpl_QueryNumSupportedInterfaces
@@ -159,9 +157,9 @@ XAresult XALEDArrayDeviceImpl_QueryNumSupportedInterfaces( XAuint32 *pNumSupport
     DEBUG_API("->XALEDArrayDeviceImpl_QueryNumSupportedInterfaces");
     if( pNumSupportedInterfaces )
     {
-#ifdef _GSTREAMER_BACKEND_  
+  
         *pNumSupportedInterfaces = LEDARRAY_ITFCOUNT;
-#endif
+
         DEBUG_API_A1("<-XALEDArrayDeviceImpl_QueryNumSupportedInterfaces - %ld", *pNumSupportedInterfaces );
         return XA_RESULT_SUCCESS;
     }
@@ -180,7 +178,7 @@ XAresult XALEDArrayDeviceImpl_QuerySupportedInterfaces( XAuint32 index,
 {
     DEBUG_API("->XALEDArrayDeviceImpl_QuerySupportedInterfaces");
 
-#ifdef _GSTREAMER_BACKEND_  
+  
     if( index >= LEDARRAY_ITFCOUNT || !pInterfaceId )
     {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
@@ -190,12 +188,12 @@ XAresult XALEDArrayDeviceImpl_QuerySupportedInterfaces( XAuint32 index,
     else
     {
         *pInterfaceId = *(XALEDArrayDeviceItfIIDs[index]);
-#endif
+
         DEBUG_API("<-XALEDArrayDeviceImpl_QuerySupportedInterfaces");
         return XA_RESULT_SUCCESS;
-#ifdef _GSTREAMER_BACKEND_  
+  
     }
-#endif    
+    
 }
 
 
@@ -210,7 +208,7 @@ XAresult XALEDArrayDeviceImpl_QuerySupportedInterfaces( XAuint32 index,
  */
 XAresult XALEDArrayDeviceImpl_DoRealize( XAObjectItf self )
 {
-#ifdef _GSTREAMER_BACKEND_
+
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XAuint8 itfIdx = 0;
     XALEDArrayDeviceImpl* pObjImpl = (XALEDArrayDeviceImpl*)(pObj);
@@ -229,7 +227,7 @@ XAresult XALEDArrayDeviceImpl_DoRealize( XAObjectItf self )
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-    ret = XALEDArrayAdapt_PostInit( pObjImpl->adaptationCtx );
+    ret = XALEDArrayAdapt_PostInit( (XAAdaptationGstCtx*)pObjImpl->adaptationCtx );
     if( ret != XA_RESULT_SUCCESS )
     {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSLEDArray);
@@ -276,7 +274,7 @@ XAresult XALEDArrayDeviceImpl_DoRealize( XAObjectItf self )
 
     pObj->state = XA_OBJECT_STATE_REALIZED;
     XA_IMPL_THREAD_SAFETY_EXIT(XATSLEDArray);
-#endif    
+    
     DEBUG_API("<-XALEDArrayDeviceImpl_DoRealize");
     return XA_RESULT_SUCCESS;
 }
@@ -297,7 +295,7 @@ XAresult XALEDArrayDeviceImpl_DoResume(XAObjectItf self)
  */
 void XALEDArrayDeviceImpl_FreeResources(XAObjectItf self)
 {
-#ifdef _GSTREAMER_BACKEND_  
+  
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XALEDArrayDeviceImpl* pImpl = (XALEDArrayDeviceImpl*)(*self);
     XAuint8 itfIdx = 0;
@@ -307,7 +305,7 @@ void XALEDArrayDeviceImpl_FreeResources(XAObjectItf self)
 
     if ( pImpl->adaptationCtx != NULL )
     {
-        XALEDArrayAdapt_Destroy( pImpl->adaptationCtx );
+        XALEDArrayAdapt_Destroy( (XAAdaptationGstCtx*)pImpl->adaptationCtx );
         pImpl->adaptationCtx = NULL;
     }
 
@@ -338,13 +336,13 @@ void XALEDArrayDeviceImpl_FreeResources(XAObjectItf self)
 
     if ( pImpl->adaptationCtx != NULL )
     {
-        XALEDArrayAdapt_Destroy( pImpl->adaptationCtx );
+        XALEDArrayAdapt_Destroy( (XAAdaptationGstCtx*)pImpl->adaptationCtx );
         pImpl->adaptationCtx = NULL;
     }
 
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS(XATSLEDArray);
     DEBUG_API("<-XALEDArrayDeviceImpl_FreeResources");
-#endif    
+    
     return;
 }
 /* END OF FILE */

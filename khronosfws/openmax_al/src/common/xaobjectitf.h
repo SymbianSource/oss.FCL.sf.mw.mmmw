@@ -120,7 +120,6 @@ XAresult XAObjectItfImpl_Init(XAObjectItfImpl* self,
 /* methods for asynchronous service */
 void* XAObjectItfImpl_AsyncRealize(void* args);
 void* XAObjectItfImpl_AsyncResume(void* args);
-void XAObjectItfImpl_AsyncCleanup(void* args);
 
 XAObjItfMapEntry* XAObjectItfImpl_GetItfEntry(const XAObjectItf self,
                                               const XAInterfaceID iid);

@@ -19,8 +19,10 @@
 #ifndef RSTSSESSION_H_
 #define RSTSSESSION_H_
 
-#include <e32std.h>
+#include <e32msgqueue.h>
 #include <systemtoneservice.h>
+
+#include "stsclientservercommon.h"
 
 class RStsSession : public RSessionBase
     {
@@ -30,15 +32,24 @@ public:
 
     void Close();
 
-    TInt SendPlayTone(CSystemToneService::TToneType aToneType,
-            unsigned int& aPlayToneContext);
+    TInt SendPlayTone(CSystemToneService::TToneType aTone);
 
-    TInt SendStopTone(unsigned int aPlayToneContext);
+    TInt SendPlayAlarm(CSystemToneService::TAlarmType aAlarm,
+            unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
+
+    TInt SendStopAlarm(unsigned int aAlarmContext);
 
 private:
 
+    static TInt CallBackThreadMain(TAny* aSession);
+    void RunThreadL();
+    
+    TInt StartMsgQueue();
     TInt StartServer();
+    TInt StartThread();
 
+    RThread iThread;
+    RMsgQueue<TStsCallBack> iMsgQueue;
     };
 
 #endif // RSTSSESSION_H_

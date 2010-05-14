@@ -20,11 +20,10 @@
 #include <assert.h>
 #include <string.h>
 #include "xavideoencoderitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAVideoEncoderItfAdaptation.h"
-#include "XAStaticCapsAdaptation.h"
-#include "XARecordItfAdaptation.h"
-#endif
+
+#include "xavideoencoderitfadaptation.h"
+#include "xarecorditfadaptation.h"
+#include "xacapabilitiesmgr.h"
 #include "xathreadsafety.h"
 
 
@@ -55,8 +54,7 @@ XAresult XAVideoEncoderItfImpl_SetVideoSettings(XAVideoEncoderItf self,
                                                 XAVideoSettings *pSettings)
 {
     XAresult res = XA_RESULT_SUCCESS;
-#ifdef _GSTREAMER_BACKEND_
-    XAStaticCapsData temp;
+    XACapabilities temp;
     XAuint32 recState = XA_RECORDSTATE_STOPPED;
     XAVideoEncoderItfImpl *impl = GetImpl(self);
     DEBUG_API("->XAVideoEncoderItfImpl_SetVideoSettings");
@@ -70,34 +68,40 @@ XAresult XAVideoEncoderItfImpl_SetVideoSettings(XAVideoEncoderItf self,
         DEBUG_API("<-XAVideoEncoderItfImpl_SetVideoSettings");
         return XA_RESULT_PARAMETER_INVALID;
     }
-
-    res = XAStaticCapsAdapt_GetCapsById(XACAP_ENCODER|XACAP_VIDEO, pSettings->encoderId, &temp);
-    if( res == XA_RESULT_SUCCESS )
-    {
-        res = XARecordItfAdapt_GetRecordState( impl->adaptCtx, &recState );
-        if( res == XA_RESULT_SUCCESS )
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
         {
-            if( XA_RECORDSTATE_STOPPED == recState )
+        res = XACapabilitiesMgr_GetCapsById(NULL, (XACapsType)(XACAP_ENCODER|XACAP_VIDEO), pSettings->encoderId, &temp);
+        if( res == XA_RESULT_SUCCESS )
             {
-                res = XAVideoEncoderItfAdapt_SetVideoSettings(impl->adaptCtx, pSettings);
+            res = XARecordItfAdapt_GetRecordState( (XAAdaptationGstCtx*)impl->adaptCtx, &recState );
+            if( res == XA_RESULT_SUCCESS )
+                {
+                if( XA_RECORDSTATE_STOPPED == recState )
+                    {
+                    res = XAVideoEncoderItfAdapt_SetVideoSettings((XAAdaptationGstCtx*)impl->adaptCtx, pSettings);
+                    }
+                else
+                    {
+                    DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");
+                    res = XA_RESULT_PRECONDITIONS_VIOLATED;
+                    }
+                }
             }
-            else
+        else
             {
-                DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");
-                DEBUG_API("<-XAVideoEncoderItfImpl_SetVideoSettings");
-                return XA_RESULT_PRECONDITIONS_VIOLATED;
+            DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+            res = XA_RESULT_FEATURE_UNSUPPORTED;
             }
+    
         }
-    }
     else
-    {
+        {
         DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
-        DEBUG_API("<-XAVideoEncoderItfImpl_SetVideoSettings");
-        return XA_RESULT_FEATURE_UNSUPPORTED;
-    }
+        res = XA_RESULT_FEATURE_UNSUPPORTED;     
+        }
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
-#endif
+
     DEBUG_API("<-XAVideoEncoderItfImpl_SetVideoSettings");
     return res;
 }
@@ -118,9 +122,16 @@ XAresult XAVideoEncoderItfImpl_GetVideoSettings(XAVideoEncoderItf self,
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_
-    res = XAVideoEncoderItfAdapt_GetVideoSettings(impl->adaptCtx, pSettings);
-#endif
+    if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        res = XAVideoEncoderItfAdapt_GetVideoSettings((XAAdaptationGstCtx*)impl->adaptCtx, pSettings);
+        }
+    else
+        {
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        res = XA_RESULT_FEATURE_UNSUPPORTED;      
+        }
+
     DEBUG_API("<-XAVideoEncoderItfImpl_GetVideoSettings");
     return res;
 }
@@ -133,11 +144,7 @@ XAresult XAVideoEncoderItfImpl_GetVideoSettings(XAVideoEncoderItf self,
 /* XAVideoEncoderItfImpl* XAVideoEncoderItfImpl_Create()
  * Description: Allocate and initialize VideoEncoderItfImpl
  */
-XAVideoEncoderItfImpl* XAVideoEncoderItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adaptCtx
-#endif
-        )
+XAVideoEncoderItfImpl* XAVideoEncoderItfImpl_Create( XAMediaRecorderImpl* impl )
 {
     XAVideoEncoderItfImpl* self = (XAVideoEncoderItfImpl*)
         calloc(1,sizeof(XAVideoEncoderItfImpl));
@@ -149,10 +156,8 @@ XAVideoEncoderItfImpl* XAVideoEncoderItfImpl_Create(
         self->itf.GetVideoSettings = XAVideoEncoderItfImpl_GetVideoSettings;
         self->itf.SetVideoSettings = XAVideoEncoderItfImpl_SetVideoSettings;
 
-#ifdef _GSTREAMER_BACKEND_
         /* init variables */
-        self->adaptCtx = adaptCtx;
-#endif
+        self->adaptCtx = impl->adaptationCtx;
         self->self = self;
     }
     DEBUG_API("<-XAVideoEncoderItfImpl_Create");

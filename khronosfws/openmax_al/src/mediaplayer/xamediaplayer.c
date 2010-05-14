@@ -34,11 +34,12 @@
 #include "xavideopostprocessingitf.h"
 #include "xaconfigextensionsitf.h"
 #include "xathreadsafety.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAMetadataAdaptation.h"
-#endif
+#include "xametadataadaptation.h"
+#include "xacapabilitiesmgr.h"
 #include "xadynamicsourceitf.h"
-
+#include "xastreaminformationitf.h"
+#include "xanlinearvolumeitf.h"
+#include "xanvolumeextitf.h"
 
 extern void* vfHandle;
 
@@ -59,7 +60,10 @@ static const XAInterfaceID* xaMediaPlayerItfIIDs[MP_ITFCOUNT] =
     &XA_IID_METADATAEXTRACTION,
     &XA_IID_METADATATRAVERSAL,
     &XA_IID_PLAYBACKRATE,
-    &XA_IID_VIDEOPOSTPROCESSING
+    &XA_IID_VIDEOPOSTPROCESSING,
+    &XA_IID_NOKIAVOLUMEEXT,
+    &XA_IID_NOKIALINEARVOLUME,
+    &XA_IID_STREAMINFORMATION
 };
 
 /* Global methods */
@@ -67,7 +71,9 @@ static const XAInterfaceID* xaMediaPlayerItfIIDs[MP_ITFCOUNT] =
 /* XAResult XAMediaPlayerImpl_CreateMediaPlayer
  * Create object
  */
-XAresult XAMediaPlayerImpl_CreateMediaPlayer(XAObjectItf *pPlayer,
+XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
+                                            XACapabilities* capabilities,   
+                                             XAObjectItf *pPlayer,
                                              XADataSource *pDataSrc,
                                              XADataSource *pBankSrc,
                                              XADataSink *pAudioSnk,
@@ -81,11 +87,13 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(XAObjectItf *pPlayer,
     XAuint8 itfIdx = 0;
     XAMediaType mediaType = XA_MEDIATYPE_UNKNOWN;
     XAMediaPlayerImpl* pPlayerImpl = NULL;
+    FWMgrFwType fwType;
     XAObjectItfImpl* pBaseObj = NULL;
+    const char *uri = NULL;
     XAresult ret = XA_RESULT_SUCCESS;
-    XADataLocator_URI* tmpUri;
-
+    
     DEBUG_API("->XAMediaPlayerImpl_CreateMediaPlayer");
+
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaPlayer);
 
     if(!pPlayer || !pDataSrc)
@@ -199,11 +207,11 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(XAObjectItf *pPlayer,
     pBaseObj->interfaceMap[MP_METADATATRAVERSALITF].isDynamic = XA_BOOLEAN_TRUE;
     pBaseObj->interfaceMap[MP_PLAYBACKRATEITF].isDynamic = XA_BOOLEAN_TRUE;
 
-
-    /* Set ObjectItf to point to newly created object */
+    
+    /*Set ObjectItf to point to newly created object*/ 
     *pPlayer = (XAObjectItf)&(pBaseObj->self);
 
-    /* initialize XAPlayerImpl variables */
+    /*initialize XAPlayerImpl variables */
 
     pPlayerImpl->dataSrc = pDataSrc;
     pPlayerImpl->bankSrc = pBankSrc;
@@ -211,43 +219,61 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(XAObjectItf *pPlayer,
     pPlayerImpl->imageVideoSnk = pImageVideoSnk;
     pPlayerImpl->vibra = pVibra;
     pPlayerImpl->LEDArray = pLEDArray;
-    
-    tmpUri = (XADataLocator_URI*)(pPlayerImpl->dataSrc->pLocator);
-    XAMediaPlayerImpl_DeterminePlaybackEngine(*pPlayer, tmpUri);
-    
-    /* This code is put here to return Feature Not Supported since adaptation is not present*/
-    /*************************************************/
-    XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
-    XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
-    DEBUG_ERR("Required interface not found - abort creation!");
-    DEBUG_API("<-XAMediaPlayerImpl_CreateMediaPlayer");
-    return XA_RESULT_FEATURE_UNSUPPORTED;
-    /*************************************************/
-    
-/*    if(pPlayerImpl->isMMFPlayback)
+
+    /* Determine framework type that can handle recording */
+    fwType = (FWMgrFwType)FWMgrMOUnknown;
+    /**/
+    if (pDataSrc->pLocator)
     {
+        XADataLocator_URI* dataLoc = (XADataLocator_URI*)pDataSrc->pLocator;
+        if (dataLoc->locatorType == XA_DATALOCATOR_URI)
+            {
+            uri = (char*)dataLoc->URI;
+            }
+    }
+    fwType = XAFrameworkMgr_GetFramework(
+                        mapper,
+                        uri,
+                        FWMgrMOPlayer);
+
+    if (fwType == FWMgrMOUnknown)
+        {
+        ret = XA_RESULT_CONTENT_UNSUPPORTED;
+        XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
+        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
+        DEBUG_API("<-XAMediaPlayerImpl_CreateMediaPlayer");
+        return ret;
+        }
+    
+    if(fwType == FWMgrFWMMF)
+    {    
         pPlayerImpl->adaptationCtxMMF = XAMediaPlayerAdaptMMF_Create(pPlayerImpl->dataSrc,
                                                                pPlayerImpl->bankSrc,
                                                                pPlayerImpl->audioSnk,
                                                                pPlayerImpl->imageVideoSnk,
                                                                pPlayerImpl->vibra,
                                                                pPlayerImpl->LEDArray);
-    
+        
+        pPlayerImpl->curAdaptCtx = pPlayerImpl->adaptationCtxMMF;    
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_  
-       pPlayerImpl->adaptationCtx = XAMediaPlayerAdapt_Create(pPlayerImpl->dataSrc,
+       pPlayerImpl->adaptationCtxGst = XAMediaPlayerAdapt_Create(pPlayerImpl->dataSrc,
                                                            pPlayerImpl->bankSrc,
                                                            pPlayerImpl->audioSnk,
                                                            pPlayerImpl->imageVideoSnk,
                                                            pPlayerImpl->vibra,
                                                            pPlayerImpl->LEDArray);
-#endif
+       
+       pPlayerImpl->curAdaptCtx = pPlayerImpl->adaptationCtxGst;
     }
+    
+    pPlayerImpl->curAdaptCtx->capslist = capabilities;
+    pPlayerImpl->curAdaptCtx->fwtype = fwType;
+    
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
     DEBUG_API("<-XAMediaPlayerImpl_CreateMediaPlayer");
-    return XA_RESULT_SUCCESS;*/
+    return XA_RESULT_SUCCESS;
 }
 
 /* XAResult XAMediaPlayerImpl_QueryNumSupportedInterfaces
@@ -282,9 +308,9 @@ XAresult XAMediaPlayerImpl_QuerySupportedInterfaces(XAuint32 index,
     if (index >= MP_ITFCOUNT || !pInterfaceId )
     {
         if(pInterfaceId)
-            {
+        {
             *pInterfaceId = XA_IID_NULL;
-            }
+        }
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XAMediaPlayerImpl_QuerySupportedInterfaces");
         return XA_RESULT_PARAMETER_INVALID;
@@ -307,7 +333,6 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
     XAuint8 itfIdx = 0;
     void *pItf = NULL;
     XAresult ret = XA_RESULT_SUCCESS;
-    XADataLocator_URI* tmpUri;
 
     DEBUG_API("->XAMediaPlayerImpl_DoRealize");
     XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
@@ -340,11 +365,7 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                     }
                     break;
                 case MP_PLAYITF:
-                    pItf = XAPlayItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-                            pImpl->adaptationCtx,
-#endif
-                            pImpl->adaptationCtxMMF);
+                    pItf = XAPlayItfImpl_Create(pImpl);
                     if ( pImpl->dataSrc )
                     {
                 		XAuint32 locType = *((XAuint32*)(pImpl->dataSrc->pLocator));
@@ -357,11 +378,6 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                 				DEBUG_INFO_A1("Stored view finder pointer to global address %x", vfHandle);
                 			    }
                 		    }
-                		else if(locType == XA_DATALOCATOR_URI )
-                		    {
-                            tmpUri = (XADataLocator_URI*)(pImpl->dataSrc->pLocator);
-                            XAPlayItfImpl_DeterminePlaybackEngine(pItf, tmpUri);
-                		    }
                 		else
                 		    {
                 		
@@ -369,44 +385,51 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                     }
                     break;
                 case MP_VOLUMEITF:
-#ifdef _GSTREAMER_BACKEND_  
-                    pItf = XAVolumeItfImpl_Create(pImpl->adaptationCtx);
+                    pItf = XAVolumeItfImpl_Create(pImpl->curAdaptCtx);
                     break;
                 case MP_SEEKITF:
-                    pItf = XASeekItfImpl_Create(pImpl->adaptationCtx);
+                    pItf = XASeekItfImpl_Create(pImpl);
                     break;
                 case MP_PREFETCHSTATUSITF:
-                    pItf = XAPrefetchStatusItfImpl_Create( pImpl->adaptationCtx );
+                    pItf = XAPrefetchStatusItfImpl_Create( pImpl );
                     break;
                 case MP_METADATAEXTRACTIONITF:
-                    pItf = XAMetadataExtractionItfImpl_Create( pImpl->adaptationCtx );
+                    pItf = XAMetadataExtractionItfImpl_Create( pImpl->curAdaptCtx );
                     break;
                 case MP_METADATATRAVERSALITF:
-                    pItf = XAMetadataTraversalItfImpl_Create( pImpl->adaptationCtx );
+                    pItf = XAMetadataTraversalItfImpl_Create( pImpl->curAdaptCtx );
                     break;
                 case MP_PLAYBACKRATEITF:
-                    pItf = XAPlaybackRateItfImpl_Create(pImpl->adaptationCtx);
+                    pItf = XAPlaybackRateItfImpl_Create(pImpl);
                     break;
                 case MP_CONFIGEXTENSIONITF:
                     pItf = XAConfigExtensionsItfImpl_Create();
-                    XAConfigExtensionsItfImpl_SetContext( pItf, pImpl->adaptationCtx);
+                    XAConfigExtensionsItfImpl_SetContext( pItf, pImpl->curAdaptCtx);
                     break;
                 case MP_DYNAMICSOURCEITF:
-                    pItf = XADynamicSourceItfImpl_Create(pImpl->adaptationCtx);
+                    pItf = XADynamicSourceItfImpl_Create(pImpl->curAdaptCtx);
                     break;
                 case MP_EQUALIZERITF:
-                    pItf = XAEqualizerItfImpl_Create(pImpl->adaptationCtx);
+                    pItf = XAEqualizerItfImpl_Create(pImpl->curAdaptCtx);
                     break;
                 case MP_IMAGECONTROLSITF:
-                    pItf = XAImageControlsItfImpl_Create(pImpl->adaptationCtx);
+                    pItf = XAImageControlsItfImpl_Create(pImpl->curAdaptCtx);
                     break;
                 case MP_IMAGEEFFECTSITF:
-                    pItf = XAImageEffectsItfImpl_Create(pImpl->adaptationCtx);
+                    pItf = XAImageEffectsItfImpl_Create(pImpl->curAdaptCtx);
                     break;
                 case MP_VIDEOPOSTPROCESSINGITF:
-                    pItf = XAVideoPostProcessingItfImpl_Create(pImpl->adaptationCtx);
-#endif
+                    pItf = XAVideoPostProcessingItfImpl_Create(pImpl->curAdaptCtx);
                     break;
+               case MP_NOKIAVOLUMEEXT:
+                    pItf = XANokiaVolumeExtItfImpl_Create(pImpl->curAdaptCtx);
+                    break;
+               case MP_NOKIALINEARVOLUME:
+                    pItf = XANokiaLinearVolumeItfImpl_Create(pImpl->curAdaptCtx);
+                    break;                                        
+                case MP_STREAMINFORMATIONITF:
+                    pItf = XAStreamInformationItfImpl_Create(pImpl->curAdaptCtx);
+                    break;                    
                 default:
                     break;
             }
@@ -425,15 +448,13 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
         }
     }
     /* init adaptation */
-    if(pImpl->isMMFPlayback)
+    if(pImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
     {
-       ret = XAMediaPlayerAdaptMMF_PostInit( pImpl->adaptationCtxMMF );
+       ret = XAMediaPlayerAdaptMMF_PostInit( (XAAdaptationMMFCtx*)pImpl->adaptationCtxMMF );
     }
     else
     {
-#ifdef _GSTREAMER_BACKEND_
-       ret = XAMediaPlayerAdapt_PostInit( pImpl->adaptationCtx );
-#endif
+       ret = XAMediaPlayerAdapt_PostInit( (XAAdaptationGstCtx*)pImpl->adaptationCtxGst );
     }
     if ( ret != XA_RESULT_SUCCESS )
     {
@@ -469,16 +490,11 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
 {
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XAuint8 itfIdx = 0;
-
+    XAMediaPlayerImpl* pImpl = (XAMediaPlayerImpl*)pObj;
     DEBUG_API("->XAMediaPlayerImpl_FreeResources");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
-#ifdef _GSTREAMER_BACKEND_
-    XAMediaPlayerImpl* pImpl = (XAMediaPlayerImpl*)pObj;
+
     assert(pObj && pImpl && pObj == pObj->self);
-#endif
-
-    
-
     for(itfIdx = 0; itfIdx < MP_ITFCOUNT; itfIdx++)
     {
         void *pItf = pObj->interfaceMap[itfIdx].pItf;
@@ -528,17 +544,33 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
                 case MP_VIDEOPOSTPROCESSINGITF:
                     XAVideoPostProcessingItfImpl_Free(pItf);
                     break;
+                case MP_NOKIAVOLUMEEXT:
+                    XANokiaVolumeExtItfImpl_Free(pItf);
+                    break;
+                case MP_NOKIALINEARVOLUME:
+                    XANokiaLinearVolumeItfImpl_Free(pItf);
+                    break;                                        
+                case MP_STREAMINFORMATIONITF:
+                    XAStreamInformationItfImpl_Free(pItf);
+                    break;
+                    
             }
             pObj->interfaceMap[itfIdx].pItf = NULL;
         }
     }
-#ifdef _GSTREAMER_BACKEND_
-    if ( pImpl->adaptationCtx != NULL )
-    {
-        XAMediaPlayerAdapt_Destroy( pImpl->adaptationCtx );
-        pImpl->adaptationCtx = NULL;
-    }
-#endif
+    
+    if(pImpl->curAdaptCtx)
+        {
+        if(pImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+            {
+            XAMediaPlayerAdaptMMF_Destroy( (XAAdaptationMMFCtx*)pImpl->adaptationCtxMMF );
+            }
+        else
+            {
+            XAMediaPlayerAdapt_Destroy( (XAAdaptationGstCtx*)pImpl->adaptationCtxGst );
+            }
+        }
+
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
     DEBUG_API("<-XAMediaPlayerImpl_FreeResources");
     return;
@@ -549,10 +581,10 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
  */
 XAresult XAMediaPlayerImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry  )
 {
-#ifdef _GSTREAMER_BACKEND_  
+  
     XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
     XAMediaPlayerImpl* pImpl = (XAMediaPlayerImpl*)(pObj);
-#endif
+
     XAresult ret = XA_RESULT_SUCCESS;
     DEBUG_API("->XAMediaPlayerImpl_DoAddItf");
 
@@ -560,23 +592,23 @@ XAresult XAMediaPlayerImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry
     {
         switch( mapEntry->mapIdx )
             {
-#ifdef _GSTREAMER_BACKEND_  
+  
             case MP_METADATAEXTRACTIONITF:
-                mapEntry->pItf = XAMetadataExtractionItfImpl_Create( pImpl->adaptationCtx );
+                mapEntry->pItf = XAMetadataExtractionItfImpl_Create( pImpl->curAdaptCtx );
                 break;
             case MP_METADATATRAVERSALITF:
-                mapEntry->pItf = XAMetadataTraversalItfImpl_Create( pImpl->adaptationCtx );
+                mapEntry->pItf = XAMetadataTraversalItfImpl_Create( pImpl->curAdaptCtx );
                 break;
             case MP_PLAYBACKRATEITF:
-                mapEntry->pItf = XAPlaybackRateItfImpl_Create(pImpl->adaptationCtx);
+                mapEntry->pItf = XAPlaybackRateItfImpl_Create(pImpl);
                 break;
             case MP_EQUALIZERITF:
-                mapEntry->pItf = XAEqualizerItfImpl_Create( pImpl->adaptationCtx );
+                mapEntry->pItf = XAEqualizerItfImpl_Create( pImpl->curAdaptCtx );
                 break;
             case MP_IMAGEEFFECTSITF:
-                mapEntry->pItf = XAImageEffectsItfImpl_Create( pImpl->adaptationCtx );
+                mapEntry->pItf = XAImageEffectsItfImpl_Create( pImpl->curAdaptCtx );
                 break;
-#endif
+
             default:
                 DEBUG_ERR("XAMediaPlayerImpl_DoAddItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
@@ -653,30 +685,4 @@ XAresult XAMediaPlayerImpl_DoRemoveItf(XAObjectItf self, XAObjItfMapEntry *mapEn
     DEBUG_API("<-XAMediaPlayerImpl_DoRemoveItf");
     return ret;
 }
-XAresult XAMediaPlayerImpl_DeterminePlaybackEngine(XAObjectItf self, XADataLocator_URI *uri)
-{
- 
-  XAresult ret = XA_RESULT_SUCCESS;
-  char* tempPtr = NULL;
-  char extension[5];
-  
-  XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
-  XAMediaPlayerImpl* pImpl = (XAMediaPlayerImpl*)pObj;
-  DEBUG_API("->XAMediaPlayerImpl_DeterminePlaybackEngine");
-    
-  //need to move to configuration file and add more in final class
-  
-  pImpl->isMMFPlayback = XA_BOOLEAN_TRUE;
-	
-  tempPtr = strchr((char*)(uri->URI), '.');
-  strcpy(extension, tempPtr);
-	
-  if(!strcmp(extension, ".wav"))
-  {
-     pImpl->isMMFPlayback = XA_BOOLEAN_FALSE;
-  }
 
-  DEBUG_API("<-XAMediaPlayerImpl_DeterminePlaybackEngine"); 
-  return ret;  
-  
-}

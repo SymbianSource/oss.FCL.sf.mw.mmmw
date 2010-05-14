@@ -19,6 +19,7 @@
 #include <e32svr.h>
 #include <StifParser.h>
 #include <StifTestInterface.h>
+#include <StifTestEventInterface.h>
 #include "openmaxaltestmodule.h"
 
 // EXTERNAL DATA STRUCTURES
@@ -50,12 +51,6 @@ void ObjectCallback(XAObjectItf caller,
         XAuint32 param,
         void * pInterface);
 
-void MediaRecorderCallback(XAObjectItf caller,
-        const void * pContext,
-        XAuint32 event,
-        XAresult result,
-        XAuint32 param,
-        void * pInterface);
 // FORWARD DECLARATIONS
 //class ?FORWARD_CLASSNAME;
 
@@ -91,7 +86,10 @@ xaObjectCallback COpenMAXALTestModule::GetCallbackFunc(TInt object)
             func = ObjectCallback;
             break;
         case EMediaRecorder:
-            func = MediaRecorderCallback;
+            func = ObjectCallback;
+            break;
+        case EMediaPlayer:
+            func = ObjectCallback;
             break;
         default:
             func = NULL;
@@ -101,6 +99,58 @@ xaObjectCallback COpenMAXALTestModule::GetCallbackFunc(TInt object)
     
     }
 
+void COpenMAXALTestModule::HandleObjectCallback(XAObjectItf caller,XAuint32 event,
+                        XAresult result,XAuint32 param, void * pInterface)
+    {
+    switch(event)
+        {
+        case XA_OBJECT_EVENT_RUNTIME_ERROR:
+            {
+            TEventIf event( TEventIf::ESetEvent, _L("Event_XA_OBJECT_EVENT_RUNTIME_ERROR") );
+            TestModuleIf().Event( event );
+            }
+            break;
+        case XA_OBJECT_EVENT_ASYNC_TERMINATION:
+            {
+            TEventIf event( TEventIf::ESetEvent, _L("Event_XA_OBJECT_EVENT_ASYNC_TERMINATION") );
+            TestModuleIf().Event( event );
+            }
+            break;
+        case XA_OBJECT_EVENT_RESOURCES_LOST:
+            {
+            TEventIf event( TEventIf::ESetEvent, _L("Event_XA_OBJECT_EVENT_RESOURCES_LOST") );
+            TestModuleIf().Event( event );
+            }
+            break;
+        case XA_OBJECT_EVENT_RESOURCES_AVAILABLE:
+            {
+            TEventIf event( TEventIf::ESetEvent, _L("Event_XA_OBJECT_EVENT_RESOURCES_AVAILABLE") );
+            TestModuleIf().Event( event );
+            }
+            break;
+        case XA_OBJECT_EVENT_ITF_CONTROL_TAKEN:
+            {
+            TEventIf event( TEventIf::ESetEvent, _L("Event_XA_OBJECT_EVENT_ITF_CONTROL_TAKEN") );
+            TestModuleIf().Event( event );
+            }
+            break;
+        case XA_OBJECT_EVENT_ITF_CONTROL_RETURNED:
+            {
+            TEventIf event( TEventIf::ESetEvent, _L("Event_XA_OBJECT_EVENT_ITF_CONTROL_RETURNED") );
+            TestModuleIf().Event( event );
+            }
+            break;
+        case XA_OBJECT_EVENT_ITF_PARAMETERS_CHANGED:
+            {
+            TEventIf event( TEventIf::ESetEvent, _L("Event_XA_OBJECT_EVENT_ITF_PARAMETERS_CHANGED") );
+            TestModuleIf().Event( event );
+
+            }
+            break;
+        default:
+            break;
+        }
+    }
 
 void ObjectCallback(XAObjectItf caller,
         const void * pContext,
@@ -109,16 +159,9 @@ void ObjectCallback(XAObjectItf caller,
         XAuint32 param,
         void * pInterface)
     {
-    
-    }
-
-void MediaRecorderCallback(XAObjectItf caller,
-        const void * pContext,
-        XAuint32 event,
-        XAresult result,
-        XAuint32 param,
-        void * pInterface)
-    {
-    
+    if (pContext)
+        {
+        ((COpenMAXALTestModule*)pContext)->HandleObjectCallback(caller, event, result, param, pInterface);
+        }
     }
 

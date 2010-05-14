@@ -1,6 +1,0 @@
-EXPORTS
-	??1CProgressiveDownloadUtility@@UAE@XZ @ 1 NONAME ; CProgressiveDownloadUtility::~CProgressiveDownloadUtility(void)
-	?NewL@CProgressiveDownloadUtility@@SAPAV1@XZ @ 2 NONAME ; class CProgressiveDownloadUtility * CProgressiveDownloadUtility::NewL(void)
-	?OpenL@CProgressiveDownloadUtility@@QAEPAVMAudioPdPlayUtility@@ABVRFile@@AAVMAudioPdPlayUtilityCallback@@@Z @ 3 NONAME ; class MAudioPdPlayUtility * CProgressiveDownloadUtility::OpenL(class RFile const &, class MAudioPdPlayUtilityCallback &)
-	?OpenL@CProgressiveDownloadUtility@@QAEPAVMAudioPdPlayUtility@@ABVTDesC16@@AAVMAudioPdPlayUtilityCallback@@@Z @ 4 NONAME ; class MAudioPdPlayUtility * CProgressiveDownloadUtility::OpenL(class TDesC16 const &, class MAudioPdPlayUtilityCallback &)
-

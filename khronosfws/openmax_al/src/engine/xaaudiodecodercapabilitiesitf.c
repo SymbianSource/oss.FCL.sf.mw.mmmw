@@ -21,10 +21,9 @@
 #include <string.h>
 
 #include "xaglobals.h"
+#include "xaadptbasectx.h"
 #include "xaaudiodecodercapabilitiesitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAStaticCapsAdaptation.h"
-#endif
+#include "xacapabilitiesmgr.h"
 /* XAAudioDecoderCapabilitiesItfImpl* GetImpl
  * Description: Validate interface pointer and cast it to implementation pointer.
  */
@@ -74,16 +73,16 @@ XAresult XAAudioDecoderCapabilitiesItfImpl_GetAudioDecoders(
             }
             else
             {
-#ifdef _GSTREAMER_BACKEND_  
+ 
             XAuint32 i = 0;
-            XAStaticCapsData temp;
+            XACapabilities temp;
                 for( i=0; i<impl->numCodecs; i++ )
                 {
                     /* query decoder id from adaptation using index value */
-                    XAStaticCapsAdapt_GetCapsByIdx(XACAP_DECODER|XACAP_AUDIO, i, &temp);
+                    XACapabilitiesMgr_GetCapsByIdx(NULL, (XACapsType)(XACAP_DECODER|XACAP_AUDIO), i, &temp);
                     pDecoderIds[i] = temp.xaid;
                 }
-#endif
+
             }
         }
         /* return number of decoders */
@@ -127,30 +126,31 @@ XAresult XAAudioDecoderCapabilitiesItfImpl_GetAudioDecoderCapabilities(
             }
             else
             {
-#ifdef _GSTREAMER_BACKEND_  
+ 
                 /* query capabilities from adaptation using codec id */
-                XAStaticCapsData temp;
+                XACapabilities temp;
                 memset(pDescriptor,0,sizeof(XAAudioCodecDescriptor));
-                res = XAStaticCapsAdapt_GetCapsById(XACAP_DECODER|XACAP_AUDIO, decoderId, &temp);
+                res = XACapabilitiesMgr_GetCapsById(NULL, (XACapsType)(XACAP_DECODER|XACAP_AUDIO), decoderId, &temp);
                 if( res == XA_RESULT_SUCCESS )
                 {
+                    XAAudioCodecDescriptor* desc = ((XAAudioCodecDescriptor*)(temp.pEntry));
                     /* map applicable values to XAAudioCodecCapabilities */
-                    pDescriptor->maxChannels=temp.maxCh;
-                    pDescriptor->minSampleRate=temp.minSR*1000; /* milliHz */
-                    if (temp.maxSR < (0xFFFFFFFF / 1000))
+                    pDescriptor->maxChannels = desc->maxChannels;
+                    pDescriptor->minSampleRate= desc->minSampleRate*1000; /* milliHz */
+                    if (desc->maxSampleRate < (0xFFFFFFFF / 1000))
                     {
-                        pDescriptor->maxSampleRate = temp.maxSR*1000;
+                        pDescriptor->maxSampleRate = desc->maxSampleRate*1000;
                     }
                     else
                     {
                         pDescriptor->maxSampleRate = 0xFFFFFFFF;
                     }
-                    pDescriptor->minBitsPerSample=temp.minBPS;
-                    pDescriptor->maxBitsPerSample=temp.maxBPS;
+                    pDescriptor->minBitsPerSample=desc->minBitsPerSample;
+                    pDescriptor->maxBitsPerSample=desc->maxBitsPerSample;
                     pDescriptor->isFreqRangeContinuous=XA_BOOLEAN_TRUE;
-                    pDescriptor->minBitRate=temp.minBR;
-                    pDescriptor->maxBitRate=temp.maxBR;
-                    pDescriptor->numBitratesSupported = temp.numBitrates;
+                    pDescriptor->minBitRate=desc->minBitRate;
+                    pDescriptor->maxBitRate=desc->maxBitRate;
+                    pDescriptor->numBitratesSupported = desc->numBitratesSupported;
                     pDescriptor->isBitrateRangeContinuous=XA_BOOLEAN_TRUE;
                     if (temp.xaid == XA_AUDIOCODEC_PCM )
                     {
@@ -159,7 +159,7 @@ XAresult XAAudioDecoderCapabilitiesItfImpl_GetAudioDecoderCapabilities(
                     }
                     else if (temp.xaid == XA_ADAPTID_VORBIS) /* for ogg */
                     {
-                        if (temp.maxCh == 1)
+                        if (desc->maxChannels == 1)
                         {
                             pDescriptor->profileSetting=XA_AUDIOPROFILE_MPEG1_L3;
                             pDescriptor->modeSetting=XA_AUDIOCHANMODE_MP3_MONO;
@@ -176,7 +176,7 @@ XAresult XAAudioDecoderCapabilitiesItfImpl_GetAudioDecoderCapabilities(
                     }
                     /*other caps undefined*/
                 }
-#endif                
+                
             }
         }
     }
@@ -209,10 +209,10 @@ XAAudioDecoderCapabilitiesItfImpl* XAAudioDecoderCapabilitiesItfImpl_Create()
             XAAudioDecoderCapabilitiesItfImpl_GetAudioDecoderCapabilities;
 
         /* init variables */
-#ifdef _GSTREAMER_BACKEND_  
-        assert( XAStaticCapsAdapt_GetCapsCount( XACAP_DECODER|XACAP_AUDIO,
+ 
+        assert( XACapabilitiesMgr_GetCapsCount(NULL, (XACapsType)(XACAP_DECODER|XACAP_AUDIO),
                                   &(self->numCodecs) ) == XA_RESULT_SUCCESS );
-#endif
+
         self->self = self;
     }
     DEBUG_API("<-XAAudioDecoderCapabilitiesItfImpl_Create");

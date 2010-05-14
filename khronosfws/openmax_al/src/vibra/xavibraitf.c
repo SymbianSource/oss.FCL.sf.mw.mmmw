@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xavibraitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAVibraItfAdaptation.h"
-#endif
+
+#include "xavibraitfadaptation.h"
+
 #include "xathreadsafety.h"
 /* XAVibraItfImpl* GetImpl(XAVibraItf self)
  * Description: Validate interface pointer and cast it to implementation pointer.
@@ -66,9 +66,9 @@ XAresult XAVibraItfImpl_Vibrate ( XAVibraItf self,
     /* check is vibrate mode changed */
     if( impl->vibrate != vibrate )
     {
-#ifdef _GSTREAMER_BACKEND_
-        ret = XAVibraItfAdapt_Vibrate( impl->adapCtx, vibrate );
-#endif
+
+        ret = XAVibraItfAdapt_Vibrate( (XAAdaptationGstCtx*)impl->adapCtx, vibrate );
+
         if ( ret == XA_RESULT_SUCCESS )
         {
             impl->vibrate = vibrate;
@@ -135,9 +135,9 @@ XAresult XAVibraItfImpl_SetFrequency ( XAVibraItf self, XAmilliHertz frequency )
     /* check is vibration frequency changed */
     if( impl->frequency != frequency )
     {
-#ifdef _GSTREAMER_BACKEND_
-        ret = XAVibraItfAdapt_SetFrequency( impl->adapCtx, frequency );
-#endif
+
+        ret = XAVibraItfAdapt_SetFrequency( (XAAdaptationGstCtx*)impl->adapCtx, frequency );
+
         if( ret == XA_RESULT_SUCCESS )
         {
             impl->frequency = frequency;
@@ -194,9 +194,9 @@ XAresult XAVibraItfImpl_SetIntensity ( XAVibraItf self, XApermille intensity )
     /* check is vibration intensity changed */
     if( impl->intensity != intensity )
     {
-#ifdef _GSTREAMER_BACKEND_
-        ret = XAVibraItfAdapt_SetIntensity( impl->adapCtx, intensity );
-#endif
+
+        ret = XAVibraItfAdapt_SetIntensity( (XAAdaptationGstCtx*)impl->adapCtx, intensity );
+
         if( ret == XA_RESULT_SUCCESS )
         {
             impl->intensity = intensity;
@@ -232,7 +232,7 @@ XAresult XAVibraItfImpl_GetIntensity ( XAVibraItf self, XApermille * pIntensity 
     return ret;
 }
 
-#ifdef _GSTREAMER_BACKEND_
+
 
 /*****************************************************************************
  * XAVibraItfImpl -specific methods
@@ -266,7 +266,7 @@ XAVibraItfImpl* XAVibraItfImpl_Create( XAAdaptationBaseCtx *adapCtx )
     DEBUG_API("<-XAVibraItfImpl_Create");
     return self;
 }
-#endif
+
 /* void XAVibraItfImpl_Free(XAVibraItfImpl* self)
  * Description: Free all resources reserved at XAVibraItfImpl_Create
  */

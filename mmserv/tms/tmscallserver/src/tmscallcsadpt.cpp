@@ -1017,7 +1017,7 @@ gint TMSCallCSAdpt::StopDTMF(TMSStreamType streamtype)
 gint TMSCallCSAdpt::ContinueDTMF(TBool continuesending)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
 
     if (iDTMFUplinkPlayer)
         {

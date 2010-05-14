@@ -20,7 +20,6 @@
 
 #include "stsserver.h"
 
-#include <ecom/ecom.h>
 #include "stsserversession.h"
 #include "sts.h"
 
@@ -80,7 +79,6 @@ CStsServer::~CStsServer()
     {
     iSessions.ResetAndDestroy();
     CSts::Delete(iSts);
-    REComSession::FinalClose();
     }
 
 CSession2* CStsServer::NewSessionL(const TVersion& aVersion, const RMessage2& /*aMessage*/) const
@@ -89,13 +87,18 @@ CSession2* CStsServer::NewSessionL(const TVersion& aVersion, const RMessage2& /*
             != KStsServerMinorVersion || aVersion.iBuild != KStsServerBuild)
         {
         User::Leave(KErrNotSupported);
-        } // end if
+        }
+    else
+        {
+        //TODO: Add trace here
+        }// end if
 
     CStsServer& nonConstThis = *const_cast<CStsServer*> (this);
 
     // Construct a new session, passing it a pointer to the server object.  This function
     // is const, so the const-ness must be cast away from the this pointer.
-    CSession2* returnValue = new (ELeave) CStsServerSession(nonConstThis, *iSts);
+    CSession2* returnValue = new (ELeave) CStsServerSession(nonConstThis,
+            *iSts);
 
     return returnValue;
     }
@@ -114,6 +117,10 @@ void CStsServer::DropSession(CStsServerSession* aSession)
         {
         // Remove the session from the list of sessions.
         iSessions.Remove(index);
+        }
+    else
+        {
+        //TODO: Add trace here
         } // end if
 
     if (iSessions.Count() == 0)
@@ -125,8 +132,7 @@ void CStsServer::DropSession(CStsServerSession* aSession)
 
 // SERVER LAUNCHING FUNCTIONALITY
 
-EXPORT_C void CStsServer::RunServerL(bool aPerformProcessRendezvous,
-        bool aPerformThreadRendezvous)
+EXPORT_C void CStsServer::RunServerL()
     {
     // naming the server thread after the server helps to debug panics
     User::LeaveIfError(User::RenameThread(KStsServerName));
@@ -139,17 +145,8 @@ EXPORT_C void CStsServer::RunServerL(bool aPerformProcessRendezvous,
     // create the server (leave it on the cleanup stack)
     CStsServer* server = CStsServer::NewLC();
 
-    // Initialisation complete, now signal the client, if requested.
-
-    if (aPerformProcessRendezvous)
-        {
-        RProcess::Rendezvous(KErrNone);
-        }
-
-    if (aPerformThreadRendezvous)
-        {
-        RThread::Rendezvous(KErrNone);
-        }
+    // Initialisation complete, now signal the client.
+    RProcess::Rendezvous(KErrNone);
 
     // Ready to run
     // Start wait loop, will return when server is shutdown

@@ -841,17 +841,6 @@ EXPORT_C void CAdvancedAudioPlayController::AddDataSourceL(
 
     // we need to block this until duration is calculated if using mmfplayutility
     iBlockDuration = EFalse;
-// ou1cimx1#205863
-    if (!iDataSourceAdapter->IsLocalPlayback()) 
-    	{
-	    DP0(_L("CAdvancedAudioPlayController::AddDataSourceL not file source"));        
-	    if (iSharedBufferMaxNum <= 2)
-	        {
-	        	iSharedBufferMaxNum = 3;
-	        }
-		 iSharedBufferMaxSize = iSharedBufferMaxSizeForNonSeekableSrc;
-	    DP2(_L("CAdvancedAudioPlayController::AddDataSourceL new iSharedBufferMaxNum[%d] iSharedBufferMaxSize[%d]"), iSharedBufferMaxNum, iSharedBufferMaxSize);
-    	}
     
     if ((!iEventsEnabled) && (!iDataSourceAdapter->OnlyHeaderPresent()))
         {

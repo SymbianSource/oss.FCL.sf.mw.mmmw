@@ -18,11 +18,8 @@
 #ifndef XAVIBRAITF_H
 #define XAVIBRAITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xaadptbasectx.h"
+
 /** MACROS **/
 #define MIN_INTENSITY 0
 #define MAX_INTENSITY 1000
@@ -47,10 +44,9 @@ typedef struct XAVibraItfImpl_
     XAmilliHertz    frequency;
     XApermille      intensity;
 
-#ifdef _GSTREAMER_BACKEND_  
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
+
 } XAVibraItfImpl;
 
 /** METHODS **/
@@ -65,9 +61,9 @@ XAresult XAVibraItfImpl_GetFrequency ( XAVibraItf self, XAmilliHertz * pFrequenc
 XAresult XAVibraItfImpl_SetIntensity ( XAVibraItf self, XApermille intensity );
 XAresult XAVibraItfImpl_GetIntensity ( XAVibraItf self, XApermille * pIntensity );
 
-#ifdef _GSTREAMER_BACKEND_  
+ 
 /* XAVibraItfImpl -specific methods*/
 XAVibraItfImpl* XAVibraItfImpl_Create( XAAdaptationBaseCtx *adapCtx );
-#endif
+
 void XAVibraItfImpl_Free(XAVibraItfImpl* self);
 #endif /* XAVIBRAITF_H */

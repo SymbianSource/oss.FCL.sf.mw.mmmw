@@ -18,12 +18,7 @@
 #ifndef XAPLAYITF_H
 #define XAPLAYITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
-#include "xaadaptationcontextbasemmf.h"
+#include "xaadptbasectx.h"
 #include "xamediaplayer.h"
 
 
@@ -47,7 +42,10 @@ typedef struct XAPlayItfImpl_
 
     /* variables */
     XAPlayItf cbPtrToSelf;
+    /* TODO : This is no longer needed we need to get state from XAMediaPlayerImpl
+     * Delete this.*/
     XAuint32 playbackState;
+
     xaPlayCallback callback;
     void *cbcontext;
     XAuint32 eventFlags;
@@ -57,12 +55,12 @@ typedef struct XAPlayItfImpl_
     XAmillisecond lastPosition;
     XAboolean isMarkerPosCbSend;
 
-#ifdef _GSTREAMER_BACKEND_
     /*Adaptation variables*/
+    /* TODO : This is no longer needed since we have access to XAMediaPlayerImpl
+     * Delete this.*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
-    XAAdaptationBaseMMFCtx *adaptCtxMMF;
-    XAboolean isMMFPlayback;
+    
+    XAMediaPlayerImpl* pObjImpl;
 
 } XAPlayItfImpl;
 
@@ -98,15 +96,8 @@ XAresult XAPlayItfImpl_GetPositionUpdatePeriod(XAPlayItf self, XAmillisecond *pM
 /*
  * implementation-specific methods
  */
-XAPlayItfImpl* XAPlayItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adapCtx,
-#endif
-        XAAdaptationBaseMMFCtx *adaptationCtxMMF );
-#ifdef _GSTREAMER_BACKEND_
+XAPlayItfImpl* XAPlayItfImpl_Create( XAMediaPlayerImpl *impl );
 void XAPlayItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
-#endif
-XAresult XAPlayItfImpl_DeterminePlaybackEngine(XAPlayItf self, XADataLocator_URI *uri);
 void XAPlayItfImpl_Free(XAPlayItfImpl* self);
 
 

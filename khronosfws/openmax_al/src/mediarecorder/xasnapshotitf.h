@@ -19,11 +19,9 @@
 #define XASNAPSHOTITF_H
 
 #include <semaphore.h>
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
+
+#include "xamediarecorder.h"
+
 /** MACROS **/
 
 /** TYPES **/
@@ -52,9 +50,9 @@ typedef struct XASnapshotItfImpl_
     void* usercontext;
     XASnapshotItf cbPtrToSelf;
 
-#ifdef _GSTREAMER_BACKEND_
+
     XAAdaptationBaseCtx *adapCtx;
-#endif
+
     XAboolean           snapshotongoing;
     XAboolean           initongoing;
     XAboolean           initialized;
@@ -95,16 +93,8 @@ XAresult XASnapshotItfImpl_GetShutterFeedback(XASnapshotItf self,
                                               XAboolean *enabled);
 
 /* XASnapshotItfImpl -specific methods */
-XASnapshotItfImpl* XASnapshotItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adaptCtx,
-#else
-        void
-#endif
-        );
-#ifdef _GSTREAMER_BACKEND_
+XASnapshotItfImpl* XASnapshotItfImpl_Create(XAMediaRecorderImpl* impl);
 void XASnapshotItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
-#endif
 void XASnapshotItfImpl_Free(XASnapshotItfImpl* self);
 
 #endif /* XASNAPSHOTITF_H */

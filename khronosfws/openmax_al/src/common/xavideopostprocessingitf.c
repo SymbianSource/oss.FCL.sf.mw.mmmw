@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xavideopostprocessingitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAVideoPostProsessingItfAdaptation.h"
-#endif
+ 
+#include "xavideopostprosessingitfadaptation.h"
+
 /**
  * XAVideoPostProcessingItfImpl* GetImpl(XAVideoPostProcessingItf self)
  * Description: Validated interface pointer and cast it to implementations pointer.
@@ -106,15 +106,15 @@ XAresult XAVideoPostProcessingItfImpl_IsArbitraryRotationSupported(XAVideoPostPr
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAVideoPostProcessingItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
     	DEBUG_API("<-XAVideoPostProcessingItfImpl_IsArbitraryRotationSupported");
     	return ret;
     }
 
-    ret = XAVideoPostProcessingItfAdapt_IsArbitraryRotationSupported(impl->adapCtx,
+    ret = XAVideoPostProcessingItfAdapt_IsArbitraryRotationSupported((XAAdaptationGstCtx*)impl->adapCtx,
                                                                      pSupported);
 
     if(ret == XA_RESULT_SUCCESS)
@@ -122,8 +122,8 @@ XAresult XAVideoPostProcessingItfImpl_IsArbitraryRotationSupported(XAVideoPostPr
         impl->supported = *pSupported;
     }
 
-    XAVideoPostProcessingItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAVideoPostProcessingItfImpl_IsArbitraryRotationSupported");
     return ret;
 }
@@ -264,15 +264,15 @@ XAresult XAVideoPostProcessingItfImpl_Commit(XAVideoPostProcessingItf self)
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAVideoPostProcessingItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
     	DEBUG_API("<-XAVideoPostProcessingItfImpl_Commit");
     	return ret;
     }
 
-    ret = XAVideoPostProcessingItfAdapt_Commit(impl->adapCtx,
+    ret = XAVideoPostProcessingItfAdapt_Commit((XAAdaptationGstCtx*)impl->adapCtx,
                                                impl->rotation,
                                                impl->scaleOptions,
                                                impl->backgroundColor,
@@ -295,8 +295,8 @@ XAresult XAVideoPostProcessingItfImpl_Commit(XAVideoPostProcessingItf self)
 		impl->isScaleOptions = XA_BOOLEAN_FALSE;
     }
 
-    XAVideoPostProcessingItfAdapt_ThreadExit(impl->adapCtx);
-#endif    
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+  
     DEBUG_API("<-XAVideoPostProcessingItfImpl_Commit");
     return ret;
 }
@@ -304,8 +304,6 @@ XAresult XAVideoPostProcessingItfImpl_Commit(XAVideoPostProcessingItf self)
 /**
  * XAVideoPostProcessingItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_  
-
 /**
  * XAVideoPostProcessingItfImpl* XAVideoPostProcessingItfImpl_Create()
  * @return  XAVideoPostProcessingItfImpl* - Pointer to  VideoPostProcessingItf interface implementation
@@ -347,7 +345,7 @@ XAVideoPostProcessingItfImpl* XAVideoPostProcessingItfImpl_Create(XAAdaptationBa
     DEBUG_API("<-XAVideoPostProcessingItfImpl_Create");
     return self;
 }
-#endif
+
 /**
  * void XAVideoPostProcessingItfImpl_Free(XAVideoPostProcessingItfImpl* self);
  * @param  XAVideoPostProcessingItfImpl* self -

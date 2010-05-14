@@ -1,4 +1,0 @@
-/c8,8 empty13x13
-/c8,8 qgn_prop_psln_active
-/c8,8 qgn_indi_mup2_eq_bg
-/c8,8 qgn_indi_mup_eq_slider

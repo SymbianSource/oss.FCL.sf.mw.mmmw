@@ -19,9 +19,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xaimagecontrolsitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAImageControlsItfAdaptation.h"
-#endif
+#include "xaimagecontrolsitfadaptation.h"
+
 /**
  * XAImageControlsItfImpl* GetImpl(XAVolumeItf self)
  * Description: Validated interface pointer and cast it to implementations pointer.
@@ -63,22 +62,22 @@ XAresult XAImageControlsItfImpl_SetBrightness(XAImageControlsItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAImageControlsItfAdapt_ThreadEntry(impl->adapCtx);
+
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAImageControlsItfImpl_SetBrightness");
         return ret;
     }
-    ret = XAImageControlsItfAdapt_SetBrightness(impl->adapCtx, brightness);
+    ret = XAImageControlsItfAdapt_SetBrightness((XAAdaptationGstCtx*)impl->adapCtx, brightness);
 
     if(ret == XA_RESULT_SUCCESS)
     {
         impl->brightness = brightness;
     }
 
-    XAImageControlsItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAImageControlsItfImpl_SetBrightness");
     return ret;
 }
@@ -129,22 +128,22 @@ XAresult XAImageControlsItfImpl_SetContrast(XAImageControlsItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAImageControlsItfAdapt_ThreadEntry(impl->adapCtx);
+
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED)
     {
         DEBUG_API("<-XAImageControlsItfImpl_SetContrast");
         return ret;
     }
-    ret = XAImageControlsItfAdapt_SetContrast(impl->adapCtx, contrast);
+    ret = XAImageControlsItfAdapt_SetContrast((XAAdaptationGstCtx*)impl->adapCtx, contrast);
 
     if(ret == XA_RESULT_SUCCESS)
     {
         impl->contrast = contrast;
     }
 
-    XAImageControlsItfAdapt_ThreadExit(impl->adapCtx);
-#endif    
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+   
     DEBUG_API("<-XAImageControlsItfImpl_SetContrast");
     return ret;
 }
@@ -203,22 +202,22 @@ XAresult XAImageControlsItfImpl_SetGamma(XAImageControlsItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAImageControlsItfAdapt_ThreadEntry(impl->adapCtx);
+
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAImageControlsItfImpl_SetGamma");
         return ret;
     }
-    ret = XAImageControlsItfAdapt_SetGamma(impl->adapCtx, gamma);
+    ret = XAImageControlsItfAdapt_SetGamma((XAAdaptationGstCtx*)impl->adapCtx, gamma);
 
     if(ret == XA_RESULT_SUCCESS)
     {
         impl->gamma = gamma;
     }
 
-    XAImageControlsItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAImageControlsItfImpl_SetGamma");
     return ret;
 }
@@ -275,8 +274,8 @@ XAresult XAImageControlsItfImpl_GetSupportedGammaSettings(XAImageControlsItf sel
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAImageControlsItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAImageControlsItfImpl_GetSupportedGammaSettings");
@@ -288,20 +287,20 @@ XAresult XAImageControlsItfImpl_GetSupportedGammaSettings(XAImageControlsItf sel
     if( ppSettings && pNumSettings != 0 )
     {
         /* solve array of supported gamma settings */
-        ret = XAImageControlsItfAdapt_GetSupportedGammaSettings(impl->adapCtx,
+        ret = XAImageControlsItfAdapt_GetSupportedGammaSettings((XAAdaptationGstCtx*)impl->adapCtx,
                                                                 pMinValue, pMaxValue,
                                                                 pNumSettings, ppSettings);
     }
     else
     {
         /* Solve min and max values and numSettings */
-        ret = XAImageControlsItfAdapt_GetSupportedGammaSettings(impl->adapCtx,
+        ret = XAImageControlsItfAdapt_GetSupportedGammaSettings((XAAdaptationGstCtx*)impl->adapCtx,
                                                                 pMinValue, pMaxValue,
                                                                 pNumSettings, NULL);
     }
 
-    XAImageControlsItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAImageControlsItfImpl_GetSupportedGammaSettings");
     return ret;
 }
@@ -309,7 +308,6 @@ XAresult XAImageControlsItfImpl_GetSupportedGammaSettings(XAImageControlsItf sel
 /**
  * XAImageControlsItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_  
 
 /**
  * XAImageControlsItfImplImpl* XAImageControlsItfImpl_Create()
@@ -344,7 +342,7 @@ XAImageControlsItfImpl* XAImageControlsItfImpl_Create(XAAdaptationBaseCtx *adapC
     DEBUG_API("<-XAImageControlsItfImpl_Create");
     return self;
 }
-#endif
+
 /**
  * void XAImageControlsItfImpl_Free(XAImageControlsItfImpl* self)
  * @param  XAImageControlsItfImpl* self -

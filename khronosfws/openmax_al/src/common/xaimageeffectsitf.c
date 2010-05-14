@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xaimageeffectsitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAImageEffectsItfAdaptation.h"
-#endif
+
+#include "xaimageeffectsitfadaptation.h"
+
 static XAImageEffectsItfImpl* GetImpl(XAImageEffectsItf self)
 {
     if(self)
@@ -60,15 +60,15 @@ XAresult XAImageEffectsItfImpl_QuerySupportedImageEffects(XAImageEffectsItf self
         DEBUG_API("<-XAImageEffectsItfImpl_QuerySupportedImageEffects");
         return XA_RESULT_PARAMETER_INVALID;
     }
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAImageEffectsItfAdapt_ThreadEntry(impl->adapCtx);
+
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAImageEffectsItfImpl_QuerySupportedImageEffects");
         return ret;
     }
 
-    ret = XAImageEffectsItfAdapt_QuerySupportedImageEffects(impl->adapCtx, index,
+    ret = XAImageEffectsItfAdapt_QuerySupportedImageEffects((XAAdaptationGstCtx*)impl->adapCtx, index,
                                                             pImageEffectId);
 
     if( ret == XA_RESULT_SUCCESS )
@@ -76,8 +76,8 @@ XAresult XAImageEffectsItfImpl_QuerySupportedImageEffects(XAImageEffectsItf self
         impl->index = index;
     }
 
-    XAImageEffectsItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAImageEffectsItfImpl_QuerySupportedImageEffects");
     return ret;
 }
@@ -102,23 +102,23 @@ XAresult XAImageEffectsItfImpl_EnableImageEffect(XAImageEffectsItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAImageEffectsItfAdapt_ThreadEntry(impl->adapCtx);
+ 
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAImageEffectsItfImpl_EnableImageEffect");
         return ret;
     }
 
-    ret = XAImageEffectsItfAdapt_EnableImageEffect(impl->adapCtx, imageEffectID);
+    ret = XAImageEffectsItfAdapt_EnableImageEffect((XAAdaptationGstCtx*)impl->adapCtx, imageEffectID);
 
     if( ret == XA_RESULT_SUCCESS )
     {
         impl->imageEffectID = imageEffectID;
     }
 
-    XAImageEffectsItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAImageEffectsItfImpl_EnableImageEffect");
     return ret;
 }
@@ -143,23 +143,23 @@ XAresult XAImageEffectsItfImpl_DisableImageEffect(XAImageEffectsItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAImageEffectsItfAdapt_ThreadEntry(impl->adapCtx);
+
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAImageEffectsItfImpl_DisableImageEffect");
         return ret;
     }
 
-    ret = XAImageEffectsItfAdapt_DisableImageEffect(impl->adapCtx, imageEffectID);
+    ret = XAImageEffectsItfAdapt_DisableImageEffect((XAAdaptationGstCtx*)impl->adapCtx, imageEffectID);
 
     if( ret == XA_RESULT_SUCCESS )
     {
         impl->imageEffectID = NO_IMAGE_EFFECTS;
     }
 
-    XAImageEffectsItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAImageEffectsItfImpl_DisableImageEffect");
     return ret;
 }
@@ -186,19 +186,19 @@ XAresult XAImageEffectsItfImpl_IsImageEffectEnabled(XAImageEffectsItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XAImageEffectsItfAdapt_ThreadEntry(impl->adapCtx);
+
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
     if( ret == XA_RESULT_PARAMETER_INVALID || ret == XA_RESULT_PRECONDITIONS_VIOLATED )
     {
         DEBUG_API("<-XAImageEffectsItfImpl_IsImageEffectEnabled");
         return ret;
     }
 
-    ret = XAImageEffectsItfAdapt_IsImageEffectEnabled(impl->adapCtx, imageEffectID,
+    ret = XAImageEffectsItfAdapt_IsImageEffectEnabled((XAAdaptationGstCtx*)impl->adapCtx, imageEffectID,
                                                       pEnabled);
 
-    XAImageEffectsItfAdapt_ThreadExit(impl->adapCtx);
-#endif
+    XAAdaptationBase_ThreadExit(impl->adapCtx);
+
     DEBUG_API("<-XAImageEffectsItfImpl_IsImageEffectEnabled");
     return ret;
 }
@@ -206,7 +206,6 @@ XAresult XAImageEffectsItfImpl_IsImageEffectEnabled(XAImageEffectsItf self,
 /**
  * XAImageEffectsItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_  
 
 /**
  * XAImageEffectsItfImplImpl* XAImageEffectsItfImpl_Create()
@@ -236,7 +235,7 @@ XAImageEffectsItfImpl* XAImageEffectsItfImpl_Create(XAAdaptationBaseCtx *adapCtx
     DEBUG_API("<-XAImageEffectsItfImpl_Create");
     return self;
 }
-#endif
+
 /**
  * void XAImageEffectsItfImpl_Free(XAImageEffectsItfImpl* self)
  * @param  XAImageEffectsItfImpl* self -

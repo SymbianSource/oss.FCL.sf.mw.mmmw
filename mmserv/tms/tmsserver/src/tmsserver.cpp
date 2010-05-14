@@ -83,8 +83,8 @@ TMSServer::~TMSServer()
     iUplCodecs.Close();
     delete iEffectSettings;
     delete iTarHandler;
-    CancelCenRepHandler();
-    CancelDTMFNotifier();
+    delete iAudioCenRepHandler;
+    delete iDTMFHandler;
     DeinitRingTonePlayer();
     delete iTMSRtPlayer;
 

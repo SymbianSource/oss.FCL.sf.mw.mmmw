@@ -21,9 +21,8 @@
 #include "openmaxalwrapper.h"
 #include "xaobjectitf.h"
 #include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "../adaptation/XALEDArrayAdaptCtx.h"
-#endif
+
+#include "xaadptbasectx.h"
 /** MACROS **/
 
 
@@ -51,9 +50,8 @@ typedef struct XALEDArrayDeviceImpl_
     /* variables */
     XAuint32 deviceID;
 
-#ifdef _GSTREAMER_BACKEND_
     XAAdaptationBaseCtx* adaptationCtx;
-#endif
+
 } XALEDArrayDeviceImpl;
 
 

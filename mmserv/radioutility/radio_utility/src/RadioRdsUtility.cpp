@@ -17,6 +17,7 @@
 
 
 #include "RadioRdsUtilityBody.h"
+#include "trace.h"
 
 // -----------------------------------------------------------------------------
 // CRadioRdsUtility::NewL
@@ -27,6 +28,7 @@ CRadioRdsUtility* CRadioRdsUtility::NewL(
     RRadioSession& aRadioSession,
     MRadioRdsObserver& aObserver)
     {
+    FUNC_LOG;
     CRadioRdsUtility* self = new(ELeave) CRadioRdsUtility;
     CleanupStack::PushL(self);
     self->iBody = CRadioRdsUtility::CBody::NewL(aRadioSession, aObserver);
@@ -41,7 +43,8 @@ CRadioRdsUtility* CRadioRdsUtility::NewL(
 //
 CRadioRdsUtility::~CRadioRdsUtility()
     {
-        delete iBody;
+    FUNC_LOG;
+    delete iBody;
     }
 
 // -----------------------------------------------------------------------------
@@ -51,6 +54,7 @@ CRadioRdsUtility::~CRadioRdsUtility()
 //
 CRadioRdsUtility::CRadioRdsUtility()
     {
+    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -59,6 +63,7 @@ CRadioRdsUtility::CRadioRdsUtility()
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::Close()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->Close();
     }
@@ -70,6 +75,7 @@ EXPORT_C void CRadioRdsUtility::Close()
 EXPORT_C TInt CRadioRdsUtility::GetCapabilities(
     TRdsCapabilities& aCaps ) const
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetCapabilities(aCaps);
     }
@@ -81,6 +87,7 @@ EXPORT_C TInt CRadioRdsUtility::GetCapabilities(
 EXPORT_C TInt CRadioRdsUtility::GetRdsSignalStatus(
     TBool& aRdsSignal ) const
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetRdsSignalStatus( aRdsSignal );
     }
@@ -92,6 +99,7 @@ EXPORT_C TInt CRadioRdsUtility::GetRdsSignalStatus(
 EXPORT_C TInt CRadioRdsUtility::NotifyRdsDataChange(
     TRdsData aRdsData )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->NotifyRdsDataChange( aRdsData );
     }
@@ -102,6 +110,7 @@ EXPORT_C TInt CRadioRdsUtility::NotifyRdsDataChange(
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::CancelNotifyRdsDataChange()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelNotifyRdsDataChange();
     }
@@ -113,6 +122,7 @@ EXPORT_C void CRadioRdsUtility::CancelNotifyRdsDataChange()
 EXPORT_C TInt CRadioRdsUtility::SetAutomaticSwitching(
     TBool aAuto )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->SetAutomaticSwitching(aAuto);
     }
@@ -124,6 +134,7 @@ EXPORT_C TInt CRadioRdsUtility::SetAutomaticSwitching(
 EXPORT_C TInt CRadioRdsUtility::GetAutomaticSwitching(
     TBool& aAuto )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetAutomaticSwitching(aAuto);
     }
@@ -134,6 +145,7 @@ EXPORT_C TInt CRadioRdsUtility::GetAutomaticSwitching(
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::CancelAFSearch()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelAFSearch();
     }
@@ -145,6 +157,7 @@ EXPORT_C void CRadioRdsUtility::CancelAFSearch()
 EXPORT_C TInt CRadioRdsUtility::SetAutomaticTrafficAnnouncement(
     TBool aAuto )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->SetAutomaticTrafficAnnouncement(aAuto);
     }
@@ -156,6 +169,7 @@ EXPORT_C TInt CRadioRdsUtility::SetAutomaticTrafficAnnouncement(
 EXPORT_C TInt CRadioRdsUtility::GetAutomaticTrafficAnnouncement(
     TBool& aAuto )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetAutomaticTrafficAnnouncement(aAuto);
     }
@@ -168,6 +182,7 @@ EXPORT_C void CRadioRdsUtility::StationSeekByPTY(
     TRdsProgrammeType aPty,
     TBool aUpwards )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->StationSeekByPTY(aPty, aUpwards);
     }
@@ -179,6 +194,7 @@ EXPORT_C void CRadioRdsUtility::StationSeekByPTY(
 EXPORT_C void CRadioRdsUtility::StationSeekByTA(
     TBool aSeekUp )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->StationSeekByTA(aSeekUp);
     }
@@ -190,6 +206,7 @@ EXPORT_C void CRadioRdsUtility::StationSeekByTA(
 EXPORT_C void CRadioRdsUtility::StationSeekByTP(
     TBool aSeekUp )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->StationSeekByTP(aSeekUp);
     }
@@ -200,6 +217,7 @@ EXPORT_C void CRadioRdsUtility::StationSeekByTP(
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::CancelRdsStationSeek()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelRdsStationSeek();
     }
@@ -211,6 +229,7 @@ EXPORT_C void CRadioRdsUtility::CancelRdsStationSeek()
 EXPORT_C void CRadioRdsUtility::GetFreqByPTY(
     TRdsProgrammeType aPty )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->GetFreqByPTY( aPty );
     }
@@ -221,6 +240,7 @@ EXPORT_C void CRadioRdsUtility::GetFreqByPTY(
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::CancelGetFreqByPTY()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelGetFreqByPTY();
     }
@@ -231,6 +251,7 @@ EXPORT_C void CRadioRdsUtility::CancelGetFreqByPTY()
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::GetFreqByTA()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->GetFreqByTA();
     }
@@ -241,6 +262,7 @@ EXPORT_C void CRadioRdsUtility::GetFreqByTA()
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::CancelGetFreqByTA()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelGetFreqByTA();
     }
@@ -252,6 +274,7 @@ EXPORT_C void CRadioRdsUtility::CancelGetFreqByTA()
 EXPORT_C void CRadioRdsUtility::GetPSByPTY(
     TRdsProgrammeType aPty )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->GetPSByPTY( aPty );
     }
@@ -262,6 +285,7 @@ EXPORT_C void CRadioRdsUtility::GetPSByPTY(
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::CancelGetPSByPTY()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelGetPSByPTY();
     }
@@ -272,6 +296,7 @@ EXPORT_C void CRadioRdsUtility::CancelGetPSByPTY()
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::GetPSByTA()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->GetPSByTA();
     }
@@ -282,6 +307,7 @@ EXPORT_C void CRadioRdsUtility::GetPSByTA()
 // -----------------------------------------------------------------------------
 EXPORT_C void CRadioRdsUtility::CancelGetPSByTA()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelGetPSByTA();
     }
@@ -293,6 +319,7 @@ EXPORT_C void CRadioRdsUtility::CancelGetPSByTA()
 EXPORT_C TInt CRadioRdsUtility::GetProgrammeIdentification(
     TInt& aPi )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetProgrammeIdentification( aPi );
     }
@@ -304,6 +331,7 @@ EXPORT_C TInt CRadioRdsUtility::GetProgrammeIdentification(
 EXPORT_C TInt CRadioRdsUtility::GetProgrammeType(
     TRdsProgrammeType& aPty )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetProgrammeType( aPty );
     }
@@ -315,6 +343,7 @@ EXPORT_C TInt CRadioRdsUtility::GetProgrammeType(
 EXPORT_C TInt CRadioRdsUtility::GetProgrammeService(
     TRdsPSName& aPs )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetProgrammeService( aPs );
     }
@@ -326,6 +355,7 @@ EXPORT_C TInt CRadioRdsUtility::GetProgrammeService(
 EXPORT_C TInt CRadioRdsUtility::GetRadioText(
     TRdsRadioText& aRt )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetRadioText( aRt );
     }
@@ -338,6 +368,7 @@ EXPORT_C TInt CRadioRdsUtility::GetRadioTextPlus(
     TRdsRTplusClass aRtPlusClass,
     TRdsRadioText& aRtPlusData )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetRadioTextPlus( aRtPlusClass,aRtPlusData );
     }
@@ -349,6 +380,7 @@ EXPORT_C TInt CRadioRdsUtility::GetRadioTextPlus(
 EXPORT_C TInt CRadioRdsUtility::GetClockTime(
     TDateTime& aCt )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetClockTime( aCt );
     }
@@ -360,6 +392,7 @@ EXPORT_C TInt CRadioRdsUtility::GetClockTime(
 EXPORT_C TInt CRadioRdsUtility::GetTrafficAnnouncementStatus(
     TBool& aTaStatus )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetTrafficAnnouncementStatus( aTaStatus );
     }
@@ -371,6 +404,7 @@ EXPORT_C TInt CRadioRdsUtility::GetTrafficAnnouncementStatus(
 EXPORT_C TInt CRadioRdsUtility::GetTrafficProgrammeStatus(
     TBool& aTpStatus )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetTrafficProgrammeStatus( aTpStatus );
     }

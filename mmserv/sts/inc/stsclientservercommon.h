@@ -34,12 +34,27 @@ const TInt KStsServerBuild = 0;
 // This type enumerates the client/server messages for the STS server.
 enum TStsServerCommandType
     {
+    StsMsg_RegisterMsgQueue,
     StsMsg_PlayTone,
-    StsMsg_StopTone,
+    StsMsg_PlayAlarm,
+    StsMsg_StopAlarm,
     StsMsg_ENDMARKER
     };
 
 const TStsServerCommandType KStsCmdLast =
         (TStsServerCommandType) ((int) StsMsg_ENDMARKER - 1);
+
+enum TStsCallBackType
+    {
+    EStsShutdown,
+    EStsPlayAlarmComplete
+    };
+
+struct TStsCallBack
+    {
+    TStsCallBackType callBackType;
+    MStsPlayAlarmObserver* observer;
+    unsigned int alarmContext;
+    };
 
 #endif // STSCLIENTSERVERCOMMON_H_

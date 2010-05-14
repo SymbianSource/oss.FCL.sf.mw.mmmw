@@ -18,11 +18,8 @@
 #ifndef XAVIDEOENCODERITF_H
 #define XAVIDEOENCODERITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
+
+#include "xamediarecorder.h"
 /** MACROS **/
 
 /** TYPES **/
@@ -37,10 +34,10 @@ typedef struct XAVideoEncoderItfImpl_
     struct XAVideoEncoderItf_ itf;
     /* pointer to self */
     struct XAVideoEncoderItfImpl_* self;
-#ifdef _GSTREAMER_BACKEND_
+
     /* variables */
     XAAdaptationBaseCtx *adaptCtx;
-#endif
+
 } XAVideoEncoderItfImpl;
 
 /** METHODS **/
@@ -56,14 +53,7 @@ XAresult XAVideoEncoderItfImpl_GetVideoSettings(XAVideoEncoderItf self,
 
 
 /* XAVideoEncoderItfImpl -specific methods */
-XAVideoEncoderItfImpl* XAVideoEncoderItfImpl_Create(
-#ifdef _GSTREAMER_BACKEND_
-        XAAdaptationBaseCtx *adaptCtx,
-#else
-        void
-#endif
-        );
-
+XAVideoEncoderItfImpl* XAVideoEncoderItfImpl_Create( XAMediaRecorderImpl* impl );
 void XAVideoEncoderItfImpl_Free(XAVideoEncoderItfImpl* self);
 
 #endif /* XAVIDEOENCODERITF_H */

@@ -20,9 +20,9 @@
 #include <assert.h>
 #include "xaglobals.h"
 #include "xadevicevolumeitf.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XADeviceVolumeItfAdaptation.h"
-#endif
+  
+#include "xadevicevolumeitfadaptation.h"
+
 
 static XADeviceVolumeItfImpl* GetImpl(XADeviceVolumeItf self)
 {
@@ -65,9 +65,9 @@ XAresult XADeviceVolumeItfImpl_GetVolumeScale( XADeviceVolumeItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XADeviceVolumeItfAdapt_IsDeviceIDSupported(impl->adapCtx, deviceID, &supported);
-#endif
+  
+    ret = XADeviceVolumeItfAdapt_IsDeviceIDSupported((XAAdaptationGstCtx*)impl->adapCtx, deviceID, &supported);
+
     if( ret != XA_RESULT_SUCCESS || supported != XA_BOOLEAN_TRUE )
     {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
@@ -94,9 +94,9 @@ XAresult XADeviceVolumeItfImpl_SetVolume( XADeviceVolumeItf self,
 {
     XADeviceVolumeItfImpl* impl = GetImpl(self);
     XAresult ret = XA_RESULT_SUCCESS;
-#ifdef _GSTREAMER_BACKEND_  
+  
     XAboolean supported = XA_BOOLEAN_FALSE;
-#endif
+
     DEBUG_API("->XADeviceVolumeItfImpl_SetVolume");
 
     if( !impl || volume < impl->minVolume || volume > impl->maxVolume )
@@ -106,8 +106,8 @@ XAresult XADeviceVolumeItfImpl_SetVolume( XADeviceVolumeItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XADeviceVolumeItfAdapt_IsDeviceIDSupported(impl->adapCtx, deviceID, &supported);
+  
+    ret = XADeviceVolumeItfAdapt_IsDeviceIDSupported((XAAdaptationGstCtx*)impl->adapCtx, deviceID, &supported);
     if( ret != XA_RESULT_SUCCESS || supported != XA_BOOLEAN_TRUE )
     {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
@@ -115,13 +115,13 @@ XAresult XADeviceVolumeItfImpl_SetVolume( XADeviceVolumeItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-    ret = XADeviceVolumeItfAdapt_SetVolume(impl->adapCtx, deviceID, volume);
+    ret = XADeviceVolumeItfAdapt_SetVolume((XAAdaptationGstCtx*)impl->adapCtx, deviceID, volume);
 
     if( ret == XA_RESULT_SUCCESS )
     {
         impl->curVolume = volume;
     }
-#endif
+
     DEBUG_API("<-XADeviceVolumeItfImpl_SetVolume");
     return ret;
 }
@@ -147,9 +147,9 @@ XAresult XADeviceVolumeItfImpl_GetVolume( XADeviceVolumeItf self,
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_  
-    ret = XADeviceVolumeItfAdapt_IsDeviceIDSupported(impl->adapCtx, deviceID, &supported);
-#endif
+  
+    ret = XADeviceVolumeItfAdapt_IsDeviceIDSupported((XAAdaptationGstCtx*)impl->adapCtx, deviceID, &supported);
+
     if( ret != XA_RESULT_SUCCESS || supported != XA_BOOLEAN_TRUE )
     {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
@@ -164,7 +164,7 @@ XAresult XADeviceVolumeItfImpl_GetVolume( XADeviceVolumeItf self,
 /**
  * XADeviceVolumeItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_  
+  
 /**
  * XADeviceVolumeItfImpl* XADeviceVolumeItfImpl_Create(XAAdaptationBaseCtx *adapCtx)
  * Description: Allocate and initialize DeviceVolumeImpl
@@ -198,7 +198,7 @@ XADeviceVolumeItfImpl* XADeviceVolumeItfImpl_Create(XAAdaptationBaseCtx *adapCtx
     DEBUG_API("<-XADeviceVolumeItfImpl_Create");
     return self;
 }
-#endif
+
 /* void XADeviceVolumeItfImpl_Free(XADeviceVolumeItfImpl* self)
  * Description: Free all resources reserved at XADeviceVolumeItfImpl_Create
  */

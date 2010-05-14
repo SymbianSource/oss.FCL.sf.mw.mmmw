@@ -16,9 +16,9 @@
 */
 
 #include "xaoutputmixitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAOutputMixItfAdaptation.h"
-#endif
+
+#include "xaoutputmixitfadaptation.h"
+
 #include <assert.h>
 #include "xathreadsafety.h"
 #include "e32def.h"
@@ -65,9 +65,9 @@ XAresult XAOutputMixItfImpl_GetDestinationOutputDeviceIDs( XAOutputMixItf self, 
         return XA_RESULT_PARAMETER_INVALID;
     }
 
-#ifdef _GSTREAMER_BACKEND_
-    ret = XAOutputMixItfAdapt_GetDestinationOutputDeviceIDs(impl->adapCtx, pNumDevices, pDeviceIDs );
-#endif
+
+    ret = XAOutputMixItfAdapt_GetDestinationOutputDeviceIDs((XAAdaptationGstCtx*)impl->adapCtx, pNumDevices, pDeviceIDs );
+
     XA_IMPL_THREAD_SAFETY_EXIT(XATSOutputMix);
     DEBUG_API_A1("<-XAOutputMixItfImpl_GetDestinationOutputDeviceIDs - pNumDevices %ld",*pNumDevices);
     return ret;
@@ -97,7 +97,7 @@ XAresult XAOutputMixItfImpl_RegisterDeviceChangeCallback( XAOutputMixItf self, x
    impl->callback = callback;
    impl->cbContext = pContext;
    impl->cbPtrToSelf = self;
-#ifdef _GSTREAMER_BACKEND_
+
    if(callback)
    {   /* start listening */
        XAAdaptationBase_AddEventHandler( impl->adapCtx, &XAOutputMixItfImpl_AdaptCb, XA_OUTPUTMIXITFEVENTS, (void*)self );
@@ -106,7 +106,7 @@ XAresult XAOutputMixItfImpl_RegisterDeviceChangeCallback( XAOutputMixItf self, x
    {   /* stop listening */
        XAAdaptationBase_RemoveEventHandler( impl->adapCtx, &XAOutputMixItfImpl_AdaptCb );
    }
-#endif
+
 
    DEBUG_API("<-XAOutputMixItfImpl_RegisterDeviceChangeCallback");
    return ret;
@@ -135,9 +135,9 @@ XAresult XAOutputMixItfImpl_ReRoute( XAOutputMixItf self, XAint32 numOutputDevic
        return XA_RESULT_PARAMETER_INVALID;
    }
 
-#ifdef _GSTREAMER_BACKEND_
-   ret = XAOutputMixItfAdapt_ReRoute(impl->adapCtx, numOutputDevices, pOutputDeviceIDs );
-#endif
+
+   ret = XAOutputMixItfAdapt_ReRoute((XAAdaptationGstCtx*)impl->adapCtx, numOutputDevices, pOutputDeviceIDs );
+
 
    XA_IMPL_THREAD_SAFETY_EXIT(XATSOutputMix);
    DEBUG_API("<-XAOutputMixItfImpl_ReRoute");
@@ -148,7 +148,7 @@ XAresult XAOutputMixItfImpl_ReRoute( XAOutputMixItf self, XAint32 numOutputDevic
 /**
  * XAVolumeItfImpl -specific methods
  **/
-#ifdef _GSTREAMER_BACKEND_
+
 
 /*
  * XAOutputMixItfImpl* XAOutputMixItfImpl_Create(XAAdaptationBaseCtx *adapCtx)
@@ -223,4 +223,4 @@ void XAOutputMixItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
 
      DEBUG_API("<-XAOutputMixItfImpl_AdaptCb");
 }
-#endif
+

@@ -18,11 +18,7 @@
 #ifndef XACAMERAITF_H
 #define XACAMERAITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xaadptbasectx.h"
 /** MACROS **/
 
 /** TYPES **/
@@ -69,10 +65,8 @@ typedef struct XACameraItfImpl_
     void                *context;
     XACameraItf         cbPtrToSelf;
 
-#ifdef _GSTREAMER_BACKEND_
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
 } XACameraItfImpl;
 
 /** METHODS **/
@@ -163,11 +157,9 @@ XAresult XACameraItfImpl_SetZoom( XACameraItf self, XApermille zoom,
 XAresult XACameraItfImpl_GetZoom( XACameraItf self, XApermille *pZoom,
                                   XAboolean *pDigital );
 
-#ifdef _GSTREAMER_BACKEND_
 /* XACameraItfImpl -specific methods */
 XACameraItfImpl* XACameraItfImpl_Create( XAAdaptationBaseCtx *adapCtx );
 void XACameraItfImp_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
-#endif
 void XACameraItfImpl_Free(XACameraItfImpl* self);
 
 #endif /* XACAMERAITF_H */

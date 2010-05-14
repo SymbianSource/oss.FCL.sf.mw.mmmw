@@ -18,11 +18,8 @@
 #ifndef XADEVICEVOLUMEITF_H
 #define XADEVICEVOLUMEITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_  
-#include "XAAdaptationContextBase.h"
-#endif
+#include "xaadptbasectx.h"
+
 /** MACROS **/
 #define DEFAULTDEVICEVOLUME 5
 #define DEFAULTDEVICEMINVOLUME 0
@@ -47,10 +44,10 @@ typedef struct XADeviceVolumeItfImpl_
     XAint32 minVolume;
     XAint32 maxVolume;
     XAboolean ismBscale;
-#ifdef _GSTREAMER_BACKEND_  
+ 
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
+
 } XADeviceVolumeItfImpl;
 
 /* Base interface XADeviceVolumeItf implementation */
@@ -68,10 +65,10 @@ XAresult XADeviceVolumeItfImpl_GetVolume(
                         XADeviceVolumeItf self,
                         XAuint32 deviceID,
                         XAint32 * pVolume);
-#ifdef _GSTREAMER_BACKEND_  
+  
 /* XADeviceVolumeItfImpl -specific methods */
 XADeviceVolumeItfImpl* XADeviceVolumeItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
-#endif
+
 void XADeviceVolumeItfImpl_Free(XADeviceVolumeItfImpl* self);
 
 #endif /* XADEVICEVOLUMEITF_H */

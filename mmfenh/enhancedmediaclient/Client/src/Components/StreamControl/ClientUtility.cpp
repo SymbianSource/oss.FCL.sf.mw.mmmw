@@ -12,7 +12,7 @@
 * Contributors:
 *
 * Description:  Definition of the ClientUtility class.
-*  Version     : %version: bh1mmcf#11 %
+*  Version     : %version: 12 %
 *
 */
 
@@ -27,7 +27,6 @@
 #include <StreamControlCustomCommands.h>
 #include <mmf/server/mmfdrmpluginserverproxy.h>
 #include "../../../Plugins/FileSource/inc/FileDataSourceUid.hrh"
-#include "../../../Plugins/ProgDLSource/inc/ProgDLSourceUid.hrh"
 using namespace ContentAccess;
 using namespace multimedia;
 
@@ -2296,7 +2295,7 @@ void CMMFFindAndOpenController::UseSecureDRMProcessL(TBool& aIsSecureDrmProcess)
     //need to proceed only in case of local playback mode
     TUid sourceUid = iCurrentConfig->iSource->SourceSinkUid();
     TBool localPlaybackMode;
-	if( mode == EPlayback && ( sourceUid.iUid == KFileDataSourcePlugin || sourceUid.iUid == KMmfProgDLSourceUid ) )
+	if( mode == EPlayback && ( sourceUid.iUid == KFileDataSourcePlugin ) )
 		{
 		localPlaybackMode = ETrue;
 		}

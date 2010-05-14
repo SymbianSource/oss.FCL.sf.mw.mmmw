@@ -19,19 +19,20 @@
 #include "xarecorditfadaptationmmf.h"
 #include "cmmfbackendengine.h"
 #include "xaadaptationmmf.h"
+#include "xaadptbasectx.h"
 
 /*
- * XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationBaseMMFCtx *ctx, XAuint32 state)
+ * XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationMMFCtx *ctx, XAuint32 state)
  * Sets record state to GStreamer.
  * @param XAAdaptationBaseCtx *ctx - Adaptation context
  * XAuint32 state - Record state to be set
  * @return XAresult ret - Success value
  */
-XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationBaseMMFCtx *bCtx, XAuint32 state)
+XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationMMFCtx *bCtx, XAuint32 state)
 {
     XAresult ret = XA_RESULT_SUCCESS;
     int mmfretCode;
-    XAAdaptEventMMF stalledevent = {XA_RECORDITFEVENTS, XA_RECORDEVENT_HEADSTALLED, 0, NULL};
+    XAAdaptEvent stalledevent = {XA_RECORDITFEVENTS, XA_RECORDEVENT_HEADSTALLED, 0, NULL};
     XAMediaRecorderAdaptationMMFCtx* mCtx = NULL;
     DEBUG_API_A1("->XARecordItfAdaptMMF_SetRecordState %s",RECORDSTATENAME(state));
     if(!bCtx)
@@ -65,7 +66,7 @@ XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationBaseMMFCtx *bCtx, XAuint
                 }
             else
                 {
-                XAAdaptationBaseMMF_SendAdaptEvents(bCtx, &stalledevent );
+                XAAdaptationBase_SendAdaptEvents(&bCtx->baseObj, &stalledevent );
                 }
             break;
         }
@@ -98,7 +99,7 @@ XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationBaseMMFCtx *bCtx, XAuint
  * XAresult XARecordItfAdapt_GetRecordState(XAAdaptationBaseCtx *bCtx, XAuint32 *state)
  * Description: Return record state
  */
-XAresult XARecordItfAdaptMMF_GetRecordState(XAAdaptationBaseMMFCtx *bCtx, XAuint32 *state)
+XAresult XARecordItfAdaptMMF_GetRecordState(XAAdaptationMMFCtx *bCtx, XAuint32 *state)
 {
     XAMediaRecorderAdaptationMMFCtx* mCtx = NULL;
     DEBUG_API("->XARecordItfAdaptMMF_GetRecordState");
@@ -124,7 +125,7 @@ XAresult XARecordItfAdaptMMF_GetRecordState(XAAdaptationBaseMMFCtx *bCtx, XAuint
  * XAmillisecond *pMsec - Pointer where to store current position in stream.
  * @return XAresult ret - Success value
  */
-XAresult XARecordItfAdaptMMF_GetPosition(XAAdaptationBaseMMFCtx *bCtx, XAmillisecond *pMsec)
+XAresult XARecordItfAdaptMMF_GetPosition(XAAdaptationMMFCtx *bCtx, XAmillisecond *pMsec)
 {
     XAresult ret = XA_RESULT_SUCCESS;
     XAuint64 position;
@@ -155,9 +156,9 @@ XAresult XARecordItfAdaptMMF_GetPosition(XAAdaptationBaseMMFCtx *bCtx, XAmillise
  */
 gboolean XARecordItfAdaptMMF_PositionUpdate(gpointer ctx, XAuint64 position)
 {
-    XAAdaptationBaseMMFCtx *bCtx = (XAAdaptationBaseMMFCtx*) ctx;
+    XAAdaptationMMFCtx *bCtx = (XAAdaptationMMFCtx*) ctx;
     XAMediaRecorderAdaptationMMFCtx* mCtx = (XAMediaRecorderAdaptationMMFCtx*) ctx;
-    XAAdaptEventMMF event = {XA_RECORDITFEVENTS, XA_ADAPT_POSITION_UPDATE_EVT, 1, NULL};
+    XAAdaptEvent event = {XA_RECORDITFEVENTS, XA_ADAPT_POSITION_UPDATE_EVT, 1, NULL};
     DEBUG_API("->XARecordItfAdapt_PositionUpdate");
 
     if( mCtx && mCtx->trackpositionenabled )
@@ -167,7 +168,7 @@ gboolean XARecordItfAdaptMMF_PositionUpdate(gpointer ctx, XAuint64 position)
             XARecordItfAdaptMMF_GetPosition(bCtx , &posInMsec);
             event.data = &posInMsec;
             DEBUG_API_A1("XARecordItfAdapt_PositionUpdate: pos %lu ms", posInMsec);
-            XAAdaptationBaseMMF_SendAdaptEvents(bCtx, &event );
+            XAAdaptationBase_SendAdaptEvents(&bCtx->baseObj, &event );
         }
     DEBUG_API_A1("<-XARecordItfAdapt_PositionUpdate: %d", mCtx->runpositiontimer);
     return( mCtx->runpositiontimer );
@@ -180,12 +181,12 @@ gboolean XARecordItfAdaptMMF_PositionUpdate(gpointer ctx, XAuint64 position)
  * XAresult XARecordItfAdapt_EnablePositionTracking
  * Enable/disable periodic position tracking callbacks
  */
-XAresult XARecordItfAdaptMMF_EnablePositionTracking(XAAdaptationBaseMMFCtx *bCtx, XAboolean enable)
+XAresult XARecordItfAdaptMMF_EnablePositionTracking(XAAdaptationMMFCtx *bCtx, XAboolean enable)
 {
     XAMediaRecorderAdaptationMMFCtx* mCtx = (XAMediaRecorderAdaptationMMFCtx*) bCtx;
     DEBUG_API_A1("->XARecordItfAdapt_EnablePositionTracking (enable: %lu)", enable);
 
-    if(!bCtx || bCtx->ctxId != XAMediaRecorderAdaptationMMF)
+    if(!bCtx || bCtx->baseObj.ctxId != XAMediaRecorderAdaptation)
     {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XARecordItfAdapt_EnablePositionTracking");
@@ -214,12 +215,12 @@ XAresult XARecordItfAdaptMMF_EnablePositionTracking(XAAdaptationBaseMMFCtx *bCtx
     return XA_RESULT_SUCCESS;
 }
 
-XAresult XARecordItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationBaseMMFCtx *bCtx, XAmillisecond pMsec)
+XAresult XARecordItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationMMFCtx *bCtx, XAmillisecond pMsec)
     {
     XAMediaRecorderAdaptationMMFCtx* mCtx = (XAMediaRecorderAdaptationMMFCtx*) bCtx;
     DEBUG_API_A1("->XARecordItfAdaptMMF_SetPositionUpdatePeriod (pMsec: %lu)", pMsec);
 
-    if(!bCtx || bCtx->ctxId != XAMediaRecorderAdaptationMMF)
+    if(!bCtx || bCtx->baseObj.ctxId != XAMediaRecorderAdaptation)
         {
             DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
             DEBUG_API("<-XARecordItfAdapt_EnablePositionTracking");

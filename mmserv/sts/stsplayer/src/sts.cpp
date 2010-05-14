@@ -18,6 +18,51 @@
 
 #include "sts.h"
 
+class CSts::CPlayerNode
+    {
+public:
+    CPlayerNode(CStsPlayer* aPlayer);
+    CPlayerNode(CStsPlayer* aPlayer, MStsPlayAlarmObserver& aObserver);
+    ~CPlayerNode();
+    bool HasObserver();
+    CStsPlayer* Player();
+    MStsPlayAlarmObserver& Observer();
+private:
+    CStsPlayer* iPlayer;
+    MStsPlayAlarmObserver* iObserver;
+    };
+
+CSts::CPlayerNode::CPlayerNode(CStsPlayer* aPlayer) :
+    iPlayer(aPlayer), iObserver(0)
+    {
+    }
+
+CSts::CPlayerNode::CPlayerNode(CStsPlayer* aPlayer,
+        MStsPlayAlarmObserver& aObserver) :
+    iPlayer(aPlayer), iObserver(&aObserver)
+    {
+    }
+
+CSts::CPlayerNode::~CPlayerNode()
+    {
+    delete iPlayer;
+    }
+
+bool CSts::CPlayerNode::HasObserver()
+    {
+    return iObserver != 0;
+    }
+
+CStsPlayer* CSts::CPlayerNode::Player()
+    {
+    return iPlayer;
+    }
+
+MStsPlayAlarmObserver& CSts::CPlayerNode::Observer()
+    {
+    return *iObserver;
+    }
+
 /*static*/CSts* CSts::Create()
     {
     CSts* self = new CSts();
@@ -53,47 +98,84 @@ CSts::~CSts()
     CleanUpPlayers();
     }
 
-void CSts::PlayTone(CSystemToneService::TToneType aToneType,
-        unsigned int& aPlayToneContext)
+void CSts::PlayTone(CSystemToneService::TToneType aTone)
     {
-    CStsPlayer* player = CStsPlayer::Create(*this, aToneType, iNextContext);
+    CStsPlayer* player = CStsPlayer::CreateTonePlayer(*this, aTone,
+            iNextContext);
     if (player != 0)
         {
-        iMap[iNextContext] = player;
-        aPlayToneContext = iNextContext;
+        iPlayerMap[iNextContext] = new CPlayerNode(player);
         iNextContext++;
+        if (iNextContext == 0)
+            iNextContext++;
         player->Play();
         }
     else
         {
-        aPlayToneContext = 0;
+        //TODO: Add trace here
         }
     }
 
-void CSts::StopTone(unsigned int aPlayToneContext)
+void CSts::PlayAlarm(CSystemToneService::TAlarmType aAlarm,
+        unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
     {
-    CStsPlayer* player = iMap[aPlayToneContext];
-    if (player)
+    CStsPlayer* player = CStsPlayer::CreateAlarmPlayer(*this, aAlarm,
+            iNextContext);
+    if (player != 0)
         {
-        player->Stop();
-        PlayToneComplete(aPlayToneContext);
+        iPlayerMap[iNextContext] = new CPlayerNode(player, aObserver);
+        aAlarmContext = iNextContext;
+        iNextContext++;
+        if (iNextContext == 0)
+            iNextContext++;
+        player->Play();
+        }
+    else
+        {
+        //TODO: Add trace here
+        aAlarmContext = 0;
+        }
+    }
+
+void CSts::StopAlarm(unsigned int aAlarmContext)
+    {
+    CPlayerNode* node = iPlayerMap[aAlarmContext];
+    iPlayerMap.erase(aAlarmContext);
+    if (node)
+        {
+        node->Player()->Stop();
+        delete node;
+        }
+    else
+        {
+        //TODO: Add trace here
         }
     }
 
 void CSts::CleanUpPlayers()
     {
-    for (TPlayerMap::iterator i = iMap.begin(); i != iMap.end(); i++)
-        {
-        StopTone(i->first);
-        }
+        while (!iPlayerMap.empty())
+            {
+            //TODO: Add trace here
+            StopAlarm(iPlayerMap.begin()->first);
+            }
     }
 
-void CSts::PlayToneComplete(unsigned int aPlayToneContext)
+void CSts::PlayComplete(unsigned int aContext)
     {
-    CStsPlayer* player = iMap[aPlayToneContext];
-    iMap[aPlayToneContext] = 0;
-    if (player)
+    CPlayerNode* node = iPlayerMap[aContext];
+    iPlayerMap.erase(aContext);
+    if (node)
         {
-        delete player;
+        CStsPlayer* player = node->Player();
+        if (node->HasObserver())
+            {
+            node->Observer().PlayAlarmComplete(aContext);
+            }
+        delete node;
+        }
+    else
+        {
+        // TODO: log unexpected error
         }
     }

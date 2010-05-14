@@ -21,9 +21,8 @@
 #include "openmaxalwrapper.h"
 #include "xaobjectitf.h"
 #include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "../adaptation/XARadioAdaptCtx.h"
-#endif
+
+#include "xaadptbasectx.h"
 /** MACROS **/
 
 
@@ -51,9 +50,7 @@ typedef struct XARadioDeviceImpl_
 
     /* variables */
 
-#ifdef _GSTREAMER_BACKEND_
     XAAdaptationBaseCtx* adaptationCtx;
-#endif
 } XARadioDeviceImpl;
 
 

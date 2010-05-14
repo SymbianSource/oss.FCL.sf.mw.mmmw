@@ -20,9 +20,9 @@
 #include <assert.h>
 
 #include "xaprefetchstatusitf.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#endif
+
+#include "xaadaptationgst.h"
+
 
 static XAPrefetchStatusItfImpl* GetImpl(XAPrefetchStatusItf self)
 {
@@ -188,12 +188,10 @@ XAresult XAPrefetchStatusItfImpl_GetFillUpdatePeriod(XAPrefetchStatusItf self,
     return ret;
 }
 
-#ifdef _GSTREAMER_BACKEND_
-
 /*
  * implementation-specific methods
  */
-XAPrefetchStatusItfImpl* XAPrefetchStatusItfImpl_Create( XAAdaptationBaseCtx* adaptationCtx )
+XAPrefetchStatusItfImpl* XAPrefetchStatusItfImpl_Create( XAMediaPlayerImpl* impl )
 {
     XAPrefetchStatusItfImpl *self = (XAPrefetchStatusItfImpl*)
         calloc(1,sizeof(XAPrefetchStatusItfImpl));
@@ -215,10 +213,10 @@ XAPrefetchStatusItfImpl* XAPrefetchStatusItfImpl_Create( XAAdaptationBaseCtx* ad
         self->eventFlags = 0;
         self->fillUpdatePeriod = PREFETCHSTATUSITF_DEFAULT_UPDATE_PERIOD;
         self->pStatus = XA_PREFETCHSTATUS_SUFFICIENTDATA;
-        self->adaptationCtx = adaptationCtx;
+        self->adaptationCtx = impl->curAdaptCtx;
         self->cbPtrToSelf = NULL;
 
-        XAAdaptationBase_AddEventHandler( adaptationCtx, &XAPrefetchStatusItfImpl_AdaptCb, XA_PREFETCHITFEVENTS, self );
+        XAAdaptationBase_AddEventHandler( self->adaptationCtx, &XAPrefetchStatusItfImpl_AdaptCb, XA_PREFETCHITFEVENTS, self );
 
         self->self = self;
     }
@@ -226,20 +224,16 @@ XAPrefetchStatusItfImpl* XAPrefetchStatusItfImpl_Create( XAAdaptationBaseCtx* ad
     DEBUG_API("<-XAPrefetchStatusItfImpl_Create");
     return self;
 }
-#endif
+
 
 void XAPrefetchStatusItfImpl_Free(XAPrefetchStatusItfImpl* self)
 {
     DEBUG_API("->XAPrefetchStatusItfImpl_Free");
     assert(self==self->self);
-#ifdef _GSTREAMER_BACKEND_
     XAAdaptationBase_RemoveEventHandler( (XAAdaptationBaseCtx*)self->adaptationCtx, &XAPrefetchStatusItfImpl_AdaptCb );
-#endif    
     free(self);
     DEBUG_API("<-XAPrefetchStatusItfImpl_Free");
 }
-
-#ifdef _GSTREAMER_BACKEND_
 
 /* void XAPrefetchStatusItfImpl_AdaptCb
  * Description: Listen changes in adaptation
@@ -272,5 +266,4 @@ void XAPrefetchStatusItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
 
     DEBUG_API("<-XAPrefetchStatusItfImpl_AdaptCb");
 }
-#endif
 

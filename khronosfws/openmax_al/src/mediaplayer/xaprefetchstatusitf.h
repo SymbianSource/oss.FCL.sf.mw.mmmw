@@ -20,9 +20,9 @@
 
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAMediaPlayerAdaptCtx.h"
-#endif
+#include "xaadptbasectx.h"
+#include "xamediaplayer.h"
+
 #define PREFETCHSTATUSITF_DEFAULT_UPDATE_PERIOD 100
 
 /*
@@ -45,9 +45,7 @@ typedef struct XAPrefetchStatusItfImpl_
     void                *cbcontext;
     XAuint32            eventFlags;
     XApermille          fillUpdatePeriod;
-#ifdef _GSTREAMER_BACKEND_
     XAAdaptationBaseCtx* adaptationCtx;
-#endif
 }XAPrefetchStatusItfImpl;
 
 /**
@@ -75,15 +73,13 @@ XAresult XAPrefetchStatusItfImpl_SetFillUpdatePeriod(XAPrefetchStatusItf self,
 XAresult XAPrefetchStatusItfImpl_GetFillUpdatePeriod(XAPrefetchStatusItf self,
                                                        XApermille *pPeriod);
 
-#ifdef _GSTREAMER_BACKEND_
+
 
 /*
  * implementation-specific methods
  */
-XAPrefetchStatusItfImpl* XAPrefetchStatusItfImpl_Create( XAAdaptationBaseCtx* adaptationCtx);
+XAPrefetchStatusItfImpl* XAPrefetchStatusItfImpl_Create(  XAMediaPlayerImpl* impl );
 void XAPrefetchStatusItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
-#endif
-
 void XAPrefetchStatusItfImpl_Free(XAPrefetchStatusItfImpl* self);
 
 #endif /* XAPREFETCHSTATUSITF_H_ */

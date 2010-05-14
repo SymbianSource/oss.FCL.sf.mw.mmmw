@@ -18,19 +18,58 @@
 #ifndef XAMEDIARECORDERADAPTCTXMMF_H_
 #define XAMEDIARECORDERADAPTCTXMMF_H_
 
-#include "xaadaptationcontextbasemmf.h"
+#include "xaadaptationmmf.h"
 
 
 /* TYPEDEFS */
-#define XA_RECMODE_STREAM 1
-#define XA_RECMODE_STILL 2
-
 typedef struct XAMediaRecorderAdaptationMMFCtx_ XAMediaRecorderAdaptationMMFCtx;
 
+typedef struct XAMediaRecorderAdaptationMMFCtx_
+{
+    /* Parent*/
+    XAAdaptationMMFCtx_ baseObj;
+
+    /* OMX-AL Variables */
+    XADataSource            *xaAudioSource, *xaVideoSource;
+    XADataSink              *xaSink;
+    XAuint8                 recModes;
+
+    /* GST elements */
+    XAboolean               isobjsink;   /*is sink another XA object?*/
+    XAboolean               isobjasrc;    /*is audio source another XA object?*/
+    XAboolean               isobjvsrc;    /*is video source another XA object?*/
+    XAboolean               encodingchanged;
+
+    XAboolean               mute;
+    XAuint32                premutevol;
+    XAuint32                imageEffectID;
+    XAboolean               isStereoPosition;
+    XAuint32                xaRecordState;
+    XAmillidegree           curRotation;
+    XAuint32                curMirror;
+    XAboolean               isRecord;
+
+    /* internals */
+    XAboolean               trackpositionenabled;
+    gboolean                runpositiontimer;
+
+    XAImplThreadHandle      recordingEventThr;
+
+    /* Variables for encoders */
+    XAAudioEncoderSettings  audioEncSettings;
+    XAVideoSettings         videoEncSettings;
+    XAImageSettings         imageEncSettings;
+    
+    void*                   mmfContext;
+
+
+} XAMediaRecorderAdaptationMMFCtx_;
+
 /* FUNCTIONS */
-XAAdaptationBaseMMFCtx* XAMediaRecorderAdaptMMF_Create(  XADataSource* pAudioSrc, XADataSource* pImageVideoSrc, XADataSink* pDataSnk, XAuint8 recModes );
-XAresult XAMediaRecorderAdaptMMF_PostInit( XAAdaptationBaseMMFCtx* bCtx );
-void XAMediaRecorderAdaptMMF_Destroy( XAAdaptationBaseMMFCtx* bCtx );
+XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create(  XADataSource* pAudioSrc,
+                            XADataSource* pImageVideoSrc, XADataSink* pDataSnk, XAuint8 recModes );
+XAresult XAMediaRecorderAdaptMMF_PostInit( XAAdaptationMMFCtx* bCtx );
+void XAMediaRecorderAdaptMMF_Destroy( XAAdaptationMMFCtx* bCtx );
 
 
 #endif /* XAMEDIARECORDERADAPTCTXMMF_H_ */

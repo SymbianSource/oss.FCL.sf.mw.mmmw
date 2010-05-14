@@ -18,12 +18,7 @@
 #ifndef XARDSITF_H
 #define XARDSITF_H
 
-#include "openmaxalwrapper.h"
-#include "xaglobals.h"
-#ifdef _GSTREAMER_BACKEND_
-#include "XAAdaptationContextBase.h"
-#include "XARDSItfAdaptation.h"
-#endif
+#include "xaadptbasectx.h"
 /** MACROS **/
 /** TYPES **/
 
@@ -52,10 +47,8 @@ typedef struct XARDSItfImpl_
     void                   *odaDataContext;
     XARDSItf               odaDataCbPtrToSelf;
 
-#ifdef _GSTREAMER_BACKEND_
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
-#endif
 } XARDSItfImpl;
 
 /** METHODS **/
@@ -126,13 +119,12 @@ XAresult XARDSItfImpl_RegisterRDSCallback(XARDSItf self,
 XAresult XARDSItfImpl_RegisterODADataCallback(XARDSItf self,
                                               xaNewODADataCallback callback,
                                               void * pContext);
-#ifdef _GSTREAMER_BACKEND_
+
 
 /* XARDSItfImpl -specific methods */
 XARDSItfImpl* XARDSItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
 
 void XARDSItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
-#endif
 void XARDSItfImpl_Free(XARDSItfImpl* self);
 
 #endif /* XARDSITF_H */

@@ -29,7 +29,11 @@ CStsServerSession::CStsServerSession(CStsServer& aServer, CSts& aSts) :
 
 CStsServerSession::~CStsServerSession()
     {
+    TStsCallBack callBack;
+    callBack.callBackType = EStsShutdown;
+    iMsgQueue.SendBlocking(callBack);
     iServer.DropSession(this);
+    iMsgQueue.Close();
     }
 
 void CStsServerSession::CreateL()
@@ -41,11 +45,17 @@ void CStsServerSession::ServiceL(const RMessage2& aMessage)
     {
     switch (aMessage.Function())
         {
+        case StsMsg_RegisterMsgQueue:
+            DoRegisterMsgQueueL(aMessage);
+            break;
         case StsMsg_PlayTone:
             DoPlayToneL(aMessage);
             break;
-        case StsMsg_StopTone:
-            DoStopToneL(aMessage);
+        case StsMsg_PlayAlarm:
+            DoPlayAlarmL(aMessage);
+            break;
+        case StsMsg_StopAlarm:
+            DoStopAlarmL(aMessage);
             break;
         default:
             break;
@@ -57,20 +67,54 @@ void CStsServerSession::ServiceError(const RMessage2& aMessage, TInt aError)
     CSession2::ServiceError(aMessage, aError);
     }
 
+void CStsServerSession::DoRegisterMsgQueueL(const RMessage2& aMessage)
+    {
+    TInt result = iMsgQueue.Open(aMessage, 0);
+
+    aMessage.Complete(result);
+    }
+
 void CStsServerSession::DoPlayToneL(const RMessage2& aMessage)
     {
-    CSystemToneService::TToneType toneType =
+    CSystemToneService::TToneType tone =
             (CSystemToneService::TToneType) aMessage.Int0();
+    aMessage.Complete(KErrNone);
+    iSts.PlayTone(tone);
+    }
+
+void CStsServerSession::DoPlayAlarmL(const RMessage2& aMessage)
+    {
+    CSystemToneService::TAlarmType alarm =
+            (CSystemToneService::TAlarmType) aMessage.Int0();
     unsigned int context = 0;
-    iSts.PlayTone(toneType, context);
+    iSts.PlayAlarm(alarm, context, *this);
+    iObserverMap[context] = (MStsPlayAlarmObserver*) aMessage.Ptr2();
     TPckg<unsigned int> contextPckg(context);
     TRAPD(err,aMessage.WriteL(1,contextPckg));
     aMessage.Complete(err);
+    // if the context is 0 there was a problem with the PlayAlarm,
+    // so trigger the PlayAlarmComplete callback.
+    if (context == 0)
+        {
+        PlayAlarmComplete(0);
+        }
     }
 
-void CStsServerSession::DoStopToneL(const RMessage2& aMessage)
+void CStsServerSession::DoStopAlarmL(const RMessage2& aMessage)
     {
     unsigned int context = aMessage.Int0();
     aMessage.Complete(KErrNone);
-    iSts.StopTone(context);
+    iObserverMap.erase(context);
+    iSts.StopAlarm(context);
+    }
+
+void CStsServerSession::PlayAlarmComplete(unsigned int aAlarmContext)
+    {
+    //TODO: Trigger play complete callback to RSession
+    TStsCallBack callBack =
+        {
+        EStsPlayAlarmComplete, iObserverMap[aAlarmContext], aAlarmContext
+        };
+    iMsgQueue.SendBlocking(callBack);
+    iObserverMap.erase(aAlarmContext);
     }

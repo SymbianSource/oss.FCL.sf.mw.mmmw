@@ -15,8 +15,8 @@
 *
 */
 
-#ifndef XAADAPTATION_H_
-#define XAADAPTATION_H_
+#ifndef XAADAPTATIONMMF_H_
+#define XAADAPTATIONMMF_H_
 
 #include <pthread.h>
 #include <semaphore.h>
@@ -24,11 +24,10 @@
 #include <string.h>
 #include <unistd.h>
 #include "openmaxalwrapper.h"
-#include "xaadaptationcontextbasemmf.h"
 #include "xaglobals.h"
 //#include "OpenMAXAL_ContentPipe.h"
 #include "xaplatform.h"
-
+#include "xaadptbasectx.h"
 #ifdef XA_IMPL_MEASURE_GST_DELAY
 #include <time.h>
 #endif /* XA_IMPL_MEASURE_GST_DELAY */
@@ -43,25 +42,25 @@
 
 /* TYPEDEFS */
 //typedef gboolean (*GstBusCb)( GstBus *bus, GstMessage *message, gpointer data );
-#define XA_IMPL_SUPPORTED_AUDIO_OUT_NUM 3
-#define XA_IMPL_OMIX_MAX_CONNECTED_MEDIAPLAYERS 10
+
 #define CONTENT_PIPE_BUFFER_SIZE 1000
 #define TEST_VIDEO_WIDTH     640
 #define TEST_VIDEO_HEIGHT    480
 
+/*
 typedef enum
 {
     XA_AUDIO_WAVENC = 0,
     XA_AUDIO_VORBISENC,
     XA_AUDIO_PCM,
-    XA_NUM_OF_AUDIOENCODERS /* Do not move this line */
+    XA_NUM_OF_AUDIOENCODERS  Do not move this line 
 } XAAudioEnc;
 
 typedef enum
 {
     XA_VIDEO_JPEGENC = 0,
     XA_VIDEO_THEORAENC,
-    XA_NUM_OF_VIDEOENCODERS /* Do not move this line */
+    XA_NUM_OF_VIDEOENCODERS  Do not move this line 
 } XAVideoEnc;
 
 typedef enum CP_STATE
@@ -77,31 +76,25 @@ typedef enum CP_STATE
 	CPStateEOS,
 	CPStateError
 }CP_STATE;
+*/
 
-typedef struct XAAdaptEvtHdlrMMF_
-{
-    xaAdaptEventHandlerMMF handlerfunc;    /* function handling the callback */
-    void               *handlercontext; /* context of handler */
-    XAuint32            eventtypes;     /* what kind of events this handles */
-} XAAdaptEvtHdlrMMF;
+/* Forward declaration of adaptation basecontext */
+typedef struct XAAdaptationMMFCtx_ XAAdaptationMMFCtx;
 
 /*
  * Structure that holds all common variables for every
  * mmf-Adaptation context structures.
  */
-typedef struct XAAdaptationBaseMMFCtx_
+typedef struct XAAdaptationMMFCtx_
 {
-    /* Common Variables for all adaptation elements */
-    GArray*         evtHdlrs;    /* array of event handlers */
-    XAuint32        ctxId;
-    XAboolean       placeholder;
+XAAdaptationBaseCtx baseObj;
 
-} XAAdaptationBaseMMFCtx_;
+} XAAdaptationMMFCtx_;
 
 typedef struct XAEngineAdaptationMMFCtx_
 {
     /* Parent*/
-    XAAdaptationBaseMMFCtx_    baseObj;
+    XAAdaptationMMFCtx_    baseObj;
 
 } XAEngineAdaptationMMFCtx_;
 
@@ -111,7 +104,7 @@ typedef struct XAEngineAdaptationMMFCtx_
 typedef struct XAMediaPlayerAdaptationMMFCtx_
 {
     /* Parent*/
-    XAAdaptationBaseMMFCtx_    baseObj;
+    XAAdaptationMMFCtx_    baseObj;
 
     /* OMX-AL Variables */
     XADataSource            *xaSource, *xaBankSrc;
@@ -124,65 +117,36 @@ typedef struct XAMediaPlayerAdaptationMMFCtx_
     XAboolean               isobjvsink;   /*is video sink another XA object?*/
 
     XAboolean               mute;
+    XAuint32                premutevol;
     XAuint32                imageEffectID;
     XAboolean               isStereoPosition;
     XAmillidegree           curRotation;
     XAuint32                curMirror;
-
     XAint32                 buffering;
 
     /* internals */
     XAboolean               trackpositionenabled;
-
-
     XAboolean               loopingenabled;
-
-    XAboolean		            cameraSinkSynced;
+    XAboolean		        cameraSinkSynced;
     void*                   mmfContext;
-
+	void* 					mmfMetadataContext;
+/*
+    XAuint32                playerState;
+*/
 
 } XAMediaPlayerAdaptationMMFCtx_;
 
-typedef struct XAMediaRecorderAdaptationMMFCtx_
+
+typedef struct XAMetadataAdaptationMMFCtx_
 {
     /* Parent*/
-    XAAdaptationBaseMMFCtx_ baseObj;
+    XAAdaptationMMFCtx_    baseObj;
 
     /* OMX-AL Variables */
-    XADataSource            *xaAudioSource, *xaVideoSource;
-    XADataSink              *xaSink;
-    XAuint8                 recModes;
+    XADataSource            *xaSource;
 
-    /* GST elements */
-    XAboolean               isobjsink;   /*is sink another XA object?*/
-    XAboolean               isobjasrc;    /*is audio source another XA object?*/
-    XAboolean               isobjvsrc;    /*is video source another XA object?*/
-    XAboolean               encodingchanged;
-
-    XAboolean               mute;
-    XAuint32                imageEffectID;
-    XAboolean               isStereoPosition;
-    XAuint32                xaRecordState;
-    XAmillidegree           curRotation;
-    XAuint32                curMirror;
-    XAboolean               isRecord;
-
-    /* internals */
-    XAboolean               trackpositionenabled;
-    gboolean                runpositiontimer;
-
-    XAImplThreadHandle      recordingEventThr;
-
-    /* Variables for encoders */
-    XAAudioEncoderSettings  audioEncSettings;
-    XAVideoSettings         videoEncSettings;
-    XAImageSettings         imageEncSettings;
-    
     void*                   mmfContext;
-
-
-} XAMediaRecorderAdaptationMMFCtx_;
-
+} XAMetadataAdaptationMMFCtx_;
 
 /* FUNCTIONS */
 /*
@@ -191,31 +155,8 @@ typedef struct XAMediaRecorderAdaptationMMFCtx_
  * not implemented.
  */
 
+XAresult XAAdaptationBaseMMF_Init( XAAdaptationMMFCtx* pSelf, XAuint32 ctxId );
+XAresult XAAdaptationBaseMMF_PostInit( XAAdaptationMMFCtx* ctx );
+void XAAdaptationBaseMMF_Free( XAAdaptationMMFCtx* ctx );
 
-void XAAdaptationBaseMMF_SendAdaptEvents(XAAdaptationBaseMMFCtx* ctx, XAAdaptEventMMF* event);
-
-//void XAAdaptationBase_PrepareAsyncWait(XAAdaptationBaseCtx* ctx);
-//void XAAdaptationBase_StartAsyncWait(XAAdaptationBaseCtx* ctx);
-//gboolean XAAdaptationBase_CancelAsyncWait(gpointer ctx);
-//void XAAdaptationBase_CompleteAsyncWait(XAAdaptationBaseCtx* ctx);
-
-
-//XAresult XAMediaPlayerAdapt_UpdatePositionCbTimer(XAMediaPlayerAdaptationCtx_* mCtx);
-
-//XAresult XAMediaRecorderAdapt_ChangeEncoders( XAMediaRecorderAdaptationCtx_* mCtx );
-//XAresult XAMediaRecorderAdapt_CheckCodec( XAMediaRecorderAdaptationCtx_* mCtx, XACapsType encType, XAuint32 encoderId );
-
-//XAresult XAMetadataAdapt_TryWriteTags(XAAdaptationBaseCtx* mCtx, GstBin* binToWriteTo);
-//void XAMetadataAdapt_FreeVars(XAMetadataAdaptVars *vars);
-
-//GstElement* XAOutputMixAdapt_GetSink(XAAdaptationBaseCtx* bCtx);
-
-
-//XAresult XAOutputMixAdapt_ConnectObject(XAAdaptationBaseCtx* omCtx, XAAdaptationBaseCtx* bCtx, GstElement* usedMix);
-//XAresult XAOutputMixAdapt_DisconnectObject(XAAdaptationBaseCtx* omCtx, XAAdaptationBaseCtx* bCtx);
-//void* XAAdaptationBase_ContentPipeScrThrFunc( void* arg);
-//void* XAAdaptationBase_ContentPipeSinkThrFunc( void* arg);
-//CPresult XAAdaptationBase_ContentPipeSrcCb(CP_EVENTTYPE eEvent, CPuint iParam);
-//CPresult XAAdaptationBase_ContentPipeSinkCb(CP_EVENTTYPE eEvent, CPuint iParam);
-
-#endif /* XAADAPTATION_H_ */
+#endif /* XAADAPTATIONMMF_H_ */
