@@ -23,7 +23,7 @@ TARGETTYPE      EXE
 UID             0 0x10207C7C
 EPOCSTACKSIZE   0x5000
 EPOCHEAPSIZE    0x500000 0x1000000
-CAPABILITY      ProtServ MultiMediaDD ReadDeviceData WriteDeviceData ReadUserData WriteUserData UserEnvironment
+CAPABILITY      ProtServ MultiMediaDD ReadDeviceData WriteDeviceData ReadUserData WriteUserData UserEnvironment NetworkServices
 VENDORID        VID_DEFAULT
 
 EPOCPROCESSPRIORITY high

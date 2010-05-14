@@ -28,6 +28,23 @@
 #include <s32mem.h>
 
 // CONSTANTS
+/***
+ *  File Properties Objects:
+ *  Object ID,          GUID,   128 [bits]
+ *  Object Size,        QWORD,  64 
+ *  File ID,            GUID,   128 
+ *  File Size,          QWORD,  64
+ *  Creation Date,      QWORD,  64
+ *  Data Packets Count, QWORD,  64
+ *  Play Duration,      QWORD,  64
+ *  Send Duration,      QWORD,  64
+ *  Preroll,            QWORD,  64
+ *  Flags,              DWORD,  32 
+ */
+const TInt KDurationOffset  = 64;       // duration offset from File Property object
+const TInt KPrerollOffset   = 80;       // preRoll offset from File Property object
+const TInt KFlagsOffset     = 88;       // flags offset from File Property object
+
 // ASF Header Object GUIDs 
   
 _LIT8 (KASFContentDescriptionObject, "75B22633668E11CFA6D900AA0062CE6C");
@@ -695,22 +712,37 @@ TBool CMetaDataParserWMA::GetExtContDesEntryL(TMetaDataFieldId aFieldId, TInt aO
 //
 void CMetaDataParserWMA::GetDurationL()
 	{
-	TInt offset = iFilePropertiesOffset + 16;
-	TPtrC8 size8 = iHeaderData->Mid(offset, 8);
-	TInt size = ConvertToInt64(size8);
-	offset = iFilePropertiesOffset + 88;
-	TPtrC8 flags = iHeaderData->Mid(offset, 4);
-	TInt broadcastBit = (TInt) (flags[0] & 0x01);
-	if(broadcastBit == 1)
-		{
-		return; // duration not valid.
-		}
-	//offset = iFilePropertiesOffset + 48;
-	TPtrC8 duration8 = iHeaderData->Mid(offset - 24, 8); // 100 nanosec units
-	TReal sec = ((TReal)ConvertToInt64(duration8)) / 10000000; // seconds
-	TBuf16<10> des16;
-	des16.Num(sec, TRealFormat (9, 3));
+#ifdef _DEBUG
+    RDebug::Print(_L("CMetaDataParserWMA::GetDuration()"));
+#endif    
+    TInt offset = iFilePropertiesOffset + KFlagsOffset;
+    TPtrC8 flags = iHeaderData->Mid(offset, 4);
+    TInt broadcastBit = (TInt) (flags[0] & 0x01);
+    if(broadcastBit == 1)
+        {
+        return; // duration not valid.
+        }
+    
+    offset = iFilePropertiesOffset + KDurationOffset;
+    TPtrC8 duration8 = iHeaderData->Mid(offset, 8);     // 100 nanosec units
+    TReal durationSec = ((TReal)ConvertToInt64(duration8)) / 10000000; // seconds
+    
+    offset = iFilePropertiesOffset + KPrerollOffset;
+    TPtrC8 preRoll8 = iHeaderData->Mid(offset, 8);      // millisec units
+    TReal preRollSec = ((TReal)ConvertToInt64(preRoll8)) / 1000; // seconds
+    TReal sec = durationSec - preRollSec;               // not include preroll
+
+    TBuf16<10> des16;	
+    TRealFormat format(9, 3);                           // width=9, decimal place=3
+    // Use fixed format, and do not use Triads
+    format.iType = KRealFormatFixed | KDoNotUseTriads; 
+    des16.Num(sec, format);	                            // convert to string
+	
 	iContainer->AppendL( EMetaDataDuration, des16 );
+#ifdef _DEBUG
+    RDebug::Print(_L("CMetaDataParserWMA::GetDuration(), duration=%f"), sec);
+#endif 	
+	
 	}
 
 

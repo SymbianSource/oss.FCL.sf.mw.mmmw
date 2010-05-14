@@ -80,7 +80,7 @@ void CSystemToneServiceStif::ConstructL()
                           CStifLogger::ETxt,
                           CStifLogger::EFile,
                           EFalse );
-    
+    iCallbackController = (CStsActiveObj*)(this);	
     SendTestClassVersion();
     }
 
@@ -111,6 +111,7 @@ CSystemToneServiceStif::~CSystemToneServiceStif()
 
     // Delete logger
     delete iLog; 
+    delete iCallbackController;
 
     }
 

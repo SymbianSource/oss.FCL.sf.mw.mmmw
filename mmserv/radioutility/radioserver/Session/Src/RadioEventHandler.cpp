@@ -22,6 +22,13 @@
 #include    "RadioEventHandler.h"
 #include    "RadioClientServer.h"
 #include    "RadioDebug.h"
+#include    "trace.h"
+
+// This has to be the last include. 
+#ifdef STUB_CONSTELLATION
+#   include "RadioStubManager.h"
+#   define KRadioServerPropertyCategory KStub_KRadioServerPropertyCategory
+#endif //STUB_CONSTELLATION
 
 // ============================ MEMBER FUNCTIONS ===============================
 
@@ -40,6 +47,7 @@ CRadioEventHandler::CRadioEventHandler(
 		iKey(aKey),
 		iObserver(aObserver)
     {
+    FUNC_LOG;
     if ( iKey == ERadioServPsAfSearchEnd )
     	{
 		// This is necessary to make sure AfSearchEnd comes in before FrequencyChanged event.
@@ -56,7 +64,7 @@ CRadioEventHandler::CRadioEventHandler(
 //
 void CRadioEventHandler::ConstructL()
     {
-	RADIO_RDEBUG(_L("[RADIO-SESS] CRadioEventHandler::ConstructL()"));
+    FUNC_LOG;
 	CActiveScheduler::Add(this);
 	User::LeaveIfError( iProperty.Attach(KRadioServerPropertyCategory, iKey) );
 	iProperty.Subscribe(iStatus);
@@ -73,6 +81,7 @@ CRadioEventHandler* CRadioEventHandler::NewLC(
 	RRadioSession& aSession,
 	TUint aKey )
     {
+    FUNC_LOG;
     CRadioEventHandler* self = new( ELeave ) CRadioEventHandler(aObserver,aSession, aKey);
     CleanupStack::PushL( self );
     self->ConstructL();
@@ -82,6 +91,7 @@ CRadioEventHandler* CRadioEventHandler::NewLC(
 // Destructor
 CRadioEventHandler::~CRadioEventHandler()
     {
+    FUNC_LOG;
 	if ( IsActive() )
 		{
 		Cancel();
@@ -95,6 +105,7 @@ CRadioEventHandler::~CRadioEventHandler()
 //
 void CRadioEventHandler::DoCancel()
     {
+    FUNC_LOG;
 	iProperty.Cancel();
     }
 
@@ -104,6 +115,7 @@ void CRadioEventHandler::DoCancel()
 //
 void CRadioEventHandler::RunL()
     {
+    FUNC_LOG;
     // Subscribe immediately before analyzing the notification to ensure that we
     // don't miss further updates.
 	iProperty.Subscribe(iStatus);
@@ -280,7 +292,7 @@ void CRadioEventHandler::RunL()
 			break;
 		default:
 			{
-			RADIO_RDEBUG(_L("[RADIO-SESS] CRadioEventHandler::RunL(): ERROR case default !!!"));
+			INFO("ERROR case default !!!");
 			User::Panic(_L("RadioServer"), KErrGeneral );
 			}
 			break;

@@ -42,7 +42,7 @@ public:
     virtual gint Start();
     virtual gint Stop();
     virtual gint SetTone(GString* string);
-    virtual gint ContinueDTMFStringSending(gboolean aContinue);
+    virtual gint ContinueDTMFStringSending(gboolean sending);
 
     void SetParent(TMSDTMF*& parent);
 

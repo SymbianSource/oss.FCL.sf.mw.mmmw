@@ -167,6 +167,7 @@ TInt CAudioOutputControlUtilityProxyImpl::Configure(CMMFDevSound& aDevSound)
                 CleanupStack::Pop(iAudioOutput);
             else
                 CleanupStack::PopAndDestroy(iAudioOutput);
+                iAudioOutput = NULL;
             }
         return err;
         }
@@ -253,9 +254,12 @@ TInt CAudioOutputControlUtilityProxyImpl::Configure(CMMFDevSound& aDevSound)
             {
             //in case of EMC sources
             CleanupStack::PopAndDestroy(iDRMConfigIntfc);
+            iDRMConfigIntfc = NULL;
             }
         CleanupStack::PopAndDestroy(iRestrictedAudioOutput);
         CleanupStack::PopAndDestroy(iFactory);
+        iFactory = NULL;
+        iRestrictedAudioOutput = NULL;
         }
         
     return err;

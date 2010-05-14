@@ -24,4 +24,6 @@ EXPORTS
 	?DeleteGlobalRouting@TMSFactory@TMS@@QAEHAAPAVTMSGlobalRouting@2@@Z @ 23 NONAME ; int TMS::TMSFactory::DeleteGlobalRouting(class TMS::TMSGlobalRouting * &)
 	?DeleteRingTonePlayer@TMSFactory@TMS@@QAEHAAPAVTMSRingTone@2@@Z @ 24 NONAME ; int TMS::TMSFactory::DeleteRingTonePlayer(class TMS::TMSRingTone * &)
 	?CreateFormat@TMSFactory@TMS@@QAEHHAAPAVTMSFormat@2@@Z @ 25 NONAME ; int TMS::TMSFactory::CreateFormat(int, class TMS::TMSFormat * &)
+	?CreateRTPSession@TMSFactory@TMS@@QAEHAAPAVTMSRTPSession@2@PAEI@Z @ 26 NONAME ; int TMS::TMSFactory::CreateRTPSession(class TMS::TMSRTPSession * &, unsigned char *, unsigned int)
+	?DeleteRTPSession@TMSFactory@TMS@@QAEHAAPAVTMSRTPSession@2@@Z @ 27 NONAME ; int TMS::TMSFactory::DeleteRTPSession(class TMS::TMSRTPSession * &)
 

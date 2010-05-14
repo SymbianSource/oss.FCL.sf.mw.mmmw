@@ -251,7 +251,10 @@ void TMSRtAudioHdlr::Play(TRingingType aRingType, TInt aVolume,
         switch (iPlayerStatus)
             {
             case ETonePlaying:
-                iTonePlayer->CancelPlay();
+                if (iTonePlayer)
+                    {
+                    iTonePlayer->CancelPlay();
+                    }
                 DoPlay();
                 break;
             case EToneReady:
@@ -272,7 +275,10 @@ void TMSRtAudioHdlr::Play(TRingingType aRingType, TInt aVolume,
         switch (iPlayerStatus)
             {
             case ETonePlaying:
-                iTtsPlayer->Stop();
+                if (iTtsPlayer)
+                    {
+                    iTtsPlayer->Stop();
+                    }
                 DoPlay();
                 break;
             case EToneReady:
@@ -320,17 +326,17 @@ void TMSRtAudioHdlr::Play(TRingingType aRingType, TInt aVolume,
 void TMSRtAudioHdlr::ReStartPlaying()
     {
     TRACE_PRN_FN_ENT;
-    if (iFormat == EFormatTone)
+    if (iFormat == EFormatTone && iTonePlayer)
         {
         iTonePlayer->Play();
         iPlayerStatus = ETonePlaying;
         }
-    else if (iFormat == EFormatTts)
+    else if (iFormat == EFormatTts && iTtsPlayer)
         {
         iTtsPlayer->Play();
         iPlayerStatus = ETonePlaying;
         }
-    else
+    else if (iFormat == EFormatSample && iSamplePlayer)
         {
         iSamplePlayer->Play();
         iPlayerStatus = ETonePlaying;

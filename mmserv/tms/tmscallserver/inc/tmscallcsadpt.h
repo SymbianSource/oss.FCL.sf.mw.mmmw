@@ -55,8 +55,8 @@ public:
 
     virtual gint CreateStream(TMSCallType callType, TMSStreamType strmType,
             gint& outStrmId);
-    virtual gint InitStreamL(TMSCallType callType, TMSStreamType strmType,
-            gint strmId, TMSFormatType frmtType, const RMessage2& aMessage);
+    virtual gint InitStream(TMSCallType callType, TMSStreamType strmType,
+            gint strmId, TMSFormatType frmtType, const RMessage2& message);
     virtual gint StartStream(TMSCallType callType, TMSStreamType strmType,
             gint strmId);
     virtual gint PauseStream(TMSCallType callType, TMSStreamType strmType,
@@ -74,6 +74,8 @@ public:
     virtual gint GetDataXferBufferHndl(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId,
             const guint32 key, RChunk& chunk);
+
+    // From TMS effects
     virtual gint GetMaxVolume(guint& volume);
     virtual gint SetVolume(const guint volume);
     virtual gint GetVolume(guint& volume);
@@ -87,6 +89,7 @@ public:
     virtual gint SetGlobalGain(const guint gain);
     virtual gint GetGlobalGain(guint& gain);
 
+    // From TMS formats
     virtual gint GetCodecMode(const TMSFormatType fmttype,
             const TMSStreamType strmtype, gint& mode);
     virtual gint SetCodecMode(const TMSFormatType fmttype,
@@ -102,16 +105,16 @@ public:
     virtual gint GetPlc(const TMSFormatType fmttype, gboolean& plc);
     virtual gint SetPlc(const TMSFormatType fmttype, const gboolean plc);
 
+    // From TMS audio routing
     virtual gint SetOutput(TMSAudioOutput output);
     virtual gint GetOutput(TMSAudioOutput& output);
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
     virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer);
+	
+	// From TMSDTMF
     virtual gint StartDTMF(TMSStreamType streamtype, TDes& dtmfstring);
     virtual gint StopDTMF(TMSStreamType streamtype);
     virtual gint ContinueDTMF(TBool continuesending);
-
-    void NotifyClient(const gint strmId, const gint aCommand,
-            const gint aStatus = KErrNone, const gint64 aInt64 = TInt64(0));
 
     //From TMSCSPDevSoundObserver
     void DownlinkInitCompleted(TInt status);
@@ -129,13 +132,15 @@ public:
      void HandleDTMFEvent(const TMSDTMFObserver::TCCPDtmfEvent aEvent,
              const TInt aError, const TChar aTone);
 
-protected:
+private:
     void AvailableOutputsChanged(
             CTelephonyAudioRouting& aTelephonyAudioRouting);
     void OutputChanged(CTelephonyAudioRouting& aTelephonyAudioRouting);
     void SetOutputComplete(CTelephonyAudioRouting& aTelephonyAudioRouting,
             gint aError);
     void GetSupportedBitRatesL(CBufFlat*& brbuffer);
+    void NotifyClient(const gint strmId, const gint command,
+            const gint status = KErrNone, const gint64 int64 = TInt64(0));
 
 private:
     gint iNextStreamId;

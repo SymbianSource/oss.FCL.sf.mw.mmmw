@@ -119,6 +119,8 @@ public:
     virtual void QueueEvent(gint aEventType, gint aError, void* event_data);
 
 private:
+    gint StartServer();
+
     void PopulateArrayL(TMSClientServerRequest aRequest,
             RArray<TUint32>& aDecoders, gint aCount);
     void GetAvailableOutputsL(OutputVector& outputs);

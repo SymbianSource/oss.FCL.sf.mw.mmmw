@@ -51,7 +51,7 @@ gint TMSGlobalGainEffectImpl::PostConstruct()
 gint TMSGlobalGainEffectImpl::Create(TMSEffect*& tmseffect)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSGlobalGainEffectImpl *self = new TMSGlobalGainEffectImpl;
+    TMSGlobalGainEffectImpl *self = new TMSGlobalGainEffectImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)

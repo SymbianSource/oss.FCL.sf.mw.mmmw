@@ -18,7 +18,7 @@
 
 
 // INCLUDE FILES
-#include	<AWBAudioPlayControllerResource.rsg>
+#include	<awbaudioplaycontrollerresource.rsg>
 #include	"AWBAudioPlayControllerResource.h"
 #include 	<data_caging_path_literals.hrh> 
 #include "DebugMacros.h"

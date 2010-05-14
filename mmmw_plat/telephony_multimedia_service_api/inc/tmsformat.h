@@ -64,7 +64,8 @@ public:
      *      The typedef std::vector<guint> BitRateVector; list of codecs.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_FEATURE_NOT_SUPPORTED if this method is not implemented
      *      by the adaptation.
      *
@@ -80,7 +81,8 @@ public:
      *      Bitrate to be set for the encoder.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_INVALID_ARGUMENT if requested bitrate is invalid.
      *      TMS_RESULT_FEATURE_NOT_SUPPORTED if this method is not implemented
      *      by the adaptation.
@@ -97,7 +99,8 @@ public:
      *      Current bitrate.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_FEATURE_NOT_SUPPORTED if this method is not implemented
      *      by the adaptation.
      *
@@ -111,7 +114,8 @@ public:
      *      Type of the format object.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C virtual gint GetType(TMSFormatType& fmttype);

@@ -32,9 +32,9 @@ TMSAudioToneUtilityImpl::TMSAudioToneUtilityImpl()
 // 2nd phase construcotor
 // ---------------------------------------------------------------------------
 //
-void TMSAudioToneUtilityImpl::ConstructL(MMdaAudioToneObserver& aToneObserver)
+void TMSAudioToneUtilityImpl::ConstructL(MMdaAudioToneObserver& toneObserver)
     {
-    iToneUtility = CMdaAudioToneUtility::NewL(aToneObserver);
+    iToneUtility = CMdaAudioToneUtility::NewL(toneObserver);
     }
 
 // ---------------------------------------------------------------------------
@@ -42,11 +42,11 @@ void TMSAudioToneUtilityImpl::ConstructL(MMdaAudioToneObserver& aToneObserver)
 // ---------------------------------------------------------------------------
 //
 TMSAudioToneUtilityImpl* TMSAudioToneUtilityImpl::NewL(
-        MMdaAudioToneObserver& aToneObserver)
+        MMdaAudioToneObserver& toneObserver)
     {
     TMSAudioToneUtilityImpl* self = new (ELeave) TMSAudioToneUtilityImpl;
     CleanupStack::PushL(self);
-    self->ConstructL(aToneObserver);
+    self->ConstructL(toneObserver);
     CleanupStack::Pop(self);
     return self;
     }
@@ -86,13 +86,16 @@ void TMSAudioToneUtilityImpl::CancelPlay()
     {
     // Do state specific cancellations, this way we do not end up in a
     // endless play state if CancelPlay() is called during preparation.
-    if (EMdaAudioToneUtilityPlaying == iToneUtility->State())
+    if (iToneUtility)
         {
-        iToneUtility->CancelPlay();
-        }
-    else if (EMdaAudioToneUtilityPrepared == iToneUtility->State())
-        {
-        iToneUtility->CancelPrepare();
+        if (EMdaAudioToneUtilityPlaying == State())
+            {
+            iToneUtility->CancelPlay();
+            }
+        else if (EMdaAudioToneUtilityPrepared == State())
+            {
+            iToneUtility->CancelPrepare();
+            }
         }
     }
 
@@ -100,7 +103,7 @@ void TMSAudioToneUtilityImpl::CancelPlay()
 // From class TMSAudioToneUtilityImpl
 // ---------------------------------------------------------------------------
 //
-TInt TMSAudioToneUtilityImpl::MaxVolume()
+gint TMSAudioToneUtilityImpl::MaxVolume()
     {
     return iToneUtility->MaxVolume();
     }
@@ -109,29 +112,29 @@ TInt TMSAudioToneUtilityImpl::MaxVolume()
 // From class TMSAudioToneUtilityImpl
 // ---------------------------------------------------------------------------
 //
-void TMSAudioToneUtilityImpl::SetVolume(TInt aVolume)
+void TMSAudioToneUtilityImpl::SetVolume(gint volume)
     {
-    iToneUtility->SetVolume(aVolume);
+    iToneUtility->SetVolume(volume);
     }
 
 // ---------------------------------------------------------------------------
 // From class TMSAudioToneUtilityImpl
 // ---------------------------------------------------------------------------
 //
-void TMSAudioToneUtilityImpl::SetRepeats(TInt aRepeatNumberOfTimes,
-        const TTimeIntervalMicroSeconds& aTrailingSilence)
+void TMSAudioToneUtilityImpl::SetRepeats(gint repeatNumberOfTimes,
+        const TTimeIntervalMicroSeconds& trailingSilence)
     {
-    iToneUtility->SetRepeats(aRepeatNumberOfTimes, aTrailingSilence);
+    iToneUtility->SetRepeats(repeatNumberOfTimes, trailingSilence);
     }
 
 // ---------------------------------------------------------------------------
 // From class TMSAudioToneUtilityImpl
 // ---------------------------------------------------------------------------
 //
-void TMSAudioToneUtilityImpl::SetPriority(TInt aPriority,
-        TMdaPriorityPreference aPref)
+void TMSAudioToneUtilityImpl::SetPriority(gint priority,
+        TMdaPriorityPreference pref)
     {
-    iToneUtility->SetPriority(aPriority, aPref);
+    iToneUtility->SetPriority(priority, pref);
     }
 
 // ---------------------------------------------------------------------------
@@ -139,9 +142,9 @@ void TMSAudioToneUtilityImpl::SetPriority(TInt aPriority,
 // ---------------------------------------------------------------------------
 //
 void TMSAudioToneUtilityImpl::SetVolumeRamp(
-        const TTimeIntervalMicroSeconds& aRampDuration)
+        const TTimeIntervalMicroSeconds& rampDuration)
     {
-    iToneUtility->SetVolumeRamp(aRampDuration);
+    iToneUtility->SetVolumeRamp(rampDuration);
     }
 
 // ---------------------------------------------------------------------------

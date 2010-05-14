@@ -31,6 +31,7 @@
 
 _LIT(KCharacterSetRscFile, "TopCharacterSet.rsc");
 
+
 // ============================ MEMBER FUNCTIONS ===============================
 
 // -----------------------------------------------------------------------------
@@ -172,12 +173,7 @@ void CMetaDataParser::MapID3GenreToStringL(TInt aNum, TDes& aGenrePtr)
 #ifdef _DEBUG
      RDebug::Print(_L("CMetaDataParser::MapID3GenreToStringL"));
 #endif
-    
-	if(aNum < 0 || aNum > 125 && aNum != 199)
-		{
-		return;
-		}
-	switch(aNum)
+   		switch(aNum)
 			{
 				case 0:
 					aGenrePtr.Append(KGenreBlues);
@@ -574,12 +570,7 @@ void CMetaDataParser::MapID3GenreToStringL(TInt aNum, TDes8& aGenrePtr)
 #ifdef _DEBUG
      RDebug::Print(_L("CMetaDataParser::MapID3GenreToStringL"));
 #endif
-
-	if(aNum < 0 || aNum > 125 && aNum != 199)
-		{
-		return;
-		}
-	switch(aNum)
+		switch(aNum)
 			{
 				case 0:
 					aGenrePtr.Append(KGenreBlues);
@@ -1274,6 +1265,26 @@ void CMetaDataParser::CommonParseL(
 
     GetProtectedL(aSource, aContainer);
     ParseL(aWantedFields, aContainer);
+    }
+
+// -----------------------------------------------------------------------------
+// CMetaDataParser::CommonParseDesL
+// -----------------------------------------------------------------------------
+//
+void CMetaDataParser::CommonParseDesL(
+    const RArray<TMetaDataFieldId>& aWantedFields,
+    CMetaDataFieldContainer& aContainer )
+    {
+#ifdef _DEBUG
+     RDebug::Print(_L("CMetaDataParser::CommonParseDesL"));
+#endif
+
+     //Since this is for descriptor "source", by default it is not a DRM Protected file
+     _LIT(KNoProtection, "0");
+     aContainer.AppendL( EMetaDataProtected, KNoProtection );
+           
+     //Continue parsing the file
+     ParseL(aWantedFields, aContainer);
     }
 
 // -----------------------------------------------------------------------------

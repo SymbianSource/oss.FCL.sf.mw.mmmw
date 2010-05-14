@@ -33,7 +33,7 @@ TMSModemSinkBodyImpl::~TMSModemSinkBodyImpl()
 gint TMSModemSinkBodyImpl::Create(TMSModemSinkBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSModemSinkBodyImpl* self = new TMSModemSinkBodyImpl;
+    TMSModemSinkBodyImpl* self = new TMSModemSinkBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();
@@ -64,7 +64,6 @@ void TMSModemSinkBodyImpl::SetProxy(TMSCallProxy* aProxy,
         gpointer /*queuehandler*/)
     {
     iProxy = aProxy;
-    //static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this, TMS_SINK_MODEM);
     }
 
 // End of file

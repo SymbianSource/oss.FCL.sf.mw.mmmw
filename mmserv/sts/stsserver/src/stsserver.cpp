@@ -19,25 +19,24 @@
  */
 
 #include "stsserver.h"
-
 #include "stsserversession.h"
 #include "sts.h"
 
-// TODO: IMPLEMENT PLATFORM SECURITY CHECKS ON THIS API.
-
 // Total number of ranges
-const TUint KStsRangeCount = 2;
+const TUint KStsRangeCount = 3;
 
 // Definition of the ranges of IPC numbers
 const TInt KStsRanges[KStsRangeCount] =
     {
-    0, KStsCmdLast + 1
+    0, 2, KStsCmdLast + 1
     };
 
 // Policy to implement for each of the above ranges        
 const TUint8 KStsElementsIndex[KStsRangeCount] =
     {
-    CPolicyServer::EAlwaysPass, CPolicyServer::ENotSupported
+            CPolicyServer::EAlwaysPass,
+            CPolicyServer::ECustomCheck,
+            CPolicyServer::ENotSupported
     };
 
 // Package all the above together into a policy
@@ -79,6 +78,61 @@ CStsServer::~CStsServer()
     {
     iSessions.ResetAndDestroy();
     CSts::Delete(iSts);
+    }
+
+// Performs security checks based on the tone or Alarm type.
+CPolicyServer::TCustomResult CStsServer::CustomSecurityCheckL(
+        const RMessage2& aMsg, TInt& /*aAction*/, TSecurityInfo& aMissing)
+    {
+    CPolicyServer::TCustomResult result;
+
+    switch (aMsg.Function())
+        {
+        case StsMsg_PlayTone:
+            {
+            CSystemToneService::TToneType tone =
+                    (CSystemToneService::TToneType) aMsg.Int0();
+            result = SecurityCheckTone(tone, aMsg, aMissing);
+            }
+            break;
+        case StsMsg_PlayAlarm:
+            {
+            CSystemToneService::TAlarmType alarm =
+                    (CSystemToneService::TAlarmType) aMsg.Int0();
+            result = SecurityCheckAlarm(alarm, aMsg, aMissing);
+            }
+            break;
+        default:
+            result = CPolicyServer::EFail;
+        }
+
+    return result;
+    }
+
+CPolicyServer::TCustomResult CStsServer::SecurityCheckAlarm(
+        CSystemToneService::TAlarmType aAlarm, const RMessage2& /*aMsg*/,
+        TSecurityInfo& /*aMissing*/)
+    {
+    CPolicyServer::TCustomResult result;
+    switch(aAlarm)
+        {
+        default:
+            result = CPolicyServer::EPass;
+        }
+    return result;
+    }
+
+CPolicyServer::TCustomResult CStsServer::SecurityCheckTone(
+        CSystemToneService::TToneType aTone, const RMessage2& /*aMsg*/,
+        TSecurityInfo& /*aMissing*/)
+    {
+    CPolicyServer::TCustomResult result;
+    switch(aTone)
+        {
+        default:
+            result = CPolicyServer::EPass;
+        }
+    return result;
     }
 
 CSession2* CStsServer::NewSessionL(const TVersion& aVersion, const RMessage2& /*aMessage*/) const

@@ -51,7 +51,8 @@ public:
      *      The type of sink object (TMS_SOURCE_MIC).
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C virtual gint GetType(TMSSourceType& sourcetype);

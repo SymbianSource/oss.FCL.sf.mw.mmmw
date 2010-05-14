@@ -64,7 +64,7 @@ gint TMSInbandToneBodyImpl::PostConstruct()
     {
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
-    iProxy = new TMSProxy;
+    iProxy = new TMSProxy();
 
     if (!iProxy)
         {
@@ -96,7 +96,7 @@ gint TMSInbandToneBodyImpl::AddObserver(TMSInbandToneObserver& obsrvr,
                     iObserver, iParent, iClientId);
             if (ret == TMS_RESULT_SUCCESS)
                 {
-                //ret = iProxy->StartInbandToneNotifier();
+                //ret = iProxy->StartInbandToneNotifier(); //TODO: remove?
                 }
             }
         else
@@ -119,7 +119,7 @@ gint TMSInbandToneBodyImpl::RemoveObserver(TMSInbandToneObserver& obsrvr)
         ret = iProxy->RemoveMsgQueueNotifier(EMsgQueueInbandToneType,
                 iObserver);
         iObserver = NULL;
-        //iProxy->CancelInbandToneNotifier();
+        //iProxy->CancelInbandToneNotifier(); //TODO: remove?
         }
     else
         {

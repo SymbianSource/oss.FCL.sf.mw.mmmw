@@ -368,7 +368,8 @@ public:
      *      Created DTMF player.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_INSUFFICIENT_MEMORY if DTMF player creation failed due
      *      to insufficient memory.
      *      TMS_RESULT_FATAL_ERROR if an error occured.
@@ -385,7 +386,8 @@ public:
      *      DTMF player to be deleted.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_INVALID_ARGUMENT if the DTMF player is not valid.
      *
      */

@@ -25,7 +25,7 @@
 #ifdef __cplusplus
 
 #include <e32base.h>
-#include <MdaAudioSamplePlayer.h>  
+#include <mdaaudiosampleplayer.h>  
 #include <f32file.h>
 #include <videoplayer.h>
 #include <videoplayer2.h>
@@ -166,6 +166,7 @@ private:
 private:
     CMMFBackendEngine();
     void ConstructL();
+    void InitAudioRecorderUtilityL();
     void InitAudioPlayerUtilityL();
     void InitVideoPlayerUtilityL();
     void InitPlayerTimersL();

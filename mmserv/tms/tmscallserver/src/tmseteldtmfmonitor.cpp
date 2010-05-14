@@ -39,6 +39,21 @@ TMSEtelDtmfMonitor* TMSEtelDtmfMonitor::NewL(TMSDTMFProvider& aObserver,
     }
 
 // -----------------------------------------------------------------------------
+// Constructs the monitor.
+// -----------------------------------------------------------------------------
+//
+TMSEtelDtmfMonitor::TMSEtelDtmfMonitor(TMSDTMFProvider& aObserver,
+        RMmCustomAPI& aMmCustom) :
+    CActive(EPriorityStandard),
+    iObserver(aObserver),
+    iMmCustom(aMmCustom)
+    {
+    TRACE_PRN_FN_ENT;
+    CActiveScheduler::Add(this);
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
 // Destructs the object by canceling first ongoing monitoring.
 // -----------------------------------------------------------------------------
 //
@@ -73,7 +88,7 @@ void TMSEtelDtmfMonitor::StartMonitoring()
 void TMSEtelDtmfMonitor::RunL()
     {
     TRACE_PRN_FN_ENT;
-    TInt err = iStatus.Int();
+    gint err = iStatus.Int();
     TRACE_PRN_N1(_L("**TMS TMSEtelDtmfMonitor::RunL: status:%d"), err);
 
     if (err == KErrNone)
@@ -143,25 +158,7 @@ void TMSEtelDtmfMonitor::RunL()
 void TMSEtelDtmfMonitor::DoCancel()
     {
     TRACE_PRN_FN_ENT;
-    if (iStatus == KRequestPending)
-        {
-        iMmCustom.CancelAsyncRequest(ECustomNotifyDtmfEventIPC);
-        }
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// Constructs the monitor.
-// -----------------------------------------------------------------------------
-//
-TMSEtelDtmfMonitor::TMSEtelDtmfMonitor(TMSDTMFProvider& aObserver,
-        RMmCustomAPI& aMmCustom) :
-    CActive(EPriorityStandard),
-    iObserver(aObserver),
-    iMmCustom(aMmCustom)
-    {
-    TRACE_PRN_FN_ENT;
-    CActiveScheduler::Add(this);
+    iMmCustom.CancelAsyncRequest(ECustomNotifyDtmfEventIPC);
     TRACE_PRN_FN_EXT;
     }
 

@@ -22,6 +22,9 @@
 #include <mmf/common/mmfpaniccodes.h>
 #include "mmfaudiotonecontroller.h"
 #include <mmf/server/mmfaudiooutput.h>
+#include <ConfigurationComponentsFactory.h>
+#include <AudioOutputControlUtility.h>
+#include <mmf/server/mmffile.h>
 
 /*
  A list of panic codes for the Audio Tone Controller
@@ -127,7 +130,15 @@ void CMMFAudioToneController::ConstructL()
 	CleanupStack::PushL(audPlayConSetRepeatsParser);
 	AddCustomCommandParserL(*audPlayConSetRepeatsParser);
 	CleanupStack::Pop(audPlayConSetRepeatsParser);
-	
+	// for drm CR/Error 417-45879/ESLM-82JAHL
+    TInt err = CConfigurationComponentsFactory::CreateFactoryL(iFactory);
+    User::LeaveIfError(err);    
+    
+    if (iFactory)
+        {
+        User::LeaveIfError(iFactory->CreateAudioOutputControlUtility(iAudioOutputControlUtility));                
+        }    
+//end drm cr
 	// [ assert the invariant now that we are constructed ]
 	__ASSERT_ALWAYS( Invariant(), Panic( EStateNotConstructed));
 	}
@@ -150,6 +161,8 @@ Destructor
 */
 CMMFAudioToneController::~CMMFAudioToneController()
 	{
+    delete iAudioOutputControlUtility;
+    delete iFactory;
 	delete iMMFDevSound;
 	delete iToneSequenceData;
 	delete iMessage;
@@ -267,7 +280,17 @@ void CMMFAudioToneController::PrimeL(TMMFMessage& aMessage)
 			User::Leave(err);
 			}
 		}
-	
+	// for drm CR/Error 417-45879/ESLM-82JAHL
+    if (iDataSource->DataSourceType()==KUidMmfFileSource)
+        {
+        CMMFFile* file = static_cast<CMMFFile*>(iDataSource);
+        
+        if (file->IsProtectedL())
+            {
+            User::LeaveIfError(iAudioOutputControlUtility->SetDataSource(iDataSource));
+            }         
+        }
+	   // end drm cr
 	__ASSERT_ALWAYS( Invariant(), Panic( EStateNotPrimed ) );
 
 	}
@@ -346,7 +369,18 @@ void CMMFAudioToneController::PlayL()
 
 	// [ assert the Invariant ]
 	__ASSERT_ALWAYS( Invariant(), Panic(EStateNotReadyToPlay));
-
+        // for drm CR/Error 417-45879/ESLM-82JAHL
+	   //configure Devsound with output restriction for a DRM protected file
+	    if (iDataSource->DataSourceType()==KUidMmfFileSource)
+	        {
+	        CMMFFile* file = static_cast<CMMFFile*>(iDataSource);
+	        
+	        if (file->IsProtectedL())
+	            {
+	            iAudioOutputControlUtility->Configure(*iMMFDevSound);    //ignoring errors since rouitng changes are only suggestions to adaptation
+	            }
+	        }
+	
 	if(State() == EPausePlaying && iIsResumeSupported)
 		{
 		User::LeaveIfError(iMMFDevSound->Resume());

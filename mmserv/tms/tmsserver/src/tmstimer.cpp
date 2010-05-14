@@ -88,6 +88,16 @@ void TMSTimer::RunL()
     }
 
 // ---------------------------------------------------------
+// TMSTimer::RunL()
+// ---------------------------------------------------------
+//
+TInt TMSTimer::RunError(TInt aError)
+    {
+    //TODO: process error if HandleTimeOutL() in RunL leaves
+    return aError;
+    }
+
+// ---------------------------------------------------------
 // TMSTimer::After()
 // ---------------------------------------------------------
 //

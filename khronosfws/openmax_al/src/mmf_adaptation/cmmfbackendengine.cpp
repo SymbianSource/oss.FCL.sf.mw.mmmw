@@ -61,9 +61,16 @@ CMMFBackendEngine::CMMFBackendEngine()
 void CMMFBackendEngine::ConstructL()
     {
     iAPIBeingUsed = ENoUtility;
-    iBaseAudioRecorder = CMdaAudioRecorderUtility::NewL(*this);
-    iAudioRecorder = (CMdaAudioRecorderUtility*)iBaseAudioRecorder;
     iActiveSchedulerWait = new (ELeave) CActiveSchedulerWait;
+    }
+
+void CMMFBackendEngine::InitAudioRecorderUtilityL()
+    {
+    if (!iAudioRecorder)
+        {
+        iBaseAudioRecorder = CMdaAudioRecorderUtility::NewL(*this);
+        iAudioRecorder = (CMdaAudioRecorderUtility*)iBaseAudioRecorder;
+        }
     }
 
 void CMMFBackendEngine::InitAudioPlayerUtilityL()
@@ -113,33 +120,27 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
         if (iRecordState == ERecorderNotReady)
             {
             iFileFormat = format;
-            iAPIBeingUsed = EAudioRecorderUtility;
-            TPtr8 fileuri(((TUint8*)uri), strlen(uri) ,strlen(uri));
-            TPtr8 filepath = fileuri.RightTPtr(strlen(uri)-fileslashlen);
-            TInt pos = filepath.LocateReverse(':');
-            if(pos != KErrNotFound)
+            iAPIBeingUsed = DetermineAPIToUse(uri, EPlay);
+            err = XA_RESULT_INTERNAL_ERROR;
+            if (iAPIBeingUsed == EAudioRecorderUtility)
                 {
-                fileuri.Delete(fileslashlen+pos,1);
-                }
-
-            TUriParser8 localfileUri;
-            TInt ret = localfileUri.Parse(fileuri);
-            HBufC* file = NULL;
-            TRAP(err,file = localfileUri.GetFileNameL());
-            TPtr des = file->Des();
-            iFileName = des;
-            delete file;
-            file = NULL;
-            TRAP(err, iAudioRecorder->OpenFileL(iFileName));
-            if (!err)
-                { /* Wait until we receive moscostatechanged callback */
+                /* Initialize URI as needed by MMF utilities */
+                err = InitializeURIForMMFUtil(uri);
+                RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
+                /* Initalize Recorder related objects */
+                TRAP(err, InitAudioRecorderUtilityL());
+                RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
+    
+                TRAP(err, iAudioRecorder->OpenFileL(iFileName));
+                RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
+                /* Wait until we receive moscostatechanged callback */
                 if(!iActiveSchedulerWait->IsStarted())
                     {
                     iActiveSchedulerWait->Start();
                     }
-                err = iErrorCode;
-                }
-           }
+                RET_IF_ERR(iErrorCode, XA_RESULT_INTERNAL_ERROR);
+               }
+            }
         }
     else
         {
@@ -505,6 +506,12 @@ void CMMFBackendEngine::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrevious
 TInt CMMFBackendEngine::SetRecorderState(TRecorderState state, XAboolean stopCalled)
     {
     TInt err(KErrNone);
+
+    if (iAPIBeingUsed != EAudioRecorderUtility)
+        {
+        return XA_RESULT_INTERNAL_ERROR;
+        }
+
     switch(state)
         {
         case ERecorderNotReady:
@@ -574,28 +581,14 @@ void CMMFBackendEngine::Close()
         iPositionUpdateTimer->Stop();
         }
 
-    if(iActiveSchedulerWait)
+    if (iActiveSchedulerWait && iActiveSchedulerWait->IsStarted())
         {
-        if(iActiveSchedulerWait->IsStarted())
-            {
-            iActiveSchedulerWait->AsyncStop();
-            }
+        iActiveSchedulerWait->AsyncStop();
         }
     }
 
 void CMMFBackendEngine::Destroy()
     {
-
-    if (iBaseAudioRecorder)
-        {
-        iAudioRecorder->Close();
-        }
-
-    if (iActiveSchedulerWait && iActiveSchedulerWait->IsStarted())
-        {
-        iActiveSchedulerWait->AsyncStop();
-        }
-
     delete iPositionUpdateTimer;
     iPositionUpdateTimer = NULL;
     delete iUri;
@@ -607,12 +600,8 @@ void CMMFBackendEngine::Destroy()
     delete iBaseVideoPlayer;
     iBaseVideoPlayer = NULL;
     iVideoPlayer = NULL;
-    if (iaudioInputRecord)
-        {
-        delete iaudioInputRecord;
-        iaudioInputRecord = NULL;
-        }
-		
+    delete iaudioInputRecord;
+    iaudioInputRecord = NULL;
     delete iBaseAudioPlayer;
     iBaseAudioPlayer = NULL;
     iAudioPlayer = NULL;

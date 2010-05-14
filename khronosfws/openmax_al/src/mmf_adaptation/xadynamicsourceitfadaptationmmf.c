@@ -50,38 +50,38 @@ XAresult XADynamicSourceItfAdaptMMF_SetSource(XAAdaptationMMFCtx *bCtx, XADataSo
         
         mmf_close(mCtx->mmfContext);
         mCtx->xaSource = pDataSource;
-        ret = mmf_set_player_uri(mCtx->mmfContext, (char *)(tempUri->URI), tempFormat->containerType);
         if(mCtx->xaVideoSink)
-          {
+            {
             ret = mmf_setup_native_display(mCtx->mmfContext, mCtx->xaVideoSink);
-          }
+            }
+        if (ret == XA_RESULT_SUCCESS)
+            {
+            ret = mmf_set_player_uri(mCtx->mmfContext, (char *)(tempUri->URI), tempFormat->containerType);
+            }
         if(ret == XA_RESULT_SUCCESS)
             {
-			ret = XAPlayItfAdaptMMF_SetPlayState(&bCtx->baseObj, origstate);
-			}
-		else
-			{
-			DEBUG_ERR("Set Play state failed");
-	        ret = XA_RESULT_INTERNAL_ERROR;
-			}
-		if(ret == XA_RESULT_SUCCESS)
-		{
-			if(mCtx->mmfMetadataContext)
-			{
-				ret = mmf_metadata_utility_parse_source(mCtx->mmfMetadataContext, (char *)(tempUri->URI));
-			}
-		}
+            ret = XAPlayItfAdaptMMF_SetPlayState(&bCtx->baseObj, origstate);
+            }
+        else
+            {
+            DEBUG_ERR("Set Play state failed");
+            ret = XA_RESULT_INTERNAL_ERROR;
+            }
+        if((ret == XA_RESULT_SUCCESS) && (mCtx->mmfMetadataContext))
+            {
+            ret = mmf_metadata_utility_parse_source(mCtx->mmfMetadataContext, (char *)(tempUri->URI));
+            }
     }
-	else if(bCtx->baseObj.ctxId == XAMDAdaptation)
-	{
-		
+    else if(bCtx->baseObj.ctxId == XAMDAdaptation)
+    {
+        
         XAMetadataAdaptationMMFCtx* mCtx = (XAMetadataAdaptationMMFCtx*) bCtx;
-		if(mCtx->mmfContext)
-		{
-			mCtx->xaSource = pDataSource;
-			ret = mmf_metadata_utility_parse_source(mCtx->mmfContext, (char *)(( (XADataLocator_URI*)(pDataSource->pLocator))->URI));
-		}
-	}
+        if(mCtx->mmfContext)
+        {
+            mCtx->xaSource = pDataSource;
+            ret = mmf_metadata_utility_parse_source(mCtx->mmfContext, (char *)(( (XADataLocator_URI*)(pDataSource->pLocator))->URI));
+        }
+    }
     DEBUG_API("<-XADynamicSourceItfAdaptMMF_SetSource");
     return ret;
 }

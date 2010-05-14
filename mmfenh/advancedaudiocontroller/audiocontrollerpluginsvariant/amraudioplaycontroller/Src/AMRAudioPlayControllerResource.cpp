@@ -18,7 +18,7 @@
 
 
 // INCLUDE FILES
-#include	<AMRAudioPlayControllerResource.rsg>
+#include	<amraudioplaycontrollerresource.rsg>
 #include	"AMRAudioPlayControllerResource.h"
 #include "DebugMacros.h"
 #include 	<data_caging_path_literals.hrh> 

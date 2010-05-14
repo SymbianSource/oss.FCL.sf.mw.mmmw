@@ -16,9 +16,9 @@
 */
 
 #include <string.h>
-#include <gst.h>
-#include <gstappsrc.h>
-#include <gstappsink.h>
+#include <gst/gst.h>
+#include <gst/app/gstappsrc.h>
+#include <gst/app/gstappsink.h>
 #include "xaadaptationgst.h"
 #include "xasnapshotitfadaptation.h"
 #include "xamediarecorderadaptctx.h"

@@ -51,7 +51,7 @@ gint TMSGainEffectImpl::PostConstruct()
 gint TMSGainEffectImpl::Create(TMSEffect*& tmseffect)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSGainEffectImpl *self = new TMSGainEffectImpl;
+    TMSGainEffectImpl *self = new TMSGainEffectImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)

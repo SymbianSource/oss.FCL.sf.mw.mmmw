@@ -46,7 +46,8 @@ enum TMMFMdaAudioToneControllerPanicCodes
 The public API for clients of the MMFAudioToneController
 @internalTechnology
 */
-
+class CConfigurationComponentsFactory;
+class CAudioOutputControlUtility; 
 class CMMFAudioToneController : public CMMFController, 
 							public MMMFAudioPlayDeviceCustomCommandImplementor,
 							public MMMFAudioPlayControllerCustomCommandImplementor,
@@ -158,6 +159,10 @@ private:
 /** the Dev Sound that will be used to play the tone*/
 	CMMFDevSound*            iMMFDevSound;
 
+    // for drm CR/Error 417-45879/ESLM-82JAHL
+	CConfigurationComponentsFactory*   iFactory;
+	CAudioOutputControlUtility*        iAudioOutputControlUtility; // used for audio routing for DRM files
+	// end drm cr
 /** Current state of the controller, see TControllerState*/
 	TControllerState         iState;
 

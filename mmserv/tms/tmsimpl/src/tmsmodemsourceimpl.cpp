@@ -52,7 +52,7 @@ gint TMSModemSourceImpl::Create(TMSSource*& tmssource)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
     TRACE_PRN_FN_ENT;
-    TMSModemSourceImpl *self = new TMSModemSourceImpl;
+    TMSModemSourceImpl *self = new TMSModemSourceImpl();
     if (self)
         {
         ret = self->PostConstruct();
@@ -71,7 +71,6 @@ gint TMSModemSourceImpl::SetProxy(TMSCallProxy* /*aProxy*/,
         gpointer /*queuehandler*/)
     {
     gint ret = TMS_RESULT_SUCCESS;
-    //static_cast<TMSModemSourceBodyImpl*>(this->iBody)->SetProxy(aProxy, queuehandler);
     return ret;
     }
 

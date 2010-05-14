@@ -37,7 +37,7 @@ TMSClientSinkBodyImpl::~TMSClientSinkBodyImpl()
 gint TMSClientSinkBodyImpl::Create(TMSClientSinkBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSClientSinkBodyImpl* self = new TMSClientSinkBodyImpl;
+    TMSClientSinkBodyImpl* self = new TMSClientSinkBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();

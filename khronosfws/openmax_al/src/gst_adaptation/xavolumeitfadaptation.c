@@ -15,8 +15,8 @@
 *
 */
 
-#include <gst.h>
-#include <mixer.h>
+#include <gst/gst.h>
+#include <gst/interfaces/mixer.h>
 #include "xaadaptationgst.h"
 #include "xavolumeitfadaptation.h"
 #include "xamediaplayeradaptctx.h"

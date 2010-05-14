@@ -53,6 +53,13 @@ private:
      */
     void RunL();
 
+    /**
+     * From CActive
+     * Implementation of CActive::RunError.
+     * Called when RunL leaves.
+     */
+    TInt RunError(TInt /*aError*/) {}
+
 private:
 
     /**

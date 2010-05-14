@@ -44,7 +44,7 @@ public:
 public:
     // New functions
 
-    void SetDtmf(TmsMsgBufPckg dtmfpckg, TBool aPublish = ETrue);
+    void SetDtmf(TmsMsgBufPckg dtmfpckg, gboolean publish = TRUE);
 
 private:
 
@@ -59,7 +59,7 @@ private:
     void ConstructL();
 
 private:
-    TInt iVolume; //Volume
+    gint iVolume;
     };
 
 } //namespace TMS

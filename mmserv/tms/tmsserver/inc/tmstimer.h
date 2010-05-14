@@ -95,6 +95,11 @@ protected:
     virtual void RunL();
 
     /**
+     * From CTimer::RunL()
+     */
+    virtual TInt RunError(TInt aError);
+
+    /**
      * From CTimer::DoCancel()
      */
     virtual void DoCancel();

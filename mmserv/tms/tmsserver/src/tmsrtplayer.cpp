@@ -204,13 +204,16 @@ void TMSRingTonePlayer::LoadActiveProfileSettingsL()
         iProfile->Release();
         iProfile = NULL;
         }
-    __ASSERT_DEBUG(iEngine, PANIC(TMS_RESULT_UNINITIALIZED_OBJECT));
+    __ASSERT_ALWAYS(iEngine, PANIC(TMS_RESULT_UNINITIALIZED_OBJECT));
 
     iProfile = iEngine->ActiveProfileL();
-    MProEngToneSettings& settings = iProfile->ToneSettings();
-    iRtParam.iVolume = settings.RingingVolume();
-    iRtParam.iRingingType = settings.RingingType();
-    iRtParam.iCallerText = settings.TextToSpeech();
+    if (iProfile)
+        {
+        MProEngToneSettings& settings = iProfile->ToneSettings();
+        iRtParam.iVolume = settings.RingingVolume();
+        iRtParam.iRingingType = settings.RingingType();
+        iRtParam.iCallerText = settings.TextToSpeech();
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -222,7 +225,7 @@ void TMSRingTonePlayer::LoadProfileRingToneL()
     TRACE_PRN_FN_ENT;
 
     LoadActiveProfileSettingsL();
-    __ASSERT_DEBUG(iProfile, PANIC(TMS_RESULT_UNINITIALIZED_OBJECT));
+    __ASSERT_ALWAYS(iProfile, PANIC(TMS_RESULT_UNINITIALIZED_OBJECT));
 
     MProEngTones& tones = iProfile->ProfileTones();
     // Get alternate line RT: tones.RingingTone2()
@@ -1114,7 +1117,7 @@ void TMSRingTonePlayer::DoHandleTtsDelayTimeout()
     TMSRtAudioHdlr* currPlayer = NULL;
     currPlayer = GetCurrentlyActiveAudioPlayerWithTTS();
 
-    if (!currPlayer)
+    if (!currPlayer || !iTtsPlayer)
         {
         return;
         }
@@ -1376,12 +1379,11 @@ void TMSRingTonePlayer::DoHandlePlayerError(TBool aDelete, TBool aSync)
                 }
 
 #ifdef __WINS__
-            TRAPD(ignore, PlayAudioRingToneL());
+            TRAP_IGNORE(PlayAudioRingToneL());
             iTonePlayingStatus = EDefaultTonePlaying;
 #else
-            TRAPD(ignore, PlayDefaultToneL());
+            TRAP_IGNORE(PlayDefaultToneL());
 #endif
-            if (ignore) ;
             break;
             }
         case EDefaultTonePlaying:
@@ -1592,11 +1594,15 @@ TInt TMSRingTonePlayer::CheckToneFileSize(const TDesC& aFile, TInt aSizeLimitKB)
     TInt error = TMS_RESULT_SUCCESS;
 
     RFs fs;
-    fs.Connect();
-    TEntry entry;
-    if (TMS_RESULT_SUCCESS == fs.Entry(aFile, entry))
+    error = fs.Connect();
+
+    if (error == TMS_RESULT_SUCCESS)
         {
-        size = entry.iSize;
+        TEntry entry;
+        if (TMS_RESULT_SUCCESS == fs.Entry(aFile, entry))
+            {
+            size = entry.iSize;
+            }
         }
     fs.Close();
 

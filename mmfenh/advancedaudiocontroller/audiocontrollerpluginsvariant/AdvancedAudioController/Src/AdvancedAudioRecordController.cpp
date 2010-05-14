@@ -1019,6 +1019,18 @@ EXPORT_C void CAdvancedAudioRecordController::RecordComplete()
 EXPORT_C void CAdvancedAudioRecordController::SendEvent(
 	const TMMFEvent& aEvent )
     {
+#ifdef _DEBUG
+    RDebug::Print(_L("CAdvancedAudioRecordController::SendEvent[%d] this[%x]"), aEvent.iErrorCode, this);
+#endif
+    // fix for DALM-853QJX, handling preemption use case during recording, this handles only preemption errors and other errors are ignored
+    // MMFDevSound throws the following error codes incase of any preemption events
+    // (DevSound instance has been thrown-off or initial request has been rejected)
+    if ( (aEvent.iErrorCode == KErrAccessDenied) || (aEvent.iErrorCode == KErrInUse) || (aEvent.iErrorCode == KErrDied) )
+        {
+        // this might be a DevSound Preemption
+        iState = EStopping;
+        TRAP_IGNORE(DoStopL());
+        }
     SendEventToClient(aEvent);
     }
 

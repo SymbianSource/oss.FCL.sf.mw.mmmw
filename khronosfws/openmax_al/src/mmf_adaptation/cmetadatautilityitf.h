@@ -9,7 +9,7 @@
 #include <e32hashtab.h>
 #include <OpenMAXAL.h>
 
-#include <Hxmetadatautil.h>
+#include <hxmetadatautil.h>
 #include <MetaDataUtility.h>
 #include <MetaDataFieldContainer.h>
 #include <MetaDataField.hrh>

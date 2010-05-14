@@ -38,7 +38,7 @@ TMSG711FormatBodyImpl::~TMSG711FormatBodyImpl()
 gint TMSG711FormatBodyImpl::Create(TMSG711FormatBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSG711FormatBodyImpl* self = new TMSG711FormatBodyImpl;
+    TMSG711FormatBodyImpl* self = new TMSG711FormatBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();

@@ -52,7 +52,7 @@ EXPORT_C gint TMSUtility::TMSResult(const gint aError)
             result = TMS_RESULT_INSUFFICIENT_MEMORY;
             break;
         case KErrNotSupported: //-5
-            result = TMS_RESULT_DOES_NOT_EXIST;
+            result = TMS_RESULT_ILLEGAL_OPERATION;
             break;
         case KErrArgument: //-6
             result = TMS_RESULT_INVALID_ARGUMENT;
@@ -74,10 +74,10 @@ EXPORT_C gint TMSUtility::TMSResult(const gint aError)
             result = TMS_RESULT_GENERAL_ERROR;
             break;
         case KErrDied: //-13
-        case KErrInUse: //-14
         case KErrServerTerminated: //-15
             result = TMS_RESULT_FATAL_ERROR;
             break;
+        case KErrInUse: //-14
         case KErrServerBusy: //-16
         case KErrCompletion: //-17
         case KErrNotReady: //-18

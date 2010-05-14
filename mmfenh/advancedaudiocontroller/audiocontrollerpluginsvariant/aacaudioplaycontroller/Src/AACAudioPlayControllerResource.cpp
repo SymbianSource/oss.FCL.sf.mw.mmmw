@@ -18,7 +18,7 @@
 
 // INCLUDE FILES
 #include "AACAudioPlayControllerResource.h"
-#include <AACAudioPlayControllerResource.rsg>
+#include <aacaudioplaycontrollerresource.rsg>
 #include <data_caging_path_literals.hrh>
 
 // LOCAL CONSTANTS AND MACROS

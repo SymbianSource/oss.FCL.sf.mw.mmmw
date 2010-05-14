@@ -22,7 +22,7 @@
 #include "AMRAudioPlayControllerDecoder.h"
 #include "DebugMacros.h"
 //#include <AmrDecHwDeviceTICIM.h>
-#include <MmfPanicCodes.h>
+#include <mmfpaniccodes.h>
 
 // The size of AMR header, header must include bits for determining frame length
 const TInt KAmrFrameHeaderSize1 = 1;

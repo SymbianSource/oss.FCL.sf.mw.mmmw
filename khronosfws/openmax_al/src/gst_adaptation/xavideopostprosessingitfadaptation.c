@@ -15,8 +15,8 @@
 *
 */
 
-#include <gst.h>
-#include <video.h>
+#include <gst/gst.h>
+#include <gst/video/video.h>
 #include "xaadaptationgst.h"
 #include "xamediaplayeradaptctx.h"
 #include "xamediarecorderadaptctx.h"

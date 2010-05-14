@@ -74,4 +74,5 @@ EXPORTS
 	_ZTV13CRadioRequest @ 73 NONAME ; #<VT>#
 	_ZTV13RRadioSession @ 74 NONAME ; #<VT>#
 	_ZTV18CRadioEventHandler @ 75 NONAME ; #<VT>#
+	_ZN13RRadioSession4NewLEv @ 76 NONAME
 

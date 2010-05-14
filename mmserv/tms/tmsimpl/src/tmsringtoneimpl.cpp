@@ -67,7 +67,7 @@ EXPORT_C gint TMSRingToneImpl::Create(TMSRingTone*& rt)
     {
     TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSRingToneImpl *self = new TMSRingToneImpl;
+    TMSRingToneImpl *self = new TMSRingToneImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)
@@ -93,7 +93,7 @@ EXPORT_C gint TMSRingToneImpl::Create(TMSRingTone*& rt, RWindow& window,
     {
     TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSRingToneImpl *self = new TMSRingToneImpl;
+    TMSRingToneImpl *self = new TMSRingToneImpl();
     if (self)
         {
         ret = self->PostConstruct(window, scrid);

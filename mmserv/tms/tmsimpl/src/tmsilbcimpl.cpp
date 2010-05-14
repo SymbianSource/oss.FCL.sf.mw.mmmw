@@ -52,7 +52,7 @@ gint TMSILBCFormatImpl::PostConstruct()
 gint TMSILBCFormatImpl::Create(TMSFormat*& tmsformat)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSILBCFormatImpl *self = new TMSILBCFormatImpl;
+    TMSILBCFormatImpl *self = new TMSILBCFormatImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)

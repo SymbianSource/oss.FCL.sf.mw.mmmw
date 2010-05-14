@@ -53,7 +53,8 @@ public:
      *      Any user data passed to the function.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_ALREADY_EXIST if the obsrvr is already in the list.
      *
      */
@@ -79,7 +80,8 @@ public:
      * Common for CS and VOIP (uplink and downlink)
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Start();
@@ -89,7 +91,8 @@ public:
      * Common for CS and VOIP (Uplink and Downlink).
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Stop();
@@ -102,7 +105,8 @@ public:
      *      String containing one or more DTMF digits.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint SetTone(GString* string);
@@ -121,7 +125,8 @@ public:
      *      Boolean to continue sending DTMF string.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint ContinueDTMFStringSending(gboolean sending);

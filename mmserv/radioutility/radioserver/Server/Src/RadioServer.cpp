@@ -3032,7 +3032,11 @@ TInt CRadioServer::ProcessGetTrafficProgrammeStatus(
 void CRadioServer::CompleteAsyncRequest(
     TInt aErrorCode )
     {
-    if ( iAsyncRequest && !(iAsyncRequest->iMessage.IsNull()) )
+    if ( !iAsyncRequest )
+        {
+        RADIO_RDEBUG_INT(_L("[RADIO-SVR] CompleteAsyncRequest(%d) - iAsyncRequest NULL"), aErrorCode);
+        }
+    else if ( !(iAsyncRequest->iMessage.IsNull()) )
         {
         RADIO_RDEBUG_INT2(_L("[RADIO-SVR] CompleteAsyncRequest(%d, %d) - Client alive"), iAsyncRequest->iType, aErrorCode);
         iAsyncRequest->iMessage.Complete(aErrorCode);
@@ -3055,7 +3059,11 @@ void CRadioServer::CompleteAsyncRequest(
 void CRadioServer::CompleteSyncRequest(
     TInt aErrorCode )
     {
-    if ( iSyncRequest && !(iSyncRequest->iMessage.IsNull()) )
+    if ( !iSyncRequest )
+        {
+        RADIO_RDEBUG_INT(_L("[RADIO-SVR] CompleteSyncRequest(%d) - iSyncRequest NULL"), aErrorCode);
+        }
+    else if ( !(iSyncRequest->iMessage.IsNull()) )
         {
         RADIO_RDEBUG_INT2(_L("[RADIO-SVR] CompleteSyncRequest(%d, %d) - Client alive"), iSyncRequest->iType, aErrorCode);
         iSyncRequest->iMessage.Complete(aErrorCode);

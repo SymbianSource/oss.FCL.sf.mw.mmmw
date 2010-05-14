@@ -60,7 +60,6 @@ private:
     TMSRingTone* iParent;
     guint iClientId;
     gint iScreenID;
-    //RWindow iWindow;
     };
 
 } //namespace TMS

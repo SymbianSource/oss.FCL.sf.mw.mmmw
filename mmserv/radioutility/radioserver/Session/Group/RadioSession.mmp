@@ -35,6 +35,8 @@ USERINCLUDE	../../Inc
 USERINCLUDE	../../../inc
 
 MW_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE /epoc32/include/internal
 
 LIBRARY		euser.lib
 LIBRARY		MmfControllerFramework.lib
+LIBRARY     flogger.lib

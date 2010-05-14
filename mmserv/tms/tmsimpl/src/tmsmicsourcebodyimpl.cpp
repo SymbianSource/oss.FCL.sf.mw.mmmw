@@ -33,7 +33,7 @@ TMSMicSourceBodyImpl::~TMSMicSourceBodyImpl()
 gint TMSMicSourceBodyImpl::Create(TMSMicSourceBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSMicSourceBodyImpl* self = new TMSMicSourceBodyImpl;
+    TMSMicSourceBodyImpl* self = new TMSMicSourceBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();

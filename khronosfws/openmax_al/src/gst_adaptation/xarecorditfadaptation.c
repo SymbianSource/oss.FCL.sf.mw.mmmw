@@ -16,7 +16,7 @@
 */
 
 #include <pthread.h>
-#include <gst.h>
+#include <gst/gst.h>
 #include "xamediarecorderadaptctx.h"
 #include "xarecorditfadaptation.h"
 #include "xaadaptationgst.h"

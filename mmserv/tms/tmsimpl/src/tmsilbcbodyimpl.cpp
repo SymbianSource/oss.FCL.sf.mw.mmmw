@@ -38,7 +38,7 @@ TMSILBCFormatBodyImpl::~TMSILBCFormatBodyImpl()
 gint TMSILBCFormatBodyImpl::Create(TMSILBCFormatBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSILBCFormatBodyImpl* self = new TMSILBCFormatBodyImpl;
+    TMSILBCFormatBodyImpl* self = new TMSILBCFormatBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();

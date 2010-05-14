@@ -15,15 +15,20 @@
  *
  */
 
-#ifndef CPEAUDIOINBANDTONEPLAYER_H
-#define CPEAUDIOINBANDTONEPLAYER_H
+#ifndef TMSAUDIOINBANDTONEPLAYER_H
+#define TMSAUDIOINBANDTONEPLAYER_H
 
 // INCLUDES
 #include <mdaaudiotoneplayer.h>
+#include <barsc.h>
+#include <barsread.h>
 #include <ccpdefs.h>
 #include <tms.h>
 
 namespace TMS {
+
+// CONSTANTS
+const gint KPhoneInbandToneZero = 0;
 
 // FORWARD DECLARATIONS
 class TMSAudioToneUtility;
@@ -53,7 +58,7 @@ public:
      * Plays given tone. Originates from CCP plugin.
      * @param aTone inband tone needed to play
      */
-    void PlayInbandTone(TMSInbandToneType aTone);
+    void PlayInbandTone(TMSInbandToneType tone);
 
     /**
      * Cancels playing.
@@ -64,7 +69,7 @@ public:
      * Sets volume.
      * @param    aVolume     Volume in 0...10 scale.
      */
-    void SetVolume(TInt aVolume);
+    void SetVolume(gint volume);
 
 private:
 
@@ -79,11 +84,29 @@ private:
     void ConstructL();
 
     /**
+     * Create inband tone sequences from resources.
+     */
+    void CreateToneSequencesL();
+
+    /**
      * Playes current tone.
      * @param None.
      * @return None.
      */
     void PlayCurrentTone();
+
+    /**
+     * Configure tone player utility for current sequence playback.
+     */
+    void SetToneAttributes(const guint pref,
+            const guint priority = KAudioPriorityNetMsg,
+            const gint repeatTimes = KMdaAudioToneRepeatForever,
+            const gint trailSilence = KPhoneInbandToneZero);
+
+    /**
+     * Allocate tone sequence from resource.
+     */
+    void AllocSeqFromResourceL(const gint resource);
 
     //From MMdaAudioToneObserver
 
@@ -107,7 +130,7 @@ private:
      * @param   aVolume     Volume level in 0...10 scale.
      * @return  Volume level in media server scale.
      */
-    TInt CalculateMediaServerVolume(TInt aVolume) const;
+    gint CalculateMediaServerVolume(gint volume) const;
 
     /**
      * Updates tone player's volume to the current audio volume level.
@@ -118,37 +141,23 @@ private:
     // Data
 
     // Currently playing, NULL or tone sequence.
-    TMSAudioToneUtility* iCurrent;
-    //Member variable for inband tone
+    TMSAudioToneUtility* iPlayer;
+    // Member variable for inband tone
     TMSInbandToneType iToneName;
-    //NetworkBusy sequence
-    HBufC8* iResourceBusySeq;
-    //NetworkBusy sequence
-    HBufC8* iResourceReorderSeq;
-    //NetworkBusy sequence
-    HBufC8* iResourceCongestionSeq;
-    //NetworkBusy sequence
-    HBufC8* iResourceSpecialSeq;
-    //NetworkBusy sequence
-    HBufC8* iResourceRadioPathSeq;
-    //NetworkBusy sequence
-    HBufC8* iResourceRingGoingSeq;
-    //CallWaiting sequence
-    HBufC8* iResourceCallWaitingSeq;
-    //Ringing type
-    //       TProfileRingingType iRingingType;
-    //Data call tone sequence
-    HBufC8* iPlayDataSequence;
-    //Data call silent sequence
-    HBufC8* iPlayNoSoundSequence;
-    //Data call beep sequence
-    HBufC8* iPlayBeepSequence;
-    //Handle to a file server session
+    // Ringing type
+    // TProfileRingingType iRingingType;
+    // Handle to a file server session
     RFs iFsSession;
-
+	// For reading sequence tones from resource file
+    TFileName iFileName;
+    RResourceFile iResourceFile;
+    TResourceReader iReader;
+    // Array of tone pointers
+    RPointerArray<HBufC8> iTones;
     };
+
 } // namespace TMS
 
-#endif      // CPEAUDIOINBANDTONEPLAYER_H
+#endif // TMSAUDIOINBANDTONEPLAYER_H
 
 // End of File

@@ -15,7 +15,7 @@
 *
 */
 
-#include <gst.h>
+#include <gst/gst.h>
 #include "unistd.h"
 #include <pthread.h>
 #include "xamediaplayeradaptctx.h"

@@ -29,6 +29,7 @@ CStsServerSession::CStsServerSession(CStsServer& aServer, CSts& aSts) :
 
 CStsServerSession::~CStsServerSession()
     {
+    CleanUpObservers();
     TStsCallBack callBack;
     callBack.callBackType = EStsShutdown;
     iMsgQueue.SendBlocking(callBack);
@@ -70,7 +71,12 @@ void CStsServerSession::ServiceError(const RMessage2& aMessage, TInt aError)
 void CStsServerSession::DoRegisterMsgQueueL(const RMessage2& aMessage)
     {
     TInt result = iMsgQueue.Open(aMessage, 0);
-
+    if (result == KErrNone)
+        {
+        TThreadId id = RThread().Id();
+        TPckg<TThreadId> idPckg(id);
+        TRAP(result,aMessage.Write(1, idPckg));
+        }
     aMessage.Complete(result);
     }
 
@@ -108,9 +114,19 @@ void CStsServerSession::DoStopAlarmL(const RMessage2& aMessage)
     iSts.StopAlarm(context);
     }
 
+void CStsServerSession::CleanUpObservers()
+    {
+    while (!iObserverMap.empty())
+        {
+        //TODO: Add trace here
+        unsigned int context = iObserverMap.begin()->first;
+        iObserverMap.erase(context);
+        iSts.StopAlarm(context);
+        }
+    }
+
 void CStsServerSession::PlayAlarmComplete(unsigned int aAlarmContext)
     {
-    //TODO: Trigger play complete callback to RSession
     TStsCallBack callBack =
         {
         EStsPlayAlarmComplete, iObserverMap[aAlarmContext], aAlarmContext

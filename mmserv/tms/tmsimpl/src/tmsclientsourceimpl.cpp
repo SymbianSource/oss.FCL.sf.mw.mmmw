@@ -51,7 +51,7 @@ gint TMSClientSourceImpl::PostConstruct()
 gint TMSClientSourceImpl::Create(TMSSource*& tmssource)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSClientSourceImpl *self = new TMSClientSourceImpl;
+    TMSClientSourceImpl *self = new TMSClientSourceImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)

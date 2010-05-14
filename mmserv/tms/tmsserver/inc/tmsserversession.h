@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __TMSSERVERSESSION_H
-#define __TMSSERVERSESSION_H
+#ifndef TMSSERVERSESSION_H
+#define TMSSERVERSESSION_H
 
 // INCLUDES
 #include <sounddevice.h>
@@ -87,6 +87,6 @@ private:
 
 } //namespace TMS
 
-#endif //__TMSSERVERSESSION_H
+#endif //TMSSERVERSESSION_H
 
 // End of file

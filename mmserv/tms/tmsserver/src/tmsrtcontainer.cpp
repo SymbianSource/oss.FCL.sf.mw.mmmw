@@ -19,7 +19,6 @@
 #include <apgcli.h>
 #include <DRMHelper.h>
 #include <bldvariant.hrh>
-//#include <pathinfo.h>
 #include "tmsrtcontainer.h"
 
 using namespace TMS;
@@ -222,17 +221,8 @@ TBool TMSRtContainer::IsFileInRom() const
 // -----------------------------------------------------------------------------
 //
 TBool TMSRtContainer::IsFileInVideoDirectory() const
-    {/*
-    TParsePtrC parsedName(*iFileName);
-
-    if (PathInfo::PathType(parsedName.DriveAndPath()) == PathInfo::EVideosPath)
-        {
-        return ETrue;
-        }
-    else
-        {*/
-        return EFalse;
-        //}
+    {
+    return EFalse;
     }
 
 // -----------------------------------------------------------------------------

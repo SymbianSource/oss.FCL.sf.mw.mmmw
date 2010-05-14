@@ -16,10 +16,10 @@
 */
 
 #include <string.h>
-#include <gst.h>
+#include <gst/gst.h>
 #include "xacameraadaptctx.h"
 #include "xaadaptationgst.h"
-#include <photography.h>
+#include <gst/interfaces/photography.h>
 //#include "XAStaticCapsAdaptation.h"
 
 

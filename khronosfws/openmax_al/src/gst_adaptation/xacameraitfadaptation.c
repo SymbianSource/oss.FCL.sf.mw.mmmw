@@ -15,8 +15,8 @@
 *
 */
 
-#include <gst.h>
-#include <photography.h>
+#include <gst/gst.h>
+#include <gst/interfaces/photography.h>
 #include "xacameraadaptctx.h"
 #include "xacameraitfadaptation.h"
 #include "xaadaptationgst.h"

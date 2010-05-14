@@ -147,9 +147,8 @@ gint TMSCallCSAdpt::CreateStream(TMSCallType /*callType*/,
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSCallCSAdpt::InitStreamL(TMSCallType /*callType*/,
-        TMSStreamType strmType, gint strmId, TMSFormatType /*frmtType*/,
-        const RMessage2& aMessage)
+gint TMSCallCSAdpt::InitStream(TMSCallType /*callType*/, TMSStreamType strmType,
+        gint strmId, TMSFormatType /*frmtType*/, const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -157,13 +156,14 @@ gint TMSCallCSAdpt::InitStreamL(TMSCallType /*callType*/,
     switch (strmType)
         {
         case TMS_STREAM_UPLINK:
+            {
             if (strmId == iUplinkStreamId)
                 {
                 // Open message queue handling client-server communication
                 if (iMsgQueueUp.Handle() <= 0)
                     {
                     // Third argument in TMSCallProxy::InitStream
-                    status = iMsgQueueUp.Open(aMessage, 1);
+                    status = iMsgQueueUp.Open(message, 1);
                     }
                 if (status == TMS_RESULT_SUCCESS)
                     {
@@ -171,11 +171,13 @@ gint TMSCallCSAdpt::InitStreamL(TMSCallType /*callType*/,
 
                     if (status == TMS_RESULT_SUCCESS)
                         {
-                        iDTMFUplinkPlayer =  TMSDTMFProvider::NewL();
-                        iDTMFUplinkPlayer->AddObserverL(*this);
-                        if(!iDTMFNotifier)
+                        TRAP(status, iDTMFUplinkPlayer =
+                                TMSDTMFProvider::NewL());
+                        iDTMFUplinkPlayer->AddObserver(*this);
+                        if (!iDTMFNotifier)
                             {
-                            iDTMFNotifier = TMSDtmfNotifier::NewL();
+                            TRAP(status, iDTMFNotifier =
+                                    TMSDtmfNotifier::NewL());
                             }
                         }
                     }
@@ -186,14 +188,16 @@ gint TMSCallCSAdpt::InitStreamL(TMSCallType /*callType*/,
                 status = TMS_RESULT_DOES_NOT_EXIST;
                 }
             break;
+            }
         case TMS_STREAM_DOWNLINK:
+            {
             if (strmId == iDnlinkStreamId)
                 {
                 // Open message queue handling client-server communication
                 if (iMsgQueueDn.Handle() <= 0)
                     {
                     // Third argument in TMSCallProxy::InitStream
-                    status = iMsgQueueDn.Open(aMessage, 1);
+                    status = iMsgQueueDn.Open(message, 1);
                     }
                 if (status == TMS_RESULT_SUCCESS)
                     {
@@ -201,20 +205,22 @@ gint TMSCallCSAdpt::InitStreamL(TMSCallType /*callType*/,
                     if (status == TMS_RESULT_SUCCESS)
                         {
                         TRAP(status, iRouting =
-                             CTelephonyAudioRouting::NewL(*this));
+                                CTelephonyAudioRouting::NewL(*this));
                         if (status == TMS_RESULT_SUCCESS)
                             {
-                            iTarSettings = TMSTarSettings::NewL();
+                            TRAP(status, iTarSettings = TMSTarSettings::NewL());
                             }
                         if (status == TMS_RESULT_SUCCESS)
                             {
                             TRAP(status, iDTMFDnlinkPlayer =
-                                 TMSAudioDtmfTonePlayer::NewL(*this,
-                                 KAudioPrefKeyDownDTMF,
-                                 KAudioPriorityDtmfKeyPress));
-                            if(!iDTMFNotifier)
+                                    TMSAudioDtmfTonePlayer::NewL(*this,
+                                    KAudioDTMFString,
+                                    KAudioPriorityDTMFString));
+
+                            if (!iDTMFNotifier)
                                 {
-                                iDTMFNotifier = TMSDtmfNotifier::NewL();
+                                TRAP(status, iDTMFNotifier =
+                                        TMSDtmfNotifier::NewL());
                                 }
                             }
                         }
@@ -226,9 +232,12 @@ gint TMSCallCSAdpt::InitStreamL(TMSCallType /*callType*/,
                 status = TMS_RESULT_DOES_NOT_EXIST;
                 }
             break;
+            }
         default:
+            {
             status = TMS_RESULT_STREAM_TYPE_NOT_SUPPORTED;
             break;
+            }
         }
 
     TRACE_PRN_IF_ERR(status);
@@ -925,7 +934,6 @@ gint TMSCallCSAdpt::GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer)
             {
             tmsoutput = TOTMSOUTPUT(availableOutputs[i]);
             stream.WriteUint32L(tmsoutput);
-            //TRACE_PRN_N1(_L("TMS->CallIPAdpt: outputs: [%d]"), availableOutputs[i]);
             }
 
         CleanupStack::PopAndDestroy(&stream);
@@ -956,8 +964,7 @@ gint TMSCallCSAdpt::StartDTMF(TMSStreamType strmtype, TDes& dtmfstring)
             }
 
         dtmfpckg().iStatus = TMS_RESULT_SUCCESS;
-        //TMS_EVENT_DTMF_TONE_STARTED;
-        dtmfpckg().iRequest = ECmdDTMFOpenDnlinkComplete;
+        dtmfpckg().iRequest = ECmdDTMFToneDnlPlayStarted;
         if (iDTMFNotifier)
             {
             iDTMFNotifier->SetDtmf(dtmfpckg, TRUE);
@@ -972,8 +979,7 @@ gint TMSCallCSAdpt::StartDTMF(TMSStreamType strmtype, TDes& dtmfstring)
             }
 
         dtmfpckg().iStatus = TMSUtility::EtelToTMSResult(status);
-        //TMS_EVENT_DTMF_TONE_STARTED;
-        dtmfpckg().iRequest = ECmdDTMFOpenUplinkComplete;
+        dtmfpckg().iRequest = ECmdDTMFToneUplPlayStarted;
 
         if (iDTMFNotifier)
             {
@@ -1014,7 +1020,7 @@ gint TMSCallCSAdpt::StopDTMF(TMSStreamType streamtype)
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSCallCSAdpt::ContinueDTMF(TBool continuesending)
+gint TMSCallCSAdpt::ContinueDTMF(gboolean continuesending)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
@@ -1035,9 +1041,10 @@ gint TMSCallCSAdpt::ContinueDTMF(TBool continuesending)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallCSAdpt::DTMFInitCompleted(TInt /*error*/)
+void TMSCallCSAdpt::DTMFInitCompleted(gint /*error*/)
     {
     TRACE_PRN_FN_ENT;
+    // TODO: process error
     TRACE_PRN_FN_EXT;
     }
 
@@ -1046,7 +1053,7 @@ void TMSCallCSAdpt::DTMFInitCompleted(TInt /*error*/)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallCSAdpt::DTMFToneFinished(TInt error)
+void TMSCallCSAdpt::DTMFToneFinished(gint error)
     {
     TRACE_PRN_FN_ENT;
     TmsMsgBufPckg dtmfpckg;
@@ -1057,7 +1064,6 @@ void TMSCallCSAdpt::DTMFToneFinished(TInt error)
         }
 
     dtmfpckg().iStatus = TMSUtility::TMSResult(error);
-    //TMS_EVENT_DTMF_TONE_STOPPED
     dtmfpckg().iRequest = ECmdDTMFTonePlayFinished;
     if (iDTMFNotifier)
         {
@@ -1073,7 +1079,7 @@ void TMSCallCSAdpt::DTMFToneFinished(TInt error)
 // -----------------------------------------------------------------------------
 //
 void TMSCallCSAdpt::HandleDTMFEvent(
-        const TMSDTMFObserver::TCCPDtmfEvent aEvent, const TInt aError,
+        const TMSDTMFObserver::TCCPDtmfEvent aEvent, const gint aError,
         const TChar /*aTone*/)
     {
     TRACE_PRN_FN_ENT;
@@ -1085,35 +1091,19 @@ void TMSCallCSAdpt::HandleDTMFEvent(
 
     switch (aEvent)
         {
-            /** Unknown */
-        case ECCPDtmfUnknown:
-            break;
-            /** DTMF sending started manually */
-        case ECCPDtmfManualStart:
-            /** Automatic DTMF sending initialized */
-        case ECCPDtmfSequenceStart:
-            //TMS_EVENT_DTMF_TONE_STARTED
-            dtmfpckg().iRequest = ECmdDTMFOpenUplinkComplete;
-            break;
 
-            /** DTMF sending stopped manually */
-        case ECCPDtmfManualStop:
-            //break;
-            /** DTMF sending aborted manually */
-        case ECCPDtmfManualAbort:
-            //break;
-            /** Automatic DTMF sending stopped */
-        case ECCPDtmfSequenceStop:
-            //break;
-            /** Automatic DTMF sending aborted */
-        case ECCPDtmfSequenceAbort:
-            //break;
-            /** There was stop mark in DTMF string */
-        case ECCPDtmfStopInDtmfString:
-            //break;
-            /** DTMF sending completed succesfully */
-        case ECCPDtmfStringSendingCompleted:
-            //TMS_EVENT_DTMF_TONE_STOPPED
+        case ECCPDtmfUnknown:               //Unknown
+            break;
+        case ECCPDtmfManualStart:           //DTMF sending started manually
+        case ECCPDtmfSequenceStart:         //Automatic DTMF sending initialized
+            dtmfpckg().iRequest = ECmdDTMFToneUplPlayStarted;
+            break;
+        case ECCPDtmfManualStop:            //DTMF sending stopped manually
+        case ECCPDtmfManualAbort:           //DTMF sending aborted manually
+        case ECCPDtmfSequenceStop:          //Automatic DTMF sending stopped
+        case ECCPDtmfSequenceAbort:         //Automatic DTMF sending aborted
+        case ECCPDtmfStopInDtmfString:      //There was stop mark in DTMF string
+        case ECCPDtmfStringSendingCompleted: //DTMF sending success
             dtmfpckg().iRequest = ECmdDTMFTonePlayFinished;
             break;
         default:
@@ -1134,7 +1124,7 @@ void TMSCallCSAdpt::HandleDTMFEvent(
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallCSAdpt::DownlinkInitCompleted(TInt status)
+void TMSCallCSAdpt::DownlinkInitCompleted(gint status)
     {
     TRACE_PRN_FN_ENT;
     NotifyClient(iDnlinkStreamId, ECmdDownlinkInitComplete, status, 0);
@@ -1146,7 +1136,7 @@ void TMSCallCSAdpt::DownlinkInitCompleted(TInt status)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallCSAdpt::UplinkInitCompleted(TInt status)
+void TMSCallCSAdpt::UplinkInitCompleted(gint status)
     {
     TRACE_PRN_FN_ENT;
     NotifyClient(iUplinkStreamId, ECmdUplinkInitComplete, status, 0);
@@ -1249,7 +1239,6 @@ void TMSCallCSAdpt::SetOutputComplete(
         {
         iTarSettings->SetTar(pckg, ETrue);
         }
-    //TRACE_PRN_IF_ERR(aError);
     TRACE_PRN_FN_EXT;
     }
 
@@ -1258,11 +1247,11 @@ void TMSCallCSAdpt::SetOutputComplete(
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallCSAdpt::NotifyClient(const gint strmId, const gint aCommand,
-        const gint aStatus, const gint64 /*aInt64*/)
+void TMSCallCSAdpt::NotifyClient(const gint strmId, const gint command,
+        const gint status, const gint64 /*int64*/)
     {
-    iMsgBuffer.iRequest = aCommand;
-    iMsgBuffer.iStatus = aStatus;
+    iMsgBuffer.iRequest = command;
+    iMsgBuffer.iStatus = status;
 
     if (strmId == iUplinkStreamId)
         {

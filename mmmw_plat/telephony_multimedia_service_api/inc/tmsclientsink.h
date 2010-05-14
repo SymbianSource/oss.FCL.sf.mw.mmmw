@@ -72,7 +72,8 @@ public:
      *      Any user data passed to the function.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_ALREADY_EXIST if the obsrvr is already in the list.
      *
      */
@@ -88,7 +89,8 @@ public:
      *      The listener to be removed.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_DOES_NOT_EXIST if obsrvr is not already in the list.
      *
      */
@@ -120,7 +122,8 @@ public:
      *      The type of sink object (TMS_SINK_CLIENT).
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C virtual gint GetType(TMSSinkType& sinktype);

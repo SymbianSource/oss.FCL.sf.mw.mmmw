@@ -30,7 +30,7 @@
 //#include <MmfControllerFrameworkBase.h>
 //#include <MmfControllerFramework.h>
 //#include <MmfBase.h>
-//#include <MmfPanicCodes.h>
+//#include <mmfpaniccodes.h>
 #include "AdvancedAudioDecoder.h"
 #include "DataSourceAdapter.h"
 

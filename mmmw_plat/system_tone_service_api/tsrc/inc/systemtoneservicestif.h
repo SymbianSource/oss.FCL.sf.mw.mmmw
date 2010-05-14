@@ -19,11 +19,13 @@
 #define SYSTEMTONESERVICESTIF_H
 
 //  INCLUDES
+#include <e32base.h>
 #include <StifLogger.h>
 #include <TestScripterInternal.h>
 #include <StifTestModule.h>
 #include <TestclassAssert.h>
 #include <systemtoneservice.h>
+#include "systemtoneservicesactiveobj.h"
 
 
 // CONSTANTS
@@ -140,10 +142,15 @@ NONSHARABLE_CLASS(CSystemToneServiceStif) : public CScriptBase, MStsPlayAlarmObs
     private:  
     	 // inherited from MPlayAlarmObserver
        virtual void PlayAlarmComplete(unsigned int aAlarmContext);
+       virtual void HandleEvent();
     	
+    	
+    	  
     	  // Data
         TPlayState            iPlayState;
         CSystemToneService*   iSts;
+          // Active object with a timer to timeout the test case
+        CStsActiveObj*        iCallbackController;   
         TUint                 iCurrentContext;
 
 

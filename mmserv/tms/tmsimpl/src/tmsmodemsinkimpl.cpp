@@ -50,7 +50,7 @@ gint TMSModemSinkImpl::PostConstruct()
 gint TMSModemSinkImpl::Create(TMSSink*& tmssink)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSModemSinkImpl *self = new TMSModemSinkImpl;
+    TMSModemSinkImpl *self = new TMSModemSinkImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)
@@ -71,7 +71,6 @@ gint TMSModemSinkImpl::SetProxy(TMSCallProxy* /*aProxy*/,
         gpointer /*queuehandler*/)
     {
     gint ret = TMS_RESULT_SUCCESS;
-    //static_cast<TMSModemSinkBodyImpl*>(this->iBody)->SetProxy(aProxy, queuehandler);
     return ret;
     }
 

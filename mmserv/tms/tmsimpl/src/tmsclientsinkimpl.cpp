@@ -51,7 +51,7 @@ gint TMSClientSinkImpl::PostConstruct()
 gint TMSClientSinkImpl::Create(TMSSink*& tmssink)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSClientSinkImpl *self = new TMSClientSinkImpl;
+    TMSClientSinkImpl *self = new TMSClientSinkImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)

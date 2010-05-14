@@ -59,7 +59,8 @@ public:
      *      Sets selected G.711 encoding or decoding mode.
 
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_INVALID_STATE if this method is used during active
      *      encoding or decoding operation.
      *      TMS_RESULT_FEATURE_NOT_SUPPORTED if this method is not implemented
@@ -82,7 +83,8 @@ public:
      *      Returns current G.711 encoding or decoding mode.
 
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetMode(TMSG711CodecMode& mode);
@@ -98,7 +100,8 @@ public:
      *      Sets CNG feature on or off.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_INVALID_STATE if this method is used during active
      *      decoding operation.
      *      TMS_RESULT_FEATURE_NOT_SUPPORTED if this method is not implemented
@@ -117,7 +120,7 @@ public:
      *      Current CNG setting of the decoder.
      *
      * @return gint
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise system error..
      *
      */
     IMPORT_C gint GetCNG(gboolean& cng);
@@ -133,7 +136,7 @@ public:
      *      Sets PLC feature on or off.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise system error..
      *      TMS_RESULT_INVALID_STATE if this method is used during active
      *      decoding operation.
      *      TMS_RESULT_FEATURE_NOT_SUPPORTED if this method is not implemented
@@ -151,7 +154,8 @@ public:
      *      Current CNG setting of the decoder.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetPlc(gboolean& plc);
@@ -166,7 +170,8 @@ public:
      *      Sets VAD feature on or off.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_FEATURE_NOT_SUPPORTED if this method is not implemented
      *      by the adaptation.
      *
@@ -182,7 +187,8 @@ public:
      *      Current VAD setting of the encoder.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetVADMode(gboolean& vad);

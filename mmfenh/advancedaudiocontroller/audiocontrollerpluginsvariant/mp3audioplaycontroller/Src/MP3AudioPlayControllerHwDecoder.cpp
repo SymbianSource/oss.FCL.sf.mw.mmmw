@@ -21,7 +21,7 @@
 // INCLUDE FILES
 #include "MP3AudioPlayControllerDecoder.h"
 #include "DebugMacros.h"
-#include <MmfPanicCodes.h>
+#include <mmfpaniccodes.h>
 #include <Mmfcodec.h>
 
 const TUint KRawMp3MaxFrameSize  = 1441;

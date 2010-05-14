@@ -40,7 +40,7 @@ TMSVolumeEffectBodyImpl::~TMSVolumeEffectBodyImpl()
 gint TMSVolumeEffectBodyImpl::Create(TMSVolumeEffectBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSVolumeEffectBodyImpl* self = new TMSVolumeEffectBodyImpl;
+    TMSVolumeEffectBodyImpl* self = new TMSVolumeEffectBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();

@@ -51,7 +51,7 @@ void CRadioUtility::CBody::ConstructL(
     {
     FUNC_LOG;
     INFO_1("Size of RRadioSession: %i", sizeof(RRadioSession) );
-    iRadioSession = new (ELeave) RRadioSession();
+    iRadioSession = RRadioSession::NewL();
     User::LeaveIfError(iRadioSession->Connect(*this, aPrimaryClient));
     }
 
