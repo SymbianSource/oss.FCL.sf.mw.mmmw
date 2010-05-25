@@ -37,14 +37,14 @@ class TMSCallIPAdpt : public TMSCallAdpt
 public:
     // Constractor
     static TMSCallIPAdpt* NewL();
-
     virtual ~TMSCallIPAdpt();
     virtual gint PostConstruct();
 
+    // From TMSStream
     virtual gint CreateStream(TMSCallType callType, TMSStreamType strmType,
             gint& outStrmId);
-    virtual gint InitStreamL(TMSCallType callType, TMSStreamType strmType,
-            gint strmId, TMSFormatType frmtType, const RMessage2& aMessage);
+    virtual gint InitStream(TMSCallType callType, TMSStreamType strmType,
+            gint strmId, TMSFormatType frmtType, const RMessage2& message);
     virtual gint StartStream(TMSCallType callType, TMSStreamType strmType,
             gint strmId);
     virtual gint PauseStream(TMSCallType callType, TMSStreamType strmType,
@@ -63,6 +63,7 @@ public:
             const TMSStreamType strmType, const gint strmId,
             const guint32 key, RChunk& chunk);
 
+    // From TMS effects
     virtual gint GetMaxVolume(guint& volume);
     virtual gint SetVolume(const guint volume);
     virtual gint GetVolume(guint& volume);
@@ -76,6 +77,7 @@ public:
     virtual gint SetGlobalGain(const guint gain);
     virtual gint GetGlobalGain(guint& gain);
 
+    // From TMS formats
     virtual gint GetCodecMode(const TMSFormatType fmttype,
             const TMSStreamType strmtype, gint& mode);
     virtual gint SetCodecMode(const TMSFormatType fmttype,
@@ -91,11 +93,13 @@ public:
     virtual gint GetPlc(const TMSFormatType fmttype, gboolean& plc);
     virtual gint SetPlc(const TMSFormatType fmttype, const gboolean plc);
 
+    // From TMS audio output
     virtual gint SetOutput(TMSAudioOutput output);
     virtual gint GetOutput(TMSAudioOutput& output);
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
-    virtual gint GetAvailableOutputsL(TInt& count, CBufFlat*& outputsbuffer);
+    virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer);
 
+    // From TMS codec formats
     gint SetIlbcCodecMode(const gint mode, const TMSStreamType strmtype);
     gint GetIlbcCodecMode(gint& mode, const TMSStreamType strmtype);
     gint SetG711CodecMode(const gint mode, const TMSStreamType strmtype);
@@ -106,22 +110,21 @@ public:
     gint ConcealErrorForNextBuffer();
     gint BadLsfNextBuffer();
 
-    gint OpenDownlinkL(const RMessage2& aMessage);
-    gint OpenUplinkL(const RMessage2& aMessage);
-    void SetFormat(const gint strmId, const TUint32 aFormat);
+    gint OpenDownlinkL(const RMessage2& message);
+    gint OpenUplinkL(const RMessage2& message);
+    void SetFormat(const gint strmId, const guint32 aFormat);
 
-    void BufferFilledL(TUint dataSize);
+    void BufferFilledL(guint dataSize);
     void BufferEmptiedL();
     gint GetDataXferChunkHndl(const TMSStreamType strmType,
-            const TUint32 key, RChunk& chunk);
+            const guint32 key, RChunk& chunk);
 
 private:
     void ConstructL();
     TMSCallIPAdpt();
 
-    void NotifyClient(const gint strmId, const TInt aCommand,
-            const TInt aStatus = KErrNone, const TInt64 aInt64 = TInt64(0));
-    //void DetermineG711FrameRateL(); //G711 10/20ms
+    void NotifyClient(const gint strmId, const gint aCommand,
+            const gint aStatus = KErrNone, const gint64 aInt64 = gint64(0));
     void GetSupportedBitRatesL(CBufFlat*& brbuffer);
 
 private:
@@ -140,13 +143,13 @@ private:
 
     TmsMsgBuf iMsgBuffer;
     TMMFPrioritySettings iPriority;
-    TUint32 iUpFourCC;
-    TUint32 iDnFourCC;
-    TInt iMaxVolume;
-    TInt iMaxGain;
-    RArray<TUint> iArrBitrates;
+    guint32 iUpFourCC;
+    guint32 iDnFourCC;
+    gint iMaxVolume;
+    gint iMaxGain;
+    RArray<guint> iArrBitrates;
     RArray<TFourCC> iCodecs;
-    TInt iCodecsCount;
+    gint iCodecsCount;
 
     };
 

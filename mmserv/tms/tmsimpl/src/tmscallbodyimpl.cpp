@@ -31,7 +31,7 @@ TMSCallBodyImpl::~TMSCallBodyImpl()
 gint TMSCallBodyImpl::Create(TMSCallBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSCallBodyImpl* self = new TMSCallBodyImpl;
+    TMSCallBodyImpl* self = new TMSCallBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();

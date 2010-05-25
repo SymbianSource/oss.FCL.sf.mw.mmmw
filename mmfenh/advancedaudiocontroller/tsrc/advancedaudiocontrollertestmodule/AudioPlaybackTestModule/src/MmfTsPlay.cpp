@@ -372,7 +372,7 @@ TInt CMmfTsPlay::RunTestCaseL( const TInt aCaseNumber , const TFileName& aConfig
     TParsePtrC fp(aConfig);
     iLogger->Log(_L("Opening configuration file [%S], case #%d"), &aConfig,
             aCaseNumber);
-    CStifParser *parser;
+    CStifParser *parser = NULL;
     TRAPD(error, parser = CStifParser::NewL(fp.DriveAndPath() , fp.NameAndExt() ));
     iLogger->Log(_L("CStifParser::NewL [%d] \n"), error);
     if (error == KErrNone)

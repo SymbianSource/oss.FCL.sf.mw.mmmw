@@ -51,7 +51,7 @@ void CMetaDataParserRA::ConstructL()
     {
 	if ( ValidateL() )
 		{
-	    iExists = TRUE;
+//	    iExists = TRUE;
 		iHxMetaDataUtility = CHXMetaDataUtility::NewL();
 		}
 	else
@@ -122,6 +122,9 @@ void CMetaDataParserRA::ParseL(
 		RFile rFile;
 		rFile.Duplicate( ((CMetaDataSourceFile&)iSource).FileHandler() );
 		TRAPD(err, iHxMetaDataUtility->OpenFileL((RFile &)rFile));	// casting necessary--compile error	
+#ifdef _DEBUG
+		RDebug::Print(_L("CMetaDataParserRA::ParseL: Open File err = %d"), err);
+#endif  
 		rFile.Close();
 		User::LeaveIfError(err);
 	}

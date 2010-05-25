@@ -18,7 +18,7 @@
 
 
 // INCLUDE FILES
-#include	<3GPAudioPlayControllerResource.rsg>
+#include	<3gpaudioplaycontrollerresource.rsg>
 #include	"3GPAudioPlayControllerResource.h"
 #include 	<data_caging_path_literals.hrh>
 

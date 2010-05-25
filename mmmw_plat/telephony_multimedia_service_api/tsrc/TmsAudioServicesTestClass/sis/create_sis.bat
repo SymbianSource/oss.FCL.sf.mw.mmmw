@@ -18,5 +18,5 @@ echo Description:  TMS SIS package creation utility
 rem
 
 del TmsAudioServicesTestClass.sis*
-makesis TmsAudioServicesTestClass.pkg TmsAudioServicesTestClass.sis
+makesis ..\group\TmsAudioServicesTestClass.pkg TmsAudioServicesTestClass.sis
 rem signsis TmsAudioServicesTestClass.sis TmsAudioServicesTestClass.sisx rd.crt rd.key

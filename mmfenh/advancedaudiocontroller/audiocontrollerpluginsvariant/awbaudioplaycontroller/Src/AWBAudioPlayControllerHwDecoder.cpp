@@ -23,7 +23,7 @@
 #include "DebugMacros.h"
 
 //#include <AmrWbDecHwDeviceTICIM.h>
-#include <MmfPanicCodes.h>
+#include <mmfpaniccodes.h>
 
 const TInt KAwbFrameHeaderSize1 = 1;
 

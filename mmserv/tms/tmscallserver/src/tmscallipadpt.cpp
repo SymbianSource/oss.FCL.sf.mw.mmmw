@@ -158,14 +158,13 @@ gint TMSCallIPAdpt::CreateStream(TMSCallType /*callType*/,
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::InitStreamL(TMSCallType /*callType*/,
-        TMSStreamType strmType, gint strmId, TMSFormatType frmtType,
-        const RMessage2& aMessage)
+gint TMSCallIPAdpt::InitStream(TMSCallType /*callType*/, TMSStreamType strmType,
+        gint strmId, TMSFormatType frmtType, const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
 
-    TUint32 fourCC = TOFOURCC(frmtType);
+    guint32 fourCC = TOFOURCC(frmtType);
     if (fourCC == NULL)
         {
         return TMS_RESULT_INVALID_ARGUMENT;
@@ -179,7 +178,7 @@ gint TMSCallIPAdpt::InitStreamL(TMSCallType /*callType*/,
             if (strmId == iUplinkStreamId)
                 {
                 SetFormat(iUplinkStreamId, fourCC);
-                status = OpenUplinkL(aMessage);
+                status = OpenUplinkL(message);
                 NotifyClient(iUplinkStreamId, ECmdUplinkInitComplete, status);
                 }
             break;
@@ -190,7 +189,7 @@ gint TMSCallIPAdpt::InitStreamL(TMSCallType /*callType*/,
             if (strmId == iDnlinkStreamId)
                 {
                 SetFormat(iDnlinkStreamId, fourCC);
-                status = OpenDownlinkL(aMessage);
+                status = OpenDownlinkL(message);
                 NotifyClient(iDnlinkStreamId, ECmdDownlinkInitComplete, status);
                 }
             break;
@@ -988,7 +987,7 @@ gint TMSCallIPAdpt::SetPlc(const TMSFormatType fmttype, const gboolean plc)
 // Method for player initialization.
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& aMessage)
+gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -1010,7 +1009,7 @@ gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& aMessage)
         if (iMsgQueueDn.Handle() <= 0)
             {
             // Second argument in TMSCallProxy::InitStream
-            status = iMsgQueueDn.Open(aMessage, 1);
+            status = iMsgQueueDn.Open(message, 1);
             }
 
         if (status == TMS_RESULT_SUCCESS)
@@ -1030,7 +1029,7 @@ gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& aMessage)
 // Method for recorder initialization.
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& aMessage)
+gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -1050,7 +1049,7 @@ gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& aMessage)
         if (iMsgQueueUp.Handle() <= 0)
             {
             // Second argument in TMSCallProxy::InitStream
-            status = iMsgQueueUp.Open(aMessage, 1);
+            status = iMsgQueueUp.Open(message, 1);
             }
 
         if (status == TMS_RESULT_SUCCESS)
@@ -1070,7 +1069,7 @@ gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& aMessage)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallIPAdpt::SetFormat(const gint strmId, const TUint32 aFormat)
+void TMSCallIPAdpt::SetFormat(const gint strmId, const guint32 aFormat)
     {
     if (strmId == iUplinkStreamId)
         {
@@ -1087,7 +1086,7 @@ void TMSCallIPAdpt::SetFormat(const gint strmId, const TUint32 aFormat)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallIPAdpt::BufferFilledL(TUint dataSize)
+void TMSCallIPAdpt::BufferFilledL(guint dataSize)
     {
     if (iIPDownlink)
         {
@@ -1114,7 +1113,7 @@ void TMSCallIPAdpt::BufferEmptiedL()
 // -----------------------------------------------------------------------------
 //
 gint TMSCallIPAdpt::GetDataXferChunkHndl(const TMSStreamType strmType,
-        const TUint32 key, RChunk& chunk)
+        const guint32 key, RChunk& chunk)
     {
     TRACE_PRN_FN_ENT;
 
@@ -1383,8 +1382,8 @@ gint TMSCallIPAdpt::GetAvailableOutputsL(gint& /*count*/,
 // TMSCallIPAdpt::NotifyClient
 // -----------------------------------------------------------------------------
 //
-void TMSCallIPAdpt::NotifyClient(const gint strmId, const TInt aCommand,
-        const TInt aStatus, const TInt64 /*aInt64*/)
+void TMSCallIPAdpt::NotifyClient(const gint strmId, const gint aCommand,
+        const gint aStatus, const gint64 /*aInt64*/)
     {
     iMsgBuffer.iRequest = aCommand;
     iMsgBuffer.iStatus = aStatus;

@@ -42,7 +42,7 @@ class TMSCenRepAudioHandler;
 class TMSServer : public CServer2
     {
 public:
-    static TMSServer* NewL();
+    static void RunServerL();
     ~TMSServer();
 
     void AddSession();
@@ -79,6 +79,7 @@ public:
     void CancelCenRepHandler();
 
 private:
+    static TMSServer* NewLC();
     TMSServer();
     void ConstructL();
     CSession2* NewSessionL(const TVersion& aVersion,

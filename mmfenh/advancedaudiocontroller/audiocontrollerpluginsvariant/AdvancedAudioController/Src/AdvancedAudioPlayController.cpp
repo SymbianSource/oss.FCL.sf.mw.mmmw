@@ -1910,7 +1910,7 @@ EXPORT_C void CAdvancedAudioPlayController::BufferFilledL(CMMFBuffer* aBuffer)
                         }
                     else
                         {
-                        // This is needed for non-seekable sources as DoRepeat() calls DoInitialize in this case
+                        // This is needed for non-seekable sources as DoRepeatL() calls DoInitialize in this case
                         // this resets the source to read from 0 and sets the iState to EInitializing.
                         // BufferFilled will not read the header again, change state to EInitialized and seek to the iInitPosition.
                         // The next BufferFilled will come here, where we will continue playback from byte position 0
@@ -2412,20 +2412,20 @@ EXPORT_C void CAdvancedAudioPlayController::LastBufferSent()
     DP0(_L("CAdvancedAudioPlayController::LastBufferSent End"));
     }
 
-void CAdvancedAudioPlayController::DoRepeat()
+void CAdvancedAudioPlayController::DoRepeatL()
     {
-    DP0(_L("CAdvancedAudioPlayController::DoRepeat Begin"));
+    DP0(_L("CAdvancedAudioPlayController::DoRepeatL Begin"));
     // save the current position, this will be used to calculate the position in loop play when
     // client calls for PositionL() or Pause() operations
     // TODO:  need to check this position when loop play is going on in a play window
     iSavedTimePositionInMicroSecs = iAudioOutput->CalculateAudioOutputPositionL();
-    DP1(_L("CAdvancedAudioPlayController::DoRepeat iSavedTimePositionInMicroSecs[%u]"), iSavedTimePositionInMicroSecs);
+    DP1(_L("CAdvancedAudioPlayController::DoRepeatL iSavedTimePositionInMicroSecs[%u]"), iSavedTimePositionInMicroSecs);
     
     if ((!iRepeatForever) && (iCurrentRepeatCount < iRepeatCount))
         {
         iCurrentRepeatCount++;
         }
-    DP1(_L("CAdvancedAudioPlayController::DoRepeat Number of times played till now = %d"), iCurrentRepeatCount);
+    DP1(_L("CAdvancedAudioPlayController::DoRepeatL Number of times played till now = %d"), iCurrentRepeatCount);
     
     if (iSourceIsTimeSeekable || iSourceIsPosSeekable)
         { // For seekable source
@@ -2434,25 +2434,25 @@ void CAdvancedAudioPlayController::DoRepeat()
         // SetPlayWindow(iPlayWindowStartPosition, iPlayWindowEndPosition);
         if (iPlayWindowStartPosition > 0)
             {
-            DP1(_L("CAdvancedAudioPlayController::DoRepeat SetPositionL[%d]ms"), I64LOW(iPlayWindowStartPosition.Int64()/1000));
+            DP1(_L("CAdvancedAudioPlayController::DoRepeatL SetPositionL[%d]ms"), I64LOW(iPlayWindowStartPosition.Int64()/1000));
             SetPositionL(iPlayWindowStartPosition);
             }
         else
             {
-            DP0(_L("CAdvancedAudioPlayController::DoRepeat SetPositionL(0)"));
+            DP0(_L("CAdvancedAudioPlayController::DoRepeatL SetPositionL(0)"));
             SetPositionL(0);
             }
         // Register for PlayWindow end position as the FrameTable has set its playwindowendpostime to zero
         if (iPlayWindowEndPosition > 0)
             {
-            DP1(_L("CAdvancedAudioPlayController::DoRepeat iAudioUtility->SetPlayWindowEndTimeMs(%d)"), I64LOW(iPlayWindowEndPosition.Int64()/1000));
+            DP1(_L("CAdvancedAudioPlayController::DoRepeatL iAudioUtility->SetPlayWindowEndTimeMs(%d)"), I64LOW(iPlayWindowEndPosition.Int64()/1000));
             iAudioUtility->SetPlayWindowEndTimeMs(iPlayWindowEndPosition.Int64() / 1000);
             }
         }
     else
         { // For non-seekable source
         // Stop and start playback
-        DP0(_L("CAdvancedAudioPlayController::DoRepeat Non-Seekable source."));
+        DP0(_L("CAdvancedAudioPlayController::DoRepeatL Non-Seekable source."));
         iAudioOutput->StopL(EFalse);
         iDataSourceAdapter->SourceStopL(); // clear the buffers in the source before seeking and priming it
         DoInitializeL();
@@ -2460,13 +2460,19 @@ void CAdvancedAudioPlayController::DoRepeat()
         // and the current position is adjusted to be placed after the header.
         iReadHeader = ETrue;
         }
-    DP0(_L("CAdvancedAudioPlayController::DoRepeat End") );
+    DP0(_L("CAdvancedAudioPlayController::DoRepeatL End") );
     }
 
 EXPORT_C void CAdvancedAudioPlayController::TrailingSilenceTimerComplete()
     {
     DP0(_L("CAdvancedAudioPlayController::TrailingSilenceTimerComplete "));
-    DoRepeat();
+   
+    TRAPD(err,DoRepeatL()); //Fix for Bug ECWG-84WE9J
+    DP1(_L("CAdvancedAudioPlayController::TrailingSilenceTimerComplete: DoRepeatL [%d]"), err);
+    if(err)
+        {
+         SendEventToClient(TMMFEvent(KMMFEventCategoryPlaybackComplete,err));
+        }
     }
 
 EXPORT_C TInt CAdvancedAudioPlayController::GetCodecConfigData(RArray<TInt>& aCodecConfigData)

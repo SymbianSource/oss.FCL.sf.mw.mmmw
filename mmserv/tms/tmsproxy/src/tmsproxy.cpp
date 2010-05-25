@@ -31,43 +31,45 @@ const TUint KSessionMessageSlots = 10;
 
 // -----------------------------------------------------------------------------
 // StartServer
-// Static function to start the server process thread.
-// Start the server process/thread which lives in an EPOCEXE object.
-// Returns: gint: TMS_RESULT_SUCCESS (0) if no error
+//
+// Function that will launch TMS server executable in it its own process.
+// Start the server process/thread, which lives in an EPOCEXE object.
+// Returns: gint: TMS_RESULT_SUCCESS (0) if no error.
 // -----------------------------------------------------------------------------
 //
-static gint StartServer()
+gint TMSProxy::StartServer()
     {
     const TUidType serverUid(KNullUid, KNullUid, KTMSServerUid3);
 
     // Only one instance of the server is allowed. Attempt of launching
     // second instance of the server will fail with KErrAlreadyExists.
     RProcess server;
-    gint r = server.Create(KTMSServerName, KNullDesC, serverUid);
+    gint ret = server.Create(KTMSServerFile, KNullDesC, serverUid);
 
-    if (r != TMS_RESULT_SUCCESS)
+    if (ret == TMS_RESULT_SUCCESS)
         {
-        return r;
+        TRequestStatus stat;
+        server.Rendezvous(stat);
+
+        if (stat != KRequestPending)
+            {
+            server.Kill(0); // abort startup
+            }
+        else
+            {
+            server.Resume(); // logon OK - start the server
+            }
+
+        User::WaitForRequest(stat); // wait for start or death
+
+        // We can't use the 'exit reason' if the server panicked, as '0' is a
+        // valid panic 'reason', which cannot be distinguished from
+        // TMS_RESULT_SUCCESS.
+        ret = (server.ExitType() == EExitPanic) ? KErrGeneral : stat.Int();
+        server.Close();
         }
 
-    TRequestStatus stat;
-    server.Rendezvous(stat);
-
-    if (stat != KRequestPending)
-        {
-        server.Kill(0); // abort startup
-        }
-    else
-        {
-        server.Resume(); // logon OK - start the server
-        }
-
-    User::WaitForRequest(stat); // wait for start or death
-
-    // Panic reason cannot be '0' as it would conflict with TMS_RESULT_SUCCESS
-    r = (server.ExitType() == EExitPanic) ? KErrGeneral : stat.Int();
-    server.Close();
-    return r;
+    return ret;
     }
 
 // -----------------------------------------------------------------------------
@@ -621,7 +623,7 @@ void TMSProxy::QueueEvent(gint aEventType, gint aError, void* event_data)
     {
     TMSSignalEvent event = {}; //all elements initialized to zeros
     event.type = aEventType;
-    event.reason = aError;
+    event.reason = TMSRESULT(aError);
     event.user_data = NULL; //use only to return data passed in by the user
 
     switch (aEventType)

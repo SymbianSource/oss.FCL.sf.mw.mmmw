@@ -18,7 +18,7 @@
 #ifndef __SOUND_PLAYER_H
 #define  __SOUND_PLAYER_H
 
-#include <MdaAudioSamplePlayer.h>
+#include <mdaaudiosampleplayer.h>
 #include <StifTestModule.h>
 #include "EventTarget.h"
 #include "Parameters.h"

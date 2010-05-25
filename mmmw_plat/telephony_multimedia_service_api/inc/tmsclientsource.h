@@ -68,7 +68,8 @@ public:
      *      Any user data passed to the function.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_ALREADY_EXIST if the obsrvr is already in the list.
      *
      */
@@ -140,7 +141,8 @@ public:
      *      Toggles buffer enqueuing ON and OFF.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint SetEnqueueMode(const gboolean enable);
@@ -167,7 +169,8 @@ public:
      * Has no effect in the PULL mode.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Flush();
@@ -185,7 +188,8 @@ public:
      *          TMS_STREAM_MIC
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C virtual gint GetType(TMSSourceType& sourcetype);

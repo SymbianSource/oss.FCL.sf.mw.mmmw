@@ -23,7 +23,7 @@
 #include "DebugMacros.h"
 #include <Mmfcodec.h>
 
-#include <MmfPanicCodes.h>
+#include <mmfpaniccodes.h>
 
 // New eAAC+ custom interface is used only when using DSP decoder and 
 // the eAAC+ feature is turned on.

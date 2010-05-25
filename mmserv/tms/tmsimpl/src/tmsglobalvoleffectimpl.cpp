@@ -51,7 +51,7 @@ gint TMSGlobalVolEffectImpl::PostConstruct()
 gint TMSGlobalVolEffectImpl::Create(TMSEffect*& tmseffect)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSGlobalVolEffectImpl *self = new TMSGlobalVolEffectImpl;
+    TMSGlobalVolEffectImpl *self = new TMSGlobalVolEffectImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)

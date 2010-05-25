@@ -101,7 +101,8 @@ enum TMSMsgQueueNotifierType
 const TUid KTMSPropertyCategory = {0x10207C7C};
 
 // server name and UID
-_LIT(KTMSServerName, "tmsserver");
+_LIT(KTMSServerFile, "tmsserver");
+_LIT(KTMSServerName, "!TmsServer");
 const TUid KTMSServerUid3 = {0x10207C7C};
 const TUid KUidTMSCallServerUid3 = {0x10207C78};
 

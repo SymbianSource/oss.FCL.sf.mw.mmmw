@@ -128,6 +128,17 @@ class CMetaDataParser : public CBase
                 CMetaDataFieldContainer& aContainer );
 
         /**
+        * Parses the common metadata, the metadata fields are
+        * inserted into the container.
+        * @since 9.2
+        * @param aWantedFields An array of TMetaDataFieldId's. Empty array is interpreted as all fields.
+        * @param aContainer On return, metadata found in aSource is stored here
+        * @return void
+        */
+        void CommonParseDesL( const RArray<TMetaDataFieldId>& aWantedFields, 
+                CMetaDataFieldContainer& aContainer );
+
+        /**
         * Append DRM Protected data to the container.
         * @param aSource a Metadata source file.
         * @param aContainer On return, metadata ptotected data is stored here

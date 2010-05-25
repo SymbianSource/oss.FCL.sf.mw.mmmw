@@ -30,7 +30,7 @@
 //#include <MmfControllerFrameworkBase.h>
 //#include <MmfControllerFramework.h>
 //#include <MmfBase.h>
-//#include <MmfPanicCodes.h>
+//#include <mmfpaniccodes.h>
 #include "AdvancedAudioEncoder.h"
 
 // CLASS DECLARATION

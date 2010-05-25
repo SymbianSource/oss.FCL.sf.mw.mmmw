@@ -92,7 +92,8 @@ public:
      *      Context ID.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_FATAL_ERROR if an error occured.
      *
      */
@@ -108,7 +109,8 @@ public:
      *      Created stream.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_INSUFFICIENT_MEMORY if call creation failed due to
      *      insufficient memory.
      *      TMS_RESULT_STREAM_TYPE_NOT_SUPPORTED if stream type is not
@@ -117,7 +119,7 @@ public:
      *      TMS_REASON_EMERGENCY_CALL_ONGOING if emergency call is active.
      *      TMS_REASON_PERMISSION_DENIED if permission is denied.
      *      TMS_RESULT_INVALID_ARGUMENT if strm is not set to NULL.
-     *      TMS_RESULT_ALREADY_EXIST if the same streamtype is created 
+     *      TMS_RESULT_ALREADY_EXIST if the same streamtype is created
      *      multiple times.
      *
      */
@@ -130,7 +132,8 @@ public:
      *      Stream to be deleted.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_INVALID_ARGUMENT if the stream is not valid.
      */
     IMPORT_C gint DeleteStream(TMSStream*& strm);

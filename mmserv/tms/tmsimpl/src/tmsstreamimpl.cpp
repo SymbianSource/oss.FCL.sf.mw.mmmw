@@ -52,7 +52,7 @@ gint TMSStreamImpl::Create(TMSCallType callType, TMSStreamType stype,
         TMSCallProxy* proxy, TMSStream*& strm)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSStreamImpl *self = new TMSStreamImpl;
+    TMSStreamImpl *self = new TMSStreamImpl();
 
     if (self)
         {

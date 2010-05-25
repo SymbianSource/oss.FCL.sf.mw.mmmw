@@ -50,7 +50,7 @@ gint TMSSpeakerSinkImpl::PostConstruct()
 gint TMSSpeakerSinkImpl::Create(TMSSink*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSSpeakerSinkImpl* self = new TMSSpeakerSinkImpl;
+    TMSSpeakerSinkImpl* self = new TMSSpeakerSinkImpl();
     if (self)
         {
         ret = self->PostConstruct();
@@ -68,7 +68,6 @@ gint TMSSpeakerSinkImpl::SetProxy(TMSCallProxy* /*aProxy*/,
         gpointer /*queuehandler*/)
     {
     gint ret = TMS_RESULT_SUCCESS;
-    //static_cast<TMSSpeakerSinkBodyImpl*>(this->iBody)->SetProxy(aProxy, queuehandler);
     return ret;
     }
 

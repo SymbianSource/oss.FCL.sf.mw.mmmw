@@ -35,6 +35,11 @@ namespace TMS {
 class TMSBuffer
     {
 public:
+    /*
+     * Destructor
+     */
+    virtual ~TMSBuffer() {}
+
     /**
      * Return buffer type.
      *
@@ -42,7 +47,8 @@ public:
      *      Type of the buffer object (TMS_BUFFER_MEMORY).
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     virtual gint GetType(TMSBufferType& buftype) = 0;
@@ -56,7 +62,8 @@ public:
      *      Time stamp in microseconds.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     virtual gint GetTimeStamp(guint64& ts) = 0;
@@ -70,7 +77,8 @@ public:
      *      Time stamp in microseconds.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     virtual gint SetTimeStamp(const guint64 ts) = 0;
@@ -82,7 +90,8 @@ public:
      *      Size of data in the buffer.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     virtual gint GetDataSize(guint& size) = 0;
@@ -94,7 +103,8 @@ public:
      *      Size of data in the buffer.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     virtual gint SetDataSize(const guint size) = 0;
@@ -107,7 +117,8 @@ public:
      *      Pointer to the data stored in the buffer.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     virtual gint GetDataPtr(guint8*& bufptr) = 0;

@@ -1277,6 +1277,26 @@ void CMetaDataParser::CommonParseL(
     }
 
 // -----------------------------------------------------------------------------
+// CMetaDataParser::CommonParseDesL
+// -----------------------------------------------------------------------------
+//
+void CMetaDataParser::CommonParseDesL(
+    const RArray<TMetaDataFieldId>& aWantedFields,
+    CMetaDataFieldContainer& aContainer )
+    {
+#ifdef _DEBUG
+     RDebug::Print(_L("CMetaDataParser::CommonParseDesL"));
+#endif
+
+     //Since this is for descriptor "source", by default it is not a DRM Protected file
+     _LIT(KNoProtection, "0");
+     aContainer.AppendL( EMetaDataProtected, KNoProtection );
+           
+     //Continue parsing the file
+     ParseL(aWantedFields, aContainer);
+    }
+
+// -----------------------------------------------------------------------------
 // CMetaDataParser::GetProtectedL
 // -----------------------------------------------------------------------------
 //

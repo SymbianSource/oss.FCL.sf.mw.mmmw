@@ -428,7 +428,7 @@ TInt CMmfTsPlay::DisplayFields(TInt aEntryCount, CSimpleSoundPlayer* aSndPlayer,
 {
 	TInt i;
 	TInt j=0;
-    CMMFMetaDataEntry*	metaDataPtr;
+    CMMFMetaDataEntry*	metaDataPtr = NULL;
 
 	for( i = 0; i < aEntryCount; i++)
 	{

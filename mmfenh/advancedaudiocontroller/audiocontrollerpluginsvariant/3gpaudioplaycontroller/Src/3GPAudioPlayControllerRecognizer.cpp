@@ -30,6 +30,7 @@ const TInt KExtLength = 4;
 _LIT(KDot, ".");
 _LIT(KDot3gp, ".3gp");
 _LIT(KDot3ga, ".3ga");
+_LIT(KDot3gpp, ".3gpp");
 _LIT8(K3gpAudioMimeType, "audio/3gpp");
 _LIT8(K3gpVideoMimeType, "video/3gpp");
 
@@ -202,7 +203,14 @@ void C3GPAudioPlayControllerRecognizer::DoRecognizeL(
             }
         }
 
-    TPtrC ext(aName.Right(KExtLength));
+   // TPtrC ext(aName.Right(KExtLength));
+   TInt num=aName.LocateReverse('.');
+   if(num < 0)
+   {
+	num = 0;
+   }
+    TPtrC ext(aName.Right(aName.Length()-num));
+
     DP0(_L("C3GPAudioPlayControllerRecognizer::DoRecognizeL: Extension:"));
 #ifdef _DEBUG
     RDebug::RawPrint(ext);
@@ -211,7 +219,7 @@ void C3GPAudioPlayControllerRecognizer::DoRecognizeL(
 
     if ( (ext.CompareF(KDot3gp) == 0) || (ext.CompareF(KDotMp4) == 0) ||
          (ext.CompareF(KDotM4a) == 0) || (ext.CompareF(KDot3g2) == 0) || 
-         (ext.CompareF(KDot3ga) == 0) || headerMatch)
+         (ext.CompareF(KDot3ga) == 0) || (ext.CompareF(KDot3gpp) == 0) || headerMatch)
         {
         RFile* fileHandle= NULL;
         TRAPD(handleErr, fileHandle = FilePassedByHandleL());
@@ -277,7 +285,7 @@ void C3GPAudioPlayControllerRecognizer::DoRecognizeL(
                          (header.FindF(K3gs6Header) == 0) ||
                          (header.FindF(KMmp4Header) == 0) ||
                          (ext.CompareF(KDot3gp)     == 0) ||
-                         (ext.CompareF(KDot3ga)     == 0) )
+                         (ext.CompareF(KDot3ga)     == 0)||(ext.CompareF(KDot3gpp) == 0) )
                         {
                         iDataType = TDataType(K3gpAudioMimeType);
                         iConfidence = ECertain;
@@ -308,7 +316,7 @@ void C3GPAudioPlayControllerRecognizer::DoRecognizeL(
                      (header.FindF(K3gr6Header) == 0) ||
                      (header.FindF(K3gs6Header) == 0) ||
                      (header.FindF(KMmp4Header) == 0) ||
-                     (ext.CompareF(KDot3gp)     == 0) )
+                     (ext.CompareF(KDot3gp)     == 0) || (ext.CompareF(KDot3gpp) == 0))
                     {
                     iDataType = TDataType(K3gpVideoMimeType);
                     iConfidence = ECertain;

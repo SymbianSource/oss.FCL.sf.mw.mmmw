@@ -46,7 +46,7 @@ TMSGlobalVolEffectBodyImpl::~TMSGlobalVolEffectBodyImpl()
 gint TMSGlobalVolEffectBodyImpl::Create(TMSGlobalVolEffectBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSGlobalVolEffectBodyImpl* self = new TMSGlobalVolEffectBodyImpl;
+    TMSGlobalVolEffectBodyImpl* self = new TMSGlobalVolEffectBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();
@@ -64,7 +64,7 @@ gint TMSGlobalVolEffectBodyImpl::PostConstruct()
     {
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
-    iProxy = new TMSProxy;
+    iProxy = new TMSProxy();
     if (!iProxy)
         {
         ret = TMS_RESULT_INSUFFICIENT_MEMORY;

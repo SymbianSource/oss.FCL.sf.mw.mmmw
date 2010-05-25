@@ -45,7 +45,7 @@ TMSCSCallBodyImpl::~TMSCSCallBodyImpl()
 gint TMSCSCallBodyImpl::Create(TMSCallBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSCSCallBodyImpl* self = new TMSCSCallBodyImpl;
+    TMSCSCallBodyImpl* self = new TMSCSCallBodyImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)
@@ -67,7 +67,7 @@ gint TMSCSCallBodyImpl::PostConstruct()
     gint ret(TMS_RESULT_SUCCESS);
     TRACE_PRN_FN_ENT;
 
-    iSession = new TMSCallProxy;
+    iSession = new TMSCallProxy();
 
     TRACE_PRN_FN_ENT;
     if (!iSession)

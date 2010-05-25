@@ -25,6 +25,7 @@
 using namespace TMS;
 
 const guint KArrayExpandSize = 8;
+const guint KNumOfElements = 10;
 
 // -----------------------------------------------------------------------------
 // TMSCallSession::TMSCallSession
@@ -289,7 +290,7 @@ void TMSCallSession::HandleInitStreamL(const RMessage2& aMessage)
         {
         TMSCliSrvStreamInitDataStructBufPckg pckg;
         aMessage.ReadL(0, pckg);
-        status = iCallAdpt->InitStreamL(pckg().CallType, pckg().StreamType,
+        status = iCallAdpt->InitStream(pckg().CallType, pckg().StreamType,
                 pckg().StreamId, pckg().FormatType, aMessage);
 
         switch (pckg().StreamType)
@@ -1097,7 +1098,7 @@ void TMSCallSession::HandleRoutingGetAvailableOutputsL(
     gint count;
     if (iCallAdpt)
         {
-        CBufFlat* outputbuf = CBufFlat::NewL(10);
+        CBufFlat* outputbuf = CBufFlat::NewL(KNumOfElements);
         CleanupStack::PushL(outputbuf);
         status = iCallAdpt->GetAvailableOutputsL(count, outputbuf);
 

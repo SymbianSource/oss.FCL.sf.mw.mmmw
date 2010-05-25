@@ -33,7 +33,7 @@ TMSModemSourceBodyImpl::~TMSModemSourceBodyImpl()
 gint TMSModemSourceBodyImpl::Create(TMSModemSourceBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSModemSourceBodyImpl* self = new TMSModemSourceBodyImpl;
+    TMSModemSourceBodyImpl* self = new TMSModemSourceBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();
@@ -64,7 +64,6 @@ void TMSModemSourceBodyImpl::SetProxy(TMSCallProxy* aProxy,
         gpointer /*queuehandler*/)
     {
     iProxy = aProxy;
-    //static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this, TMS_SOURCE_MODEM);
     }
 
 // End of file

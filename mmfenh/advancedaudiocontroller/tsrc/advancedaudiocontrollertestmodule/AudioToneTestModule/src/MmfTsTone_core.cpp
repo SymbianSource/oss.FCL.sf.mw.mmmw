@@ -1788,7 +1788,7 @@ TInt CMmfTsTone::TestCaseVolumeChangeL(CStifSectionParser *section , TTestResult
         CMediaEvent *ime = CMediaEvent::NewL(&iOutputPrinter,delay,0, player, reportParams);
                           
         CleanupStack::PushL(ime);
-        TInt expectedVolume;
+        TInt expectedVolume = 0 ;
         iOutputPrinter.Printf(_L("current volume before change:%d"),player->GetVolume());
         RDebug::Print(_L("current volume before change:%d"),player->GetVolume());
         switch(volumeLevel)

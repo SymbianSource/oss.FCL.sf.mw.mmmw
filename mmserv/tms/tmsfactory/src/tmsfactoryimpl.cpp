@@ -193,7 +193,7 @@ gint TMSFactoryImpl::DeleteGlobalRouting(TMSGlobalRouting*& globrouting)
 gint TMSFactoryImpl::QueryDevice(const TMSStreamType strmtype)
     {
     gint ret(TMS_RESULT_SUCCESS);
-    TMSProxy* session = new TMSProxy;
+    TMSProxy* session = new TMSProxy();
     if (session)
         {
         if (session->Connect() == TMS_RESULT_SUCCESS)
