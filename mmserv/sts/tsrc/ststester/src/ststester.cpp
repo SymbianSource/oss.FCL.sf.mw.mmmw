@@ -177,12 +177,12 @@ void CStsTester::ExecuteOperation(TInt aOperation, const TDesC& /*aOperationText
             // Only play if not already playing
             if (iPlayState != EPlaying)
                 {
+                iPlayState = EPlaying;
                 TAG_TIME_PROFILING_BEGIN;
                 iSts->PlayAlarm(CSystemToneService::EClockAlarm,
                         iCurrentContext, *this);
                 TAG_TIME_PROFILING_END;
                 PRINT_TO_CONSOLE_TIME_DIFF;
-                iPlayState = EPlaying;
                 }
             break;
             }

@@ -18,6 +18,8 @@
 
 
 
+
+
 // INCLUDE FILES
 #include	<MetaDataFieldContainer.h>
 #include	<Oma2Agent.h>
@@ -152,7 +154,7 @@ void CMetaDataUtilityBody::OpenDesL(
 	iParser = FindParserDesL(aDes);
 	if ( iParser )
 		{
-		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
+		iParser->CommonParseDesL(aWantedFields, *iContainer);
 		}
 	}
 
@@ -697,7 +699,7 @@ void CMetaDataUtilityBody::OpenDesL(
 		}
 	if ( iParser )
 		{
-		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
+		iParser->CommonParseDesL(aWantedFields, *iContainer);
 		}
 	}	
 	

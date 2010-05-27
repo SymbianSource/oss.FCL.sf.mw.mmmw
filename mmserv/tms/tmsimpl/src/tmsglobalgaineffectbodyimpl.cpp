@@ -46,7 +46,7 @@ TMSGlobalGainEffectBodyImpl::~TMSGlobalGainEffectBodyImpl()
 gint TMSGlobalGainEffectBodyImpl::Create(TMSGlobalGainEffectBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSGlobalGainEffectBodyImpl* self = new TMSGlobalGainEffectBodyImpl;
+    TMSGlobalGainEffectBodyImpl* self = new TMSGlobalGainEffectBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();
@@ -64,7 +64,7 @@ gint TMSGlobalGainEffectBodyImpl::PostConstruct()
     {
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
-    iProxy = new TMSProxy;
+    iProxy = new TMSProxy();
     if (!iProxy)
         {
         ret = TMS_RESULT_INSUFFICIENT_MEMORY;

@@ -19,8 +19,6 @@
 
 #include <tms.h>
 #include <AudioPreference.h>
-#include <barsc.h>
-#include <barsread.h>
 #include <data_caging_path_literals.hrh>
 #include <defaultbeep.rsg>
 #include "tmsutility.h"
@@ -30,13 +28,12 @@
 using namespace TMS;
 
 // CONSTANTS
-const TInt KPhoneInbandVolumeMax = 10;
-const TInt KPhoneInbandVolumeMin = 0;
-const TInt KPhoneInbandToneZero = 0;
+const gint KPhoneInbandVolumeMax = 10;
+const gint KPhoneInbandVolumeMin = 0;
 
 // Resourcefile destination.
-_LIT( KSystemDefaultbeepRscDrive, "Z:" );
-_LIT( KSystemDefaultbeepRscFile, "DEFAULTBEEP.rSC" );
+_LIT(KSystemDefaultbeepRscDrive, "Z:");
+_LIT(KSystemDefaultbeepRscFile, "DEFAULTBEEP.rSC");
 
 // -----------------------------------------------------------------------------
 // TMSAudioInbandTonePlayer::NewL
@@ -45,10 +42,9 @@ _LIT( KSystemDefaultbeepRscFile, "DEFAULTBEEP.rSC" );
 //
 TMSAudioInbandTonePlayer* TMSAudioInbandTonePlayer::NewL()
     {
-    TMSAudioInbandTonePlayer* self =
-            new (ELeave) TMSAudioInbandTonePlayer();
+    TMSAudioInbandTonePlayer* self = new (ELeave) TMSAudioInbandTonePlayer();
     CleanupStack::PushL(self);
-    self->ConstructL( /*aAudioFactory*/);
+    self->ConstructL();
     CleanupStack::Pop(self);
     return self;
     }
@@ -57,20 +53,15 @@ TMSAudioInbandTonePlayer* TMSAudioInbandTonePlayer::NewL()
 TMSAudioInbandTonePlayer::~TMSAudioInbandTonePlayer()
     {
     TRACE_PRN_FN_ENT;
+    iResourceFile.Close();
     iFsSession.Close();
-    iCurrent->CancelPlay();
-    delete iCurrent;
-
-    delete iPlayBeepSequence;
-    delete iPlayNoSoundSequence;
-    delete iPlayDataSequence;
-    delete iResourceCallWaitingSeq;
-    delete iResourceRingGoingSeq;
-    delete iResourceRadioPathSeq;
-    delete iResourceSpecialSeq;
-    delete iResourceCongestionSeq;
-    delete iResourceReorderSeq;
-    delete iResourceBusySeq;
+    iTones.ResetAndDestroy();
+    iTones.Close();
+    if (iPlayer)
+        {
+        iPlayer->CancelPlay();
+        }
+    delete iPlayer;
     TRACE_PRN_FN_EXT;
     }
 
@@ -80,7 +71,8 @@ TMSAudioInbandTonePlayer::~TMSAudioInbandTonePlayer()
 // might leave.
 // -----------------------------------------------------------------------------
 //
-TMSAudioInbandTonePlayer::TMSAudioInbandTonePlayer()
+TMSAudioInbandTonePlayer::TMSAudioInbandTonePlayer() :
+    iPlayer(NULL)
     {
     }
 
@@ -91,181 +83,64 @@ TMSAudioInbandTonePlayer::TMSAudioInbandTonePlayer()
 //
 void TMSAudioInbandTonePlayer::ConstructL()
     {
-    // iCurrent = aFactory.CreateAudioToneUtilityL( *this );
     TRACE_PRN_FN_ENT;
-    iCurrent = TMSAudioToneUtilityImpl::NewL(*this);
-
-    //Get the inband tone sequences from resource and and store to member
-    //variables
-    RResourceFile resourceFile;
-
-    TFileName fileName(KSystemDefaultbeepRscDrive);
-    fileName.Append(KDC_RESOURCE_FILES_DIR);
-    fileName.Append(KSystemDefaultbeepRscFile);
-
-    iFsSession.Connect();
-    resourceFile.OpenL(iFsSession, fileName);
-    CleanupClosePushL(resourceFile);
-
-    HBufC8* resourceBusy = resourceFile.AllocReadL(R_NET_BUSY);
-    HBufC8* resourceReorder = resourceFile.AllocReadL(R_NET_REORDER);
-    HBufC8* resourceCongestion = resourceFile.AllocReadL(R_NET_CONGESTION);
-    HBufC8* resourceSpecial = resourceFile.AllocReadL(
-            R_NET_SPECIAL_INFORMATION);
-    HBufC8* resourceRadioPath = resourceFile.AllocReadL(
-            R_NET_RADIO_NOT_AVAILABLE);
-    HBufC8* resourceRingGoing = resourceFile.AllocReadL(R_NET_RING_GOING);
-    HBufC8* resourceCallWaiting = resourceFile.AllocReadL(R_NET_CALL_WAITING);
-    HBufC8* dataCallTone = resourceFile.AllocReadL(R_DATA_CALL_TONE);
-    HBufC8* noSoundSequence = resourceFile.AllocReadL(R_NO_SOUND_SEQUENCE);
-    HBufC8* beepSequence = resourceFile.AllocReadL(R_BEEP_SEQUENCE);
-
-    CleanupStack::PopAndDestroy(&resourceFile);
-
-    TResourceReader reader;
-    TInt i(0);
-    TInt length(0);
-
-    //SubscriberBusy
-    reader.SetBuffer(resourceBusy);
-    length = reader.ReadInt16();
-    iResourceBusySeq = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendBusy(iResourceBusySeq->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendBusy.Append(reader.ReadUint16());
-        }
-
-    //Reorder
-    reader.SetBuffer(resourceReorder);
-    length = reader.ReadInt16();
-    iResourceReorderSeq = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendReorder(iResourceReorderSeq->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendReorder.Append(reader.ReadUint16());
-        }
-
-    //Congestion
-    reader.SetBuffer(resourceCongestion);
-    length = reader.ReadInt16();
-    iResourceCongestionSeq = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendCongestion(iResourceCongestionSeq->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendCongestion.Append(reader.ReadUint16());
-        }
-
-    //Special Information
-    reader.SetBuffer(resourceSpecial);
-    length = reader.ReadInt16();
-    iResourceSpecialSeq = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendSpecial(iResourceSpecialSeq->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendSpecial.Append(reader.ReadUint16());
-        }
-
-    //RadioPathNotAvailable
-    reader.SetBuffer(resourceRadioPath);
-    length = reader.ReadInt16();
-    iResourceRadioPathSeq = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendRadio(iResourceRadioPathSeq->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendRadio.Append(reader.ReadUint16());
-        }
-
-    //RemoteAlertingTone
-    reader.SetBuffer(resourceRingGoing);
-    length = reader.ReadInt16();
-    iResourceRingGoingSeq = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendRingGoing(iResourceRingGoingSeq->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendRingGoing.Append(reader.ReadUint16());
-        }
-    //CallWaitingTone
-    reader.SetBuffer(resourceCallWaiting);
-    length = reader.ReadInt16();
-    iResourceCallWaitingSeq = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendCallWaiting(iResourceCallWaitingSeq->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendCallWaiting.Append(reader.ReadUint16());
-        }
-
-    //DataCalTone
-    reader.SetBuffer(dataCallTone);
-    length = reader.ReadInt16();
-    iPlayDataSequence = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendDataCallTone(iPlayDataSequence->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendDataCallTone.Append(reader.ReadUint16());
-        }
-
-    //NoSoundSequence
-    reader.SetBuffer(noSoundSequence);
-    length = reader.ReadInt16();
-    iPlayNoSoundSequence = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendNoSoundSequence(iPlayNoSoundSequence->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendNoSoundSequence.Append(reader.ReadUint16());
-        }
-
-    //BeepSequence
-    reader.SetBuffer(beepSequence);
-    length = reader.ReadInt16();
-    iPlayBeepSequence = HBufC8::NewL(length);
-    //Tptr modifies member variables (HBufC8) length so it includes the memory
-    //edited by Append()
-    TPtr8 appendBeepSequence(iPlayBeepSequence->Des());
-
-    for (i = 0; i < length; i++)
-        {
-        appendBeepSequence.Append(reader.ReadUint16());
-        }
-
-    delete dataCallTone;
-    delete noSoundSequence;
-    delete beepSequence;
-    delete resourceBusy;
-    delete resourceReorder;
-    delete resourceCongestion;
-    delete resourceSpecial;
-    delete resourceRadioPath;
-    delete resourceRingGoing;
-    delete resourceCallWaiting;
+    iPlayer = TMSAudioToneUtilityImpl::NewL(*this);
+    iTones.Reset();
+    CreateToneSequencesL();
     TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSAudioInbandTonePlayer::CreateSequencesL
+// Create inband tone sequences from resources.
+// -----------------------------------------------------------------------------
+//
+void TMSAudioInbandTonePlayer::CreateToneSequencesL()
+    {
+    TRACE_PRN_FN_ENT;
+
+    iFileName = KSystemDefaultbeepRscDrive;
+    iFileName.Append(KDC_RESOURCE_FILES_DIR);
+    iFileName.Append(KSystemDefaultbeepRscFile);
+    iFsSession.Connect();
+    iResourceFile.OpenL(iFsSession, iFileName);
+
+    // DO NOT change order of sequence allocation!
+    AllocSeqFromResourceL(R_NET_BUSY);                 //iTones[0]
+    AllocSeqFromResourceL(R_NET_RADIO_NOT_AVAILABLE);  //iTones[1]
+    AllocSeqFromResourceL(R_NET_CONGESTION);           //iTones[2]
+    AllocSeqFromResourceL(R_NET_SPECIAL_INFORMATION);  //iTones[3]
+    AllocSeqFromResourceL(R_NET_REORDER);              //iTones[4]
+    AllocSeqFromResourceL(R_NET_RING_GOING);           //iTones[5]
+    AllocSeqFromResourceL(R_NET_CALL_WAITING);         //iTones[6]
+    AllocSeqFromResourceL(R_DATA_CALL_TONE);           //iTones[7]
+    AllocSeqFromResourceL(R_NO_SOUND_SEQUENCE);        //iTones[8]
+    AllocSeqFromResourceL(R_BEEP_SEQUENCE);            //iTones[9]
+
+    iResourceFile.Close();
+    iFsSession.Close();
+
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSAudioInbandTonePlayer::AllocSeqFromResourceL
+//
+// -----------------------------------------------------------------------------
+//
+void TMSAudioInbandTonePlayer::AllocSeqFromResourceL(const gint resource)
+    {
+    HBufC8* res = iResourceFile.AllocReadLC(resource);
+    iReader.SetBuffer(res);
+    gint length = iReader.ReadInt16();
+    HBufC8* buf = HBufC8::NewL(length);
+    TPtr8 ptr(buf->Des());
+    for (gint i = 0; i < length; i++)
+        {
+        ptr.Append(iReader.ReadUint16());
+        }
+    User::LeaveIfError(iTones.Append(buf));
+    CleanupStack::PopAndDestroy(res);
     }
 
 // -----------------------------------------------------------------------------
@@ -273,52 +148,18 @@ void TMSAudioInbandTonePlayer::ConstructL()
 // Searches the given Inband tone from iToneArray and calls PlayCurrentTone.
 // -----------------------------------------------------------------------------
 //
-void TMSAudioInbandTonePlayer::PlayInbandTone(
-/*TCCPTone*/TMSInbandToneType aTone)
+void TMSAudioInbandTonePlayer::PlayInbandTone(TMSInbandToneType tone)
     {
     TRACE_PRN_FN_ENT;
-    //Stop playing if there is something playing
+
+    // First stop any ongoing playback
     Cancel();
-
     UpdateTonePlayerVolume();
+    iToneName = tone;
 
-    iToneName = aTone;
-
-    TPtr8 resourceBusySeq = iResourceBusySeq -> Des();
-    TPtr8 resourceRadioPathSeq = iResourceRadioPathSeq -> Des();
-    TPtr8 resourceCongestionSeq = iResourceCongestionSeq -> Des();
-    TPtr8 resourceSpecialSeq = iResourceSpecialSeq -> Des();
-    TPtr8 resourceReorderSeq = iResourceReorderSeq->Des();
-    TPtr8 resourceRingGoingSeq = iResourceRingGoingSeq -> Des();
-    TPtr8 resourceCallWaitingSeq = iResourceCallWaitingSeq -> Des();
-
-    switch (aTone)
+    if (iPlayer && (tone >= 0 && tone < iTones.Count()))
         {
-        case TMS_INBAND_USER_BUSY://ECCPToneUserBusy:
-            iCurrent->PrepareToPlayDesSequence(resourceBusySeq);
-            break;
-        case TMS_INBAND_RADIO_PATH_NOT_AVAIL://ECCPToneRadioPathNotAvailable:
-            iCurrent->PrepareToPlayDesSequence(resourceRadioPathSeq);
-            break;
-        case TMS_INBAND_CONGESTION://ECCPToneCongestion:
-            iCurrent->PrepareToPlayDesSequence(resourceCongestionSeq);
-            break;
-        case TMS_INBAND_SPECIAL_INFO://ECCPToneSpecialInformation:
-            iCurrent->PrepareToPlayDesSequence(resourceSpecialSeq);
-            break;
-        case TMS_INBAND_REORDER://ECCPReorder:
-            iCurrent->PrepareToPlayDesSequence(resourceReorderSeq);
-            break;
-        case TMS_INBAND_REMOTE_ALEARTING://ECCPRemoteAlerting:
-            iCurrent->PrepareToPlayDesSequence(resourceRingGoingSeq);
-            break;
-        case TMS_INBAND_CALL_WAITING://ECCPCallWaiting:
-            iCurrent->PrepareToPlayDesSequence(resourceCallWaitingSeq);
-            break;
-        case TMS_INBAND_NO_SEQUENCE://ECCPNoSoundSequence:
-            break;
-        default:
-            break;
+        iPlayer->PrepareToPlayDesSequence(iTones[tone]->Des());
         }
     TRACE_PRN_FN_EXT;
     }
@@ -333,17 +174,17 @@ void TMSAudioInbandTonePlayer::Cancel()
     {
     TRACE_PRN_FN_ENT;
 
-    if (iCurrent)
+    if (iPlayer)
         {
-        if (iCurrent->State() == EMdaAudioToneUtilityNotReady)
+        if (iPlayer->State() == EMdaAudioToneUtilityNotReady)
             {
             // Prepare is called, but toneplayer's state is not yet prepare,
             // then cancel to prepare is needed.
-            iCurrent->CancelPrepare();
+            iPlayer->CancelPrepare();
             }
         else
             {
-            iCurrent->CancelPlay();
+            iPlayer->CancelPlay();
             }
         }
     TRACE_PRN_FN_EXT;
@@ -358,114 +199,89 @@ void TMSAudioInbandTonePlayer::Cancel()
 void TMSAudioInbandTonePlayer::PlayCurrentTone()
     {
     TRACE_PRN_FN_ENT;
-    if (iCurrent)
+    if (iPlayer)
         {
-        if (iCurrent->State() == EMdaAudioToneUtilityPrepared)
+        if (iPlayer->State() == EMdaAudioToneUtilityPrepared)
             {
             UpdateTonePlayerVolume();
 
             switch (iToneName)
                 {
-                case TMS_INBAND_USER_BUSY://ECCPToneUserBusy:
-                    iCurrent->SetRepeats(KMdaAudioToneRepeatForever,
-                            TTimeIntervalMicroSeconds(KPhoneInbandToneZero));
-                    iCurrent->SetPriority(KAudioPriorityNetMsg,
-                            static_cast<TMdaPriorityPreference> (
-                                    KAudioPrefBusy));
+                case TMS_INBAND_USER_BUSY:
+                    SetToneAttributes(KAudioPrefBusy);
                     break;
-                case TMS_INBAND_RADIO_PATH_NOT_AVAIL://ECCPToneRadioPathNotAvailable:
-                    iCurrent->SetRepeats(KMdaAudioToneRepeatForever,
-                            TTimeIntervalMicroSeconds(KPhoneInbandToneZero));
-                    iCurrent->SetPriority(KAudioPriorityNetMsg,
-                            static_cast<TMdaPriorityPreference> (
-                                    KAudioPrefRadioNotAvailable));
+                case TMS_INBAND_RADIO_PATH_NOT_AVAIL:
+                    SetToneAttributes(KAudioPrefRadioNotAvailable);
                     break;
-                case TMS_INBAND_CONGESTION://ECCPToneCongestion:
-                    iCurrent->SetRepeats(KMdaAudioToneRepeatForever,
-                            TTimeIntervalMicroSeconds(KPhoneInbandToneZero));
-                    iCurrent->SetPriority(KAudioPriorityNetMsg,
-                            static_cast<TMdaPriorityPreference> (
-                                    KAudioPrefCongestion));
+                case TMS_INBAND_CONGESTION:
+                    SetToneAttributes(KAudioPrefCongestion);
                     break;
-                case TMS_INBAND_SPECIAL_INFO://ECCPToneSpecialInformation:
-                    iCurrent->SetRepeats(KMdaAudioToneRepeatForever,
-                            TTimeIntervalMicroSeconds(KPhoneInbandToneZero));
-                    iCurrent->SetPriority(KAudioPriorityNetMsg,
-                            static_cast<TMdaPriorityPreference> (
-                                    KAudioPrefSpecialInformation));
+                case TMS_INBAND_SPECIAL_INFO:
+                    SetToneAttributes(KAudioPrefSpecialInformation);
                     break;
-                case TMS_INBAND_REORDER://ECCPReorder:
-                    iCurrent->SetRepeats(KMdaAudioToneRepeatForever,
-                            TTimeIntervalMicroSeconds(KPhoneInbandToneZero));
-                    iCurrent->SetPriority(KAudioPriorityNetMsg,
-                            static_cast<TMdaPriorityPreference> (
-                                    KAudioPrefReorder));
+                case TMS_INBAND_REORDER:
+                    SetToneAttributes(KAudioPrefReorder);
                     break;
-                case TMS_INBAND_REMOTE_ALEARTING://ECCPRemoteAlerting:
-                    iCurrent->SetRepeats(KMdaAudioToneRepeatForever,
-                            TTimeIntervalMicroSeconds(KPhoneInbandToneZero));
-                    iCurrent->SetPriority(KAudioPriorityNetMsg,
-                            static_cast<TMdaPriorityPreference> (
-                                    KAudioPrefRingGoing));
+                case TMS_INBAND_REMOTE_ALEARTING:
+                    SetToneAttributes(KAudioPrefRingGoing);
                     break;
-                case TMS_INBAND_CALL_WAITING://ECCPCallWaiting:
-                    iCurrent->SetRepeats(0, TTimeIntervalMicroSeconds(
-                            KPhoneInbandToneZero));
-                    iCurrent->SetPriority(KAudioPriorityNetMsg,
-                            static_cast<TMdaPriorityPreference> (
-                                    KAudioPrefCallWaiting));
+                case TMS_INBAND_CALL_WAITING:
+                    SetToneAttributes(KAudioPrefCallWaiting,
+                            KAudioPriorityNetMsg, 0);
                     break;
-                case TMS_INBAND_DATA_CALL://ECCPDataCallTone: //EProfileRingingTypeRinging, EProfileRingingTypeAscending, EProfileRingingTypeRingingOnce
-                    iCurrent->SetRepeats(KMdaAudioToneRepeatForever,
-                            TTimeIntervalMicroSeconds(KPhoneInbandToneZero));
-                    iCurrent->SetPriority(KAudioPriorityPhoneCall,
-                            static_cast<TMdaPriorityPreference> (
-                                    KAudioPrefIncomingDataCall));
+                case TMS_INBAND_DATA_CALL:
+                    SetToneAttributes(KAudioPrefIncomingDataCall,
+                            KAudioPriorityPhoneCall);
 
-                    //      if ( iRingingType == EProfileRingingTypeAscending )
-                    //           {
-                    //           iCurrent->SetVolumeRamp(
-                    //               TTimeIntervalMicroSeconds( KPERingingToneRampDuration ) );
-                    //           }
-                    //       else
-                    //          {
-                    //EProfileRingingTypeRinging, EProfileRingingTypeRingingOnce
-                    iCurrent->SetVolumeRamp(TTimeIntervalMicroSeconds(
+            //      if ( iRingingType == EProfileRingingTypeAscending )
+            //           {
+            //           iPlayer->SetVolumeRamp(
+            //               TTimeIntervalMicroSeconds( KPERingingToneRampDuration ) );
+            //           }
+            //       else
+            //          {
+            //          EProfileRingingTypeRinging, EProfileRingingTypeRingingOnce
+                    iPlayer->SetVolumeRamp(TTimeIntervalMicroSeconds(
                             KPhoneInbandToneZero));
-                    //           }
-                    //      if ( iRingingType == EProfileRingingTypeRingingOnce )
-                    //          {
-                    iCurrent->SetRepeats(0, TTimeIntervalMicroSeconds(
-                            KPhoneInbandToneZero));
+            //           }
+            //      if ( iRingingType == EProfileRingingTypeRingingOnce )
+            //          {
+            //        iPlayer->SetRepeats(0, TTimeIntervalMicroSeconds(
+            //                KPhoneInbandToneZero));
                     //          }
                     break;
-                case TMS_INBAND_NO_SEQUENCE://ECCPNoSoundSequence:
-                case TMS_INBAND_BEEP_SEQUENCE://ECCPBeepSequence:
-                    iCurrent->SetRepeats(KMdaAudioToneRepeatForever,
-                            TTimeIntervalMicroSeconds(KPhoneInbandToneZero));
-                    iCurrent->SetPriority(
-                            KAudioPriorityPhoneCall,
-                            static_cast<TMdaPriorityPreference> (
-                                    KAudioPrefIncomingCall));
-                    iCurrent->SetRepeats(0, TTimeIntervalMicroSeconds(
-                            KPhoneInbandToneZero));
-                    iCurrent->SetVolumeRamp(TTimeIntervalMicroSeconds(
+                case TMS_INBAND_NO_SEQUENCE:
+                case TMS_INBAND_BEEP_SEQUENCE:
+                    SetToneAttributes(KAudioPrefIncomingCall,
+                            KAudioPriorityPhoneCall);
+
+                    //iPlayer->SetRepeats(0, TTimeIntervalMicroSeconds(
+                    //        KPhoneInbandToneZero));
+                    iPlayer->SetVolumeRamp(TTimeIntervalMicroSeconds(
                             KPhoneInbandToneZero));
                     break;
                 default:
                     break;
                 }
-
-#ifdef __WINS__
-
-#else
+#ifndef __WINS__
             //Play the tone
-            iCurrent->Play();
+            iPlayer->Play();
 #endif
-
-            } // State()
-        } //iCurrent
+            }
+        }
     TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSAudioInbandTonePlayer::SetToneAttributes
+//
+// -----------------------------------------------------------------------------
+//
+void TMSAudioInbandTonePlayer::SetToneAttributes(const guint pref,
+        const guint priority, const gint repeatTimes, const gint trailSilence)
+    {
+    iPlayer->SetRepeats(repeatTimes, TTimeIntervalMicroSeconds(trailSilence));
+    iPlayer->SetPriority(priority, static_cast<TMdaPriorityPreference> (pref));
     }
 
 // -----------------------------------------------------------------------------
@@ -488,16 +304,19 @@ void TMSAudioInbandTonePlayer::MatoPrepareComplete(TInt aError)
 // TMSAudioInbandTonePlayer::SetVolume
 // -----------------------------------------------------------------------------
 //
-void TMSAudioInbandTonePlayer::SetVolume(TInt aVolume)
+void TMSAudioInbandTonePlayer::SetVolume(gint volume)
     {
     TRACE_PRN_FN_ENT;
-    TInt safeVolume = Max(Min(aVolume, KPhoneInbandVolumeMax),
+    gint safeVolume = Max(Min(volume, KPhoneInbandVolumeMax),
             KPhoneInbandVolumeMin);
 
-    if (iCurrent && EMdaAudioToneUtilityNotReady != iCurrent->State())
+    if (iPlayer)
         {
-        TInt mediaServerVolume = CalculateMediaServerVolume(safeVolume);
-        iCurrent->SetVolume(mediaServerVolume);
+        gint mediaServerVolume = CalculateMediaServerVolume(safeVolume);
+        if (EMdaAudioToneUtilityNotReady != iPlayer->State())
+            {
+            iPlayer->SetVolume(mediaServerVolume);
+            }
         }
     TRACE_PRN_FN_EXT;
     }
@@ -508,12 +327,10 @@ void TMSAudioInbandTonePlayer::SetVolume(TInt aVolume)
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void TMSAudioInbandTonePlayer::MatoPlayComplete(TInt aError)
+void TMSAudioInbandTonePlayer::MatoPlayComplete(TInt /*aError*/)
     {
     TRACE_PRN_FN_ENT;
-    if (aError != KErrNone)
-        {
-        }
+    // TODO: process error?
     TRACE_PRN_FN_EXT;
     }
 
@@ -521,13 +338,13 @@ void TMSAudioInbandTonePlayer::MatoPlayComplete(TInt aError)
 // TMSAudioInbandTonePlayer::CalculateMediaServerVolume
 // -----------------------------------------------------------------------------
 //
-TInt TMSAudioInbandTonePlayer::CalculateMediaServerVolume(TInt aVolume) const
+gint TMSAudioInbandTonePlayer::CalculateMediaServerVolume(gint volume) const
     {
     TRACE_PRN_FN_ENT;
     TRACE_PRN_FN_EXT;
     // Our volume level scale is 0...10, media server's can be anything.
     // This scales the volume to correct level.
-    return (iCurrent->MaxVolume() * aVolume) /
+    return (iPlayer->MaxVolume() * volume) /
             (KPhoneInbandVolumeMax - KPhoneInbandVolumeMin);
     }
 
@@ -538,8 +355,7 @@ TInt TMSAudioInbandTonePlayer::CalculateMediaServerVolume(TInt aVolume) const
 void TMSAudioInbandTonePlayer::UpdateTonePlayerVolume()
     {
     TRACE_PRN_FN_ENT;
-    TInt volume( /*KPhoneInbandVolumeMin*/KPhoneInbandVolumeMax);
-    // iOwner.GetAudioVolumeSync( volume );
+    gint volume( /*KPhoneInbandVolumeMin*/KPhoneInbandVolumeMax);
     SetVolume(volume);
     TRACE_PRN_FN_EXT;
     }

@@ -12,18 +12,9 @@
  * Contributors:
  *
  * Description:
- * This is the project specification file for building the
- * stsimplementation static library.
+ * This file provides the information required for building the
+ * system tone service server side implementation.
  */
 
-#include <platform_paths.hrh>
-
-TARGET          stsimplementation.lib
-TARGETTYPE      lib
-
-MW_LAYER_SYSTEMINCLUDE
-USERINCLUDE     ../../inc
-
-SOURCEPATH      ../src
-
-SOURCE          stsimplementation.cpp rstssession.cpp
+PRJ_MMPFILES
+sts.mmp

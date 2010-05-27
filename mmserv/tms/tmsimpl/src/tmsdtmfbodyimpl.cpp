@@ -39,9 +39,9 @@ TMSDTMFBodyImpl::~TMSDTMFBodyImpl()
     if (iProxy)
         {
         iProxy->Close();
-        delete iProxy;
-        iProxy = NULL;
         }
+    delete iProxy;
+
     if (iString)
         {
         g_string_free(iString, TRUE);
@@ -77,18 +77,19 @@ gint TMSDTMFBodyImpl::PostConstruct()
     {
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
-    iProxy = new TMSProxy;
+    iProxy = new TMSProxy();
     if (!iProxy)
         {
         ret = TMS_RESULT_INSUFFICIENT_MEMORY;
         }
-    RET_REASON_IF_ERR(ret);
-
-    if (iProxy->Connect() != TMS_RESULT_SUCCESS)
+    else
         {
-        delete iProxy;
-        iProxy = NULL;
-        ret = TMS_RESULT_FATAL_ERROR;
+        if (iProxy->Connect() != TMS_RESULT_SUCCESS)
+            {
+            delete iProxy;
+            iProxy = NULL;
+            ret = TMS_RESULT_FATAL_ERROR;
+            }
         }
     RET_REASON_IF_ERR(ret);
     return ret;
@@ -141,7 +142,7 @@ gint TMSDTMFBodyImpl::RemoveObserver(TMSDTMFObserver& obsrvr)
 gint TMSDTMFBodyImpl::Start()
     {
     gint ret(TMS_RESULT_SUCCESS);
-    if (iProxy)
+    if (iProxy && iString)
         {
         if (iString->len)
             {
@@ -154,7 +155,7 @@ gint TMSDTMFBodyImpl::Start()
         }
     else
         {
-        ret = TMS_RESULT_DOES_NOT_EXIST;
+        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
         }
     return ret;
     }
@@ -168,30 +169,35 @@ gint TMSDTMFBodyImpl::Stop()
         }
     else
         {
-        ret = TMS_RESULT_DOES_NOT_EXIST;
+        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
         }
     return ret;
     }
 
 gint TMSDTMFBodyImpl::SetTone(GString* string)
     {
+    __ASSERT_ALWAYS(string, PANIC(TMS_RESULT_NULL_ARGUMENT));
+
     gint ret(TMS_RESULT_SUCCESS);
 
-    if (iString && iString->len)
+    if (iString)
         {
-        g_string_free(iString, TRUE);
+        if (iString->len)
+            {
+            g_string_free(iString, TRUE);
+            }
         }
 
     iString = g_string_new_len(string->str, string->len);
     return ret;
     }
 
-gint TMSDTMFBodyImpl::ContinueDTMFStringSending(gboolean aContinue)
+gint TMSDTMFBodyImpl::ContinueDTMFStringSending(gboolean sending)
     {
     gint ret(TMS_RESULT_SUCCESS);
     if (iProxy)
         {
-        ret = iProxy->ContinueDTMFStringSending(aContinue);
+        ret = iProxy->ContinueDTMFStringSending(sending);
         }
     else
         {

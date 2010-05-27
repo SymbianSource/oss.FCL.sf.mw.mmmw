@@ -120,10 +120,7 @@ void TMSEtelDtmfStopMonitor::RunL()
 void TMSEtelDtmfStopMonitor::DoCancel()
     {
     TRACE_PRN_FN_ENT;
-    if (iStatus == KRequestPending)
-        {
-        iPhone.CancelAsyncRequest(EMobilePhoneNotifyStopInDTMFString);
-        }
+    iPhone.CancelAsyncRequest(EMobilePhoneNotifyStopInDTMFString);
     TRACE_PRN_FN_EXT;
     }
 

@@ -113,7 +113,6 @@ private:
     TUint iAvgBitrate;
     TUint iOffset;
     TUint iTimeRefMs;
-    TUint iBufCnt;
     TUint iPosEventMs;
     TUint iPlayWindowEndPosEventMs;
     TInt iIntervalRef;

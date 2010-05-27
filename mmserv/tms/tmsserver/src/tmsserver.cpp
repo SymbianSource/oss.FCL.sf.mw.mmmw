@@ -45,12 +45,11 @@ const TInt KOutputsArraySize = 10;
 //
 // -----------------------------------------------------------------------------
 //
-TMSServer* TMSServer::NewL()
+TMSServer* TMSServer::NewLC()
     {
     TMSServer* self = new (ELeave) TMSServer;
     CleanupStack::PushL(self);
     self->ConstructL();
-    CleanupStack::Pop(self);
     return self;
     }
 
@@ -1292,13 +1291,16 @@ void TMSServer::RtPlayerEvent(gint aEventType, gint aError)
     }
 
 // -----------------------------------------------------------------------------
-// RunServerL
+// TMSServer::RunServerL
 //
 // -----------------------------------------------------------------------------
 //
-static void RunServerL()
+void TMSServer::RunServerL()
     {
     TRACE_PRN_N(_L("TMS->RunServerL"));
+
+    // Naming the server thread after the server helps to debug panics
+    User::LeaveIfError(User::RenameThread(KTMSServerName));
 
     // Create and install the active scheduler we need
     CActiveScheduler* scheduler = new (ELeave) CActiveScheduler;
@@ -1306,7 +1308,7 @@ static void RunServerL()
     CActiveScheduler::Install(scheduler);
 
     // Create the server (leave it on the cleanup stack)
-    TMSServer* server = TMSServer::NewL();
+    TMSServer* server = TMSServer::NewLC();
 
     // Initialisation complete, now signal the client
     RProcess::Rendezvous(TMS_RESULT_SUCCESS);
@@ -1316,7 +1318,7 @@ static void RunServerL()
 
     // Ready to exit.
     // Cleanup scheduler and delete the server
-    delete server;
+    CleanupStack::PopAndDestroy(server);
     CleanupStack::PopAndDestroy(scheduler);
 
     TRACE_PRN_N(_L("TMS->RunServerL - TMS server closed"));
@@ -1565,7 +1567,7 @@ TInt E32Main()
     TInt r = KErrNoMemory;
     if (cleanup)
         {
-        TRAP(r, RunServerL());
+        TRAP(r, TMSServer::RunServerL());
         delete cleanup;
         }
     __UHEAP_MARKEND;

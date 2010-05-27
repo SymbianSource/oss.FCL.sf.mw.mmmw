@@ -214,7 +214,7 @@ private:
     void DoPlay();
 
     /**
-     * Ser tinging type properties
+     * Set ringing type properties
      */
     void SetRingingTypeProperties();
 

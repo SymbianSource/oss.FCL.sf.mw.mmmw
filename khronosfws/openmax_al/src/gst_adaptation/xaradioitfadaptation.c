@@ -16,7 +16,7 @@
 */
 
 #include <unistd.h>
-#include <gst.h>
+#include <gst/gst.h>
 #include "xaadaptationgst.h"
 #include "xaradioitfadaptation.h"
 #include "xaradioadaptctx.h"

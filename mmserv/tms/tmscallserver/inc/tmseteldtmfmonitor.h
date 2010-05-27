@@ -97,7 +97,6 @@ private:
      * Custom API reference.
      */
     RMmCustomAPI& iMmCustom;
-
     };
 
 } //namespace TMS

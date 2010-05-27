@@ -29,7 +29,7 @@ class TMSInbandToneObserver;
 /**
  * TMSInbandTone class
 *
-* This class provides Inband tone playback capability to the TMS clients. 
+* This class provides Inband tone playback capability to the TMS clients.
 *
 * @lib tmsapi.lib
 *
@@ -52,7 +52,8 @@ public:
      *      Any user data passed to the function.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_ALREADY_EXIST if the obsrvr is already in the list.
      *
      */
@@ -73,12 +74,13 @@ public:
 
     /**
      * Starts the inband tone playback. The inband volume will correspond to
-     * the current downlink volume level. 
-     * 
+     * the current downlink volume level.
+     *
      * For CS calltype.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Start(TMSInbandToneType inbandtonetype);
@@ -87,7 +89,8 @@ public:
      * Stops the inband tone playback.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Stop();

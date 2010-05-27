@@ -254,7 +254,7 @@ public:
      * sink is re-claimed by the client.
      *
      * @param  sink
-     *      Dink to removed from the stream.
+     *      Sink to removed from the stream.
      *
      * @return
      *      TMS_RESULT_SUCCESS if sink is removed successfully from the stream.
@@ -385,6 +385,17 @@ public:
     IMPORT_C gint GetState();
 
     /**
+     * Get stream ID.
+     *
+     * This function can be called at any time.
+     *
+     * @return
+     *      Unique ID of the stream.
+     *
+     */
+    IMPORT_C gint GetStreamId();
+
+    /**
      * Get stream type.
      *
      * This function can be called at any time.
@@ -395,17 +406,6 @@ public:
      *
      * @return
      *      Stream type indicating whether it is an uplink or downlink.
-     *
-     */
-    IMPORT_C gint GetStreamId();
-
-    /**
-     * Get stream ID.
-     *
-     * This function can be called at any time.
-     *
-     * @return
-     *      Unique ID of the stream.
      *
      */
     IMPORT_C gint GetStreamType();

@@ -45,7 +45,7 @@ TMSIPCallBodyImpl::~TMSIPCallBodyImpl()
 gint TMSIPCallBodyImpl::Create(TMSCallBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSIPCallBodyImpl* self = new TMSIPCallBodyImpl;
+    TMSIPCallBodyImpl* self = new TMSIPCallBodyImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)
@@ -194,7 +194,7 @@ gint TMSIPCallBodyImpl::RemStreamFromList(TMSStream*& strm)
     if (itStrm)
         {
         iStreamsVector.erase(itStrm); // Remove from array
-        // Don't delete itStrm as the iterator advanced to the next 
+        // Don't delete itStrm as the iterator advanced to the next
         // item on the list
         ret = TMSStreamImpl::Delete(strm);
         }

@@ -21,6 +21,7 @@
 // INCLUDE FILES
 #include    "RadioRequest.h"
 #include    "RadioDebug.h"
+#include    "trace.h"
 
 // ============================ MEMBER FUNCTIONS ===============================
 
@@ -43,6 +44,7 @@ CRadioRequest::CRadioRequest(
 		iInt(0),
 		iIntPckg(iInt)
     {
+    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -52,7 +54,7 @@ CRadioRequest::CRadioRequest(
 //
 void CRadioRequest::ConstructL()
     {
-	RADIO_RDEBUG(_L("[RADIO-SESS] CRadioRequest::ConstructL()"));
+    FUNC_LOG;
 	CActiveScheduler::Add(this);
     }
 
@@ -66,6 +68,7 @@ CRadioRequest* CRadioRequest::NewLC(
 	MRadioObserver& aObserver,
 	TRadioServerRequest aRequest )
     {
+    FUNC_LOG;
     CRadioRequest* self = new( ELeave ) CRadioRequest(aSession, aObserver, aRequest);
     CleanupStack::PushL( self );
     self->ConstructL();
@@ -75,6 +78,8 @@ CRadioRequest* CRadioRequest::NewLC(
 // Destructor
 CRadioRequest::~CRadioRequest()
     {
+    FUNC_LOG;
+    INFO_1("My pointer: 0x%x", this );
 	if ( IsActive() )
 		{
 		Cancel();
@@ -91,6 +96,7 @@ void CRadioRequest::CompleteRequest(
 	TRadioServerRequest aRequest,
 	TInt aError )
     {
+    FUNC_LOG;
 	iRequest = aRequest;
 
 	TRequestStatus* stat = &iStatus;
@@ -104,6 +110,7 @@ void CRadioRequest::CompleteRequest(
 //
 void CRadioRequest::DoCancel()
     {
+    FUNC_LOG;
 	iSession.CancelRequest(iRequest);
     }
 
@@ -113,11 +120,12 @@ void CRadioRequest::DoCancel()
 //
 void CRadioRequest::RunL()
     {
+    FUNC_LOG;
 	TInt err = iStatus.Int();
 	if ( err == KErrCancel )
 		{
 		// Ignore the cancelled request
-		RADIO_RDEBUG_INT(_L("[RADIO-SESS] CRadioRequest::RunL():cancelled [%d]"), iRequest);
+		INFO_1("cancelled iRequest [%d]", iRequest);
 		return;
 		}
 
@@ -127,31 +135,31 @@ void CRadioRequest::RunL()
 		case ERadioServStationSeek:
 			{
 			iInt = iIntPckg();
-			RADIO_RDEBUG_INT(_L("[RADIO-SESS] CRadioRequest::RunL(): ERadioServStationSeek [%d]"), iInt);
+			INFO_1("ERadioServStationSeek [%d]", iInt);
 			iObserver.StationSeekComplete(err, iInt);
 			}
 			break;
 		case ERadioServSetFrequency:
 			{
-			RADIO_RDEBUG(_L("[RADIO-SESS] CRadioRequest::RunL(): ERadioServSetFrequency"));
+			INFO("ERadioServSetFrequency");
 			iObserver.SetFrequencyComplete(err);
 			}
 			break;
 		case ERadioServRequestTunerControl:
 			{
-			RADIO_RDEBUG(_L("[RADIO-SESS] CRadioRequest::RunL(): ERadioServRequestTunerControl"));
+			INFO("ERadioServRequestTunerControl");
 			iObserver.RequestTunerControlComplete(err);
 			}
 			break;
 		case ERadioServSetFrequencyRange:
 			{
-			RADIO_RDEBUG(_L("[RADIO-SESS] CRadioRequest::RunL(): ERadioServSetFrequencyRange"));
+			INFO("ERadioServSetFrequencyRange");
 			iObserver.SetFrequencyRangeComplete(err);
 			}
 			break;
 		case ERadioServPlay:
 			{
-			RADIO_RDEBUG(_L("[RADIO-SESS] CRadioRequest::RunL(): ERadioServPlay"));
+			INFO("INFOERadioServPlay");
 			if ( err != KErrNone )
 				{
 				iObserver.RadioEventStateChange(EFalse, err);
@@ -161,21 +169,21 @@ void CRadioRequest::RunL()
 		case ERadioServStationSeekByPTY:
 			{
 			iInt = iIntPckg();
-			RADIO_RDEBUG_INT(_L("[RADIO-SESS] CRadioRequest::RunL(): ERadioServStationSeekByPTY [%d]"), iInt);
+			INFO_1("ERadioServStationSeekByPTY [%d]", iInt);
 			iObserver.StationSeekByPTYComplete(err, iInt);
 			}
 			break;
 		case ERadioServStationSeekByTA:
 			{
 			iInt = iIntPckg();
-			RADIO_RDEBUG_INT(_L("[RADIO-SESS] CRadioRequest::RunL(): ERadioServStationSeekByTA [%d]"), iInt);
+			INFO_1("ERadioServStationSeekByTA [%d]", iInt);
 			iObserver.StationSeekByTAComplete(err, iInt);
 			}
 			break;
 		case ERadioServStationSeekByTP:
 			{
 			iInt = iIntPckg();
-			RADIO_RDEBUG_INT(_L("[RADIO-SESS] CRadioRequest::RunL(): ERadioServStationSeekByTP [%d]"), iInt);
+			INFO_1("ERadioServStationSeekByTP [%d]", iInt);
 			iObserver.StationSeekByTPComplete(err, iInt);
 			}
 			break;
@@ -205,7 +213,7 @@ void CRadioRequest::RunL()
 			break;
 		default:
 			{
-			RADIO_RDEBUG(_L("[RADIO-SESS] CRadioRequest::RunL(): ERROR case default !!!"));
+			INFO("ERROR case default !!!");
 			User::Panic(_L("RadioServer"), KErrGeneral );
 			break;
 			}

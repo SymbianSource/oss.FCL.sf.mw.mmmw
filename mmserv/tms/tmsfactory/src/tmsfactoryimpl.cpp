@@ -68,8 +68,6 @@ gint TMSFactoryImpl::IsCallTypeSupported(TMSCallType ctype, gboolean& flag)
         case TMS_CALL_IP:
             flag = ETrue;
             break;
-        case TMS_CALL_ECS: //from TB 10.2
-        case TMS_CALL_RTP: //from TB 10.2
         default:
             flag = EFalse;
             break;
@@ -248,7 +246,7 @@ gint TMSFactoryImpl::DeleteInbandTonePlayer(TMSInbandTone*& inbandtone)
 gint TMSFactoryImpl::QueryDevice(const TMSStreamType strmtype)
     {
     gint ret(TMS_RESULT_SUCCESS);
-    TMSProxy* session = new TMSProxy;
+    TMSProxy* session = new TMSProxy();
     if (session)
         {
         if (session->Connect() == TMS_RESULT_SUCCESS)

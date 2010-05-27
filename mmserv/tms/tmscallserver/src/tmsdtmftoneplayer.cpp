@@ -16,8 +16,6 @@
  */
 
 // INCLUDE FILES
-#include <mdaaudiotoneplayer.h>
-#include <AudioPreference.h>
 #include "tmsutility.h"
 #include "tmsdtmftoneplayer.h"
 
@@ -40,12 +38,11 @@ using namespace TMS;
 // -----------------------------------------------------------------------------
 //
 TMSAudioDtmfTonePlayer* TMSAudioDtmfTonePlayer::NewL(
-        TMSDTMFTonePlayerObserver& obsrvr, guint aAudioPreference,
-        guint aAudioPriority)
+        TMSDTMFTonePlayerObserver& obsrvr, guint audioPreference,
+        guint audioPriority)
     {
-    //iObserver = obsrvr;
-    TMSAudioDtmfTonePlayer* self = new (ELeave) TMSAudioDtmfTonePlayer(
-            obsrvr, aAudioPreference, aAudioPriority);
+    TMSAudioDtmfTonePlayer* self = new (ELeave) TMSAudioDtmfTonePlayer(obsrvr,
+            audioPreference, audioPriority);
 
     CleanupStack::PushL(self);
     self->ConstructL();
@@ -69,11 +66,11 @@ TMSAudioDtmfTonePlayer::~TMSAudioDtmfTonePlayer()
 // -----------------------------------------------------------------------------
 //
 TMSAudioDtmfTonePlayer::TMSAudioDtmfTonePlayer(
-        TMSDTMFTonePlayerObserver& obsrvr, guint aAudioPreference,
-        guint aAudioPriority) :
+        TMSDTMFTonePlayerObserver& obsrvr, guint audioPreference,
+        guint audioPriority) :
     iObserver(obsrvr),
-    iPref(aAudioPreference),
-    iPrior(aAudioPriority)
+    iPref(audioPreference),
+    iPrior(audioPriority)
     {
     TRACE_PRN_FN_ENT;
     TRACE_PRN_FN_EXT;
@@ -100,10 +97,10 @@ void TMSAudioDtmfTonePlayer::ConstructL()
 // Sets the volume level that is used when the dtmf tone is played.
 // -----------------------------------------------------------------------------
 //
-void TMSAudioDtmfTonePlayer::SetVolume(gint aVolume)
+void TMSAudioDtmfTonePlayer::SetVolume(gint volume)
     {
     TRACE_PRN_FN_ENT;
-    gint vol = ConvertVolume(aVolume);
+    gint vol = ConvertVolumeLevel(volume);
 
     if (vol != iVolume)
         {
@@ -119,17 +116,17 @@ void TMSAudioDtmfTonePlayer::SetVolume(gint aVolume)
 // member function.
 // -----------------------------------------------------------------------------
 //
-void TMSAudioDtmfTonePlayer::PlayDtmfTone(TDes& aTone)
+void TMSAudioDtmfTonePlayer::PlayDtmfTone(TDes& tone)
     {
     TRACE_PRN_FN_ENT;
     Cancel();
 
-    // DTMF signalling.
+    // DTMF signaling.
     if (iDTMFPlayer)
         {
         TBuf<KBufSize> key;
-        key.Append(aTone);
-        TRAP_IGNORE(iDTMFPlayer->PlayDTMFStringL(aTone));
+        key.Append(tone);
+        TRAP_IGNORE(iDTMFPlayer->PlayDTMFStringL(tone));
         }
     TRACE_PRN_FN_EXT;
     }
@@ -152,16 +149,15 @@ void TMSAudioDtmfTonePlayer::Cancel()
 // char ('*').
 // -----------------------------------------------------------------------------
 //
-void TMSAudioDtmfTonePlayer::Normalize(TChar& aTone)
+void TMSAudioDtmfTonePlayer::Normalize(TChar& tone)
     {
     TRACE_PRN_FN_ENT;
-    aTone.LowerCase();
-
+    tone.LowerCase();
     TPtrC ast(KPhoneTone_Asterisk);
 
-    if (ast.Locate(aTone) != KErrNotFound)
+    if (ast.Locate(tone) != KErrNotFound)
         {
-        aTone = ast[0];
+        tone = ast[0];
         }
     TRACE_PRN_FN_EXT;
     }
@@ -177,7 +173,7 @@ void TMSAudioDtmfTonePlayer::InitializeComplete(TInt aError)
     if (aError == KErrNone)
         {
         TMMFPrioritySettings dtmfPlayerSettings;
-        dtmfPlayerSettings.iPref = (TMdaPriorityPreference) iPref;
+        dtmfPlayerSettings.iPref = iPref;
         dtmfPlayerSettings.iPriority = iPrior;
         dtmfPlayerSettings.iState = EMMFStateTonePlaying;
         iDTMFPlayer->SetPrioritySettings(dtmfPlayerSettings);
@@ -206,74 +202,13 @@ void TMSAudioDtmfTonePlayer::ToneFinished(TInt aError)
     }
 
 // -----------------------------------------------------------------------------
-// TMSAudioDtmfTonePlayer::BufferToBeFilled
+// TMSAudioDtmfTonePlayer::ConvertVolumeLevel
 // -----------------------------------------------------------------------------
 //
-void TMSAudioDtmfTonePlayer::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
+gint TMSAudioDtmfTonePlayer::ConvertVolumeLevel(gint volume)
     {
     TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSAudioDtmfTonePlayer::PlayError
-// -----------------------------------------------------------------------------
-//
-void TMSAudioDtmfTonePlayer::PlayError(TInt /*aError*/)
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSAudioDtmfTonePlayer::BufferToBeEmptied
-// -----------------------------------------------------------------------------
-//
-void TMSAudioDtmfTonePlayer::BufferToBeEmptied(CMMFBuffer* /*aBuffer*/)
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSAudioDtmfTonePlayer::RecordError
-// -----------------------------------------------------------------------------
-//
-void TMSAudioDtmfTonePlayer::RecordError(TInt /*aError*/)
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSAudioDtmfTonePlayer::ConvertError
-// -----------------------------------------------------------------------------
-//
-void TMSAudioDtmfTonePlayer::ConvertError(TInt /*aError*/)
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSAudioDtmfTonePlayer::DeviceMessage
-// -----------------------------------------------------------------------------
-//
-void TMSAudioDtmfTonePlayer::DeviceMessage(TUid /*aMessageType*/,
-        const TDesC8& /*aMsg*/)
-    {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSAudioDtmfTonePlayer::ConvertVolume
-// -----------------------------------------------------------------------------
-//
-gint TMSAudioDtmfTonePlayer::ConvertVolume(gint aVolume)
-    {
-    TRACE_PRN_FN_ENT;
-    gint result = iDTMFPlayer->MaxVolume() * aVolume / KMaxVolumeLevel;
+    gint result = iDTMFPlayer->MaxVolume() * volume / KMaxVolumeLevel;
     TRACE_PRN_FN_EXT;
     return result;
     }

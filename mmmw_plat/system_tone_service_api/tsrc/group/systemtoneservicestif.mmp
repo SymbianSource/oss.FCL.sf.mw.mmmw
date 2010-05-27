@@ -45,6 +45,7 @@ OS_LAYER_SYSTEMINCLUDE
 
 SOURCEPATH      ../src
 
+SOURCE		systemtoneservicesactiveobj.cpp
 SOURCE          systemtoneservicestif.cpp
 SOURCE          systemtoneservicestifblocks.cpp
 

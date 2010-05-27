@@ -35,9 +35,9 @@ const TInt KStsServerBuild = 0;
 enum TStsServerCommandType
     {
     StsMsg_RegisterMsgQueue,
+    StsMsg_StopAlarm,
     StsMsg_PlayTone,
     StsMsg_PlayAlarm,
-    StsMsg_StopAlarm,
     StsMsg_ENDMARKER
     };
 

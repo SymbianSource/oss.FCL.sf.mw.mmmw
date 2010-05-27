@@ -16,8 +16,8 @@
  * whole of System Tone Service.
  */
 
-#include "../stsimplementation/group/bld.inf"
-#include "../stsplayer/group/bld.inf"
+#include "../sts/group/bld.inf"
+#include "../stsproxy/group/bld.inf"
 #include "../stsserver/group/bld.inf"
 
 PRJ_PLATFORMS
@@ -25,7 +25,7 @@ DEFAULT
 
 PRJ_EXPORTS
 ../data/sts_stub.sis /epoc32/data/z/system/install/sts_stub.sis
-../rom/systemtoneservice.iby       CORE_MW_LAYER_IBY_EXPORT_PATH(systemtoneservice.iby)
+../rom/mmmwsystemtoneservice.iby       CORE_MW_LAYER_IBY_EXPORT_PATH(mmmwsystemtoneservice.iby)
 
 PRJ_MMPFILES
 systemtoneservice.mmp

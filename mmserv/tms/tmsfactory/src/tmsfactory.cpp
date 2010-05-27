@@ -276,3 +276,15 @@ EXPORT_C gint TMSFactory::DeleteInbandTonePlayer(TMSInbandTone*& inbandtone)
     return status;
     }
 
+EXPORT_C gint TMSFactory::CreateRTPSession(TMSRTPSession*& /*rtpsession*/,
+        guint8* /*sdp*/, guint /*mode*/)
+    {
+    return TMS_RESULT_FEATURE_NOT_SUPPORTED;
+    }
+
+EXPORT_C gint TMSFactory::DeleteRTPSession(TMSRTPSession*& /*rtpsession*/)
+    {
+    return TMS_RESULT_FEATURE_NOT_SUPPORTED;
+    }
+
+

@@ -52,7 +52,7 @@ gint TMSG729FormatImpl::PostConstruct()
 gint TMSG729FormatImpl::Create(TMSFormat*& tmsformat)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSG729FormatImpl *self = new TMSG729FormatImpl;
+    TMSG729FormatImpl *self = new TMSG729FormatImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)

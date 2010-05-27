@@ -20,6 +20,7 @@
 
 #include <e32base.h>
 #include <mdaaudiotoneplayer.h>
+#include <glib.h>
 #include "tmsaudiotoneutility.h"
 
 namespace TMS {
@@ -35,7 +36,7 @@ class TMSAudioToneUtilityImpl : public TMSAudioToneUtility
 public:
 
     static TMSAudioToneUtilityImpl* NewL(
-            MMdaAudioToneObserver& aToneObserver);
+            MMdaAudioToneObserver& toneObserver);
 
     /**
      * Destructor.
@@ -48,7 +49,7 @@ public:
      * From TMSAudioToneUtilityImpl
      * @see CMdaAudioToneUtility
      */
-    void PrepareToPlayDesSequence(const TDesC8& aSequence);
+    void PrepareToPlayDesSequence(const TDesC8& sequence);
 
     /**
      * From TMSAudioToneUtilityImpl
@@ -66,32 +67,32 @@ public:
      * From TMSAudioToneUtilityImpl
      * @see CMdaAudioToneUtility
      */
-    TInt MaxVolume();
+    gint MaxVolume();
 
     /**
      * From TMSAudioToneUtilityImpl
      * @see CMdaAudioToneUtility
      */
-    void SetVolume(TInt aVolume);
+    void SetVolume(gint volume);
 
     /**
      * From TMSAudioToneUtilityImpl
      * @see CMdaAudioToneUtility
      */
-    void SetRepeats(TInt aRepeatNumberOfTimes,
-            const TTimeIntervalMicroSeconds& aTrailingSilence);
+    void SetRepeats(gint repeatNumberOfTimes,
+            const TTimeIntervalMicroSeconds& trailingSilence);
 
     /**
      * From TMSAudioToneUtilityImpl
      * @see CMdaAudioToneUtility
      */
-    void SetPriority(TInt aPriority, TMdaPriorityPreference aPref);
+    void SetPriority(gint priority, TMdaPriorityPreference pref);
 
     /**
      * From TMSAudioToneUtilityImpl
      * @see CMdaAudioToneUtility
      */
-    void SetVolumeRamp(const TTimeIntervalMicroSeconds& aRampDuration);
+    void SetVolumeRamp(const TTimeIntervalMicroSeconds& rampDuration);
 
     /**
      * From TMSAudioToneUtilityImpl
@@ -109,7 +110,7 @@ private:
 
     TMSAudioToneUtilityImpl();
 
-    void ConstructL(MMdaAudioToneObserver& aToneObserver);
+    void ConstructL(MMdaAudioToneObserver& toneObserver);
 
 private:
     // data

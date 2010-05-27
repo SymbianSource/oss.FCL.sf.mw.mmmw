@@ -17,8 +17,8 @@
 
 #include <string.h>
 #include <assert.h>
-#include <gst.h>
-#include <gstappsink.h>
+#include <gst/gst.h>
+#include <gst/app/gstappsink.h>
 #include "xacapabilitiesmgr.h"
 #include "xamediarecorderadaptctx.h"
 #include "xacameraadaptctx.h"

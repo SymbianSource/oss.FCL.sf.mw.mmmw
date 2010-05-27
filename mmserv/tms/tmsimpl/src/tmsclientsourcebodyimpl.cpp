@@ -38,7 +38,7 @@ TMSClientSourceBodyImpl::~TMSClientSourceBodyImpl()
 gint TMSClientSourceBodyImpl::Create(TMSClientSourceBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSClientSourceBodyImpl* self = new TMSClientSourceBodyImpl;
+    TMSClientSourceBodyImpl* self = new TMSClientSourceBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();

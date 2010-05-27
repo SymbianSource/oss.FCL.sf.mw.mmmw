@@ -31,7 +31,7 @@ typedef enum
 
 
 /* Config file location */
-const char configFileLocation[] = "c:/openmaxal/openmaxal.cfg";
+const char configFileLocation[] = "z:/openmaxal/openmaxal.cfg";
 
 /* Tags used for parsing */
 const char mediaPlayerBeginTag[] = "<mediaplayer>";
@@ -92,9 +92,10 @@ FrameworkMap* XAFrameworkMgr_CreateFrameworkMap()
     if (fp == NULL)
         {
         createDefaultRules(configFileLocation);
+
+        fp = fopen(configFileLocation, "r");
         }
 
-    fp = fopen(configFileLocation, "r");
     if (fp != NULL)
     {
         while((fgets(buffer, LINEWIDTH, fp) != NULL) && processedEntry)

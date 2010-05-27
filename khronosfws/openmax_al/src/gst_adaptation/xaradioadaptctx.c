@@ -15,7 +15,7 @@
 *
 */
 
-#include <gst.h>
+#include <gst/gst.h>
 #include "xaradioadaptctx.h"
 #include "xaadaptationgst.h"
 #include "assert.h"

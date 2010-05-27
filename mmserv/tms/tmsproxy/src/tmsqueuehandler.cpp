@@ -200,8 +200,8 @@ void TMSQueueHandler::RunL()
                 iObserver->QueueEvent(TMS_EVENT_RINGTONE_DEINIT_COMPLETE,
                         msgBuf.iStatus, NULL);
                 break;
-            case ECmdDTMFOpenDnlinkComplete:
-            case ECmdDTMFOpenUplinkComplete:
+            case ECmdDTMFToneDnlPlayStarted:
+            case ECmdDTMFToneUplPlayStarted:
                 iObserver->QueueEvent(TMS_EVENT_DTMF_TONE_STARTED,
                         msgBuf.iStatus, NULL);
                 break;

@@ -96,7 +96,8 @@ public:
      *      Volume level to be set.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint SetLevel(const guint level);
@@ -108,7 +109,8 @@ public:
      *      Volume level.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetLevel(guint& level);
@@ -120,7 +122,8 @@ public:
      *      Max volume level.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetMaxLevel(guint& level);
@@ -134,7 +137,8 @@ public:
      *      Variable that contains the effect type on return.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetType(TMSEffectType& effecttype);

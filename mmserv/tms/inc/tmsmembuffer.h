@@ -34,56 +34,56 @@ public:
     static gint Create(guint size, TMSBuffer*& tmsbuffer);
     static gint Create(guint size, guint8* dataptr, TMSBuffer*& tmsbuffer);
 
-    // Implementation of TMSBuffer interface begins
+    /*
+     * Returns buffer type.
+     *
+     * @param buftype buffer type
+     *
+     */
     virtual gint GetType(TMSBufferType& buftype);
+
     /**
-     Gets the timestamp on the Buffer so that the framework can
-     determine the time at which this buffer has to be rendered
-     by the output device sink.
-
-     @param ts
-     timestamp in microseconds
-
+     * Gets the timestamp on the Buffer so that the framework can
+     * determine the time at which this buffer has to be rendered
+     * by the output device sink.
+     *
+     * @param ts buffer timestamp in microseconds
+     *
      */
     virtual gint GetTimeStamp(guint64& ts);
 
     /**
-     Sets the timestamp on the Buffer so that the framework can
-     determine the time at which this buffer has to be rendered
-     by the output device sink.
-
-     @param ts
-     timestamp in milliseconds
-
+     * Sets the timestamp on the Buffer so that the framework can
+     * determine the time at which this buffer has to be rendered
+     * by the output device sink.
+     *
+     * @param ts timestamp in milliseconds
+     *
      */
     virtual gint SetTimeStamp(const guint64 ts);
 
     /**
-     Gets the size of data in the buffer specified by the client.
-
-     @param size
-     size of data in bytes
-
+     * Gets the size of data in the buffer specified by the client.
+     *
+     * @param size size of data in bytes
+     *
      */
     virtual gint GetDataSize(guint& size);
 
     /**
-     Sets the size of data in the buffer after the client
-     fill it.
-
-     @param size
-     size of data in bytes
-
+     * Sets the size of data in the buffer after the client fill it.
+     *
+     * @param size size of data in bytes
+     *
      */
     virtual gint SetDataSize(const guint size);
 
     /**
-     Gets the pointer to the memory location associated with this
-     buffer where the data is stored.
-
-     @param bufptr
-     ptr to the data stored in the buffer.
-
+     * Gets the pointer to the memory location associated with this
+     * buffer where the data is stored.
+     *
+     * @param bufptr ptr to the data stored in the buffer.
+     *
      */
     virtual gint GetDataPtr(guint8*& bufptr);
 

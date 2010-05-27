@@ -38,7 +38,7 @@ TMSPCMFormatBodyImpl::~TMSPCMFormatBodyImpl()
 gint TMSPCMFormatBodyImpl::Create(TMSPCMFormatBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSPCMFormatBodyImpl* self = new TMSPCMFormatBodyImpl;
+    TMSPCMFormatBodyImpl* self = new TMSPCMFormatBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();

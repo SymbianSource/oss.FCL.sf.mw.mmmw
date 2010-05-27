@@ -18,7 +18,7 @@
 
 
 // INCLUDE FILES
-#include	<AMRAudioRecordControllerResource.rsg>
+#include	<amraudiorecordcontrollerresource.rsg>
 #include	"AMRAudioRecordControllerResource.h"
 #include 	<data_caging_path_literals.hrh>
 

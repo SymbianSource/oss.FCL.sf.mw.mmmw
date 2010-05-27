@@ -53,7 +53,8 @@ public:
      *      Any user data passed to the function.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_ALREADY_EXIST if the obsrvr is already in the list.
      *
      */
@@ -98,7 +99,8 @@ public:
      *            will be played from the phone book (if available).
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Init(const TMSRingToneType type = TMS_RINGTONE_DEFAULT,
@@ -108,7 +110,8 @@ public:
      * Deinit ring tone player.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Deinit();
@@ -117,7 +120,8 @@ public:
      * Start ring tone playback.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Play();
@@ -126,7 +130,8 @@ public:
      * Stop ring tone playback.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Stop();
@@ -135,7 +140,8 @@ public:
      * Pause ring tone playback.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Pause();
@@ -144,7 +150,8 @@ public:
      * Mute ring tone playback.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint Mute();

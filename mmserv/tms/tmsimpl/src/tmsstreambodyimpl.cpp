@@ -77,7 +77,7 @@ gint TMSStreamBodyImpl::Create(TMSCallType callType, TMSStreamType stype,
         TMSCallProxy* proxy, TMSStream& parent, TMSStreamBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSStreamBodyImpl* self = new TMSStreamBodyImpl;
+    TMSStreamBodyImpl* self = new TMSStreamBodyImpl();
     if (self)
         {
         ret = self->PostConstruct(callType, stype, proxy, parent);

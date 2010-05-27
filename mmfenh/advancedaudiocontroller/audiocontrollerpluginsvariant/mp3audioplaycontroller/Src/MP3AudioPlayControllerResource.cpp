@@ -18,7 +18,7 @@
 
 
 // INCLUDE FILES
-#include	<MP3AudioPlayControllerResource.rsg>
+#include	<mp3audioplaycontrollerresource.rsg>
 #include	"MP3AudioPlayControllerResource.h"
 #include "DebugMacros.h"
 

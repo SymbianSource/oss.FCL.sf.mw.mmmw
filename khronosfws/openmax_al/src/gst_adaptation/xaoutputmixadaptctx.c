@@ -15,7 +15,7 @@
 *
 */
 
-#include <gst.h>
+#include <gst/gst.h>
 #include "xaoutputmixadaptctx.h"
 #include "xaadaptationgst.h"
 #include "xacapabilitiesmgr.h"

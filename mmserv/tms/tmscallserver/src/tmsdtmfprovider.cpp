@@ -56,184 +56,6 @@ TMSDTMFProvider::~TMSDTMFProvider()
     }
 
 // -----------------------------------------------------------------------------
-// Notifies observers about a DTMF event
-// -----------------------------------------------------------------------------
-//
-void TMSDTMFProvider::NotifyDTMFEvent(
-        const TMSDTMFObserver::TCCPDtmfEvent aEvent, const gint aError,
-        const TChar aTone)
-    {
-    TRACE_PRN_FN_ENT;
-    for (gint i = 0; i < iObservers.Count(); i++)
-        {
-        TMSDTMFObserver* obs = iObservers[i];
-        if (obs)
-            {
-            iObservers[i]->HandleDTMFEvent(aEvent, aError, aTone);
-            }
-        }
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// Cancel DTMF string sending
-// -----------------------------------------------------------------------------
-//
-TInt TMSDTMFProvider::CancelDtmfStringSending()
-    {
-    TRACE_PRN_FN_ENT;
-    gint ret(KErrAlreadyExists);
-    if (IsActive())
-        {
-        Cancel();
-        ret = KErrNone;
-        }
-    TRACE_PRN_FN_EXT;
-    return ret;
-    }
-
-// -----------------------------------------------------------------------------
-// Starts DTMF string sending
-// -----------------------------------------------------------------------------
-//
-TInt TMSDTMFProvider::StartDtmfTone(const TChar aTone)
-    {
-    TRACE_PRN_FN_ENT;
-    gint ret(KErrAlreadyExists);
-    if (!IsActive())
-        {
-        ret = iPhone.StartDTMFTone(aTone);
-        }
-    TRACE_PRN_FN_EXT;
-    return ret;
-    }
-
-// -----------------------------------------------------------------------------
-// Stop DTMF tone
-// -----------------------------------------------------------------------------
-//
-TInt TMSDTMFProvider::StopDtmfTone()
-    {
-    TRACE_PRN_FN_ENT;
-    gint ret(KErrAlreadyExists);
-    if (!IsActive())
-        {
-        ret = iPhone.StopDTMFTone();
-        }
-    TRACE_PRN_FN_EXT;
-    return ret;
-    }
-
-// -----------------------------------------------------------------------------
-// Send DTMF string
-// -----------------------------------------------------------------------------
-//
-TInt TMSDTMFProvider::SendDtmfToneString(const TDesC& aString)
-    {
-    TRACE_PRN_FN_ENT;
-    gint ret = KErrInUse;
-    if (!IsActive())
-        {
-        iStatus = KRequestPending;
-        iPhone.SendDTMFTones(iStatus, aString);
-        SetActive();
-        ret = KErrNone;
-        }
-    TRACE_PRN_FN_EXT;
-    return ret;
-    }
-
-// -----------------------------------------------------------------------------
-// Continue DTMF string sending
-// -----------------------------------------------------------------------------
-//
-TInt TMSDTMFProvider::ContinueDtmfStringSending(const TBool aContinue)
-    {
-    TRACE_PRN_FN_ENT;
-    gint status = iPhone.ContinueDTMFStringSending(aContinue);
-    TRACE_PRN_FN_EXT;
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// Adds observer.
-// -----------------------------------------------------------------------------
-//
-void TMSDTMFProvider::AddObserverL(const TMSDTMFObserver& aObserver)
-    {
-    TRACE_PRN_FN_ENT;
-    if (iObservers.Find(&aObserver) == KErrNotFound)
-        {
-        iObservers.Append(&aObserver);
-        }
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// Removes given observer.
-// -----------------------------------------------------------------------------
-//
-TInt TMSDTMFProvider::RemoveObserver(const TMSDTMFObserver& aObserver)
-    {
-    TRACE_PRN_FN_ENT;
-    gint ret = KErrNotFound;
-    gint found = iObservers.Find(&aObserver);
-    if (found != KErrNotFound)
-        {
-        iObservers.Remove(found);
-        ret = KErrNone;
-        }
-    TRACE_PRN_FN_EXT;
-    return ret;
-    }
-
-// -----------------------------------------------------------------------------
-// From CActive.
-// Handles request completion.
-// -----------------------------------------------------------------------------
-//
-void TMSDTMFProvider::RunL()
-    {
-    TRACE_PRN_FN_ENT;
-    if (iStatus == KErrNone)
-        {
-        TMSDTMFObserver::TCCPDtmfEvent event =
-                TMSDTMFObserver::ECCPDtmfStringSendingCompleted;
-        NotifyDTMFEvent(event, KErrNone, NULL);
-        }
-    else
-        {
-        gint error = iStatus.Int();
-        if (error != KErrCancel)
-            {
-            TMSDTMFObserver::TCCPDtmfEvent event =
-                    TMSDTMFObserver::ECCPDtmfStringSendingCompleted;
-            NotifyDTMFEvent(event, error, NULL);
-            }
-        else
-            {
-            // Cancel is not notified
-            }
-        }
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
-// From CActive
-// Canceling functionality.
-// -----------------------------------------------------------------------------
-//
-void TMSDTMFProvider::DoCancel()
-    {
-    TRACE_PRN_FN_ENT;
-    if (iStatus == KRequestPending)
-        {
-        iPhone.CancelAsyncRequest(EMobilePhoneSendDTMFTones);
-        }
-    TRACE_PRN_FN_EXT;
-    }
-
-// -----------------------------------------------------------------------------
 // Constructs the requester.
 // -----------------------------------------------------------------------------
 //
@@ -305,6 +127,178 @@ void TMSDTMFProvider::ConstructL()
     // iStopMonitor->StartMonitoring();
 
     CleanupStack::Pop(2);//telserver,phone
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// Notifies observers about a DTMF event
+// -----------------------------------------------------------------------------
+//
+void TMSDTMFProvider::NotifyDTMFEvent(
+        const TMSDTMFObserver::TCCPDtmfEvent aEvent, const gint aError,
+        const TChar aTone)
+    {
+    TRACE_PRN_FN_ENT;
+    for (gint i = 0; i < iObservers.Count(); i++)
+        {
+        TMSDTMFObserver* obs = iObservers[i];
+        if (obs)
+            {
+            iObservers[i]->HandleDTMFEvent(aEvent, aError, aTone);
+            }
+        }
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// Cancel DTMF string sending
+// -----------------------------------------------------------------------------
+//
+gint TMSDTMFProvider::CancelDtmfStringSending()
+    {
+    TRACE_PRN_FN_ENT;
+    gint ret(KErrAlreadyExists);
+    if (IsActive())
+        {
+        Cancel();
+        ret = KErrNone;
+        }
+    TRACE_PRN_FN_EXT;
+    return ret;
+    }
+
+// -----------------------------------------------------------------------------
+// Starts DTMF string sending
+// -----------------------------------------------------------------------------
+//
+gint TMSDTMFProvider::StartDtmfTone(const TChar aTone)
+    {
+    TRACE_PRN_FN_ENT;
+    gint ret(KErrAlreadyExists);
+    if (!IsActive())
+        {
+        ret = iPhone.StartDTMFTone(aTone);
+        }
+    TRACE_PRN_FN_EXT;
+    return ret;
+    }
+
+// -----------------------------------------------------------------------------
+// Stop DTMF tone
+// -----------------------------------------------------------------------------
+//
+gint TMSDTMFProvider::StopDtmfTone()
+    {
+    TRACE_PRN_FN_ENT;
+    gint ret(KErrAlreadyExists);
+    if (!IsActive())
+        {
+        ret = iPhone.StopDTMFTone();
+        }
+    TRACE_PRN_FN_EXT;
+    return ret;
+    }
+
+// -----------------------------------------------------------------------------
+// Send DTMF string
+// -----------------------------------------------------------------------------
+//
+gint TMSDTMFProvider::SendDtmfToneString(const TDesC& aString)
+    {
+    TRACE_PRN_FN_ENT;
+    gint ret = KErrInUse;
+    if (!IsActive())
+        {
+        iStatus = KRequestPending;
+        iPhone.SendDTMFTones(iStatus, aString);
+        SetActive();
+        ret = KErrNone;
+        }
+    TRACE_PRN_FN_EXT;
+    return ret;
+    }
+
+// -----------------------------------------------------------------------------
+// Continue DTMF string sending
+// -----------------------------------------------------------------------------
+//
+gint TMSDTMFProvider::ContinueDtmfStringSending(const gboolean aContinue)
+    {
+    TRACE_PRN_FN_ENT;
+    gint status = iPhone.ContinueDTMFStringSending(aContinue);
+    TRACE_PRN_FN_EXT;
+    return status;
+    }
+
+// -----------------------------------------------------------------------------
+// Adds observer.
+// -----------------------------------------------------------------------------
+//
+void TMSDTMFProvider::AddObserver(const TMSDTMFObserver& aObserver)
+    {
+    TRACE_PRN_FN_ENT;
+    if (iObservers.Find(&aObserver) == KErrNotFound)
+        {
+        iObservers.Append(&aObserver);
+        }
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// Removes given observer.
+// -----------------------------------------------------------------------------
+//
+gint TMSDTMFProvider::RemoveObserver(const TMSDTMFObserver& aObserver)
+    {
+    TRACE_PRN_FN_ENT;
+    gint ret = KErrNotFound;
+    gint found = iObservers.Find(&aObserver);
+    if (found != KErrNotFound)
+        {
+        iObservers.Remove(found);
+        ret = KErrNone;
+        }
+    TRACE_PRN_FN_EXT;
+    return ret;
+    }
+
+// -----------------------------------------------------------------------------
+// From CActive.
+// Handles request completion.
+// -----------------------------------------------------------------------------
+//
+void TMSDTMFProvider::RunL()
+    {
+    TRACE_PRN_FN_ENT;
+    if (iStatus == KErrNone)
+        {
+        TMSDTMFObserver::TCCPDtmfEvent event =
+                TMSDTMFObserver::ECCPDtmfStringSendingCompleted;
+        NotifyDTMFEvent(event, KErrNone, NULL);
+        }
+    else
+        {
+        gint error = iStatus.Int();
+        if (error != KErrCancel)
+            {
+            TMSDTMFObserver::TCCPDtmfEvent event =
+                    TMSDTMFObserver::ECCPDtmfStringSendingCompleted;
+            NotifyDTMFEvent(event, error, NULL);
+            }
+        // Cancel is not notified
+        }
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// From CActive
+// Canceling functionality.
+// -----------------------------------------------------------------------------
+//
+void TMSDTMFProvider::DoCancel()
+    {
+    TRACE_PRN_FN_ENT;
+    iPhone.CancelAsyncRequest(EMobilePhoneSendDTMFTones);
     TRACE_PRN_FN_EXT;
     }
 

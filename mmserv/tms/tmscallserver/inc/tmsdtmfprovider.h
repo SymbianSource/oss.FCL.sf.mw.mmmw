@@ -20,6 +20,7 @@
 
 #include <e32base.h>
 #include <etelmm.h>
+#include <glib.h>
 #include <rmmcustomapi.h>
 #include "tmsdtmfobserver.h"
 
@@ -59,14 +60,14 @@ public:
      * @param aTone Character
      */
     void NotifyDTMFEvent(const TMSDTMFObserver::TCCPDtmfEvent aEvent,
-            const TInt aError, const TChar aTone);
+            const gint aError, const TChar aTone);
 
     // from base class MCCPDTMFProvider
     /**
      * Cancels asynchronous DTMF string sending.
      * @return KErrNone if succesfull, otherwise another system wide error code
      */
-    TInt CancelDtmfStringSending();
+    gint CancelDtmfStringSending();
 
     /**
      * Starts the transmission of a single DTMF tone across a
@@ -74,13 +75,13 @@ public:
      * @param aTone Tone to be played.
      * @return KErrNone if succesfull, otherwise another system wide error code
      */
-    TInt StartDtmfTone(const TChar aTone);
+    gint StartDtmfTone(const TChar aTone);
 
     /**
      * Stops playing current DTMF tone.
      * @return KErrNone if succesfull, otherwise another system wide error code
      */
-    TInt StopDtmfTone();
+    gint StopDtmfTone();
 
     /**
      * Plays DTMF string.
@@ -88,7 +89,7 @@ public:
      * @return KErrNone if succesfull, otherwise another system wide error code
      * KErrArgument if the specified string contains illegal DTMF characters
      */
-    TInt SendDtmfToneString(const TDesC& aString);
+    gint SendDtmfToneString(const TDesC& aString);
 
     /**
      * Continue or cancel sending DTMF string which was stopped with 'w'
@@ -97,7 +98,7 @@ public:
      * EFalse if the rest of the DTMF string is to be discarded.
      * @return KErrNone if succesfull, otherwise another system wide error code
      */
-    TInt ContinueDtmfStringSending(const TBool aContinue);
+    gint ContinueDtmfStringSending(const gboolean aContinue);
 
     /**
      * Add an observer for DTMF related events.
@@ -106,7 +107,7 @@ public:
      * @param aObserver Observer
      * @leave system error if observer adding fails
      */
-    void AddObserverL(const TMSDTMFObserver& aObserver);
+    void AddObserver(const TMSDTMFObserver& aObserver);
 
     /**
      * Remove an observer.
@@ -114,7 +115,7 @@ public:
      * @return KErrNone if removed succesfully. KErrNotFound if observer was
      * not found. Any other system error depending on the error.
      */
-    TInt RemoveObserver(const TMSDTMFObserver& aObserver);
+    gint RemoveObserver(const TMSDTMFObserver& aObserver);
 
     // from base class CActive
 protected:

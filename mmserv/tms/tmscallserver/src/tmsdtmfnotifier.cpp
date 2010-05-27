@@ -44,9 +44,9 @@ TMSDtmfNotifier::TMSDtmfNotifier()
 void TMSDtmfNotifier::ConstructL()
     {
     TRACE_PRN_FN_ENT;
-    TInt err = RProperty::Define(EDtmfPs, RProperty::EByteArray,
+    gint err = RProperty::Define(EDtmfPs, RProperty::EByteArray,
             KTMSServerReadPolicy, KTMSServerWritePolicy);
-    TRACE_PRN_N1(_L("DtmfSetting::ConstructL err:%d"),err);
+    TRACE_PRN_N1(_L("DtmfSetting::ConstructL err:%d"), err);
 
     if (err != KErrAlreadyExists)
         {
@@ -73,25 +73,23 @@ TMSDtmfNotifier* TMSDtmfNotifier::NewL()
 TMSDtmfNotifier::~TMSDtmfNotifier()
     {
     TRACE_PRN_FN_ENT;
-    TInt err = RProperty::Delete(KTMSPropertyCategory, EDtmfPs);
-    TRACE_PRN_N1(_L("DtmfSetting::~TMSDtmfNotifier err:%d"),err);
+    gint err = RProperty::Delete(KTMSPropertyCategory, EDtmfPs);
+    TRACE_PRN_N1(_L("DtmfSetting::~TMSDtmfNotifier err:%d"), err);
     TRACE_PRN_FN_ENT;
     }
 
 // -----------------------------------------------------------------------------
-// TMSDtmfNotifier::SetVolume
+// TMSDtmfNotifier::SetDtmf
 // -----------------------------------------------------------------------------
 //
-void TMSDtmfNotifier::SetDtmf(TmsMsgBufPckg dtmfpckg, TBool aPublish)
+void TMSDtmfNotifier::SetDtmf(TmsMsgBufPckg dtmfpckg, gboolean publish)
     {
     TRACE_PRN_FN_ENT;
-    //TInt err(KErrNone);
-    if (aPublish)
+    if (publish)
         {
-        /*err =*/RProperty::Set(KTMSPropertyCategory, EDtmfPs, dtmfpckg);
+        gint err = RProperty::Set(KTMSPropertyCategory, EDtmfPs, dtmfpckg);
+        TRACE_PRN_N1(_L("DtmfSetting::SetDtmf err:%d"), err);
         }
-
-    //TRACE_PRN_N1(_L("DtmfSetting::SetDtmf err:%d"),err);
     TRACE_PRN_FN_EXT;
     }
 

@@ -19,6 +19,7 @@
 #define STSSERVER_H_
 
 #include <e32base.h>
+#include <systemtoneservice.h>
 
 class CSts;
 class CStsServerSession;
@@ -42,7 +43,17 @@ private:
     void ConstructL();
     virtual ~CStsServer();
 
+    CPolicyServer::TCustomResult SecurityCheckAlarm(
+            CSystemToneService::TAlarmType aAlarm, const RMessage2& aMsg,
+            TSecurityInfo& aMissing);
+
+    CPolicyServer::TCustomResult SecurityCheckTone(
+            CSystemToneService::TToneType aTone, const RMessage2& aMsg,
+            TSecurityInfo& aMissing);
+
     // inherited from CPolicyServer    
+    virtual CPolicyServer::TCustomResult CustomSecurityCheckL(
+            const RMessage2& aMsg, TInt& aAction, TSecurityInfo& aMissing);
     CSession2* NewSessionL(const TVersion& aVersion,
             const RMessage2& aMessage) const;
 

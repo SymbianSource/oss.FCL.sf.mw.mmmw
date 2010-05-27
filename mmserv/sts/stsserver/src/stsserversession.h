@@ -48,6 +48,8 @@ private:
     void DoPlayAlarmL(const RMessage2& aMessage);
     void DoStopAlarmL(const RMessage2& aMessage);
 
+    void CleanUpObservers();
+    
     // inherited from MPlayAlarmObserver
     virtual void PlayAlarmComplete(unsigned int aAlarmContext);
 

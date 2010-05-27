@@ -29,7 +29,7 @@ class CMMFDevSound;
 // CLASS DECLARATION
 
 /**
- *  plays DTMF tones using media server
+ *  Plays DTMF tones using media server
  */
 
 namespace TMS {
@@ -43,7 +43,7 @@ public:
      * Two-phased constructor.
      */
     static TMSAudioDtmfTonePlayer* NewL(TMSDTMFTonePlayerObserver& obsrvr,
-            guint aAudioPreference, guint aAudioPriority);
+            guint audioPreference, guint audioPriority);
 
     /**
      * Destructor.
@@ -57,7 +57,7 @@ public:
      * @param aVolume volume value or KDtmfSilent.
      * @return None.
      */
-    void SetVolume(gint aVolume);
+    void SetVolume(gint volume);
 
     /**
      * Starts playing given dtmf tone infinitely.
@@ -88,31 +88,31 @@ public:
     /**
      * See MDevSoundObserver
      */
-    void BufferToBeFilled(CMMFBuffer* aBuffer);
+    void BufferToBeFilled(CMMFBuffer* /*aBuffer*/) {}
 
     /**
      * See MDevSoundObserver
      */
-    void PlayError(TInt aError);
+    void PlayError(TInt /*aError*/) {}
 
     /**
      * See MDevSoundObserver
      */
-    void BufferToBeEmptied(CMMFBuffer* aBuffer);
+    void BufferToBeEmptied(CMMFBuffer* /*aBuffer*/) {}
 
     /**
      * See MDevSoundObserver
      */
-    void RecordError(TInt aError);
+    void RecordError(TInt /*aError*/) {}
 
     /**
      * See MDevSoundObserver
      */
-    void ConvertError(TInt aError);
+    void ConvertError(TInt /*aError*/) {}
     /**
      * See MDevSoundObserver
      */
-    void DeviceMessage(TUid aMessageType, const TDesC8& aMsg);
+    void DeviceMessage(TUid /*aMessageType*/, const TDesC8& /*aMsg*/) {}
 
 protected:
 
@@ -120,7 +120,7 @@ protected:
      * C++ default constructor.
      */
     TMSAudioDtmfTonePlayer(TMSDTMFTonePlayerObserver& obsrvr,
-            guint aAudioPreference, guint aAudioPriority);
+            guint audioPreference, guint audioPriority);
 
     void ConstructL();
 
@@ -129,7 +129,7 @@ protected:
      * @param aTone dtmf tone.
      * @return None.
      */
-    void Normalize(TChar& aTone);
+    void Normalize(TChar& tone);
 
 private:
     //new functions
@@ -139,7 +139,7 @@ private:
      * CMMFDevSound. The CMMFDevSound uses valuess that can from 0 to the
      * value returned by a call to CMMFDevSound::MaxVolume().
      */
-    gint ConvertVolume(gint aVolume);
+    gint ConvertVolumeLevel(gint volume);
 
 protected:
     // Data
@@ -153,7 +153,6 @@ protected:
     TMSDTMFTonePlayerObserver& iObserver;
     guint iPref;
     guint iPrior;
-
     };
 
 } //namespace TMS

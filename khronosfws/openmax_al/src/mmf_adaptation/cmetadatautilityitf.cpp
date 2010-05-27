@@ -392,7 +392,7 @@ char* CS60MetadataUtilityItf::KeyMapping(TMetaDataFieldId fldID)
 		}
 	} 
 
-	return NULL;
+	return "UnSupported";
 }
 
 TInt CS60MetadataUtilityItf::ValueEncoding(TMetaDataFieldId fldID)
@@ -766,7 +766,7 @@ char* CHXMetadataUtilityItf::KeyMapping(HXMetaDataKeys::EHXMetaDataId fldID)
 		}
 	} 
 
-	return NULL;
+	return "UnSupported";
 }
 
 TInt CHXMetadataUtilityItf::ValueEncoding(HXMetaDataKeys::EHXMetaDataId fldID)

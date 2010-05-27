@@ -20,6 +20,7 @@
 #define RSTSSESSION_H_
 
 #include <e32msgqueue.h>
+#include <map>
 #include <systemtoneservice.h>
 
 #include "stsclientservercommon.h"
@@ -32,24 +33,37 @@ public:
 
     void Close();
 
-    TInt SendPlayTone(CSystemToneService::TToneType aTone);
+    void SendPlayTone(CSystemToneService::TToneType aTone);
 
-    TInt SendPlayAlarm(CSystemToneService::TAlarmType aAlarm,
+    void SendPlayAlarm(CSystemToneService::TAlarmType aAlarm,
             unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 
-    TInt SendStopAlarm(unsigned int aAlarmContext);
+    void SendStopAlarm(unsigned int aAlarmContext);
 
 private:
 
     static TInt CallBackThreadMain(TAny* aSession);
     void RunThreadL();
-    
-    TInt StartMsgQueue();
+
+    TInt CreateServerSession();
+    void HandleMessage(TStsCallBack& aMessage);
     TInt StartServer();
     TInt StartThread();
+    void CleanUpObservers();
+    void SignalObservers();
 
     RThread iThread;
     RMsgQueue<TStsCallBack> iMsgQueue;
+    TThreadId iServerThreadId;
+
+    enum TState
+        {
+        EInitializing, ERunning, EStopping
+        };
+    TState iState;
+    typedef std::map<unsigned int, MStsPlayAlarmObserver*> TObserverMap;
+    TObserverMap iObserverMap;
+    RMutex iObserverMutex;
     };
 
 #endif // RSTSSESSION_H_

@@ -55,7 +55,8 @@ public:
      *      Sets VAD feature on or off.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *      TMS_RESULT_FEATURE_NOT_SUPPORTED if this method is not implemented
      *      by the adaptation.
      *      TMS_RESULT_DOES_NOT_EXIST if the custom interface handle does
@@ -73,7 +74,8 @@ public:
      *      Current VAD setting of the encoder.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetVADMode(gboolean& vad);

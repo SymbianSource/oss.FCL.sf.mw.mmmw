@@ -673,10 +673,20 @@ void CMetaDataParserID3v24::GetDurationL(
 	TInt length = info.Length();
 	if ( length )
 		{
-		TReal sec = (TReal) atoi((char*)info.Ptr()) / 1000;
-		TBuf16<10> info1;
-		info1.Num(sec, TRealFormat (9, 3));
-		iContainer->AppendL( EMetaDataDuration, info1 );
+		HBufC* data16 = HBufC::NewLC( length );
+		TPtr unicode( data16->Des() );
+		if ( ConvertToUnicodeL(encoding, info, unicode) == KErrNone )
+			{
+			TLex16 lex(unicode);
+			TReal milliSec = 0;
+			TBuf16<10> info1;
+			
+			lex.Val(milliSec);				
+			info1.Num(milliSec/1000, TRealFormat (9, 3));
+			iContainer->AppendL( EMetaDataDuration, info1 );
+			}
+		CleanupStack::PopAndDestroy();  // data16
+		
 		}
 
 	CleanupStack::PopAndDestroy();  // frame

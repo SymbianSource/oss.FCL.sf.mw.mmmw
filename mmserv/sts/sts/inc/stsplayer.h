@@ -18,7 +18,7 @@
 #ifndef STSPLAYER_H_
 #define STSPLAYER_H_
 
-#include <MdaAudioSamplePlayer.h>
+#include <mdaaudiosampleplayer.h>
 #include <systemtoneservice.h>
 
 class MStsPlayerObserver

@@ -17,8 +17,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <gst.h>
-#include <photography.h>
+#include <gst/gst.h>
+#include <gst/interfaces/photography.h>
 #include "xaglobals.h"
 #include "xastaticcameracapsadaptation.h"
 #include "xaadptbasectx.h"

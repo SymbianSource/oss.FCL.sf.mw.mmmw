@@ -29,6 +29,9 @@ namespace TMS {
 class TMSAudioToneUtility
     {
 public:
+
+    virtual ~TMSAudioToneUtility() {}
+
     /**
      * See CMdaAudioToneUtility::PrepareToPlayDesSequence.
      */
@@ -72,7 +75,7 @@ public:
             const TTimeIntervalMicroSeconds& aRampDuration) = 0;
 
     /**
-     * See CMdaAudioToneUtility::SetVolumeRamp.
+     * See CMdaAudioToneUtility::Play.
      */
     virtual void Play() = 0;
 

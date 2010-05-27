@@ -24,10 +24,10 @@
 #include <unistd.h>
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
-#include <gst.h>
-#include <gstappsrc.h>
-#include <gstappsink.h>
-#include <gstappbuffer.h>
+#include <gst/gst.h>
+#include <gst/app/gstappsrc.h>
+#include <gst/app/gstappsink.h>
+#include <gst/app/gstappbuffer.h>
 #include "xaplatform.h"
 #include "xaadptbasectx.h"
 #include <stdlib.h>

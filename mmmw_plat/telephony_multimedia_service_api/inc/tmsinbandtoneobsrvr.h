@@ -20,7 +20,7 @@
 #define TMS_INBAND_OBSRVR_H
 
 // Include files
-#include <glib.h>
+#include <tms.h>
 
 namespace TMS {
 

@@ -35,18 +35,16 @@ TMSRingToneBodyImpl::~TMSRingToneBodyImpl()
     if (iProxy)
         {
         iProxy->Close();
-        delete iProxy;
-        iProxy = NULL;
         }
+    delete iProxy;
     iObserver = NULL;
     iParent = NULL;
-    iUserData = NULL;
     }
 
 gint TMSRingToneBodyImpl::Create(TMSRingToneBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSRingToneBodyImpl* self = new TMSRingToneBodyImpl;
+    TMSRingToneBodyImpl* self = new TMSRingToneBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();
@@ -64,7 +62,7 @@ gint TMSRingToneBodyImpl::Create(TMSRingToneBody*& bodyimpl,
         RWindow& /*window*/, gint /*scrid*/)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSRingToneBodyImpl* self = new TMSRingToneBodyImpl;
+    TMSRingToneBodyImpl* self = new TMSRingToneBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();
@@ -82,7 +80,7 @@ gint TMSRingToneBodyImpl::PostConstruct()
     {
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
-    iProxy = new TMSProxy;
+    iProxy = new TMSProxy();
 
     if (!iProxy)
         {

@@ -15,7 +15,7 @@
 *
 */
 
-#include <gst.h>
+#include <gst/gst.h>
 #include "xavibraadaptctx.h"
 #include "xaadaptationgst.h"
 

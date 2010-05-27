@@ -111,7 +111,8 @@ public:
      *
      * @return
      *      TMS_RESULT_INVALID_ARGUMENT if set to TMS_AUDIO_OUTPUT_NONE.
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint SetOutput(const TMSAudioOutput output);
@@ -126,7 +127,8 @@ public:
      *      Current audio output device.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetOutput(TMSAudioOutput& output);
@@ -141,7 +143,8 @@ public:
      *      Previous audio output device.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetPreviousOutput(TMSAudioOutput& output);
@@ -157,7 +160,8 @@ public:
      *      audio output devices (TMSAudioOutput-type).
      *
      * @return
-     *      TMS_RESULT_SUCCESS if the operation was successful.
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
      *
      */
     IMPORT_C gint GetAvailableOutputs(OutputVector& outputs);

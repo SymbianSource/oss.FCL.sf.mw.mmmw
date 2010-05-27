@@ -20,7 +20,7 @@
 
 // INCLUDE FILES
 #include	"AMRAudioRecordControllerEncoder.h"
-#include 	<MmfPanicCodes.h>
+#include 	<mmfpaniccodes.h>
 #include	<SpeechEncoderConfig.h> // Custom Interface for Speech Encoder Configuration
 
 // AMR Bit Rate constant

@@ -13,11 +13,7 @@
  *
  * Description:
  * This file defines the API for System Tone Service which is
- * implemented in the systemtoneservice.dll.  This API uses
- * the private implementation pattern to help improve the BC
- * of the API by decoupling the implementation from the
- * interface. 
- *
+ * implemented in the systemtoneservice.dll.
  */
 
 #ifndef SYSTEMTONESERVICE_H_
@@ -32,18 +28,37 @@ NONSHARABLE_CLASS( CStsImplementation);
 //Observer declaration
 /**
  *  Play Alarm Observer API definition.
- *  This defines the interface that must be implemented by Play Alarm
- *  Observers.
- *
+ *  This defines the interface that must be implemented by clients using
+ *  the PlayAlarm method.  This API allows the clients to observe  when
+ *  the Play Alarm completes.  The same observer can be used for different
+ *  PlayAlarm calls, even ones that are playing at the same time.
  */
 class MStsPlayAlarmObserver
     {
 public:
     /**
      * Informs the observer when the play alarm as indicated by the alarm
-     * context is complete.  This method will not be called when this alarm
-     * associated with the alarm context has been stopped with the StopAlarm
-     * method.
+     * context is complete.  This method is guaranteed to be called unless
+     * the alarm context has been stopped with the StopAlarm method, in
+     * which case the callback is guaranteed not to be called.
+     * 
+     * Implementations of this interface cannot make any assumptions about
+     * which thread this method is called on, it may or may not be the same
+     * thread from which the PlayAlarm was called.  It is up to the clients
+     * to provide what ever mutual exclusion protection that is needed for
+     * data accessed in this method.
+     * 
+     * In some cases and especially on SMP systems there is a chance that
+     * this method may be called before the PlayAlarm method returns.  It is
+     * up to the client to correctly handle this potential race condition.
+     * 
+     * Clients cannot assume properties about the thread that the callback
+     * is running on, for instance the thread may or may not have Active
+     * Scheduler.
+     * 
+     * It is strongly recommended that clients do as little as possible
+     * processing in this method and to complete this method as quickly as
+     * possible.
      *
      * @param aAlarmContext The context of the alarm that has completed.
      */
@@ -52,9 +67,15 @@ public:
 
 // Class declaration
 /**
- *  System Tone Service API definition.
- *  This is the native C++ API for applications and middleware components
- *  to play standard system tones.
+ * System Tone Service API definition.
+ * This is the native C++ API for applications and middleware components
+ * to play standard system tones.  This API uses the Private Implementation
+ * (PIMPL) pattern to help improve the BC of the API by decoupling the
+ * implementation from the interface.
+ * 
+ * The methods of this class are guaranteed to be thread safe and may be
+ * used from any thread within the same process.  An instance of this class
+ * may not be shared between processes, even if the processes share memory.
  *
  *  @code
  *   CSystemToneService* sts = CSystemToneService::Create();
@@ -78,15 +99,30 @@ public:
 NONSHARABLE_CLASS(CSystemToneService) : public CBase
     {
 public:
-    //** Constructor - returns NULL if construction fails */
+    /**
+     * Constructor
+     * Creates and initializes an instance of the System Tone Service.
+     * 
+     * @returns Either a pointer to the new CSystemToneService instance
+     *          or NULL if construction fails.
+     */
     IMPORT_C static CSystemToneService* Create();
 
-    //** Destructor */
+    /** Destructor
+     * Deinitializes and deletes the specified System Tone Service instance.  This method
+     * should not be called if an existing PlayAlarm has not yet completed or has not been
+     * stopped, otherwise whether or not the outstanding alarms actually plays or stops is
+     * not guaranteed.
+     * 
+     * @param[in] aSystemToneService A pointer to the CSystemToneService instance
+     *                           to be deleted.  This pointer will be invalid
+     *                           after this method completes.
+     */
     IMPORT_C static void Delete(CSystemToneService* aSystemToneService);
 
 public:
     // Data types
-    /** The type of System Tones that are supported by this API. */
+    /** The type of system tones that are supported by this API. */
     enum TToneType
         {
         // Capture Tones
@@ -136,7 +172,7 @@ public:
         EVoiceAbort = 0x0703
         };
 
-    /** The type of System Alarms that are supported by this API. */
+    /** The type of system alarms that are supported by this API. */
     enum TAlarmType
         {
         // Calendar Alarms
@@ -151,31 +187,40 @@ public:
         };
 
     /**
-     * Plays the specified tone.  If the tone type is not recognized a default tone will
-     * be played.  This method is for fixed duration tones that are expected 
-     * to play to completion and do not need to be stopped by the client.
+     * Plays the specified system tone.  If the tone type is not recognized, a default
+     * tone will be played.  Tones are short, fixed duration that always play to
+     * completion and cannot be stopped by the client.
      *
-     * @param aTone An input parameter that indicates the type of tone to play.
+     * @param[in] aTone The system tone type to play.
      */
     IMPORT_C void PlayTone(TToneType aTone);
 
     /**
-     * Plays the specified alarm.  If the alarm type is not recognized a default alarm will
-     * be played.  Alarms are tones that are not fixed duration such as a calendar alarm
-     * that can be manually stopped by the client, or the client needs to know when the alarm
-     * has completed playing.
+     * Plays the specified system alarm.  If the alarm type is not recognized, a default
+     * alarm will be played.  Alarms are tones that are long or not fixed duration such as a
+     * calendar alarm that can be manually stopped by the client.  The client is notified
+     * when an alarm playback completes if it is not manually stopped by the client.
      *
-     * @param aAlarn An input parameter that indicates the type of alarm to play.
-     * @param aAlarmContext An output parameter that provides back a unique context to
-     *  the client for this alarm that can be used for stopping the alarm.
+     * @param[in]  aAlarm        The system alarm type to play.
+     * @param[out] aAlarmContext A guaranteed globablly unique context representing this
+     *                           specific alarm playback that can be used for stopping the
+     *                           alarm or used to indicate to the observer which alarm playback
+     *                           has completed.
+     * @param[in] aObserver      A reference to the observer that is to be notified if this alarm
+     *                           playback completes before StopAlarm is called.  The same observer
+     *                           can be used for multiple PlayAlarms, even for ones playing at the
+     *                           same time.  It is the responsibility of the client to manage the
+     *                           life cycle of the observer.  However the observer must exist until
+     *                           all alarms the observer is associated with are either completed
+     *                           or stopped.
      */
     IMPORT_C void PlayAlarm(TAlarmType aAlarm, unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 
     /**
-     * Stops the specified alarm playback.  If the playback has already completed or the
+     * Stops the specified system alarm playback.  If the playback has already completed or the
      * context is not valid, this method does nothing.
      *
-     * @param aAlarmContext The context to the alarm that is to be stopped.
+     * @param[in] aAlarmContext The context to the specific alarm that is to be stopped.
      */
     IMPORT_C void StopAlarm(unsigned int aAlarmContext);
 

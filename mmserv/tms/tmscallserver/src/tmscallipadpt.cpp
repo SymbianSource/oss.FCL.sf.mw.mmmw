@@ -105,7 +105,6 @@ gint TMSCallIPAdpt::PostConstruct()
     iNextStreamId = 1;
     iUplinkInitialized = FALSE;
     iDnlinkInitialized = FALSE;
-
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -163,14 +162,13 @@ gint TMSCallIPAdpt::CreateStream(TMSCallType /*callType*/,
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::InitStreamL(TMSCallType /*callType*/,
-        TMSStreamType strmType, gint strmId, TMSFormatType frmtType,
-        const RMessage2& aMessage)
+gint TMSCallIPAdpt::InitStream(TMSCallType /*callType*/, TMSStreamType strmType,
+        gint strmId, TMSFormatType frmtType, const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
 
-    TUint32 fourCC = TOFOURCC(frmtType);
+    guint32 fourCC = TOFOURCC(frmtType);
     if (fourCC == NULL)
         {
         return TMS_RESULT_INVALID_ARGUMENT;
@@ -184,17 +182,11 @@ gint TMSCallIPAdpt::InitStreamL(TMSCallType /*callType*/,
             if (strmId == iUplinkStreamId)
                 {
                 SetFormat(iUplinkStreamId, fourCC);
-                status = OpenUplinkL(aMessage);
-
-                iDTMFUplinkPlayer = TMSAudioDtmfTonePlayer::NewL(*this,
-                        KAudioPrefUnknownVoipAudioUplink,
-                        KAudioPriorityUnknownVoipAudioUplink);
-
-                if (!iDTMFNotifier)
+                status = OpenUplinkL(message);
+                if (status == TMS_RESULT_SUCCESS)
                     {
-                    iDTMFNotifier = TMSDtmfNotifier::NewL();
+                    status = InitDTMF(TMS_STREAM_UPLINK);
                     }
-
                 NotifyClient(iUplinkStreamId, ECmdUplinkInitComplete, status);
                 }
             break;
@@ -205,17 +197,11 @@ gint TMSCallIPAdpt::InitStreamL(TMSCallType /*callType*/,
             if (strmId == iDnlinkStreamId)
                 {
                 SetFormat(iDnlinkStreamId, fourCC);
-                status = OpenDownlinkL(aMessage);
-
-                iDTMFDnlinkPlayer = TMSAudioDtmfTonePlayer::NewL(*this,
-                        KAudioPrefUnknownVoipAudioDownlink,
-                        KAudioPriorityUnknownVoipAudioDownlink);
-
-                if (!iDTMFNotifier)
+                status = OpenDownlinkL(message);
+                if (status == TMS_RESULT_SUCCESS)
                     {
-                    iDTMFNotifier = TMSDtmfNotifier::NewL();
+                    status = InitDTMF(TMS_STREAM_DOWNLINK);
                     }
-
                 NotifyClient(iDnlinkStreamId, ECmdDownlinkInitComplete, status);
                 }
             break;
@@ -1013,14 +999,21 @@ gint TMSCallIPAdpt::SetPlc(const TMSFormatType fmttype, const gboolean plc)
 // Method for player initialization.
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& aMessage)
+gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
 
     // Clients must have MultimediaDD capability to use this priority/pref.
     // TODO: Also, TMS will monitor for emergency call and if detected it
     //       will deny access to audio resources.
+
+    /* Clarify with adaptation team which prio/pref values should be used.
+     * 1) KAudioPrefUnknownVoipAudioDownlink      -3rd party VoIP?
+     *    KAudioPriorityUnknownVoipAudioDownlink  -3rd party VoIP?
+     * 2) KAudioPrefVoipAudioDownlink             -NOK native VoIP?
+     *    KAudioPriorityVoipAudioDownlink         -NOK native VoIP?
+     */
     iPriority.iPref = KAudioPrefVoipAudioDownlink;
     iPriority.iPriority = KAudioPriorityVoipAudioDownlink;
 
@@ -1035,7 +1028,7 @@ gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& aMessage)
         if (iMsgQueueDn.Handle() <= 0)
             {
             // Second argument in TMSCallProxy::InitStream
-            status = iMsgQueueDn.Open(aMessage, 1);
+            status = iMsgQueueDn.Open(message, 1);
             }
 
         if (status == TMS_RESULT_SUCCESS)
@@ -1044,7 +1037,6 @@ gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& aMessage)
             iIPDownlink->SetMsgQueue(iMsgQueueDn);
             }
         }
-
     TRACE_PRN_IF_ERR(status);
     TRACE_PRN_FN_EXT;
     return status;
@@ -1055,12 +1047,19 @@ gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& aMessage)
 // Method for recorder initialization.
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& aMessage)
+gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
 
-    // Ensure clients have MultimediaDD capability to use this priority/pref
+    // Clients must have MultimediaDD capability to use this priority/pref
+
+    /* Clarify with adaptation team which prio/pref values should be used.
+     * 1) KAudioPrefUnknownVoipAudioUplink      -3rd party VoIP?
+     *    KAudioPriorityUnknownVoipAudioUplink  -3rd party VoIP?
+     * 2) KAudioPrefVoipAudioUplink             -NOK native VoIP?
+     *    KAudioPriorityVoipAudioUplink         -NOK native VoIP?
+     */
     iPriority.iPref = KAudioPrefVoipAudioUplink;
     iPriority.iPriority = KAudioPriorityVoipAudioUplink;
 
@@ -1075,7 +1074,7 @@ gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& aMessage)
         if (iMsgQueueUp.Handle() <= 0)
             {
             // Second argument in TMSCallProxy::InitStream
-            status = iMsgQueueUp.Open(aMessage, 1);
+            status = iMsgQueueUp.Open(message, 1);
             }
 
         if (status == TMS_RESULT_SUCCESS)
@@ -1084,7 +1083,6 @@ gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& aMessage)
             iIPUplink->SetMsgQueue(iMsgQueueUp);
             }
         }
-
     TRACE_PRN_IF_ERR(status);
     TRACE_PRN_FN_EXT;
     return status;
@@ -1095,7 +1093,7 @@ gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& aMessage)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallIPAdpt::SetFormat(const gint strmId, const TUint32 aFormat)
+void TMSCallIPAdpt::SetFormat(const gint strmId, const guint32 aFormat)
     {
     if (strmId == iUplinkStreamId)
         {
@@ -1112,7 +1110,7 @@ void TMSCallIPAdpt::SetFormat(const gint strmId, const TUint32 aFormat)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallIPAdpt::BufferFilledL(TUint dataSize)
+void TMSCallIPAdpt::BufferFilledL(guint dataSize)
     {
     if (iIPDownlink)
         {
@@ -1139,7 +1137,7 @@ void TMSCallIPAdpt::BufferEmptiedL()
 // -----------------------------------------------------------------------------
 //
 gint TMSCallIPAdpt::GetDataXferChunkHndl(const TMSStreamType strmType,
-        const TUint32 key, RChunk& chunk)
+        const guint32 key, RChunk& chunk)
     {
     TRACE_PRN_FN_ENT;
 
@@ -1405,6 +1403,60 @@ gint TMSCallIPAdpt::GetAvailableOutputsL(gint& /*count*/,
     }
 
 // -----------------------------------------------------------------------------
+// TMSCallIPAdpt::InitDTMF
+//
+// -----------------------------------------------------------------------------
+//
+gint TMSCallIPAdpt::InitDTMF(TMSStreamType strmtype)
+    {
+    TRACE_PRN_FN_ENT;
+    gint status(TMS_RESULT_STREAM_TYPE_NOT_SUPPORTED);
+
+    if (strmtype == TMS_STREAM_DOWNLINK)
+        {
+        delete iDTMFDnlinkPlayer;
+        iDTMFDnlinkPlayer = NULL;
+
+        /* Clarify with adaptation team which prio/pref values should be used.
+         * 1) KAudioDTMFString                       -local play, no mixing
+         *    KAudioPriorityDTMFString               -local play, no mixing
+         * 2) KAudioPrefUnknownVoipAudioDownlink     -3rd party VoIP?
+         *    KAudioPriorityUnknownVoipAudioDownlink -3rd party VoIP?
+         * 3) KAudioPrefVoipAudioDownlink            -NOK native VoIP?
+         *    KAudioPriorityVoipAudioDownlink        -NOK native VoIP?
+         */
+        TRAP(status, iDTMFDnlinkPlayer = TMSAudioDtmfTonePlayer::NewL(*this,
+                KAudioPrefVoipAudioDownlink, KAudioPriorityVoipAudioDownlink));
+         }
+    else if (strmtype == TMS_STREAM_UPLINK)
+        {
+        delete iDTMFUplinkPlayer;
+        iDTMFUplinkPlayer = NULL;
+
+        /* Clarify with adaptation team which prio/pref values should be used.
+         * Currently the audio policy blocks DTMF mixing with the UPL stream.
+         * 1) KAudioPrefUnknownVoipAudioUplink      -3rd party VoIP?
+         *    KAudioPriorityUnknownVoipAudioUplink  -3rd party VoIP?
+         *    KAudioPriorityUnknownVoipAudioUplinkNonSignal -???
+         * 2) KAudioPrefVoipAudioUplink             -NOK native VoIP?
+         *    KAudioPrefUnknownVoipAudioUplinkNonSignal -???
+         *    KAudioPrefVoipAudioUplinkNonSignal        -???
+         *    KAudioPriorityVoipAudioUplink         -NOK native VoIP?
+         */
+        TRAP(status, iDTMFUplinkPlayer = TMSAudioDtmfTonePlayer::NewL(*this,
+                KAudioPrefVoipAudioUplink, KAudioPriorityVoipAudioUplink));
+        }
+
+    if (!iDTMFNotifier && status == TMS_RESULT_SUCCESS)
+         {
+         TRAP(status, iDTMFNotifier = TMSDtmfNotifier::NewL());
+         }
+
+    TRACE_PRN_FN_EXT;
+    return status;
+    }
+
+// -----------------------------------------------------------------------------
 // TMSCallIPAdpt::StartDTMF
 //
 // -----------------------------------------------------------------------------
@@ -1412,35 +1464,44 @@ gint TMSCallIPAdpt::GetAvailableOutputsL(gint& /*count*/,
 gint TMSCallIPAdpt::StartDTMF(TMSStreamType strmtype, TDes& dtmfstring)
     {
     TRACE_PRN_FN_ENT;
+    gint status(TMS_RESULT_STREAM_TYPE_NOT_SUPPORTED);
     TmsMsgBufPckg dtmfpckg;
+    dtmfpckg().iStatus = status;
+    dtmfpckg().iRequest = ECmdDTMFTonePlayFinished;
+
     if (strmtype == TMS_STREAM_DOWNLINK)
         {
-        if (iDTMFDnlinkPlayer /*&& iDTMFDnlinkStatus*/)
+        status = TMS_RESULT_UNINITIALIZED_OBJECT;
+        if (iDTMFDnlinkPlayer)
             {
             iDTMFDnlinkPlayer->PlayDtmfTone(dtmfstring);
-            dtmfpckg().iStatus = TMS_RESULT_SUCCESS;
-            //TMS_EVENT_DTMF_TONE_STARTED
-            dtmfpckg().iRequest = ECmdDTMFOpenDnlinkComplete;
+            status = TMS_RESULT_SUCCESS;
             }
+        dtmfpckg().iStatus = status;
+        dtmfpckg().iRequest = ECmdDTMFToneDnlPlayStarted;
         }
     else if (strmtype == TMS_STREAM_UPLINK)
         {
-        if (iDTMFUplinkPlayer /*&& iDTMFUplinkStatus*/)
+        status = TMS_RESULT_UNINITIALIZED_OBJECT;
+        if (iDTMFUplinkPlayer)
             {
             iDTMFUplinkPlayer->PlayDtmfTone(dtmfstring);
-            dtmfpckg().iStatus = TMS_RESULT_SUCCESS;
-            //TMS_EVENT_DTMF_TONE_STARTED
-            dtmfpckg().iRequest = ECmdDTMFOpenUplinkComplete;
+            status = TMS_RESULT_SUCCESS;
             }
+        dtmfpckg().iStatus = status;
+        dtmfpckg().iRequest = ECmdDTMFToneUplPlayStarted;
         }
 
     if (iDTMFNotifier)
         {
-        iDTMFNotifier->SetDtmf(dtmfpckg, TRUE);
+        iDTMFNotifier->SetDtmf(dtmfpckg);
         }
+
+    TRACE_PRN_IF_ERR(status);
     TRACE_PRN_FN_EXT;
-    return TMS_RESULT_SUCCESS;
+    return status;
     }
+
 // -----------------------------------------------------------------------------
 // TMSCallIPAdpt::StopDTMF
 //
@@ -1454,7 +1515,7 @@ gint TMSCallIPAdpt::StopDTMF(TMSStreamType streamtype)
         {
         iDTMFDnlinkPlayer->Cancel();
         }
-    else
+    else if (streamtype == TMS_STREAM_UPLINK)
         {
         iDTMFUplinkPlayer->Cancel();
         }
@@ -1468,10 +1529,8 @@ gint TMSCallIPAdpt::StopDTMF(TMSStreamType streamtype)
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::ContinueDTMF(TBool /*continuesending*/)
+gint TMSCallIPAdpt::ContinueDTMF(gboolean /*continuesending*/)
     {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
     return TMS_RESULT_FEATURE_NOT_SUPPORTED;
     }
 
@@ -1481,10 +1540,10 @@ gint TMSCallIPAdpt::ContinueDTMF(TBool /*continuesending*/)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallIPAdpt::DTMFInitCompleted(TInt /*error*/)
+void TMSCallIPAdpt::DTMFInitCompleted(gint /*error*/)
     {
-    //DTMF init status
     TRACE_PRN_FN_ENT;
+    //TRACE_PRN_IF_ERR(error);
     TRACE_PRN_FN_EXT;
     }
 
@@ -1493,22 +1552,22 @@ void TMSCallIPAdpt::DTMFInitCompleted(TInt /*error*/)
 //
 // -----------------------------------------------------------------------------
 //
-void TMSCallIPAdpt::DTMFToneFinished(TInt error)
+void TMSCallIPAdpt::DTMFToneFinished(gint error)
     {
     TRACE_PRN_FN_ENT;
+    TRACE_PRN_IF_ERR(error);
     TmsMsgBufPckg dtmfpckg;
 
-     if(error == KErrUnderflow || error == KErrInUse)
+    // Ignore KErrUnderflow - end of DTMF playback.
+    if(error == KErrUnderflow /*|| error == KErrInUse*/)
          {
          error = TMS_RESULT_SUCCESS;
          }
-
     dtmfpckg().iStatus = error;
-    //TMS_EVENT_DTMF_TONE_STOPPED
     dtmfpckg().iRequest = ECmdDTMFTonePlayFinished;
     if (iDTMFNotifier)
         {
-        iDTMFNotifier->SetDtmf(dtmfpckg, TRUE);
+        iDTMFNotifier->SetDtmf(dtmfpckg);
         }
     TRACE_PRN_FN_EXT;
     }
@@ -1517,8 +1576,8 @@ void TMSCallIPAdpt::DTMFToneFinished(TInt error)
 // TMSCallIPAdpt::NotifyClient
 // -----------------------------------------------------------------------------
 //
-void TMSCallIPAdpt::NotifyClient(const gint strmId, const TInt aCommand,
-        const TInt aStatus, const TInt64 /*aInt64*/)
+void TMSCallIPAdpt::NotifyClient(const gint strmId, const gint aCommand,
+        const gint aStatus, const gint64 /*aInt64*/)
     {
     iMsgBuffer.iRequest = aCommand;
     iMsgBuffer.iStatus = aStatus;

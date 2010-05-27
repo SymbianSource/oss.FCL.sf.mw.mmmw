@@ -55,7 +55,8 @@ TInt CSystemToneServiceStif::RunMethodL(CStifItemParser& aItem )
 
 void CSystemToneServiceStif::Delete()
     {
-
+				iSts = NULL;
+				iCallbackController = NULL;
     }
 
 
@@ -213,15 +214,30 @@ TInt  CSystemToneServiceStif::StopAlarm(CStifItemParser& aItem  )
     
     return error;
 }
+
+
+void CSystemToneServiceStif::HandleEvent()
+	{
+		TEventIf event( TEventIf::ESetEvent, _L("Event_PlayAlarmComplete") );
+    TestModuleIf().Event( event );
+	}
+
+	
     
 void CSystemToneServiceStif::PlayAlarmComplete(unsigned int aAlarmContext)
     {
     if (aAlarmContext == iCurrentContext)
         {
+        	
+         _LIT( Ksystemtoneservicestif, "STS" );
+          _LIT( KPrint, "PlayAlarmComplete" );
+          TestModuleIf().Printf( 0, Ksystemtoneservicestif, KPrint );
+          // Print to log file
+          iLog->Log( KPrint );	
+        	
         iPlayState = EStopped;
-        TEventIf event( TEventIf::ESetEvent, _L("Event_PlayAlarmComplete") );
-        TestModuleIf().Event( event );
-        
+        iCallbackController->Cancel();
+        //HandleEvent();
         }
     }  
 

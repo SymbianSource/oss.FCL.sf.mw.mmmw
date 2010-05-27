@@ -17,8 +17,8 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <gstappsrc.h>
-#include <gst.h>
+#include <gst/gst.h>
+#include <gst/app/gstappsrc.h>
 #include "xamediaplayeradaptctx.h"
 #include "xamediaplayeradaptctxmmf.h"
 #include "xaadaptationgst.h"

@@ -66,7 +66,7 @@ EXPORT_C gint TMSCallImpl::Create(TMSCallType ctype, TMSCall*& tmscall,
         guint ctxid)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSCallImpl *self = new TMSCallImpl;
+    TMSCallImpl *self = new TMSCallImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)

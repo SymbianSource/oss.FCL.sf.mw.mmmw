@@ -16,7 +16,7 @@
 */
 
 #include <string.h>
-#include <gst.h>
+#include <gst/gst.h>
 #include "xaoutputmixadaptctx.h"
 #include "xaoutputmixitfadaptation.h"
 #include "xaadaptationgst.h"

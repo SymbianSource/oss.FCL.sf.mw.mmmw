@@ -51,7 +51,7 @@ gint TMSMicSourceImpl::PostConstruct()
 gint TMSMicSourceImpl::Create(TMSSource*& tmssource)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSMicSourceImpl *self = new TMSMicSourceImpl;
+    TMSMicSourceImpl *self = new TMSMicSourceImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)
@@ -72,7 +72,6 @@ gint TMSMicSourceImpl::SetProxy(TMSCallProxy* /*aProxy*/,
         gpointer /*queuehandler*/)
     {
     gint ret = TMS_RESULT_SUCCESS;
-    //static_cast<TMSMicSourceBodyImpl*>(this->iBody)->SetProxy(aProxy, queuehandler);
     return ret;
     }
 

@@ -40,7 +40,7 @@ TMSGainEffectBodyImpl::~TMSGainEffectBodyImpl()
 gint TMSGainEffectBodyImpl::Create(TMSGainEffectBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSGainEffectBodyImpl* self = new TMSGainEffectBodyImpl;
+    TMSGainEffectBodyImpl* self = new TMSGainEffectBodyImpl();
     if (self)
         {
         ret = self->PostConstruct();

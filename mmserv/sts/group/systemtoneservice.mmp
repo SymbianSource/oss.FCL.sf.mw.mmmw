@@ -23,15 +23,19 @@ TARGETTYPE    dll
 UID           0x1000008d 0x10207C8F
 CAPABILITY    ALL -TCB
 
+EPOCALLOWDLLDATA
+
 MW_LAYER_SYSTEMINCLUDE
-USERINCLUDE   ../inc
+
+USERINCLUDE   ../stsproxy/inc
 
 SOURCEPATH    ../src
 
 SOURCE        systemtoneservice.cpp
 
-DEFFILE       systemtoneservice.def
 NOSTRICTDEF
+DEFFILE       systemtoneservice.def
+
+STATICLIBRARY stsproxy.lib
 
 LIBRARY       euser.lib
-STATICLIBRARY stsimplementation.lib

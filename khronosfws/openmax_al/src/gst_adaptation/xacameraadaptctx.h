@@ -19,7 +19,7 @@
 #define XACAMERAADAPTCTX_H
 
 #include "xaadaptationgst.h"
-#include <photography.h>
+#include <gst/interfaces/photography.h>
 /* TYPEDEFS */
 
 typedef struct XACameraAdaptationCtx_ XACameraAdaptationCtx;
