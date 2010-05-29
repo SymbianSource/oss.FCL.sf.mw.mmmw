@@ -832,7 +832,7 @@ class CAdvancedAudioPlayController : public CAdvancedAudioController,
 		// sets the repeat count and trailing silence timer value supplied by the client
         TInt DoSetRepeats(TInt aRepeatNumberOfTimes, const TTimeIntervalMicroSeconds& aTrailingSilence);
         // handles the loop play of seekable and non-seekable sources
-        void DoRepeat();
+        void DoRepeatL();
         TBool IsLoopPlayEnabled() const;
         
     public: // Functions from base classes (MTrailingSilenceObserver)

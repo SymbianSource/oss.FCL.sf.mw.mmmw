@@ -300,7 +300,7 @@ void TMSCallSession::HandleInitStreamL(const RMessage2& aMessage)
         TMSCliSrvStreamInitDataStructBufPckg pckg;
         aMessage.ReadL(0, pckg);
         status = iCallAdpt->InitStream(pckg().CallType, pckg().StreamType,
-                pckg().StreamId, pckg().FormatType, aMessage);
+                pckg().StreamId, pckg().FormatType, pckg().RetryTime, aMessage);
 
         switch (pckg().StreamType)
             {
@@ -336,7 +336,7 @@ void TMSCallSession::HandleStartStreamL(const RMessage2& aMessage)
         TMSCliSrvStreamOpDataStructBufPckg pckg;
         aMessage.ReadL(0, pckg);
         status = iCallAdpt->StartStream(pckg().CallType, pckg().StreamType,
-                pckg().StreamId);
+                pckg().StreamId, pckg().RetryTime);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;

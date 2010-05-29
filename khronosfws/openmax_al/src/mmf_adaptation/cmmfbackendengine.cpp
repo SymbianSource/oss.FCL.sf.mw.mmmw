@@ -120,7 +120,7 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
         if (iRecordState == ERecorderNotReady)
             {
             iFileFormat = format;
-            iAPIBeingUsed = DetermineAPIToUse(uri, EPlay);
+            iAPIBeingUsed = DetermineAPIToUse(uri, ERecord);
             err = XA_RESULT_INTERNAL_ERROR;
             if (iAPIBeingUsed == EAudioRecorderUtility)
                 {
@@ -131,7 +131,7 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
                 TRAP(err, InitAudioRecorderUtilityL());
                 RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
     
-                TRAP(err, iAudioRecorder->OpenFileL(iFileName));
+                TRAP(err, iAudioRecorder->OpenFileL(iUriPtr));
                 RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
                 /* Wait until we receive moscostatechanged callback */
                 if(!iActiveSchedulerWait->IsStarted())
@@ -183,13 +183,24 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
                 TRAP(err, InitVideoPlayerUtilityL());
                 RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
 
-                /* Open file */
-                TAG_TIME_PROFILING_BEGIN;
-                TRAP(err, iVideoPlayer->OpenFileL(iUriPtr));
-                RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
-                TAG_TIME_PROFILING_END;
-                PRINT_TO_CONSOLE_TIME_DIFF;
-
+                if(iUriType == ELocal)
+                    {
+                    /* Open file */
+                    TAG_TIME_PROFILING_BEGIN;
+                    TRAP(err, iVideoPlayer->OpenFileL(iUriPtr));
+                    RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
+                    TAG_TIME_PROFILING_END;
+                    PRINT_TO_CONSOLE_TIME_DIFF;
+                    }
+                else
+                    {
+                    /* Open URL */
+                    TAG_TIME_PROFILING_BEGIN;
+                    TRAP(err, iVideoPlayer->OpenUrlL(iUriPtr));
+                    RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
+                    TAG_TIME_PROFILING_END;
+                    PRINT_TO_CONSOLE_TIME_DIFF;
+                    }
                 /* Wait until we receive  MvpuoOpenComplete */
                 PRINT_TO_CONSOLE_HOME_TIME;
                 if (!iActiveSchedulerWait->IsStarted())
@@ -227,6 +238,10 @@ TInt CMMFBackendEngine::DetermineAPIToUse(char* uri, TFuncInUse aFunc)
     char ext[MAX_EXTENSION_SIZE] = { 0 };
     int extLen;
 
+    int colpos;
+    char urischeme[MAX_EXTENSION_SIZE] = { 0 };
+    int urischemeLen;
+
     dotPtr = strrchr(uri, (int)'.');
     if (!dotPtr)
         {
@@ -242,22 +257,42 @@ TInt CMMFBackendEngine::DetermineAPIToUse(char* uri, TFuncInUse aFunc)
         ext[i] = tolower(ext[i]);
         }
 
+    colpos = strcspn(uri,":");
+
+    strncpy(urischeme, uri, colpos+1);
+    /*Null terminate the string*/
+    urischeme[colpos+1] = '\0';
+    urischemeLen = sizeof(urischeme);
+    for(unsigned int i=0; i < urischemeLen; i++)
+        {
+        urischeme[i] = tolower(urischeme[i]);
+        }
+    
+    
+    
     if (aFunc == ERecord)
         {
         return EAudioRecorderUtility;
         }
     else
         {
-        if (!strcasecmp(ext, ".mp3") ||
-           !strcasecmp(ext, ".amr") ||
-           !strcasecmp(ext, ".aac") ||
-           !strcasecmp(ext, ".mid") ||
-		   !strcasecmp(ext, ".wav") ||
-           !strcasecmp(ext, ".awb"))
+        if(!strcasecmp(urischeme, "file:"))
             {
-            return EAudioPlayerUtility;
+            if (!strcasecmp(ext, ".mp3") ||
+               !strcasecmp(ext, ".amr") ||
+               !strcasecmp(ext, ".aac") ||
+               !strcasecmp(ext, ".mid") ||
+               !strcasecmp(ext, ".wav") ||
+               !strcasecmp(ext, ".awb"))
+                {
+                return EAudioPlayerUtility;
+                }
+              else
+                {
+                return EVideoPlayerUtility;
+                }
             }
-          else
+        else
             {
             return EVideoPlayerUtility;
             }
@@ -463,12 +498,15 @@ void CMMFBackendEngine::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrevious
             if (iPreviousRecordState == CMdaAudioClipUtility::ENotReady)
                 {
                 //RDebug::Print(_L("CMMFBackendEngine::MoscoStateChangeEvent 2"));
-                TRAP(err,iaudioInputRecord = CAudioInput::NewL( *iAudioRecorder ));
-                RArray<CAudioInput::TAudioInputPreference> inputArray;
-                inputArray.Append( CAudioInput::EDefaultMic );
-                // Set Audio Input
-                iaudioInputRecord->SetAudioInputL( inputArray.Array( ) );
-                inputArray.Close();
+                TRAP(err,iAudioInputRecord = CAudioInput::NewL( *iAudioRecorder ));
+                if(err == KErrNone)
+                    {
+                    RArray<CAudioInput::TAudioInputPreference> inputArray;
+                    inputArray.Append( CAudioInput::EDefaultMic );
+                    // Set Audio Input
+                    TRAP(err, iAudioInputRecord->SetAudioInputL( inputArray.Array( ) ));
+                    inputArray.Close();
+                    }
                 TMMFMessageDestination destination(KUidMetaDataWriteCustomCommand);
                 TMMFMessageDestinationPckg pckg = TMMFMessageDestinationPckg(destination);
                 TInt ret = iAudioRecorder->RecordControllerCustomCommandSync(pckg, 0, KNullDesC8, KNullDesC8);
@@ -565,7 +603,14 @@ void CMMFBackendEngine::Close()
                 break;
             };
         }
-
+    
+    // deleting the AudioInput object
+    if(iAudioInputRecord)
+        {
+          delete iAudioInputRecord;
+          iAudioInputRecord = NULL;
+        }
+    
     if (iBaseAudioPlayer && iAudioPlayer)
         {
         iAudioPlayer->Close();
@@ -600,8 +645,6 @@ void CMMFBackendEngine::Destroy()
     delete iBaseVideoPlayer;
     iBaseVideoPlayer = NULL;
     iVideoPlayer = NULL;
-    delete iaudioInputRecord;
-    iaudioInputRecord = NULL;
     delete iBaseAudioPlayer;
     iBaseAudioPlayer = NULL;
     iAudioPlayer = NULL;
@@ -713,7 +756,7 @@ TInt CMMFBackendEngine::GetSampleRate(XAmilliHertz* samplerate)
             TRAP(err, sr = iAudioRecorder->DestinationSampleRateL());
             if(err == KErrNone)
                 {
-                *samplerate = sr;
+                *samplerate = sr*1000;
                 }
             }
         }
@@ -730,7 +773,7 @@ TInt CMMFBackendEngine::GetSampleRate(XAmilliHertz* samplerate)
                                                         configPackage);
             if(err == KErrNone)
                 {
-                *samplerate = configPackage().iSampleRate;
+                *samplerate = configPackage().iSampleRate*1000;
                 }
             }
         }
@@ -791,7 +834,7 @@ TInt CMMFBackendEngine::SetDestinationSampleRate(XAmilliHertz* samplerate)
     TInt err(KErrNone);
     if(iRecordState == CMMFBackendEngine::ERecorderOpen)
         {
-        TRAP(err, iAudioRecorder->SetDestinationSampleRateL(*samplerate));
+        TRAP(err, iAudioRecorder->SetDestinationSampleRateL(*samplerate/1000));
         if(err != KErrNone)
             {
             return XA_RESULT_PARAMETER_INVALID;
@@ -1442,13 +1485,14 @@ TInt CMMFBackendEngine::InitializeURIForMMFUtil(char *uri)
 
     iUriPtr.Set(iUri->Des());
     iUriPtr.Copy(uriParam); /* Copy data*/
-    iUriPtr.LowerCase();
+    //iUriPtr.LowerCase();
 
     /* For file scheme convert from file:///c:/folder/file.ext
      * format to c:\\folder\\file.ext using TUriParser. */
     _LIT(KFileScheme,"file:///");
     if (iUriPtr.Find(KFileScheme) >= 0)
         {
+        iUriType = ELocal;
         TPtr tmp(const_cast<TUint16 *>(iUriPtr.Ptr()) + KFileScheme().Length(),
                 iUriPtr.Length(),
                 iUriPtr.Length());
@@ -1476,6 +1520,10 @@ TInt CMMFBackendEngine::InitializeURIForMMFUtil(char *uri)
         delete file;
         file = NULL;
 
+        }
+    else
+        {
+        iUriType = EStreaming;
         }
     return err;
     }

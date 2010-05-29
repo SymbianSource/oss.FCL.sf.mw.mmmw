@@ -418,6 +418,7 @@ XAresult XAMediaRecorderImpl_DoRealize( XAObjectItf self )
                 case MR_AUDIOENCODERITF:
                     pItf = XAAudioEncoderItfImpl_Create(pObjImpl);
                     break;
+#ifdef OMAX_CAMERABIN
                 case MR_SNAPSHOTITF:
                     pItf = XASnapshotItfImpl_Create(pObjImpl);
                     break;
@@ -427,6 +428,7 @@ XAresult XAMediaRecorderImpl_DoRealize( XAObjectItf self )
                 case MR_IMAGEENCODERITF:
                     pItf = XAImageEncoderItfImpl_Create(pObjImpl);
                     break; 
+#endif
                 case MR_METADATAINSERTIONITF:
                     pItf = XAMetadataInsertionItfImpl_Create(pObjImpl);
                     break;                    
@@ -438,6 +440,7 @@ XAresult XAMediaRecorderImpl_DoRealize( XAObjectItf self )
                 case MR_EQUALIZERITF:
                     pItf = XAEqualizerItfImpl_Create( pObjImpl->adaptationCtx );
                     break;
+#ifdef OMAX_CAMERABIN
                 case MR_IMAGECONTROLSITF:
                     pItf = XAImageControlsItfImpl_Create( pObjImpl->adaptationCtx );
                     break;
@@ -447,6 +450,7 @@ XAresult XAMediaRecorderImpl_DoRealize( XAObjectItf self )
                 case MR_VIDEOPOSTPROCESSINGITF:
                     pItf = XAVideoPostProcessingItfImpl_Create( pObjImpl->adaptationCtx );
                     break;
+#endif
                 case MR_VOLUMEITF:
                     pItf = XAVolumeItfImpl_Create( pObjImpl->adaptationCtx );
                     break;
@@ -524,6 +528,7 @@ void XAMediaRecorderImpl_FreeResources(XAObjectItf self)
                 case MR_EQUALIZERITF:
                     XAEqualizerItfImpl_Free(pItf);
                     break;
+#ifdef OMAX_CAMERABIN
                 case MR_IMAGECONTROLSITF:
                     XAImageControlsItfImpl_Free(pItf);
                     break;
@@ -533,12 +538,14 @@ void XAMediaRecorderImpl_FreeResources(XAObjectItf self)
                 case MR_IMAGEENCODERITF:
                     XAImageEncoderItfImpl_Free(pItf);
                     break;
+#endif
                 case MR_METADATAINSERTIONITF:
                     XAMetadataInsertionItfImpl_Free(pItf);
                     break;
                 case MR_RECORDITF:
                     XARecordItfImpl_Free(pItf);
                     break;
+#ifdef OMAX_CAMERABIN
                 case MR_SNAPSHOTITF:
                     XASnapshotItfImpl_Free(pItf);
                     break;
@@ -548,6 +555,7 @@ void XAMediaRecorderImpl_FreeResources(XAObjectItf self)
                 case MR_VIDEOPOSTPROCESSINGITF:
                     XAVideoPostProcessingItfImpl_Free(pItf);
                     break;
+#endif
                 case MR_VOLUMEITF:
                     XAVolumeItfImpl_Free(pItf);
                     break;
@@ -613,10 +621,11 @@ XAresult XAMediaRecorderImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEnt
         case MR_EQUALIZERITF:
             mapEntry->pItf = XAEqualizerItfImpl_Create( pImpl->adaptationCtx );
             break;
+#ifdef OMAX_CAMERABIN
         case MR_IMAGEEFFECTSITF:
             mapEntry->pItf = XAImageEffectsItfImpl_Create( pImpl->adaptationCtx );
             break;
-
+#endif
         default:
             DEBUG_ERR("XAMediaRecorderImpl_DoAddItf unknown id");
             ret = XA_RESULT_FEATURE_UNSUPPORTED;
@@ -672,9 +681,11 @@ XAresult XAMediaRecorderImpl_DoRemoveItf(XAObjectItf self, XAObjItfMapEntry *map
         case MR_EQUALIZERITF:
             XAEqualizerItfImpl_Free( mapEntry->pItf );
             break;
+#ifdef OMAX_CAMERABIN
         case MR_IMAGEEFFECTSITF:
             XAImageEffectsItfImpl_Free( mapEntry->pItf );
             break;
+#endif
         default:
             DEBUG_ERR("XAMediaRecorderImpl_DoRemoveItf unknown id");
             ret = XA_RESULT_FEATURE_UNSUPPORTED;

@@ -122,20 +122,24 @@ typedef struct XAMediaPlayerAdaptationMMFCtx_
     XAboolean               isStereoPosition;
     XAmillidegree           curRotation;
     XAuint32                curMirror;
+
     XAint32                 buffering;
 
     /* internals */
     XAboolean               trackpositionenabled;
+
+
     XAboolean               loopingenabled;
-    XAboolean		        cameraSinkSynced;
+
+    XAboolean		        		cameraSinkSynced;
     void*                   mmfContext;
-	void* 					mmfMetadataContext;
+	void* 										mmfMetadataContext;
+	XAboolean 								isForRadio;
 /*
     XAuint32                playerState;
 */
 
 } XAMediaPlayerAdaptationMMFCtx_;
-
 
 typedef struct XAMetadataAdaptationMMFCtx_
 {
@@ -148,6 +152,22 @@ typedef struct XAMetadataAdaptationMMFCtx_
     void*                   mmfContext;
 } XAMetadataAdaptationMMFCtx_;
 
+
+
+/*
+ * Structure for Radio specific variables
+ */
+typedef struct XARadioAdaptationCtx_ {
+
+    /* Parent*/
+    XAAdaptationMMFCtx_    baseObj;
+    XAuint32 frequency;
+    XAuint8 range;
+
+    pthread_t emulationThread;
+    pthread_t rdsEmulationThread;
+
+} XARadioAdaptationCtx_;
 /* FUNCTIONS */
 /*
  * gboolean XAAdaptationBase_GstBusCb( GstBus *bus, GstMessage *message, gpointer data );

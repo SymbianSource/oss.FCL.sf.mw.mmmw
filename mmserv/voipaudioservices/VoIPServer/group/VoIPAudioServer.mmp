@@ -25,6 +25,7 @@ EPOCSTACKSIZE   0x5000
 EPOCHEAPSIZE    0x20000 0x1000000 // Min 128kb, max 16Mb
 CAPABILITY      MultiMediaDD ReadDeviceData WriteDeviceData UserEnvironment ReadUserData WriteUserData
 VENDORID        VID_DEFAULT
+EPOCPROCESSPRIORITY high
 
 SOURCEPATH      ../src
 

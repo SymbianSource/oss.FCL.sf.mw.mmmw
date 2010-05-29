@@ -19,14 +19,29 @@
 #include <systemtoneservice.h>
 #include "systemtoneservicesactiveobj.h"
 
-CStsActiveObj::CStsActiveObj(MStsPlayAlarmObserver* aObserver) : CActive (EPriorityStandard)
+
+CStsActiveObj::CStsActiveObj() : CActive (CActive::EPriorityStandard)
 {
-    CActiveScheduler::Add(this);
+   
 }
 
 
+void CStsActiveObj::ConstructL(MStsPlayAlarmObserver* aObserver, CStifLogger* aLogger) 
+{  
+	iObserver = aObserver;
+    iLog = aLogger;
+    CActiveScheduler::Add(this);
+}
 
+CStsActiveObj* CStsActiveObj::NewL( MStsPlayAlarmObserver* aTestClass, CStifLogger* aLogger)
+{
+    CStsActiveObj* self = new ( ELeave ) CStsActiveObj();
+    CleanupStack::PushL( self );
+    self->ConstructL( aTestClass, aLogger);
+    CleanupStack::Pop( self );
+    return self;
 
+}
 
 CStsActiveObj::~ CStsActiveObj()
 {
@@ -39,12 +54,12 @@ CStsActiveObj::~ CStsActiveObj()
 
 void  CStsActiveObj::RunL()
 {
-	if(IsActive())
+	/*(if(IsActive())
     {
         Cancel();
     }
     
-    SetActive();
+    SetActive();*/
 }
 
 

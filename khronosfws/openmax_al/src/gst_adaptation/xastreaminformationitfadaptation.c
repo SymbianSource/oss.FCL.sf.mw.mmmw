@@ -68,9 +68,8 @@ XAresult  XAStreamInformationItfAdapt_QueryMediaContainerInformation(
     }
 
     /* Get media container type */
-    DEBUG_INFO_A2("Adaptation Context- ID is [%u] Extended ID[%u]",
-                (unsigned int)adaptCtx->ctxId,
-                (unsigned int)((XAMediaPlayerAdaptationCtx*) adaptCtx)->extendedCtxId);
+    DEBUG_INFO_A1("Adaptation Context- ID is [%u] ",
+                (unsigned int)adaptCtx->ctxId );
 
     /* Initialize to unspecified */
     *containerType = XA_CONTAINERTYPE_UNSPECIFIED;

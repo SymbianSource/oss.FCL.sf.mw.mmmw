@@ -69,19 +69,19 @@ XAresult XADynamicSourceItfAdaptMMF_SetSource(XAAdaptationMMFCtx *bCtx, XADataSo
             }
         if((ret == XA_RESULT_SUCCESS) && (mCtx->mmfMetadataContext))
             {
-            ret = mmf_metadata_utility_parse_source(mCtx->mmfMetadataContext, (char *)(tempUri->URI));
+            	mmf_metadata_utility_parse_source(mCtx->mmfMetadataContext, (char *)(tempUri->URI));
             }
     }
     else if(bCtx->baseObj.ctxId == XAMDAdaptation)
     {
         
         XAMetadataAdaptationMMFCtx* mCtx = (XAMetadataAdaptationMMFCtx*) bCtx;
-        if(mCtx->mmfContext)
-        {
-            mCtx->xaSource = pDataSource;
-            ret = mmf_metadata_utility_parse_source(mCtx->mmfContext, (char *)(( (XADataLocator_URI*)(pDataSource->pLocator))->URI));
-        }
-    }
+		if(mCtx->mmfContext)
+		{
+			mCtx->xaSource = pDataSource;
+			mmf_metadata_utility_parse_source(mCtx->mmfContext, (char *)(( (XADataLocator_URI*)(pDataSource->pLocator))->URI));
+		}
+	}
     DEBUG_API("<-XADynamicSourceItfAdaptMMF_SetSource");
     return ret;
 }

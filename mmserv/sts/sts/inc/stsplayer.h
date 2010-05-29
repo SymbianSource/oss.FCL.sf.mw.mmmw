@@ -21,6 +21,9 @@
 #include <mdaaudiosampleplayer.h>
 #include <systemtoneservice.h>
 
+class MProEngEngine;
+class MProEngProfile;
+
 class MStsPlayerObserver
     {
 public:
@@ -30,6 +33,7 @@ public:
 class CStsPlayer : private MMdaAudioPlayerCallback
     {
 public:
+
     static CStsPlayer* CreateTonePlayer(MStsPlayerObserver& aObserver,
             CSystemToneService::TToneType aTone, unsigned int aContext);
     static CStsPlayer* CreateAlarmPlayer(MStsPlayerObserver& aObserver,
@@ -38,9 +42,14 @@ public:
     void Play();
     void Stop();
 
+
 protected:
+    
+    void LoadActiveProfileSettingsL();
+    void SetToneSettings(CSystemToneService::TToneType aTone);
+    void SetAlarmSettings(CSystemToneService::TAlarmType aAlarm);
     CStsPlayer(MStsPlayerObserver& aObserver, const TDesC& aFileName,
-            int aRepeatNumberOfTimes, unsigned int aContext);
+    int aRepeatNumberOfTimes, unsigned int aContext);
     bool Init();
 
 private:
@@ -53,6 +62,15 @@ private:
     TPtrC iFileName;
     int iRepeatNumberOfTimes;
     unsigned int iContext;
+
+    MProEngEngine* iEngine;
+    MProEngProfile* iProfile;
+
+    TInt iVolume;
+    TBool iWarningToneEnabled;
+    TUint iAudioPreference;
+    TUint iAudioPriority;
+
     };
 
 #endif // STSPLAYER_H_

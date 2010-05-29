@@ -28,6 +28,9 @@ PRJ_EXPORTS
 ../conf/presetutility_10207B87.crml           MW_LAYER_CRML(presetutility_10207B87.crml)
 
 
+backup_registration.xml z:/private/10207B87/backup_registration.xml
+
+
 // iby files
 ../rom/fmpresetutility.iby			CORE_MW_LAYER_IBY_EXPORT_PATH(fmpresetutility.iby)
 ../rom/presetutility.iby			  CORE_MW_LAYER_IBY_EXPORT_PATH(presetutility.iby)

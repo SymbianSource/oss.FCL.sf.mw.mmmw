@@ -19,7 +19,9 @@
 #define XACAMERAADAPTCTX_H
 
 #include "xaadaptationgst.h"
+#ifdef OMAX_CAMERABIN
 #include <gst/interfaces/photography.h>
+#endif
 /* TYPEDEFS */
 
 typedef struct XACameraAdaptationCtx_ XACameraAdaptationCtx;
@@ -39,8 +41,9 @@ typedef struct XACameraAdaptationCtx_ {
     XAuint32        curMirror;
 
     /* GST Variables */
+#ifdef OMAX_CAMERABIN
     GstFocusStatus focusStatus;
-
+#endif
     /* Internals */
     XAboolean       recording;
     XAboolean       playing;

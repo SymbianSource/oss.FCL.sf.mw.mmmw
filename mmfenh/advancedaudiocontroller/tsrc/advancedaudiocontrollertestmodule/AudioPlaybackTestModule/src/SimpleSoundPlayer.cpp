@@ -448,12 +448,14 @@ void CSimpleSoundPlayer::MapcInitComplete(TInt aError, const TTimeIntervalMicroS
 			}
 
 
-
+			
+			TInt pwErr =0;		            
+			
 			if (playWindow)
 			{
 				iLogger.Log(_L("SetPlayWindow, start=[%d]"),startPosition.Int64());
 				iLogger.Log(_L("SetPlayWindow, end=[%d]"), endPosition.Int64() );
-				TInt pwErr = iMdaPlayer->SetPlayWindow(startPosition, endPosition);
+				pwErr = iMdaPlayer->SetPlayWindow(startPosition, endPosition);
 				iLogger.Log(_L("SetPlayWindow err=[%d]"), pwErr);
 				if (clearWindow)
 				{
@@ -462,7 +464,11 @@ void CSimpleSoundPlayer::MapcInitComplete(TInt aError, const TTimeIntervalMicroS
 
 				}
 			}
-
+			if (iNegativePlayBackWindow && pwErr ) 
+			{
+			   iLogger.Log(_L("SetPlayWindow Expected Err for negative test case"));
+			   CActiveScheduler::Stop(); 
+			}
 			if (setBalance)
 			{
 				SetBalance(aBalance);

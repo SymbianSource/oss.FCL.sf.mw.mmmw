@@ -49,3 +49,4 @@ LIBRARY        efsrv.lib
 LIBRARY        libc.lib
 LIBRARY        libstdcpp.lib
 LIBRARY        mediaclientaudio.lib
+LIBRARY        profileengine.lib

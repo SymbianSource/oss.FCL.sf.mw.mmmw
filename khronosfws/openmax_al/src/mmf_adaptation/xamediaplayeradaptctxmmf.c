@@ -41,64 +41,64 @@ XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc, XAData
 {
     XAMediaPlayerAdaptationMMFCtx *pSelf = NULL;
     XAuint32 locType = 0;
+    XADataLocator_IODevice *ioDevice;         
     XAresult res;
     DEBUG_API("->XAMediaPlayerAdaptMMF_Create");
     
     pSelf = calloc(1, sizeof(XAMediaPlayerAdaptationMMFCtx));
     if ( pSelf)
     {
-          
-        if( XAAdaptationBaseMMF_Init(&(pSelf->baseObj),XAMediaPlayerAdaptation)
-            != XA_RESULT_SUCCESS )
-        {
-            DEBUG_ERR("Failed to init base context!!!");
-            free(pSelf);
-            pSelf = NULL;
-        }
-        else
-            
-        {
-            pSelf->baseObj.baseObj.fwtype = FWMgrFWMMF;
-            pSelf->xaSource = pDataSrc;
-            pSelf->xaBankSrc = pBankSrc;
-            pSelf->xaAudioSink = pAudioSnk;
-            pSelf->xaVideoSink = pImageVideoSnk;
-            pSelf->xaLEDArray = pLEDArray;
-            pSelf->xaVibra = pVibra;
-            pSelf->curMirror = XA_VIDEOMIRROR_NONE;
-            pSelf->curRotation = 0;
-            pSelf->isobjsrc = XA_BOOLEAN_FALSE;
-            pSelf->cameraSinkSynced = XA_BOOLEAN_FALSE;
-            /*pSelf->waitData = XA_BOOLEAN_FALSE;*/
-        }
-
-  
-    if ( pDataSrc )
-		{
-			locType = *((XAuint32*)(pDataSrc->pLocator));
-			if ( locType == XA_DATALOCATOR_IODEVICE  )
+    	if ( pDataSrc )
 			{
-			//XADataLocator_IODevice *ioDevice = (XADataLocator_IODevice*)(pDataSrc->pLocator);
-			}
+				locType = *((XAuint32*)(pDataSrc->pLocator));
+				if ( locType == XA_DATALOCATOR_IODEVICE  )
+				{
+					ioDevice = (XADataLocator_IODevice*)(pDataSrc->pLocator);
+					if ( ioDevice->deviceType == XA_IODEVICE_RADIO )
+					{
+						return XAMediaPlayerAdaptMMF_CreateRadio(pSelf, pDataSrc, pBankSrc, pAudioSnk, pImageVideoSnk, pVibra, pLEDArray);
+					}
+				}    	
 		}
-    }
-    
-    else
-        {
-        DEBUG_ERR("Failed to create XAMediaPlayerAdaptationMMFCtx !!!");
-        return NULL;
-        }
-    if(pSelf)
+    if( XAAdaptationBaseMMF_Init(&(pSelf->baseObj),XAMediaPlayerAdaptation) != XA_RESULT_SUCCESS )
     {
-	    res = mmf_backend_engine_init(&(pSelf->mmfContext));
-        if(!(pSelf->mmfContext) || (res != XA_RESULT_SUCCESS))
-        {
-            /* TODO Check to make sure there is no undeleted MMF objects here*/
-            DEBUG_ERR("Failed to init mmf context!!!");
-            free(pSelf);
-            pSelf = NULL;
-            return NULL;
-        }
+      DEBUG_ERR("Failed to init base context!!!");
+       free(pSelf);
+       pSelf = NULL;
+    }
+    else            
+    {
+    		pSelf->isForRadio = XA_BOOLEAN_FALSE;
+      	pSelf->baseObj.baseObj.fwtype = FWMgrFWMMF;
+        pSelf->xaSource = pDataSrc;
+        pSelf->xaBankSrc = pBankSrc;
+        pSelf->xaAudioSink = pAudioSnk;
+        pSelf->xaVideoSink = pImageVideoSnk;
+        pSelf->xaLEDArray = pLEDArray;
+        pSelf->xaVibra = pVibra;
+        pSelf->curMirror = XA_VIDEOMIRROR_NONE;
+        pSelf->curRotation = 0;
+        pSelf->isobjsrc = XA_BOOLEAN_FALSE;
+        pSelf->cameraSinkSynced = XA_BOOLEAN_FALSE;
+        /*pSelf->waitData = XA_BOOLEAN_FALSE;*/
+		}
+	}
+ 	else
+ 	{
+		DEBUG_ERR("Failed to create XAMediaPlayerAdaptationMMFCtx !!!");
+		return NULL;
+ 	}
+ 	if(pSelf)
+ 	{
+		res = mmf_backend_engine_init(&(pSelf->mmfContext));
+   	if(!(pSelf->mmfContext) || (res != XA_RESULT_SUCCESS))
+   	{
+    	/* TODO Check to make sure there is no undeleted MMF objects here*/
+     	DEBUG_ERR("Failed to init mmf context!!!");
+     	free(pSelf);
+    	pSelf = NULL;
+    	return NULL;
+  	}
 		res = mmf_set_play_adapt_context(pSelf->mmfContext, &(pSelf->baseObj));
 		if(pDataSrc)
 		    {
@@ -120,7 +120,53 @@ XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc, XAData
     return (XAAdaptationBaseCtx*)(&pSelf->baseObj.baseObj);
 }
 
+/*
+ * XAMediaPlayerAdaptationMMFCtx* XAMediaPlayerAdapt_CreateRadio()
 
+ * @returns XAMediaPlayerAdaptationMMFCtx* - Pointer to created context, NULL if error occurs.
+ */
+XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_CreateRadio(XAMediaPlayerAdaptationMMFCtx *pSelf, XADataSource *pDataSrc, XADataSource *pBankSrc,
+                                                      XADataSink *pAudioSnk, XADataSink *pImageVideoSnk,
+                                                      XADataSink *pVibra, XADataSink *pLEDArray)
+{
+    XAresult res;
+    DEBUG_API("->XAMediaPlayerAdaptMMF_CreateRadio");
+    
+		res =  XAAdaptationBaseMMF_Init(&(pSelf->baseObj), XARadioAdaptation); 
+		if (res != XA_RESULT_SUCCESS) 	
+   	{
+    	DEBUG_ERR("Failed to init base context!!!");
+      free(pSelf);
+      pSelf = NULL;
+      return NULL;
+    }
+
+   	pSelf->isForRadio = XA_BOOLEAN_TRUE;
+  	pSelf->baseObj.baseObj.fwtype = FWMgrFWMMF;
+    pSelf->xaSource = pDataSrc;
+    pSelf->xaBankSrc = pBankSrc;
+    pSelf->xaAudioSink = pAudioSnk;
+    pSelf->xaVideoSink = pImageVideoSnk;
+    pSelf->xaLEDArray = pLEDArray;
+    pSelf->xaVibra = pVibra;
+    pSelf->curMirror = XA_VIDEOMIRROR_NONE;
+    pSelf->curRotation = 0;
+    pSelf->isobjsrc = XA_BOOLEAN_FALSE;
+    pSelf->cameraSinkSynced = XA_BOOLEAN_FALSE;
+    /*pSelf->waitData = XA_BOOLEAN_FALSE;*/
+
+		res = mmf_backend_engine_init(&(pSelf->mmfContext));
+   	if(!(pSelf->mmfContext) || (res != XA_RESULT_SUCCESS))
+   	{
+    	/* TODO Check to make sure there is no undeleted MMF objects here*/
+    	DEBUG_ERR("Failed to init mmf context!!!");
+   		free(pSelf);
+     	pSelf = NULL;
+    	return NULL;
+    }
+    DEBUG_API("<-XAMediaPlayerAdaptMMF_Create");
+    return (XAAdaptationBaseCtx*)(&pSelf->baseObj.baseObj);
+}
 
 /*
  * XAresult XAMediaPlayerAdaptMMF_PostInit()
@@ -136,6 +182,12 @@ XAresult XAMediaPlayerAdaptMMF_PostInit( XAAdaptationMMFCtx* bCtx )
     DEBUG_API("->XAMediaPlayerAdaptMMF_PostInit");
     
     XAAdaptationBaseMMF_PostInit(bCtx);
+    
+    if (pSelf->isForRadio)
+    {
+     DEBUG_API("<-XAMediaPlayerAdaptMMF_PostInit");   
+     return XA_RESULT_SUCCESS;	
+    }    
     
     if(pSelf->mmfContext)
     {

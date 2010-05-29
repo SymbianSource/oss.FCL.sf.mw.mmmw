@@ -31,7 +31,8 @@ typedef enum
 
 
 /* Config file location */
-const char configFileLocation[] = "z:/openmaxal/openmaxal.cfg";
+const char configFileLocationZ[] = "z:/openmaxal/openmaxal.cfg";
+const char configFileLocationC[] = "c:/openmaxal/openmaxal.cfg";
 
 /* Tags used for parsing */
 const char mediaPlayerBeginTag[] = "<mediaplayer>";
@@ -87,13 +88,13 @@ FrameworkMap* XAFrameworkMgr_CreateFrameworkMap()
     FrameworkMap *curNode = NULL;
     FWMgrBool newNode;
     FrameworkMap *frameworkMap = NULL;
-    FILE* fp = fopen(configFileLocation, "r");
+    FILE* fp = fopen(configFileLocationZ, "r");
     
     if (fp == NULL)
         {
-        createDefaultRules(configFileLocation);
+        createDefaultRules(configFileLocationC);
 
-        fp = fopen(configFileLocation, "r");
+        fp = fopen(configFileLocationC, "r");
         }
 
     if (fp != NULL)
@@ -557,7 +558,7 @@ int createDefaultRules(const char * filename)
     fputs("<mmf>\r\n", fp);
     fputs("<urischeme>\r\n", fp);
     fputs("# Num of entries followed by actual entries all ending with a comma\r\n", fp);
-    fputs("3,file,http,rtsp,\r\n", fp);
+    fputs("6,file,http,rtsp,rtspu,rtspt,mms,\r\n", fp);
     fputs("</urischeme>\r\n", fp);
     fputs("<fileext>\r\n", fp);
     fputs("15,3gp,wma,wmv,wav,amr,mp3,mp4,rm,ra,avi,mkv,aac,mid,awb,3g2,\r\n", fp);

@@ -245,6 +245,23 @@ TInt COpenMAXALTestModule::RunMethodL(
         ENTRY( "al_dynsrcitf_SetSource", COpenMAXALTestModule::al_dynsrcitf_SetSource ),
         /*DynamicSourceItf ends*/
         
+        /*RadioItf begins*/
+        ENTRY( "al_radioitf_SetFreqRange", COpenMAXALTestModule::al_radioitf_SetFreqRange ),    
+        ENTRY( "al_radioitf_GetFreqRange", COpenMAXALTestModule::al_radioitf_GetFreqRange ),    
+        ENTRY( "al_radioitf_IsFreqRangeSupported", COpenMAXALTestModule::al_radioitf_IsFreqRangeSupported ),    
+        ENTRY( "al_radioitf_GetFreqRangeProperties", COpenMAXALTestModule::al_radioitf_GetFreqRangeProperties ),    
+        ENTRY( "al_radioitf_SetFrequency", COpenMAXALTestModule::al_radioitf_SetFrequency ),            	        	        	        	
+        ENTRY( "al_radioitf_CancelSetFrequency", COpenMAXALTestModule::al_radioitf_CancelSetFrequency ),    
+        ENTRY( "al_radioitf_GetFrequency", COpenMAXALTestModule::al_radioitf_GetFrequency ),    
+        ENTRY( "al_radioitf_SetSquelch", COpenMAXALTestModule::al_radioitf_SetSquelch ),    
+        ENTRY( "al_radioitf_GetSquelch", COpenMAXALTestModule::al_radioitf_GetSquelch ),    
+        ENTRY( "al_radioitf_SetStereoMode", COpenMAXALTestModule::al_radioitf_SetStereoMode ),    
+        ENTRY( "al_radioitf_GetStereoMode", COpenMAXALTestModule::al_radioitf_GetStereoMode ),    
+        ENTRY( "al_radioitf_GetSignalStrength", COpenMAXALTestModule::al_radioitf_GetSignalStrength ),    
+        ENTRY( "al_radioitf_Seek", COpenMAXALTestModule::al_radioitf_Seek ),
+        ENTRY( "al_radioitf_StopSeeking", COpenMAXALTestModule::al_radioitf_StopSeeking ),  
+        ENTRY( "al_radioitf_RegisterRadioCallback", COpenMAXALTestModule::al_radioitf_RegisterRadioCallback ),        	        	            	        	        	        	        	        	        	        	
+        /*RadioItf ends*/       	    
         /*StreamInformationItf begins*/
         ENTRY( "al_strminfoitf_QueryMediaContainerInformation", COpenMAXALTestModule::al_strminfoitf_QueryMediaContainerInformation ),
         ENTRY( "al_strminfoitf_QueryStreamType", COpenMAXALTestModule::al_strminfoitf_QueryStreamType ),
@@ -285,6 +302,7 @@ TInt COpenMAXALTestModule::RunMethodL(
         /*NokiaLinearVolumeItf begins*/
         ENTRY( "al_nokialinearvolumeitf_SetVolumeLevel", COpenMAXALTestModule::al_nokialinearvolumeitf_SetVolumeLevel ),
         ENTRY( "al_nokialinearvolumeitf_GetVolumeLevel", COpenMAXALTestModule::al_nokialinearvolumeitf_GetVolumeLevel ),
+		ENTRY( "al_nokialinearvolumeitf_SetGetVolumeLevel", COpenMAXALTestModule::al_nokialinearvolumeitf_SetGetVolumeLevel ),        	
         ENTRY( "al_nokialinearvolumeitf_GetStepCount", COpenMAXALTestModule::al_nokialinearvolumeitf_GetStepCount ),
         ENTRY( "al_nokialinearvolumeitf_RegisterVolumeCallback", COpenMAXALTestModule::al_nokialinearvolumeitf_RegisterVolumeCallback ),
         ENTRY( "al_nokialinearvolumeitf_SetCallbackEventsMask", COpenMAXALTestModule::al_nokialinearvolumeitf_SetCallbackEventsMask ),

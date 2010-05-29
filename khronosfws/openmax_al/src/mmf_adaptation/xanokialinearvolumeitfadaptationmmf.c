@@ -21,6 +21,8 @@
 #include "xanokialinearvolumeitfadaptationmmf.h"
 #include "xamediaplayeradaptctxmmf.h"
 #include "cmmfbackendengine.h"
+#include "cmmfradiobackendengine.h"
+
 /*
  * XAresult XANokiaLinearVolumeItfAdapt_SetVolumeLevel(void *ctx, AdaptationContextIDS ctx->baseObj.ctxId,
  *                                          XAuint32 percentage)
@@ -54,6 +56,11 @@ XAresult XANokiaLinearVolumeItfAdapt_SetVolumeLevel(XAAdaptationMMFCtx *ctx, XAu
         mmf_volumeitf_set_volume(((XAMediaPlayerAdaptationMMFCtx*)ctx)->mmfContext,
                                     vol);
         }
+    else if (ctx->baseObj.ctxId == XARadioAdaptation)
+    	{
+		    mmf_set_player_adapt_context(cmmfradiobackendengine_init(), ctx);	        	
+    		res = set_volume(cmmfradiobackendengine_init(), percentage);  		    		
+    	}	    
     DEBUG_API("<-XANokiaLinearVolumeItfAdapt_SetVolumeLevel");
     return res;
 }
@@ -62,8 +69,7 @@ XAresult XANokiaLinearVolumeItfAdapt_GetStepCount(XAAdaptationMMFCtx *ctx,
                                                     XAuint32* stepcount)
     {
     XAresult res = XA_RESULT_SUCCESS;
-    DEBUG_API_A1("->XANokiaLinearVolumeItfAdapt_SetVolumeLevel to: %d",
-                                                            percentage);
+    DEBUG_API("->XANokiaLinearVolumeItfAdapt_GetStepCount ");
     if(!ctx || ( ctx->baseObj.ctxId != XAMediaPlayerAdaptation &&
                  ctx->baseObj.ctxId != XAMediaRecorderAdaptation &&
                  ctx->baseObj.ctxId != XARadioAdaptation) )
@@ -80,7 +86,7 @@ XAresult XANokiaLinearVolumeItfAdapt_GetStepCount(XAAdaptationMMFCtx *ctx,
                                         stepcount);
         }
     
-    DEBUG_API("<-XANokiaLinearVolumeItfAdapt_SetVolumeLevel");
+    DEBUG_API("<-XANokiaLinearVolumeItfAdapt_GetStepCount");
     return res;    
     }
 

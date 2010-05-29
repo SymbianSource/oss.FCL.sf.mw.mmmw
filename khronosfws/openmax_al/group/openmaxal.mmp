@@ -41,15 +41,10 @@ SOURCEPATH      ../src/gst_adaptation
 SOURCE	        xaadaptationgst.c
 SOURCE 	        xagstcapabilitiesmgr.c
 SOURCE	        xaaudioencoderitfadaptation.c
-SOURCE	        xacameraadaptctx.c
-SOURCE	        xacameraitfadaptation.c
 SOURCE	        xadevicevolumeitfadaptation.c
 SOURCE	        xadynamicsourceitfadaptation.c
 SOURCE	        xaengineadaptctx.c
 SOURCE	        xaequalizeritfadaptation.c
-SOURCE	        xaimagecontrolsitfadaptation.c
-SOURCE	        xaimageeffectsitfadaptation.c
-SOURCE	        xaimageencoderitfadaptation.c
 SOURCE	        xaledarrayadaptctx.c
 SOURCE	        xaledarrayitfadaptation.c
 SOURCE	        xamediaplayeradaptctx.c
@@ -60,28 +55,36 @@ SOURCE	        xaoutputmixadaptctx.c
 SOURCE	        xaoutputmixitfadaptation.c
 SOURCE	        xaplaybackrateitfadaptation.c
 SOURCE	        xaplayitfadaptation.c
-SOURCE	        xaradioadaptctx.c
-SOURCE	        xaradioitfadaptation.c
+
 SOURCE	        xardsitfadaptation.c
 SOURCE	        xarecorditfadaptation.c
 SOURCE	        xaseekitfadaptation.c
-SOURCE	        xasnapshotitfadaptation.c
-SOURCE	        xastaticcameracapsadaptation.c
 SOURCE	        xavibraadaptctx.c
 SOURCE	        xavibraitfadaptation.c
-SOURCE	        xavideoencoderitfadaptation.c
-SOURCE	        xavideopostprosessingitfadaptation.c
 SOURCE	        xavolumeitfadaptation.c
 SOURCE 	        xastreaminformationitfadaptation.c
+#ifdef OMAX_CAMERABIN
+SOURCE	        xacameraadaptctx.c
+SOURCE	        xacameraitfadaptation.c
+SOURCE	        xaimagecontrolsitfadaptation.c
+SOURCE	        xaimageeffectsitfadaptation.c
+SOURCE	        xaimageencoderitfadaptation.c
+SOURCE	        xasnapshotitfadaptation.c
+SOURCE	        xastaticcameracapsadaptation.c
+SOURCE	        xavideoencoderitfadaptation.c
+SOURCE	        xavideopostprosessingitfadaptation.c
+#endif
 
 SOURCEPATH ../src/adptcommon
 SOURCE 	        xaframeworkmgr.c
 SOURCE 	        xacapabilitiesmgr.c
 SOURCE 	        xaadptbasectx.c
 
+#ifdef OMAX_CAMERABIN
 SOURCEPATH      ../src/camera
 SOURCE          xacameradevice.c
 SOURCE          xacameraitf.c
+#endif
 
 SOURCEPATH      ../src/common
 SOURCE          openmaxal.c
@@ -90,35 +93,38 @@ SOURCE          xaconfigextensionsitf.c
 SOURCE          xadynamicsourceitf.c
 SOURCE          xadynintmgmtitf.c
 SOURCE          xaequalizeritf.c
-SOURCE          xaimagecontrolsitf.c
-SOURCE          xaimageeffectsitf.c
 SOURCE          xametadataextractionitf.c
 SOURCE          xametadatatraversalitf.c
 SOURCE          xaobjectitf.c
 SOURCE          xaplatform.c
 SOURCE          xathreadsafety.c
-SOURCE          xavideopostprocessingitf.c
 SOURCE          xavolumeitf.c
 SOURCE 		xastreaminformationitf.c
 SOURCE          xanokialinearvolume_iid.c
 SOURCE          xanokiavolumeext_iid.c
 SOURCE          xanokialinearvolumeitf.c
 SOURCE          xanokiavolumeextitf.c
+#ifdef OMAX_CAMERABIN
+SOURCE          xaimagecontrolsitf.c
+SOURCE          xaimageeffectsitf.c
+SOURCE          xavideopostprocessingitf.c
+#endif
 
 SOURCEPATH      ../src/engine
 SOURCE          xaaudiodecodercapabilitiesitf.c
 SOURCE          xaaudioencodercapabilitiesitf.c
 SOURCE          xaaudioiodevicecapabilitiesitf.c
-SOURCE          xacameracapabilitiesitf.c
 SOURCE          xadevicevolumeitf.c
 SOURCE          xaengine.c
 SOURCE          xaengineitf.c
+SOURCE          xathreadsyncitf.c
+#ifdef OMAX_CAMERABIN
+SOURCE          xacameracapabilitiesitf.c
 SOURCE          xaimagedecodercapabilitiesitf.c
 SOURCE          xaimageencodercapabilitiesitf.c
-SOURCE          xathreadsyncitf.c
 SOURCE          xavideodecodercapabilitiesitf.c
 SOURCE          xavideoencodercapabilitiesitf.c
-
+#endif
 SOURCEPATH      ../src/ledarray
 SOURCE          xaledarraydevice.c
 SOURCE          xaledarrayitf.c
@@ -132,12 +138,14 @@ SOURCE          xaseekitf.c
 
 SOURCEPATH      ../src/mediarecorder
 SOURCE          xaaudioencoderitf.c
-SOURCE          xaimageencoderitf.c
 SOURCE          xamediarecorder.c
 SOURCE          xametadatainsertionitf.c
 SOURCE          xarecorditf.c
+#ifdef OMAX_CAMERABIN
+SOURCE          xaimageencoderitf.c
 SOURCE          xasnapshotitf.c
 SOURCE          xavideoencoderitf.c
+#endif
 
 SOURCEPATH      ../src/metadataextractor
 SOURCE          xametadataextractor.c
@@ -166,6 +174,9 @@ SOURCE          cmmfbackendengine.cpp
 SOURCE          xamediarecorderadaptctxmmf.c
 SOURCE          xarecorditfadaptationmmf.c
 SOURCE 	        sfmrlocaltimer.cpp
+SOURCE		xaradioitfadaptation.c
+SOURCE  	xaradioadaptctx.c
+SOURCE 		cmmfradiobackendengine.cpp
 SOURCE          xanokialinearvolumeitfadaptationmmf.c
 SOURCE          xanokiavolumeextitfadaptationmmf.c
 SOURCE 	        xammfcapabilitiesmgr.c
@@ -212,16 +223,20 @@ LIBRARY         mediaclientaudio.lib
 LIBRARY         MMFControllerFramework.lib
 LIBRARY         mediaclientvideo.lib
 LIBRARY         AudioInputRouting.lib
+LIBRARY		Radio_Utility.lib
+
 LIBRARY         libgmodule.lib
 LIBRARY         libgobject.lib
 LIBRARY         libgstreamer.lib
 LIBRARY         libgstapp.lib
-LIBRARY		libgstphotography.lib
 LIBRARY 	libgstinterfaces.lib 
-LIBRARY		libgstvideo.lib
 LIBRARY 	libgstbase.lib
 LIBRARY 	libgstcoreelements.lib
 LIBRARY		libgstcoreindexers.lib
 LIBRARY 	MetaDataUtility.lib
+#ifdef OMAX_CAMERABIN
+LIBRARY		libgstphotography.lib
+LIBRARY		libgstvideo.lib
+#endif
 STATICLIBRARY   hxmetadatautil.lib
 

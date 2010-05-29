@@ -64,7 +64,13 @@ public:
           ERecord
           };
       
-	enum TMMFUtiltyInUse
+      enum TUriType
+          {
+          ELocal = 0,
+          EStreaming
+          };
+
+      enum TMMFUtiltyInUse
 	    {
         ENoUtility,
         EVideoPlayerUtility,
@@ -194,7 +200,7 @@ private:
     XAuint32                    iFileFormat;
     TInt                        iPauseSupportMP4;
     CActiveSchedulerWait*       iActiveSchedulerWait;
-		CAudioInput*              iaudioInputRecord;
+    CAudioInput*                iAudioInputRecord;
 #ifdef USE_LOCAL_WINDOW_RESOURCES
     CMediaClientVideoDisplay* iMediaClientVideoDisplay;
     TRect m_clipRect;
@@ -239,6 +245,7 @@ private:
     /* Property set by client (for file without file:///) */
     HBufC* iUri; /* owns */
     TPtr iUriPtr;
+    TUriType iUriType;
     /* Property set by client */
     RWsSession* m_pWs;
     /* Property set by client */

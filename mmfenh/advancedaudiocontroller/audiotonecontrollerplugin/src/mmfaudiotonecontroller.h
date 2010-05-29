@@ -28,6 +28,7 @@
 
 #include <mmf/common/mmfstandardcustomcommands.h>
 #include <mmf/server/sounddevice.h>
+#include <mmf/common/mmfdrmcustomcommands.h>
 
 
 /** 
@@ -52,7 +53,8 @@ class CMMFAudioToneController : public CMMFController,
 							public MMMFAudioPlayDeviceCustomCommandImplementor,
 							public MMMFAudioPlayControllerCustomCommandImplementor,
 							public MDevSoundObserver,
-							public MMMFAudioPlayControllerSetRepeatsCustomCommandImplementor
+							public MMMFAudioPlayControllerSetRepeatsCustomCommandImplementor,
+							public MMMFDRMCustomCommandImplementor 
 	{
 public:
 	static CMMFController* NewL();
@@ -109,6 +111,12 @@ public:
 	
 	//from MMMFAudioPlayControllerSetRepeatsCustomCommandImplementor
 	virtual TInt MapcSetRepeats(TInt aRepeatNumberOfTimes, const TTimeIntervalMicroSeconds& aTrailingSilence);
+	
+	// From MMMFDRMCustomCommandImplementor
+    virtual TInt MdcExecuteIntent(ContentAccess::TIntent aIntent);
+    virtual TInt MdcEvaluateIntent(ContentAccess::TIntent aIntent);
+    virtual TInt MdcDisableAutomaticIntent(TBool aDisableAutoIntent);
+    virtual TInt MdcSetAgentProperty(ContentAccess::TAgentProperty aProperty, TInt aValue);
 
 
 public:
@@ -141,7 +149,8 @@ protected:
 	TBool            IsValidStateTransition( TControllerState aState ) const;
 	TBool            Invariant() const;
 	TBool            IsValidState( TControllerState aState ) const ;
-	TBool            ResetPostCondition() const;
+	TBool            ResetPostCondition() const;	
+	
 
 	void             CalculateLeftRightBalance( TInt& aLeft, TInt& aRight, TInt aBalance ) const;
 	void			 CalculateBalance( TInt& aBalance, TInt aLeft, TInt aRight ) const;
@@ -177,6 +186,10 @@ private:
 
 /** Used to store message */	
 	TMMFMessage*			 iMessage;
+
+	TBool                   iDisableAutoIntent;
+	
+	MDataSink*              iDataSink;
 	};
 
 

@@ -27,15 +27,9 @@ CMetadataUtilityItf* CMetadataUtilityItf::New(char* uri)
 {
 	CMetadataUtilityItf* p_mdutilitf = new CMetadataUtilityItf;
 	
-	TInt ret = p_mdutilitf->ParseSource(uri);
+	p_mdutilitf->ParseSource(uri); //ignore error
 
-	if(ret == KErrNone)
-	{
-		return p_mdutilitf; 
-	}
-
-	delete p_mdutilitf;
-	return NULL;
+	return p_mdutilitf;
 }
 
 TInt CMetadataUtilityItf::OpenSource(char* pOrigUri)
@@ -95,7 +89,24 @@ TInt CMetadataUtilityItf::OpenSource(char* pOrigUri)
     {
         delete []uri;
     }
-    
+
+	if(ret != KErrNone)
+	{
+		//delete the utilities
+		if(m_pS60Util)
+		{
+			delete m_pS60Util;
+			m_pS60Util = NULL;
+		}
+
+		if(m_pHXUtil)
+		{
+			delete m_pHXUtil;
+			m_pHXUtil = NULL;
+		}
+
+		
+	}
 	return ret;
 }
 
@@ -113,14 +124,18 @@ TInt CMetadataUtilityItf::ExtractUCS2(TDesC& inDes, char* outPtr,TInt maxLen)
 
 TInt CMetadataUtilityItf::CalculateNumMetadataItems(TUint*numItems)
 {
+	*numItems = 0;
+	
 	if(m_pS60Util)
 	{
 		return m_pS60Util->CalculateNumMetadataItems(numItems);
 	}
-	else
+	else if(m_pHXUtil)
 	{
 		return m_pHXUtil->CalculateNumMetadataItems(numItems);
 	}
+
+	return KErrNone;
 }
 
 char* CMetadataUtilityItf::GetKey(TInt index)
@@ -129,10 +144,12 @@ char* CMetadataUtilityItf::GetKey(TInt index)
 	{
 		return m_pS60Util->GetKey(index);
 	}
-	else
+	else if(m_pHXUtil)
 	{
 		return m_pHXUtil->GetKey(index);
 	}
+
+	return NULL;
 }
 
 TInt CMetadataUtilityItf::GetValueSize(TInt index)
@@ -141,10 +158,12 @@ TInt CMetadataUtilityItf::GetValueSize(TInt index)
 	{
 		return m_pS60Util->GetValueSize(index);
 	}
-	else
+	else if(m_pHXUtil)
 	{
 		return m_pHXUtil->GetValueSize(index);
 	}
+
+	return 0;
 }
 
 TInt CMetadataUtilityItf::GetValue(TInt index, char* data, TInt maxLength, TInt* outSize, TInt* encodingType)
@@ -153,10 +172,12 @@ TInt CMetadataUtilityItf::GetValue(TInt index, char* data, TInt maxLength, TInt*
 	{
 		return m_pS60Util->GetValue(index, data, maxLength, outSize, encodingType);
 	}
-	else
+	else if(m_pHXUtil)
 	{
 		return m_pHXUtil->GetValue(index, data, maxLength, outSize, encodingType);
 	}
+
+	return 0;
 }
 
 TInt CMetadataUtilityItf::ParseSource(char* uri)

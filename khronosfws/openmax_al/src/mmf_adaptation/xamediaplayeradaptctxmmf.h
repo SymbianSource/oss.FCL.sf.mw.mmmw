@@ -28,6 +28,9 @@ typedef struct XAMediaPlayerAdaptationMMFCtx_ XAMediaPlayerAdaptationMMFCtx;
 XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_Create( XADataSource *pDataSrc, XADataSource *pBankSrc,
                                                        XADataSink *pAudioSnk, XADataSink *pImageVideoSnk,
                                                        XADataSink *pVibra, XADataSink *pLEDArray);
+XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_CreateRadio(XAMediaPlayerAdaptationMMFCtx *pSelf, XADataSource *pDataSrc, XADataSource *pBankSrc,
+                                                      XADataSink *pAudioSnk, XADataSink *pImageVideoSnk,
+                                                      XADataSink *pVibra, XADataSink *pLEDArray);                                                       
 XAresult XAMediaPlayerAdaptMMF_PostInit( XAAdaptationMMFCtx* bCtx );
 void XAMediaPlayerAdaptMMF_Destroy( XAAdaptationMMFCtx* bCtx );
 

@@ -52,9 +52,13 @@ XAresult XAEngineItfImpl_CreateCameraDevice(XAEngineItf self,
                                             const XAboolean *pInterfaceRequired)
 {
     XAEngineItfImpl* impl = GetImpl(self);
+#ifdef OMAX_CAMERABIN
     return XACameraDeviceImpl_CreateCameraDevice( impl->mapper,impl->capabilities,
                                                     pDevice, deviceID,numInterfaces,
                                                     pInterfaceIds, pInterfaceRequired );
+#else
+    return XA_RESULT_FEATURE_UNSUPPORTED;
+#endif
 }
 
 XAresult XAEngineItfImpl_CreateRadioDevice(XAEngineItf self,
@@ -249,10 +253,12 @@ XAresult XAEngineItfImpl_QueryNumSupportedInterfaces(XAEngineItf self,
             res = XAOMixImpl_QueryNumSupportedInterfaces(
                                             pNumSupportedInterfaces);
             break;
+#ifdef OMAX_CAMERABIN
         case XA_OBJECTID_CAMERADEVICE:
             res = XACameraDeviceImpl_QueryNumSupportedInterfaces(
                                             pNumSupportedInterfaces);
             break;
+#endif
         case XA_OBJECTID_RADIODEVICE:
             res = XARadioDeviceImpl_QueryNumSupportedInterfaces(
                                             pNumSupportedInterfaces);
@@ -311,10 +317,12 @@ XAresult XAEngineItfImpl_QuerySupportedInterfaces(XAEngineItf self,
             res = XAOMixImpl_QuerySupportedInterfaces(
                                                 index, pInterfaceId);
             break;
+#ifdef OMAX_CAMERABIN
         case XA_OBJECTID_CAMERADEVICE:
             res = XACameraDeviceImpl_QuerySupportedInterfaces(
                                                 index, pInterfaceId );
             break;
+#endif
         case XA_OBJECTID_RADIODEVICE:
             res = XARadioDeviceImpl_QuerySupportedInterfaces(
                                                 index, pInterfaceId );

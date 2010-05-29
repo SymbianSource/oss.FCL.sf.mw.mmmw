@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SYSTEMTONESERVICE_IBY
-#define SYSTEMTONESERVICE_IBY
+#ifndef MMMWSYSTEMTONESERVICE_IBY
+#define MMMWSYSTEMTONESERVICE_IBY
 
 #include <bldvariant.hrh>
 
@@ -30,6 +30,6 @@ file=ABI_DIR/BUILD_DIR/stsserver.exe                 SHARED_LIB_DIR/stsserver.ex
 //STS_Stub
 data=ZSYSTEM/install/sts_stub.sis                    System/Install/sts_stub.sis
 
-#endif //SYSTEMTONESERVICE_IBY
+#endif //MMMWSYSTEMTONESERVICE_IBY
 
 //End of File

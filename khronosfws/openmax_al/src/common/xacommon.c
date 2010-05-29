@@ -78,7 +78,7 @@ XAresult XACommon_CheckDataSource(XADataSource* source, XAMediaType* type)
     {
         fname = (XAchar*)((XADataLocator_URI*)(source->pLocator))->URI;
         /* check protocol prefix */
-        if(strstr((char*)fname,":///"))
+        if(strstr((char*)fname,"://"))
         {
             if(strncmp((char*)fname, "file:///", 8) == 0)
             {

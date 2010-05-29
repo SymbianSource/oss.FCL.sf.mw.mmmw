@@ -229,15 +229,13 @@ void CSystemToneServiceStif::PlayAlarmComplete(unsigned int aAlarmContext)
     if (aAlarmContext == iCurrentContext)
         {
         	
-         _LIT( Ksystemtoneservicestif, "STS" );
+          _LIT( Ksystemtoneservicestif, "STS" );
           _LIT( KPrint, "PlayAlarmComplete" );
           TestModuleIf().Printf( 0, Ksystemtoneservicestif, KPrint );
-          // Print to log file
-          iLog->Log( KPrint );	
-        	
-        iPlayState = EStopped;
-        iCallbackController->Cancel();
-        //HandleEvent();
+                 	
+        	iPlayState = EStopped;
+        	iCallbackController->Cancel();
+        	//HandleEvent();
         }
     }  
 

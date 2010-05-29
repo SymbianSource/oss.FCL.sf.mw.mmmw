@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __CALLIPADAPT_H
-#define __CALLIPADAPT_H
+#ifndef CALLIPADAPT_H
+#define CALLIPADAPT_H
 
 // INCLUDES
 #include <e32msgqueue.h>
@@ -24,6 +24,7 @@
 #include "tmsclientserver.h"
 #include "tmsshared.h"
 #include "tmscalladpt.h"
+#include "tmsipcallstream.h"
 #include "tmsdtmftoneplayer.h"
 #include "tmsdtmfnotifier.h"
 
@@ -33,35 +34,41 @@ namespace TMS {
 class TMSIPDownlink;
 class TMSIPUplink;
 
-// TMSCallIPAdpt class
+/*
+ * TMSCallIPAdpt class
+ */
 class TMSCallIPAdpt : public TMSCallAdpt,
+                      public TMSIPDevSoundObserver,
                       public TMSDTMFTonePlayerObserver
     {
 public:
-    // Constractor
     static TMSCallIPAdpt* NewL();
     virtual ~TMSCallIPAdpt();
     virtual gint PostConstruct();
 
     // From TMSStream
-    virtual gint CreateStream(TMSCallType callType, TMSStreamType strmType,
-            gint& outStrmId);
-    virtual gint InitStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId, TMSFormatType frmtType, const RMessage2& message);
-    virtual gint StartStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint PauseStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint StopStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint DeinitStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint DeleteStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint DataXferBufferEmptied(TMSCallType callType,
-            TMSStreamType strmType, gint strmId);
-    virtual gint DataXferBufferFilled(TMSCallType callType,
-            TMSStreamType strmType, gint strmId, guint datasize);
+    virtual gint CreateStream(const TMSCallType callType,
+            const TMSStreamType strmType, gint& outStrmId);
+    virtual gint InitStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId,
+            const TMSFormatType frmtType, const gint retryTime,
+            const RMessage2& message);
+    virtual gint StartStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId,
+            const gint retrytime);
+    virtual gint PauseStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint StopStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint DeinitStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint DeleteStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint DataXferBufferEmptied(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint DataXferBufferFilled(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId,
+            const guint datasize);
     virtual gint GetDataXferBufferHndl(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId,
             const guint32 key, RChunk& chunk);
@@ -96,16 +103,16 @@ public:
     virtual gint GetPlc(const TMSFormatType fmttype, gboolean& plc);
     virtual gint SetPlc(const TMSFormatType fmttype, const gboolean plc);
 
-    // From TMS audio output
-    virtual gint SetOutput(TMSAudioOutput output);
+    // From TMS audio routing
+    virtual gint SetOutput(const TMSAudioOutput output);
     virtual gint GetOutput(TMSAudioOutput& output);
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
-    virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer);
+    virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuf);
 
-    // From TMSDTMF
-    virtual gint StartDTMF(TMSStreamType streamtype, TDes& dtmfstring);
-    virtual gint StopDTMF(TMSStreamType streamtype);
-    virtual gint ContinueDTMF(gboolean continuesending);
+	// From TMSDTMF
+    virtual gint StartDTMF(const TMSStreamType streamtype, TDes& dtmfstr);
+    virtual gint StopDTMF(const TMSStreamType streamtype);
+    virtual gint ContinueDTMF(const gboolean sending);
 
     // From TMS codec formats
     gint SetIlbcCodecMode(const gint mode, const TMSStreamType strmtype);
@@ -118,8 +125,6 @@ public:
     gint ConcealErrorForNextBuffer();
     gint BadLsfNextBuffer();
 
-    gint OpenDownlinkL(const RMessage2& message);
-    gint OpenUplinkL(const RMessage2& message);
     void SetFormat(const gint strmId, const guint32 aFormat);
 
     void BufferFilledL(guint dataSize);
@@ -127,34 +132,45 @@ public:
     gint GetDataXferChunkHndl(const TMSStreamType strmType,
             const guint32 key, RChunk& chunk);
 
-    //From DTMFTonePlayerObserver
-     void DTMFInitCompleted(gint error);
-     void DTMFToneFinished(gint error);
+    //From TMSIPDevSoundObserver
+    void DownlinkInitCompleted(gint status);
+    void UplinkInitCompleted(gint status);
+    void DownlinkStarted(gint status);
+    void UplinkStarted(gint status);
+
+    //From TMSDTMFTonePlayerObserver
+    void DTMFInitCompleted(gint status);
+    void DTMFToneFinished(gint status);
 
 private:
-    void ConstructL();
     TMSCallIPAdpt();
+    void ConstructL();
+
+    gint OpenDownlink(const RMessage2& message, const gint retrytime);
+    gint OpenUplink(const RMessage2& message, const gint retrytime);
 
     gint InitDTMF(TMSStreamType strmtype);
-    void NotifyClient(const gint strmId, const gint aCommand,
-            const gint aStatus = KErrNone, const gint64 aInt64 = gint64(0));
     void GetSupportedBitRatesL(CBufFlat*& brbuffer);
+    void NotifyClient(const gint strmId, const gint command,
+            const gint status = KErrNone, const gint64 int64 = TInt64(0));
 
 private:
     gint iNextStreamId;
+    TMSIPUplink* iIPUplink;
+    TMSIPDownlink* iIPDownlink;
+    TMSAudioDtmfTonePlayer* iDTMFDnlinkPlayer;
+    TMSDtmfNotifier* iDTMFNotifier;
+    TMSAudioDtmfTonePlayer* iDTMFUplinkPlayer;
+    // Message queues for communication and data transfer back to the client
+    RMsgQueue<TmsMsgBuf> iMsgQueueUp;
+    RMsgQueue<TmsMsgBuf> iMsgQueueDn;
+    TmsMsgBuf iMsgBuffer;
+
     gboolean iUplinkInitialized;
     gint iUplinkStreamId;
     gboolean iDnlinkInitialized;
     gint iDnlinkStreamId;
 
-    TMSIPDownlink* iIPDownlink;
-    TMSIPUplink* iIPUplink;
-
-    // Message queues for communication and data transfer back to the client
-    RMsgQueue<TmsMsgBuf> iMsgQueueUp;
-    RMsgQueue<TmsMsgBuf> iMsgQueueDn;
-
-    TmsMsgBuf iMsgBuffer;
     TMMFPrioritySettings iPriority;
     guint32 iUpFourCC;
     guint32 iDnFourCC;
@@ -163,14 +179,10 @@ private:
     RArray<guint> iArrBitrates;
     RArray<TFourCC> iCodecs;
     gint iCodecsCount;
-
-    TMSAudioDtmfTonePlayer* iDTMFDnlinkPlayer;
-    TMSAudioDtmfTonePlayer* iDTMFUplinkPlayer;
-    TMSDtmfNotifier* iDTMFNotifier;
     };
 
 } //namespace TMS
 
-#endif //__CALLIPADAPT_H
+#endif //CALLIPADPT_H
 
 // End of file

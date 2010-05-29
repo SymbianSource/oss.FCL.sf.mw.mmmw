@@ -98,6 +98,40 @@ TInt COpenMAXALTestModule::al_nokialinearvolumeitf_SetVolumeLevel( CStifItemPars
     return status;
     }
     
+TInt COpenMAXALTestModule::al_nokialinearvolumeitf_SetGetVolumeLevel( CStifItemParser& aItem )
+    {
+    TInt status(KErrNone);
+    TInt volume(0);
+    XAuint32 alvol;
+    XAuint32 getVol(0);
+    status = aItem.GetNextInt(volume);
+    RET_ERR_IF_ERR(status);
+    XAuint32 expectedVol = volume;
+    
+    if(m_NokiaLinearVolumeItf)
+        {
+        alvol = volume;
+        status = (*m_NokiaLinearVolumeItf)->SetVolumeLevel(m_NokiaLinearVolumeItf, &alvol);
+        if (status != KErrNone)
+        {
+        	return status;
+        }
+        status = (*m_NokiaLinearVolumeItf)->GetVolumeLevel(m_NokiaLinearVolumeItf, &getVol);
+        if (status != KErrNone)
+        {
+        	return status;
+        } 
+        if (getVol != expectedVol) 
+        	status = KErrCompletion;     
+        }
+    else
+        {
+        return KErrNotFound;
+        }
+    
+    return status;
+    }    
+    
 TInt COpenMAXALTestModule::al_nokialinearvolumeitf_GetVolumeLevel( CStifItemParser& /*aItem*/ )
     {
     TInt status(KErrNone);

@@ -29,7 +29,7 @@ static const char* playstatenamemmf[3] =
     "XA_PLAYSTATE_PAUSED",
     "XA_PLAYSTATE_PLAYING"
 };
-#define PLAYSTATENAME(i) (const char*)((i>0&&i<4)?playstatenamesmmf[i-1]:"INVALID")
+#define PLAYSTATENAME(i) (const char*)((i>0&&i<4)?playstatenamemmf[i-1]:"INVALID")
 #endif /*_DEBUG*/
 
 
@@ -44,5 +44,5 @@ XAresult XAPlayItfAdaptMMF_SetCallbackEventsMask(XAAdaptationBaseCtx *bCtx, XAui
 XAresult XAPlayItfAdaptMMF_SetMarkerPosition(XAAdaptationBaseCtx *bCtx, XAmillisecond mSec);
 XAresult XAPlayItfAdaptMMF_ClearMarkerPosition(XAAdaptationBaseCtx *bCtx);
 XAresult XAPlayItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationBaseCtx *bCtx, XAmillisecond mSec);
-
+void XAPlayItfAdaptMMF_StateChange(XAAdaptationBaseCtx *bCtx, XAboolean playing); 
 #endif /* XAPLAYITFADAPTATIONMMF_H */

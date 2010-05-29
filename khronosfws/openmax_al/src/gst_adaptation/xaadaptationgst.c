@@ -27,8 +27,15 @@
 #include "xamediaplayeradaptctx.h"
 #include "xacameraadaptctx.h"
 #include <stdlib.h>
+
+#ifdef OMAX_CAMERABIN
 extern XAboolean cameraRealized;
+
 extern XACameraAdaptationCtx_* cameraCtx;
+#else
+XAboolean cameraRealized = XA_BOOLEAN_FALSE;
+XACameraAdaptationCtx_* cameraCtx = NULL;
+#endif
 /*
  * XAAdaptationGstCtx* XAAdaptationGst_Create()
  * 1st phase initialization function for Adaptation Base context structure.
@@ -409,9 +416,11 @@ GstElement* XAAdaptationGst_CreateGstSource( XADataSource* xaSrc, const char *na
     char* fname=NULL;
     XADataLocator_URI* uri = NULL;
     XADataLocator_IODevice* ioDevice = NULL;
+#ifdef OMAX_CAMERABIN
     XACameraDeviceImpl* cameraDevice = NULL;
-    XARadioDeviceImpl* radioDevice = NULL;
     XAObjectItfImpl* pObj = NULL;
+#endif
+    XARadioDeviceImpl* radioDevice = NULL;
 
     DEBUG_API("->XAAdaptationGst_CreateGstSource");
     if( !xaSrc || !xaSrc->pLocator || !isobj )
@@ -489,6 +498,8 @@ GstElement* XAAdaptationGst_CreateGstSource( XADataSource* xaSrc, const char *na
                     }
                     break;
                 }
+#ifdef OMAX_CAMERABIN
+             
                 case XA_IODEVICE_CAMERA:
                 {
                     DEBUG_INFO("XA_IODEVICE_CAMERA");
@@ -539,6 +550,7 @@ GstElement* XAAdaptationGst_CreateGstSource( XADataSource* xaSrc, const char *na
                     }
                     break;
                 }
+#endif                
                 case XA_IODEVICE_RADIO:
                     DEBUG_INFO("XA_IODEVICE_RADIO");
                     if ( ioDevice->device )

@@ -241,6 +241,13 @@ XAresult XAPlayItfImpl_RegisterCallback(XAPlayItf self, xaPlayCallback callback,
     impl->callback = callback;
     impl->cbcontext = pContext;
     impl->cbPtrToSelf = self;
+    
+    // No need to do anything else if radio:
+		if ( ((XAMediaPlayerAdaptationMMFCtx*)impl->pObjImpl->curAdaptCtx)->isForRadio == XA_BOOLEAN_TRUE)
+		{
+    	DEBUG_API("<-XAPlayItfImpl_RegisterCallback");
+    	return ret;			
+		}
 
     XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaPlayer );
 

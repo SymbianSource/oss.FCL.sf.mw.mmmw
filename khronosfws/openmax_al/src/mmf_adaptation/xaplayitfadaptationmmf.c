@@ -20,6 +20,7 @@
 #include "xaplayitfadaptationmmf.h"
 #include "xaadaptationmmf.h"
 #include "cmmfbackendengine.h"
+#include "cmmfradiobackendengine.h"
 #include <glib.h>
 
 extern XAboolean cameraRealized;
@@ -47,16 +48,32 @@ XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseCtx *bCtx, XAuint32 stat
     {
         case XA_PLAYSTATE_STOPPED:
         {
-            ret = mmf_playitf_stop_playback(mCtx->mmfContext);
-            break;
+        	if ( bCtx->ctxId == XARadioAdaptation )
+    		{
+    			mmf_set_player_adapt_context(cmmfradiobackendengine_init(), bCtx);	    			
+    			stop_radio(cmmfradiobackendengine_init());
+    		}
+    		else
+    		{
+    			ret = mmf_playitf_stop_playback(mCtx->mmfContext);
+          	}
+          break;
         }
         case XA_PLAYSTATE_PAUSED:
             ret = mmf_playitf_pause_playback(mCtx->mmfContext);
             break;
         case XA_PLAYSTATE_PLAYING:
         {
-            ret = mmf_playitf_resume_playback(mCtx->mmfContext);
-            break;
+   				if ( bCtx->ctxId == XARadioAdaptation )
+    			{
+    				mmf_set_player_adapt_context(cmmfradiobackendengine_init(), bCtx);	    				
+    				play_radio(cmmfradiobackendengine_init());    	
+    			} 
+    			else
+    			{ 
+          			ret = mmf_playitf_resume_playback(mCtx->mmfContext);
+        		}  
+          break;
         }
         default:
             ret = XA_RESULT_PARAMETER_INVALID;
@@ -210,4 +227,22 @@ XAresult XAPlayItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationBaseCtx *bCtx, XA
 
     DEBUG_API("<-XAPlayItfAdaptMMF_SetPositionUpdatePeriod");
     return ret;
+}
+/*
+ * XAresult XAPlayItfAdapt_StateChange
+ * Handle callback from Radio utility 
+ */
+void XAPlayItfAdaptMMF_StateChange(XAAdaptationBaseCtx *bCtx, XAboolean playing)
+{
+	  if (playing)
+	  {
+   		XAAdaptEvent event = {XA_PLAYITFEVENTS, XA_PLAYEVENT_HEADMOVING,1,0}; 
+   		XAAdaptationBase_SendAdaptEvents(bCtx, &event );  	   		
+   	}
+   	else
+   	{
+   		XAAdaptEvent event = {XA_PLAYITFEVENTS, XA_PLAYEVENT_HEADSTALLED,1,0};  
+   		XAAdaptationBase_SendAdaptEvents(bCtx, &event );  	   		  		
+   	}
+
 }

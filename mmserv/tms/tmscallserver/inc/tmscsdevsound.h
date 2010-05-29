@@ -19,58 +19,50 @@
 #define TMSCSDEVSOUND_H
 
 #include <sounddevice.h>
+#include "tmstimer.h"
 
 namespace TMS {
 
-class TMSCSPDevSoundObserver;
+// FORWARD DECLARATIONS
+class TMSTimer;
+class TMSCSDevSoundObserver;
 
 /**
  *  Wrapper for CMMFDevSound
  *
  */
-NONSHARABLE_CLASS(TMSCSPDevSound) : public CBase,
-                                    public MDevSoundObserver
+NONSHARABLE_CLASS(TMSCSDevSound) : public CBase,
+                                   public MDevSoundObserver,
+                                   public TMSTimerObserver
     {
 public:
 
     /**
      * Destructor.
      */
-    virtual ~TMSCSPDevSound();
+    virtual ~TMSCSDevSound();
 
     /**
-     * Activates the dev sound stream. TMSCSPDevSoundObserver methods are called
-     * when activation goes ok or fails. If the stream is already active or
-     * activating then nothing is done.
+     * Activates the DevSound stream.
+     * Stream activation status is indicated by TMSCSDevSoundObserver callback
+     * methods. If the stream is already active or being activated, call to
+     * this will result in no action.
      */
-    virtual void Activate();
+    virtual void Activate(const gint retrytime);
 
     /**
-     * Deactivates the devsound stream. If stream is not active or
-     * activation is not ongoing then nothing is done.
+     * Deactivates an active DevSound stream.
      */
-    virtual void Deactivate();
+    virtual void Deactivate(gboolean reset = TRUE);
 
-    /**
-     * Indicates that activation is ongoing,
-     * but the result of the activation is still unknown.
-     * @return ETrue - activation ongoing, EFalse - activation not ongoing.
+    /*
+     * Returns DevSound instance associated with the stream.
      */
-    TBool IsActivationOngoing() const;
-
-    /**
-     * Determines wether the devsound stream is active or not.
-     * @return ETrue - Stream is active, EFalse - Stream not active.
-     */
-    TBool IsActive() const;
-
     CMMFDevSound& DevSound();
-
-    // from base class MDevSoundObserver
 
     /**
      * From MDevSoundObserver
-     * Empty implementation
+     * Indicates DevSound initialization status.
      */
     void InitializeComplete(TInt aError);
 
@@ -78,50 +70,58 @@ public:
      * From MDevSoundObserver
      * Empty implementation
      */
-    void BufferToBeFilled(CMMFBuffer* aBuffer);
+    void BufferToBeFilled(CMMFBuffer* /*aBuffer*/) {}
 
     /**
      * From MDevSoundObserver
      * Empty implementation
      */
-    void PlayError(TInt aError);
+    void PlayError(TInt /*aError*/) {}
 
     /**
      * From MDevSoundObserver
      * Empty implementation
      */
-    void ToneFinished(TInt aError);
+    void ToneFinished(TInt /*aError*/) {}
 
     /**
      * From MDevSoundObserver
      * Empty implementation
      */
-    void BufferToBeEmptied(CMMFBuffer* aBuffer);
+    void BufferToBeEmptied(CMMFBuffer* /*aBuffer*/) {}
 
     /**
      * From MDevSoundObserver
      * Empty implementation
      */
-    void RecordError(TInt aError);
+    void RecordError(TInt /*aError*/) {}
 
     /**
      * From MDevSoundObserver
      * Empty implementation
      */
-    void ConvertError(TInt aError);
+    void ConvertError(TInt /*aError*/) {}
 
     /**
      * From MDevSoundObserver
      * Empty implementation
      */
-    void DeviceMessage(TUid aMessageType, const TDesC8& aMsg);
+    void DeviceMessage(TUid /*aMessageType*/, const TDesC8& /*aMsg*/) {}
+
+    /*
+     * From TMSTimerObserver.
+     * Called upon timer timeout event.
+     */
+    void TimerEvent();
 
 protected:
 
-    TMSCSPDevSound(TMSCSPDevSoundObserver& aObserver);
-
-    void ConstructL(TMMFState aMode, gint aAudioPreference,
-            gint aAudioPriority);
+    TMSCSDevSound(TMSCSDevSoundObserver& observer);
+    void ConstructL(const TMSStreamType strmtype, const gint retrytime);
+    void InitializeL();
+    void NotifyEvent(gint error);
+    void StartTimer();
+    void CancelTimer();
 
 private:
 
@@ -132,31 +132,40 @@ private:
 
 protected:
 
-    TUint iStreamType;
-
     /**
-     * Indication if device is activated. Derived class has to update this.
-     */
-    TBool iActive;
-
-    /**
-     * Indication if activation is ongoing.
+     * Indication of DevSound activated state. TRUE == stream activated.
      * Derived class has to update this.
      */
-    TBool iActivationOngoing;
+    gboolean iActive;
 
     /**
-     * Devsound instance
-     * Own.
+     * Indication of an ongoing DevSound activation.
+     * Derived class has to update this.
+     */
+    gboolean iActivationOngoing;
+
+    /**
+     * Devsound instance associated with the stream.
      */
     CMMFDevSound* iDevSound;
 
     /**
-     * Observer for successfull activation.
-     * Not own.
+     * An observer subscribing to TMSCSDevSound notifications.
      */
-    TMSCSPDevSoundObserver& iObserver;
+    TMSCSDevSoundObserver& iObserver;
 
+    TMSStreamType iStreamType;
+    gint iPreference;
+    gint iPriority;
+    TMMFState iMode;
+
+    /*
+     * For retry timer
+     */
+    gint iInitRetryTime;
+    gint iStartRetryTime;
+    TMSTimer* iTimer;
+    gint iTimeout;
     };
 
 } //namespace TMS

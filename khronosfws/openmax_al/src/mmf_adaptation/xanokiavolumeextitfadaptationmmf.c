@@ -19,6 +19,7 @@
 #include "xamediaplayeradaptctxmmf.h"
 #include "xamediarecorderadaptctxmmf.h"
 #include "cmmfbackendengine.h"
+#include "cmmfradiobackendengine.h"
 
 /*
  * XAresult XANokiaVolumeExtItfAdapt_SetMute(void *ctx, AdaptationContextIDS ctx->ctxId, XAboolean mute)
@@ -30,6 +31,8 @@
 XAresult XANokiaVolumeExtItfAdapt_SetMute(XAAdaptationMMFCtx *ctx, XAboolean mute)
 {    
     XAuint32 volume;
+    XAresult res = XA_RESULT_SUCCESS;
+    
     DEBUG_API("->XANokiaVolumeExtItfAdapt_SetMute");
     if(!ctx || ( ctx->baseObj.ctxId != XAMediaPlayerAdaptation &&
                  ctx->baseObj.ctxId != XAMediaRecorderAdaptation &&
@@ -77,11 +80,12 @@ XAresult XANokiaVolumeExtItfAdapt_SetMute(XAAdaptationMMFCtx *ctx, XAboolean mut
     }
    	else if ( ctx->baseObj.ctxId == XARadioAdaptation )
     {
-   			
+	        mmf_set_player_adapt_context(cmmfradiobackendengine_init(), ctx);	        	
+    		res = set_mute(cmmfradiobackendengine_init(), mute);  			
     }
         
     DEBUG_API("<-XANokiaVolumeExtItfAdapt_SetMute");
-    return XA_RESULT_SUCCESS;
+    return res;
 }
 
 /*
@@ -111,7 +115,11 @@ XAresult XANokiaVolumeExtItfAdapt_EnableStereoPosition(XAAdaptationMMFCtx *ctx, 
     {
  
     }
-
+    else if ( ctx->baseObj.ctxId == XARadioAdaptation )
+    {
+ 			return XA_RESULT_FEATURE_UNSUPPORTED;
+    }
+	
     DEBUG_API("<-XANokiaVolumeExtItfAdapt_EnableStereoPosition");
     return XA_RESULT_SUCCESS;
 }
@@ -143,6 +151,10 @@ XAresult XANokiaVolumeExtItfAdapt_SetStereoPosition(XAAdaptationMMFCtx *ctx,
     {
 
     }
+    else if ( ctx->baseObj.ctxId == XARadioAdaptation )
+    {
+ 			return XA_RESULT_FEATURE_UNSUPPORTED;
+    }    
 
     DEBUG_API("<-XANokiaVolumeExtItfAdapt_SetStereoPosition");
     return XA_RESULT_SUCCESS;

@@ -1435,6 +1435,7 @@ void CRadioServer::PlayError(
         iState = EStateTunerOff;
         iPreEmpted = ETrue;
         iSettings->SetRadioOff(aError);
+        RADIO_RDEBUG(_L("[RADIO-SVR] PlayError() - Call TunerOff and start waiting"));
         iTunerControl->TunerOff();		//The adaptation is expected to call TunerOffComplete() upon completion
         // wait for TunerOffComplete callback
         iSchedulerWait->Start();
@@ -1680,12 +1681,6 @@ void CRadioServer::ProcessRequestTunerControl(
         return;
         }
 
-    if ( iState != EStateStarted )
-        {
-        CompleteAsyncRequest(KErrAlreadyExists);
-        return;
-        }
-
     TInt err = KErrNone;
     if ( !iTunerControl )
         {
@@ -1832,7 +1827,7 @@ void CRadioServer::ProcessSetFrequency(
             break;
         case EStateTunerOff:
             if ( iSettings->IsAntennaAttached() && AllowRadioInOfflineMode()
-                    && !iSettings->IsTransmitterActive() )
+                    && !iSettings->IsTransmitterActive() && !iPreEmpted )
                 {
                 RADIO_RDEBUG(_L("[RADIO-SVR] ProcessSetFrequency() - Sent TunerOn request"));
                 RecreateFmTunerControl();

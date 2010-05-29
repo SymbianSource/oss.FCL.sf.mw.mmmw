@@ -166,7 +166,7 @@ EXPORT_C gint TMSStream::Init()
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (iBody)
         {
-        status = iBody->Init();
+        status = iBody->Init(0);
         }
     return status;
     }
@@ -186,7 +186,7 @@ EXPORT_C gint TMSStream::Start()
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (iBody)
         {
-        status = iBody->Start();
+        status = iBody->Start(0);
         }
     return status;
     }

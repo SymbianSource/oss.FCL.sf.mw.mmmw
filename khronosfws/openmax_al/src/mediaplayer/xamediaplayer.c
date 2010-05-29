@@ -91,7 +91,9 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
     XAObjectItfImpl* pBaseObj = NULL;
     const char *uri = NULL;
     XAresult ret = XA_RESULT_SUCCESS;
-    
+   	XADataLocator_IODevice* tmpIODevice;
+  	XADataLocator_IODevice  locatorIODevice;   	   
+
     DEBUG_API("->XAMediaPlayerImpl_CreateMediaPlayer");
 
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaPlayer);
@@ -219,19 +221,28 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
     pPlayerImpl->imageVideoSnk = pImageVideoSnk;
     pPlayerImpl->vibra = pVibra;
     pPlayerImpl->LEDArray = pLEDArray;
-
-    /* Determine framework type that can handle recording */
-    fwType = (FWMgrFwType)FWMgrMOUnknown;
-    /**/
-    if (pDataSrc->pLocator)
-    {
-        XADataLocator_URI* dataLoc = (XADataLocator_URI*)pDataSrc->pLocator;
-        if (dataLoc->locatorType == XA_DATALOCATOR_URI)
-            {
-            uri = (char*)dataLoc->URI;
-            }
-    }
-    fwType = XAFrameworkMgr_GetFramework(
+    
+    // Handle possible radio:      
+   	tmpIODevice = (XADataLocator_IODevice*)(pPlayerImpl->dataSrc->pLocator);   
+	locatorIODevice = *tmpIODevice; 
+ 	if (locatorIODevice.deviceType == XA_IODEVICE_RADIO)
+   	{		   
+		fwType = (FWMgrFwType)FWMgrFWMMF;
+	}
+	else
+		{
+    	/* Determine framework type that can handle recording */
+     	fwType = (FWMgrFwType)FWMgrMOUnknown;  
+    	/**/
+    	if (pDataSrc->pLocator)
+    	{
+      	  XADataLocator_URI* dataLoc = (XADataLocator_URI*)pDataSrc->pLocator;
+        	if (dataLoc->locatorType == XA_DATALOCATOR_URI)
+        	    {
+            	uri = (char*)dataLoc->URI;
+            	}
+    	}
+    	fwType = XAFrameworkMgr_GetFramework(
                         mapper,
                         uri,
                         FWMgrMOPlayer);
@@ -244,6 +255,7 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
         DEBUG_API("<-XAMediaPlayerImpl_CreateMediaPlayer");
         return ret;
         }
+   } // end else
     
     if(fwType == FWMgrFWMMF)
     {    
@@ -412,6 +424,7 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                 case MP_EQUALIZERITF:
                     pItf = XAEqualizerItfImpl_Create(pImpl->curAdaptCtx);
                     break;
+#ifdef OMAX_CAMERABIN
                 case MP_IMAGECONTROLSITF:
                     pItf = XAImageControlsItfImpl_Create(pImpl->curAdaptCtx);
                     break;
@@ -421,6 +434,7 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                 case MP_VIDEOPOSTPROCESSINGITF:
                     pItf = XAVideoPostProcessingItfImpl_Create(pImpl->curAdaptCtx);
                     break;
+#endif
                case MP_NOKIAVOLUMEEXT:
                     pItf = XANokiaVolumeExtItfImpl_Create(pImpl->curAdaptCtx);
                     break;
@@ -535,6 +549,7 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
                 case MP_EQUALIZERITF:
                     XAEqualizerItfImpl_Free(pItf);
                     break;
+#ifdef OMAX_CAMERABIN
                 case MP_IMAGECONTROLSITF:
                     XAImageControlsItfImpl_Free(pItf);
                     break;
@@ -544,6 +559,7 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
                 case MP_VIDEOPOSTPROCESSINGITF:
                     XAVideoPostProcessingItfImpl_Free(pItf);
                     break;
+#endif
                 case MP_NOKIAVOLUMEEXT:
                     XANokiaVolumeExtItfImpl_Free(pItf);
                     break;
@@ -605,10 +621,11 @@ XAresult XAMediaPlayerImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry
             case MP_EQUALIZERITF:
                 mapEntry->pItf = XAEqualizerItfImpl_Create( pImpl->curAdaptCtx );
                 break;
+#ifdef OMAX_CAMERABIN
             case MP_IMAGEEFFECTSITF:
                 mapEntry->pItf = XAImageEffectsItfImpl_Create( pImpl->curAdaptCtx );
                 break;
-
+#endif
             default:
                 DEBUG_ERR("XAMediaPlayerImpl_DoAddItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
@@ -667,9 +684,11 @@ XAresult XAMediaPlayerImpl_DoRemoveItf(XAObjectItf self, XAObjItfMapEntry *mapEn
             case MP_EQUALIZERITF:
                 XAEqualizerItfImpl_Free(mapEntry->pItf);
                 break;
+#ifdef OMAX_CAMERABIN				
             case MP_IMAGEEFFECTSITF:
                 XAImageEffectsItfImpl_Free(mapEntry->pItf);
                 break;
+#endif
             default:
                 DEBUG_ERR("XAMediaPlayerImpl_DoRemoveItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;

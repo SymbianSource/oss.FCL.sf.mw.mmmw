@@ -109,9 +109,15 @@ typedef enum {
 
 #define XA_ADAPTID_UNINITED 0
 
-#define XA_ADAPT_VOLUME_VOLUME_CHANGED          0xfb			 /* volume changed */
-#define XA_ADAPT_VOLUME_MUTE_CHANGED            0xfc         	/* mute changed */
-#define XA_ADAPT_VULOME_STEREOPOSITION_CHANGED  0xfd
+#define XA_ADAPT_PLAY_STATE_CHANGED 0xf5			
+#define XA_ADAPT_RADIO_FREQUENCY_CHANGED 0xf6       /* Radio frequency changed event */
+#define XA_ADAPT_RADIO_FREQUENCY_RANGE_CHANGED 0xf7 /* Radio frequency range changed event */
+#define XA_ADAPT_RADIO_SEEK_COMPLETE 0xf8           /* Radio seek complete changed event */
+#define XA_ADAPT_RADIO_STEREO_STATUS_CHANGED 	0xf9  /* Radio stereo status changed */
+#define XA_ADAPT_RADIO_SIGNAL_STRENGTH_CHANGED 0xfa   /* Radio signal status changed */
+#define XA_ADAPT_VOLUME_VOLUME_CHANGED 0xfb					/* volume changed */
+#define XA_ADAPT_VOLUME_MUTE_CHANGED 0xfc         	/* mute changed */
+#define XA_ADAPT_VULOME_STEREOPOSITION_CHANGED  0xfd /* stereo position changed */
 
 /* Adaptation event structure */
 typedef struct XAAdaptEvent_
