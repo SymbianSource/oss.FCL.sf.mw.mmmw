@@ -1352,6 +1352,21 @@ void CAdvancedAudioPlayController::DoPauseL(TBool aPreemption)
         {// we got preempted during a seek
         // we're already seeking to a position. When we get there we'll come here again, but handle it below
         DP0(_L("CAdvancedAudioPlayController::DoPauseL got a preemption during seek"));
+        
+         // if we are seeking, we need to flush the devsound buffers regardless of loop play
+        DP0(_L("CAdvancedAudioPlayController::DoPauseL AudioOutput->StopL()"));
+        iAudioOutput->StopL();
+
+        if (iPlayingForInitPos)
+         {
+           iState = EInitialized;
+         }
+        else
+         {
+           iState = EPaused;
+         }
+        iPlayingForPauseSeek = EFalse;
+        iPlayingForInitPos = EFalse; 
         return;
         }
 

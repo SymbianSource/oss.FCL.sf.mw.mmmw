@@ -114,18 +114,10 @@ enum TUserCommand
     ECmdUplinkPaused,
     ECmdFillBuffer,
     ECmdEmptyBuffer,
-    ECmdDTMFOpenDnlinkComplete,
-    ECmdDTMFOpenUplinkComplete,
-    ECmdDTMFTonePlayFinished,
-    ECmdRingToneOpenComplete,
-    ECmdRingTonePlayComplete,
-    ECmdRingToneDeinitComplete,
     ECmdDownlinkClosed,
     ECmdUplinkClosed,
     ECmdGlobalRoutingChange,
-    ECmdGlobalEffectChange,
-    ECmdInbandToneStarted,
-    ECmdInbandToneStopped
+    ECmdGlobalEffectChange
     };
 
 // -----------------------------------------------------------------------------

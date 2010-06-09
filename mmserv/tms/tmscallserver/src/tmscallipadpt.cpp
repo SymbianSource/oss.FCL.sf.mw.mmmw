@@ -100,7 +100,6 @@ gint TMSCallIPAdpt::PostConstruct()
     iNextStreamId = 1;
     iUplinkInitialized = FALSE;
     iDnlinkInitialized = FALSE;
-
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -990,11 +989,18 @@ gint TMSCallIPAdpt::SetPlc(const TMSFormatType fmttype, const gboolean plc)
 gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
 
     // Clients must have MultimediaDD capability to use this priority/pref.
     // TODO: Also, TMS will monitor for emergency call and if detected it
     //       will deny access to audio resources.
+
+    /* Clarify with adaptation team which prio/pref values should be used.
+     * 1) KAudioPrefUnknownVoipAudioDownlink      -3rd party VoIP?
+     *    KAudioPriorityUnknownVoipAudioDownlink  -3rd party VoIP?
+     * 2) KAudioPrefVoipAudioDownlink             -NOK native VoIP?
+     *    KAudioPriorityVoipAudioDownlink         -NOK native VoIP?
+     */
     iPriority.iPref = KAudioPrefVoipAudioDownlink;
     iPriority.iPriority = KAudioPriorityVoipAudioDownlink;
 
@@ -1018,7 +1024,6 @@ gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& message)
             iIPDownlink->SetMsgQueue(iMsgQueueDn);
             }
         }
-
     TRACE_PRN_IF_ERR(status);
     TRACE_PRN_FN_EXT;
     return status;
@@ -1032,9 +1037,16 @@ gint TMSCallIPAdpt::OpenDownlinkL(const RMessage2& message)
 gint TMSCallIPAdpt::OpenUplinkL(const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
 
-    // Ensure clients have MultimediaDD capability to use this priority/pref
+    // Clients must have MultimediaDD capability to use this priority/pref
+
+    /* Clarify with adaptation team which prio/pref values should be used.
+     * 1) KAudioPrefUnknownVoipAudioUplink      -3rd party VoIP?
+     *    KAudioPriorityUnknownVoipAudioUplink  -3rd party VoIP?
+     * 2) KAudioPrefVoipAudioUplink             -NOK native VoIP?
+     *    KAudioPriorityVoipAudioUplink         -NOK native VoIP?
+     */
     iPriority.iPref = KAudioPrefVoipAudioUplink;
     iPriority.iPriority = KAudioPriorityVoipAudioUplink;
 

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api id="e1fff71a33909022430461d13e338a8f" dataversion="2.0">
+  <name>telephony_multimedia_service_api</name>
+  <description>API to Telephony Multimedia Server</description>
+  <type>c++</type>
+  <collection>mmserv</collection>
+  <libs>
+    <lib name="tmsapi.lib"/>
+    <lib name="tmsfactory.lib"/>
+  </libs>
+  <release category="platform" sinceversion="0"/>
+  <attributes>
+    <htmldocprovided>no</htmldocprovided>
+    <adaptation>no</adaptation>
+  </attributes>
+</api>

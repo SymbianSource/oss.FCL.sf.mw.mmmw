@@ -430,9 +430,10 @@ public:
      *      IP call: DNL: client source, codec format and speaker sink
      *
      * @return
+     *      Common return codes:
      *      TMS_RESULT_SUCCESS if stream transitioned to the initialized state.
      *      TMS_RESULT_INVALID_STATE if stream has not transitioned to the
-     *      TMS_STREAM_UNINITIALIZED state.
+     *      TMS_STREAM_INITIALIZED state.
      *      TMS_RESULT_FORMAT_TYPE_UNSPECIFIED (IP call only) when stream
      *      has no format attached to it.
      *      TMS_RESULT_UNINITIALIZED_OBJECT when stream has no sink or source
@@ -456,10 +457,11 @@ public:
      * Note: In TMS Ver 1.0.0.0, pausing stream for CS call is not supported.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the paused
-     *      state.
+     *      Common return codes:
+     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the
+     *      paused state.
      *      TMS_RESULT_INVALID_STATE if stream is not in the
-     *      TMS_STREAM_INITIALIZED or TMS_STREAM_STARTED state.
+     *      TMS_STREAM_INITIALIZED or TMS_STREAM_PAUSED state.
      *
      */
     IMPORT_C gint Pause();
@@ -481,10 +483,11 @@ public:
      * be in the TMS_STREAM_STARTED state.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the paused
-     *      state.
+     *      Common return codes:
+     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the
+     *      started state.
      *      TMS_RESULT_INVALID_STATE if stream is not in the
-     *      TMS_STREAM_INITIALIZED or TMS_STREAM_PAUSED state.
+     *      TMS_STREAM_INITIALIZED or TMS_STREAM_STARTED state.
      *
      */
     IMPORT_C gint Start();
@@ -502,8 +505,9 @@ public:
      * be in the TMS_STREAM_INITIALIZED state.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the paused
-     *      state.
+     *      Common return codes:
+     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the
+     *      stopped state.
      *      TMS_RESULT_INVALID_STATE if stream is not in the
      *      TMS_STREAM_STARTED or TMS_STREAM_PAUSED state.
      *

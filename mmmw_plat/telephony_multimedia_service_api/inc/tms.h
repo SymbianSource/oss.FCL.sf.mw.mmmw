@@ -24,6 +24,7 @@
 
 namespace TMS {
 
+// FORWARD DECLARATION
 class TMSFormat;
 
 // Result codes
