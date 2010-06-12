@@ -429,17 +429,27 @@ public:
      *      IP call: UPL: mic source, codec format and client sink
      *      IP call: DNL: client source, codec format and speaker sink
      *
+     * @param  retrytime
+     *      Indicates (in seconds) for how long TMS should retry stream
+     *      initialization in case of an error. When stream initialization
+     *      fails within specified retry time, TMS will return
+     *      TMS_EVENT_STREAM_STATE_CHANGE_ERROR. If set to 0, TMS will return
+     *      TMS_EVENT_STREAM_STATE_CHANGE_ERROR immediately without retrying.
+     *      If set to -1, TMS will keep retrying until user cancels by calling
+     *      either Stop() or Deinit().
+     *
      * @return
+     *      Common return codes:
      *      TMS_RESULT_SUCCESS if stream transitioned to the initialized state.
      *      TMS_RESULT_INVALID_STATE if stream has not transitioned to the
-     *      TMS_STREAM_UNINITIALIZED state.
+     *      TMS_STREAM_INITIALIZED state.
      *      TMS_RESULT_FORMAT_TYPE_UNSPECIFIED (IP call only) when stream
      *      has no format attached to it.
      *      TMS_RESULT_UNINITIALIZED_OBJECT when stream has no sink or source
      *      element attached to it.
      *
      */
-    IMPORT_C gint Init();
+    IMPORT_C gint Init(gint retrytime = 0);
 
     /**
      * Trigger stream to transition to the paused state.
@@ -456,10 +466,11 @@ public:
      * Note: In TMS Ver 1.0.0.0, pausing stream for CS call is not supported.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the paused
-     *      state.
+     *      Common return codes:
+     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the
+     *      paused state.
      *      TMS_RESULT_INVALID_STATE if stream is not in the
-     *      TMS_STREAM_INITIALIZED or TMS_STREAM_STARTED state.
+     *      TMS_STREAM_INITIALIZED or TMS_STREAM_PAUSED state.
      *
      */
     IMPORT_C gint Pause();
@@ -480,14 +491,24 @@ public:
      * Upon stream's successful transition to the started state, the stream will
      * be in the TMS_STREAM_STARTED state.
      *
+     * @param  retrytime
+     *      Indicates (in seconds) for how long TMS should attempt to start
+     *      a stream in case of an error. When stream starting fails within
+     *      specified retry time, TMS will return
+     *      TMS_EVENT_STREAM_STATE_CHANGE_ERROR. If set to 0, TMS will return
+     *      TMS_EVENT_STREAM_STATE_CHANGE_ERROR immediately without retrying.
+     *      If set to -1, TMS will keep retrying until user cancels by calling
+     *      either Stop() or Deinit().
+     *
      * @return
-     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the paused
-     *      state.
+     *      Common return codes:
+     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the
+     *      started state.
      *      TMS_RESULT_INVALID_STATE if stream is not in the
-     *      TMS_STREAM_INITIALIZED or TMS_STREAM_PAUSED state.
+     *      TMS_STREAM_INITIALIZED or TMS_STREAM_STARTED state.
      *
      */
-    IMPORT_C gint Start();
+    IMPORT_C gint Start(gint retrytime = 0);
 
     /**
      * Trigger stream to transition to the initialized state.
@@ -502,8 +523,9 @@ public:
      * be in the TMS_STREAM_INITIALIZED state.
      *
      * @return
-     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the paused
-     *      state.
+     *      Common return codes:
+     *      TMS_RESULT_SUCCESS if stream successfully transitioned to the
+     *      stopped state.
      *      TMS_RESULT_INVALID_STATE if stream is not in the
      *      TMS_STREAM_STARTED or TMS_STREAM_PAUSED state.
      *

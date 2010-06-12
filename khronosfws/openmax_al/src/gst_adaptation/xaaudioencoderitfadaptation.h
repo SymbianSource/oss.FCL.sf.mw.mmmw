@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description: AudioEnc Itf GST Adaptation
 *
 */
 

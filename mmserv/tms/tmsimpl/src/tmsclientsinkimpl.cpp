@@ -16,6 +16,7 @@
  */
 
 #include "tmsutility.h"
+#include "tmsglobalcontext.h"
 #include "tmsclientsinkimpl.h"
 #include "tmsclientsinkbodyimpl.h"
 
@@ -68,12 +69,13 @@ gint TMSClientSinkImpl::Create(TMSSink*& tmssink)
     return ret;
     }
 
-gint TMSClientSinkImpl::SetProxy(TMSCallProxy* aProxy, gpointer queuehandler)
+gint TMSClientSinkImpl::SetProxy(TMSGlobalContext* context,
+        gpointer queuehandler)
     {
     gint ret = TMS_RESULT_SUCCESS;
     if (this->iBody)
         {
-        static_cast<TMSClientSinkBodyImpl*>(this->iBody)->SetProxy(aProxy,
+        static_cast<TMSClientSinkBodyImpl*>(this->iBody)->SetProxy(context,
                 queuehandler);
         }
     else

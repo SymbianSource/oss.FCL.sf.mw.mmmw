@@ -11,7 +11,8 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:  Internal Header to define Performance Profiling macros.
+*               The MACROS can be defined in the MMP file to enable profiling.
 *
 */
 

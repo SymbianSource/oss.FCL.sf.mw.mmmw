@@ -18,6 +18,7 @@
 #include <tms.h>
 #include <tmsclientsourceobsrvr.h>
 #include "tmscallproxy.h"
+#include "tmsglobalcontext.h"
 #include "tmsmembuffer.h"
 #include "tmsqueuehandler.h"
 #include "tmsclientsourcebodyimpl.h"
@@ -74,21 +75,6 @@ gint TMSClientSourceBodyImpl::AddObserver(TMSClientSourceObserver& obsrvr,
     return ret;
     }
 
-/**
- * Remove a stream observer from this stream.
- *
- * This function can be called at any time. It is recommended to remove
- * observer after calling Deinit() on stream. Else observer may receive
- * a callback that is alread dispatched.
- *
- * @param  obsrvr
- *      The listener to remove.
- *
- * @return
- *      TMS_RESULT_SUCCESS if the obsrvr is removed successfully from list.
- *      TMS_RESULT_DOES_NOT_EXIST if obsrvr is not already in the list.
- *
- */
 gint TMSClientSourceBodyImpl::RemoveObserver(TMSClientSourceObserver& obsrvr)
     {
     gint ret(TMS_RESULT_SUCCESS);
@@ -111,8 +97,8 @@ gint TMSClientSourceBodyImpl::BufferFilled(TMSBuffer& buffer)
     {
     // TODO send stream attributes here
     gint ret(TMS_RESULT_SUCCESS);
-    ret = iProxy->BufferFilled(TMS_CALL_IP, TMS_STREAM_DOWNLINK, iStreamId,
-            buffer);
+    ret = iProxy->BufferFilled(iContext->CallType, iContext->StreamType,
+            iContext->StreamId, buffer);
     return ret;
     }
 
@@ -154,13 +140,16 @@ gint TMSClientSourceBodyImpl::GetType(TMSSourceType& sourcetype)
     return ret;
     }
 
-void TMSClientSourceBodyImpl::SetProxy(TMSCallProxy* aProxy, gint strmid,
+void TMSClientSourceBodyImpl::SetProxy(TMSGlobalContext* context,
         gpointer queuehandler)
     {
-    iProxy = aProxy;
-    iStreamId = strmid;
-    static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
-            TMS_SOURCE_CLIENT);
+    iProxy = context->CallProxy;
+    iContext = context;
+    if (queuehandler)
+        {
+        static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
+                TMS_SOURCE_CLIENT);
+        }
     }
 
 void TMSClientSourceBodyImpl::QueueEvent(TInt aEventType, TInt aError,

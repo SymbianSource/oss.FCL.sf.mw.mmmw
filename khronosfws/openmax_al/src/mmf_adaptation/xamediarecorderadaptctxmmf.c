@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: MediaRecorder MMF Adaptation
+ *
+ */
 
 #include <string.h>
 #include <assert.h>
@@ -21,15 +21,8 @@
 #include "xaadaptationmmf.h"
 #include "cmmfbackendengine.h"
 #include "xaadptbasectx.h"
-//#include "XAMetadataAdaptation.h"
-//#include "XAStaticCapsAdaptation.h"
-
 
 extern XAboolean cameraRealized;
-
-//extern XACameraAdaptationCtx_* cameraCtx;
-
-
 
 /*
  * XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create()
@@ -48,9 +41,10 @@ XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
     XADataLocator_IODevice *ioDevice;
     DEBUG_API("->XAMediaRecorderAdaptMMF_Create");
 
-    pSelf = (XAMediaRecorderAdaptationMMFCtx*)calloc(1, sizeof(XAMediaRecorderAdaptationMMFCtx));
+    pSelf = (XAMediaRecorderAdaptationMMFCtx*) calloc(1,
+            sizeof(XAMediaRecorderAdaptationMMFCtx));
     if (pSelf)
-        {            
+        {
         if (XAAdaptationBaseMMF_Init(&(pSelf->baseObj),
                 XAMediaRecorderAdaptation) != XA_RESULT_SUCCESS)
             {
@@ -58,7 +52,7 @@ XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
             free(pSelf);
             pSelf = NULL;
             }
-        else        
+        else
             {
             pSelf->xaAudioSource = pAudioSrc;
             pSelf->xaVideoSource = pImageVideoSrc;
@@ -96,10 +90,10 @@ XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
                 ioDevice
                         = (XADataLocator_IODevice*) (pImageVideoSrc->pLocator);
                 if (ioDevice->deviceType == XA_IODEVICE_CAMERA
- 
-                        && !cameraRealized
-                        
-                        )
+
+                && !cameraRealized
+
+                )
                     {
                     DEBUG_ERR("Preconditions violated - Camera object not realized");
                     XAAdaptationBaseMMF_Free(&pSelf->baseObj);
@@ -109,18 +103,23 @@ XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
                 }
             }
         }
-    
-    if(pSelf)
+    else
         {
-        res = mmf_backend_engine_init(&(pSelf->mmfContext) );
-        if(!(pSelf->mmfContext) || (res != XA_RESULT_SUCCESS))
+        DEBUG_ERR("Failed to create XAMediaRecorderAdaptationMMFCtx !!!");
+        return NULL;
+        }
+
+    if (pSelf)
+        {
+        res = mmf_backend_engine_init(&(pSelf->mmfContext));
+        if (!(pSelf->mmfContext) || (res != XA_RESULT_SUCCESS))
             {
             DEBUG_ERR("Failed to init mmf context!!!");
             free(pSelf);
-            pSelf = NULL;           
-            }   
+            pSelf = NULL;
+            }
         }
-    
+
     DEBUG_API("<-XAMediaRecorderAdaptMMF_Create");
     return (XAAdaptationBaseCtx*) (&pSelf->baseObj.baseObj);
     }
@@ -135,16 +134,27 @@ XAresult XAMediaRecorderAdaptMMF_PostInit(XAAdaptationMMFCtx* bCtx)
     {
 
     XAresult ret = XA_RESULT_SUCCESS;
-    XADataLocator_URI*   tempUri;
+    XADataLocator_URI* tempUri;
     XADataFormat_MIME* tempFormat;
-    XAMediaRecorderAdaptationMMFCtx *pSelf = (XAMediaRecorderAdaptationMMFCtx*)bCtx;
+    XAMediaRecorderAdaptationMMFCtx *pSelf;
     DEBUG_API("->XAMediaRecorderAdapt_PostInit");
-    if(pSelf->mmfContext)
+    if(bCtx)
         {
-        tempUri = (XADataLocator_URI*)(pSelf->xaSink->pLocator);
-        tempFormat = (XADataFormat_MIME*)(pSelf->xaSink->pFormat);
-        mmf_set_recorder_uri(pSelf->mmfContext, (char *)(tempUri->URI), tempFormat->containerType);  
-        mmf_set_adapt_context(pSelf->mmfContext, &(pSelf->baseObj));
+        ret = XA_RESULT_PARAMETER_INVALID;
+        return ret;
+        }
+    
+    pSelf = (XAMediaRecorderAdaptationMMFCtx*) bCtx;
+    if (pSelf->mmfContext)
+        {
+        tempUri = (XADataLocator_URI*) (pSelf->xaSink->pLocator);
+        tempFormat = (XADataFormat_MIME*) (pSelf->xaSink->pFormat);
+        ret = mmf_set_recorder_uri(pSelf->mmfContext, (char *) (tempUri->URI),
+                tempFormat->containerType);
+        if(ret == XA_RESULT_SUCCESS)
+            {
+            ret = mmf_set_adapt_context(pSelf->mmfContext, &(pSelf->baseObj));
+            }
         }
 
     DEBUG_API("<-XAMediaRecorderAdapt_PostInit");
@@ -159,17 +169,18 @@ XAresult XAMediaRecorderAdaptMMF_PostInit(XAAdaptationMMFCtx* bCtx)
 void XAMediaRecorderAdaptMMF_Destroy(XAAdaptationMMFCtx* bCtx)
     {
     XAMediaRecorderAdaptationMMFCtx* ctx = NULL;
-    
+
     DEBUG_API("->XAMediaRecorderAdaptMMF_Destroy");
 
     if (bCtx == NULL)
-    {
-        DEBUG_ERR("Invalid parameter!!");DEBUG_API("<-XAMediaRecorderAdaptMMF_Destroy");
+        {
+        DEBUG_ERR("Invalid parameter!!");
+        DEBUG_API("<-XAMediaRecorderAdaptMMF_Destroy");
         return;
-    }
+        }
     ctx = (XAMediaRecorderAdaptationMMFCtx*) bCtx;
 
-    if(ctx->mmfContext)
+    if (ctx->mmfContext)
         {
         mmf_backend_engine_deinit(ctx->mmfContext);
         }
@@ -180,6 +191,4 @@ void XAMediaRecorderAdaptMMF_Destroy(XAAdaptationMMFCtx* bCtx)
 
     DEBUG_API("<-XAMediaRecorderAdaptMMF_Destroy");
     }
-
-/***************** INTERNAL FUNCTIONS *******************************/
 

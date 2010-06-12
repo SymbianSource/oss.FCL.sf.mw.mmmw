@@ -123,6 +123,8 @@ EXPORT_C CAdvancedAudioPlayController::~CAdvancedAudioPlayController()
 	delete iDataSourceAdapter;
 	delete iWait;
 	delete iBlockSetPos;
+	delete iBlockPrime;
+      
 	iSharedBuffers.ResetAndDestroy();
 	iSharedBuffers.Close();
     DP0(_L("CAdvancedAudioPlayController::~CAdvancedAudioPlayController end"));
@@ -679,7 +681,13 @@ EXPORT_C void CAdvancedAudioPlayController::HandlePreemptionEvent(TInt aError)
             iBlockSetPos->AsyncStop();
             }
         }
-
+    if(iBlockPrime)
+       {
+       if(iBlockPrime->IsStarted())
+       	   {
+            iBlockPrime->AsyncStop();
+           }
+       }
     iRequestState = EPaused;
     TRAP(err, DoPauseL(ETrue)); // this is a preemption pause
 	// In case of pre-emption we should only Pause ... but not Stop.
@@ -1631,7 +1639,11 @@ TInt CAdvancedAudioPlayController::CleanupForStop()
             iBlockSetPos->AsyncStop();
             }
         }
-   
+    if(iBlockPrime)
+        {
+        if(iBlockPrime->IsStarted())
+         iBlockPrime->AsyncStop();
+        }
     iPlayingForDuration = EFalse;
     iBlockDuration = EFalse;
     iPlayingForPauseSeek = EFalse;
@@ -1720,11 +1732,17 @@ EXPORT_C void CAdvancedAudioPlayController::SetPositionL(
 		case EInitializing:
             if (position != 0)
     	   		{ // if we are priming, we will already be ready to play from 0.
-				DP2(_L("CAdvancedAudioPlayController::SetPositionL, saving pos iReadHeader[%d] iState[%d]"),iReadHeader,iState);
-                iInitPosition = position;
+				     DP2(_L("CAdvancedAudioPlayController::SetPositionL, saving pos iReadHeader[%d] iState[%d]"),iReadHeader,iState);
+             iInitPosition = position;
        			}
-			DP0(_L("CAdvancedAudioPlayController::SetPositionL, can ignore"));
-			break;
+			  DP0(_L("CAdvancedAudioPlayController::SetPositionL, can ignore"));
+			  DP0(_L("CAdvancedAudioController::PrimeL() blocking"));
+        iBlockPrime= new (ELeave) CActiveSchedulerWait();
+        iBlockPrime->Start();
+        DP0(_L("CAdvancedAudioController::PrimeL() continuing"));
+        delete iBlockPrime;
+        iBlockPrime= NULL;
+			
 		case EInitialized:
 		case EPaused:
 		    iSavedSetPosition = position;
@@ -1899,6 +1917,14 @@ EXPORT_C void CAdvancedAudioPlayController::BufferFilledL(CMMFBuffer* aBuffer)
 				        return;
 				        }
 					iState = EInitialized;
+					if(iBlockPrime)
+					    {
+					    if(iBlockPrime->IsStarted())
+					    	{
+					      iBlockPrime->AsyncStop();
+					      }
+					    }
+					
 					// when playwindow is active for a non-seekable source during loop play
 					// we must seek to the playwindow start position and then start the playback
 					if (iPlayWindowStartPosition > 0) // do we need additional checks as loop play / non-seekable source ??

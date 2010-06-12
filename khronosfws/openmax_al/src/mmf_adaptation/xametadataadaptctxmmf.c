@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: Metadata Adaptation MMF
+ *
+ */
+
 #include <assert.h>
 #include <stdlib.h>
 #include "xametadataadaptctxmmf.h"
@@ -5,46 +22,53 @@
 #include "cmetadatautilityitf.h"
 
 XAAdaptationBaseCtx* XAMetadataAdaptCtxMMF_Create(XADataSource * pDataSrc)
-{
+    {
 
     XAMetadataAdaptationMMFCtx *pSelf = NULL;
     DEBUG_API("->XAMetadataAdaptCtxMMF_Create");
-    
+
     pSelf = calloc(1, sizeof(XAMetadataAdaptationMMFCtx));
-    if ( pSelf)
-    {
-          
-        if( XAAdaptationBaseMMF_Init(&(pSelf->baseObj),XAMDAdaptation)
-            != XA_RESULT_SUCCESS )
+    if (pSelf)
         {
+
+        if (XAAdaptationBaseMMF_Init(&(pSelf->baseObj), XAMDAdaptation)
+                != XA_RESULT_SUCCESS)
+            {
             DEBUG_ERR("Failed to init base context!!!");
             free(pSelf);
             pSelf = NULL;
-        }
+            }
         else
-            
-        {
+
+            {
             pSelf->baseObj.baseObj.fwtype = FWMgrFWMMF;
             pSelf->xaSource = pDataSrc;
-        }
-
-		if(pDataSrc)
-		{
-			pSelf->mmfContext = mmf_metadata_utility_init((char *)(( (XADataLocator_URI*)(pDataSrc->pLocator))->URI));
-			if(!pSelf->mmfContext)
-            {
-	            DEBUG_ERR("Failed to init mmf context!!!");
-    	        free(pSelf);
-        	    pSelf = NULL;           
             }
-		}
 
-    }
+        if (pDataSrc)
+            {
+            pSelf->mmfContext
+                    = mmf_metadata_utility_init(
+                            (char *) (((XADataLocator_URI*) (pDataSrc->pLocator))->URI));
+            if (!pSelf->mmfContext)
+                {
+                DEBUG_ERR("Failed to init mmf context!!!");
+                free(pSelf);
+                pSelf = NULL;
+                }
+            }
+
+        }
+    else
+        {
+        DEBUG_ERR("Failed to create XAMetadataAdaptationMMFCtx !!!");
+        return NULL;
+        }
+       
 
     DEBUG_API("<- XAMetadataAdaptCtxMMF_Create");
-    return (XAAdaptationBaseCtx*)(&pSelf->baseObj.baseObj);
-}
-
+    return (XAAdaptationBaseCtx*) (&pSelf->baseObj.baseObj);
+    }
 
 /*
  * XAresult XAMediaPlayerAdaptMMF_PostInit()
@@ -52,39 +76,38 @@ XAAdaptationBaseCtx* XAMetadataAdaptCtxMMF_Create(XADataSource * pDataSrc)
  * @param XAMediaPlayerAdaptationMMFCtx* ctx - pointer to Media Player adaptation context
  * @return XAresult - Success value
  */
-XAresult XAMetadataAdaptCtxMMF_PostInit( XAAdaptationMMFCtx* bCtx )
-{
- 	XAresult ret = XA_RESULT_SUCCESS;
- 
-  DEBUG_API("<-XAMetadataAdaptCtxMMF_PostInit");
-  return ret;
-}
+XAresult XAMetadataAdaptCtxMMF_PostInit(XAAdaptationMMFCtx* bCtx)
+    {
+    XAresult ret = XA_RESULT_SUCCESS;
+
+    DEBUG_API("<-XAMetadataAdaptCtxMMF_PostInit");
+    return ret;
+    }
 
 /*
  * void XAMediaPlayerAdaptMMF_Destroy( XAMediaPlayerAdaptationMMFCtx* ctx )
  * Destroys Media Player Adaptation Context
  * @param ctx - Media Player Adaptation context to be destroyed
  */
-void XAMetadataAdaptCtxMMF_Destroy( XAAdaptationMMFCtx* bCtx )
-{
+void XAMetadataAdaptCtxMMF_Destroy(XAAdaptationMMFCtx* bCtx)
+    {
     DEBUG_API("->XAMetadataAdaptCtxMMF_Destroy");
-    if(bCtx == NULL)
-    {
-        DEBUG_ERR("Invalid parameter!!");
-        DEBUG_API("<-XAMetadataAdaptCtxMMF_Destroy");
+    if (bCtx == NULL)
+        {
+        DEBUG_ERR("Invalid parameter!!");DEBUG_API("<-XAMetadataAdaptCtxMMF_Destroy");
         return;
-    }
-	
-    if(((XAMetadataAdaptationMMFCtx*)bCtx)->mmfContext)
-    {
-        mmf_metadata_utility_destroy(((XAMetadataAdaptationMMFCtx*)bCtx)->mmfContext);
-    }
+        }
 
-    XAAdaptationBase_Free( &bCtx->baseObj );
+    if (((XAMetadataAdaptationMMFCtx*) bCtx)->mmfContext)
+        {
+        mmf_metadata_utility_destroy(
+                ((XAMetadataAdaptationMMFCtx*) bCtx)->mmfContext);
+        }
+
+    XAAdaptationBase_Free(&bCtx->baseObj);
     free(bCtx);
     bCtx = NULL;
 
     DEBUG_API("<-XAMetadataExtractorAdaptMMF_Destroy");
-}
-
+    }
 

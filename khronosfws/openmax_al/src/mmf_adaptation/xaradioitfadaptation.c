@@ -16,10 +16,10 @@
 */
 
 #include <unistd.h>
-#include "XADebug.h"
-#include "XAAdaptationMMF.h"
-#include "XARadioItfAdaptation.h"
-#include "XARadioAdaptCtx.h"
+#include "xadebug.h"
+#include "xaadaptationmmf.h"
+#include "xaradioitfadaptation.h"
+#include "xaradioadaptctx.h"
 #include "cmmfradiobackendengine.h"
 
 /*

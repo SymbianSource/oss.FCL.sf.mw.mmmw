@@ -1,22 +1,22 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: MMF Backend Engine Header
+ *
+ */
 
-#ifndef XA_CMMFBackendEngine_H
-#define XA_CMMFBackendEngine_H
+#ifndef CMMFBackendEngine_H
+#define CMMFBackendEngine_H
 
 #define ENABLE_GRAPHICS_SURFACE_INTEGRATION
 
@@ -45,52 +45,55 @@
 #endif
 
 // MetaDataWrite Custom Command UID
-const TUid KUidMetaDataWriteCustomCommand = {0x10207af9};
+const TUid KUidMetaDataWriteCustomCommand =
+    {
+    0x10207af9
+    };
 
 #define MAX_EXTENSION_SIZE 10
 
 class CMarkerPositionTimer;
 class CPositionUpdateTimer;
 NONSHARABLE_CLASS(CMMFBackendEngine) : public CBase,
-                          public MVideoPlayerUtilityObserver,
-                          public MVideoLoadingObserver,
-                          public MMdaAudioPlayerCallback,
-                          public MMdaObjectStateChangeObserver
+        public MVideoPlayerUtilityObserver,
+        public MVideoLoadingObserver,
+        public MMdaAudioPlayerCallback,
+        public MMdaObjectStateChangeObserver
     {
-public:      
-      enum TFuncInUse
-          {
-          EPlay = 0,
-          ERecord
-          };
-      
-      enum TUriType
-          {
-          ELocal = 0,
-          EStreaming
-          };
+public:
+    enum TFuncInUse
+        {
+                EPlay = 0, 
+                ERecord
+        };
 
-      enum TMMFUtiltyInUse
-	    {
+    enum TUriType
+        {
+                ELocal = 0, 
+                EStreaming
+        };
+
+    enum TMMFUtiltyInUse
+        {
         ENoUtility,
         EVideoPlayerUtility,
         EAudioPlayerUtility,
         EAudioRecorderUtility
-	    };
-	
-	enum TRecorderState
-	{
-	  ERecorderNotReady = 0,
-	  ERecorderOpen,
-	  ERecorderRecording
-	};
-	      
+        };
+
+    enum TRecorderState
+        {
+                ERecorderNotReady = 0, 
+                ERecorderOpen, 
+                ERecorderRecording
+        };
+
 public:
 
     static CMMFBackendEngine* NewL();
     ~CMMFBackendEngine();
-    
-    TInt SetFileName(char* uri,XAuint32 format,TFuncInUse func);
+
+    TInt SetFileName(char* uri, XAuint32 format, TFuncInUse func);
     void Close();
     void Destroy();
     TInt SetRecorderState(TRecorderState state, XAboolean stopCalled);
@@ -105,11 +108,10 @@ public:
     TInt SetDestinationSampleRate(XAmilliHertz* samplerate);
     TInt SetDestinationChannels(XAuint32* channels);
 
-/*    XAresult SetWindowHandle(void* display_info);*/
     XAresult CreateAndConfigureWindowL();
     XAresult SetNativeDisplayInformation(void* display_info);
     XAresult ResumePlayback();
-    XAresult PausePlayback();    
+    XAresult PausePlayback();
     XAresult StopPlayback();
     XAresult GetPlayState(XAuint32 *pState);
     XAresult GetDuration(XAmillisecond *pMsec);
@@ -124,30 +126,27 @@ public:
     XAresult SetPosition(XAmillisecond pMsec);
     XAresult SetRepeats(XAboolean repeat);
     XAresult SetPlayWindow(XAmillisecond start, XAmillisecond end);
-	
+
     XAresult GetNumStreams(XAuint32* numstreams);
     XAresult GetStreamInfo(XAuint32 streamindex, XAuint32* streamtype);
-    XAresult GetVideoFrameSize(XAuint32* height, XAuint32* width, XAuint32* frameRate);
+    XAresult GetVideoFrameSize(XAuint32* height, XAuint32* width,
+            XAuint32* frameRate);
     XAresult SetActiveState(XAuint32 streamindex, XAboolean active);
-	
+
     XAresult SetVolume(XAuint32 volume);
     XAresult GetVolume(XAuint32* volume);
     XAresult GetMaxVolume(XAuint32* maxvolume);
 public:
 
     // MMdaObjectStateChangeObserver
-    void MoscoStateChangeEvent(
-            CBase* aObject,
-            TInt aPreviousState,
-            TInt aCurrentState,
-            TInt aErrorcCode);
+    void MoscoStateChangeEvent(CBase* aObject, TInt aPreviousState,
+            TInt aCurrentState, TInt aErrorcCode);
 
     //MMdaAudioPlayerCallback
-    void MapcInitComplete(
-            TInt aError,
+    void MapcInitComplete(TInt aError,
             const TTimeIntervalMicroSeconds& aDuration);
     void MapcPlayComplete(TInt aError);
-    
+
     //From MVidePlayerUtilityObserver
     void MvpuoOpenComplete(TInt aError);
     void MvpuoPrepareComplete(TInt aError);
@@ -157,18 +156,18 @@ public:
 
     // From MRebufferCallback
     void MvloLoadingStarted();
-    void MvloLoadingComplete();     
+    void MvloLoadingComplete();
 
-private:  
+private:
     enum TPlayerState
-    {
-      EPlayerClosed,
-      EPlayerOpened,
-      EPlayerPrepared,
-      EPlayerPaused,
-      EPlayerPlaying,
-    };
-    
+        {
+        EPlayerClosed,
+        EPlayerOpened,
+        EPlayerPrepared,
+        EPlayerPaused,
+        EPlayerPlaying,
+        };
+
 private:
     CMMFBackendEngine();
     void ConstructL();
@@ -182,29 +181,29 @@ private:
     TInt InitializeURIForMMFUtil(char *uri);
 
 private:
-    CVideoPlayerUtility2*       iVideoPlayer;
-    CBase*		                iBaseVideoPlayer;
-    CMdaAudioPlayerUtility*     iAudioPlayer;  
-    CBase*                      iBaseAudioPlayer; 
-    CMdaAudioRecorderUtility*   iAudioRecorder;
-    CBase*                      iBaseAudioRecorder;
-    TFileName                   iFileName;
-    TInt                        iAPIBeingUsed;		
-    TInt                        iPreviousRecordState;
-    TInt                        iCurrentRecordState;
-    TInt                        iErrorCode;
-    TRecorderState              iRecordState;
-    LocalTimer*                 iPositionUpdateTimer;
-    TUint64                     iTimerDelay;
-    void*                       iAdaptContext;
-    XAuint32                    iFileFormat;
-    TInt                        iPauseSupportMP4;
-    CActiveSchedulerWait*       iActiveSchedulerWait;
-    CAudioInput*                iAudioInputRecord;
+    CVideoPlayerUtility2* iVideoPlayer;
+    CBase* iBaseVideoPlayer;
+    CMdaAudioPlayerUtility* iAudioPlayer;
+    CBase* iBaseAudioPlayer;
+    CMdaAudioRecorderUtility* iAudioRecorder;
+    CBase* iBaseAudioRecorder;
+    TFileName iFileName;
+    TInt iAPIBeingUsed;
+    TInt iPreviousRecordState;
+    TInt iCurrentRecordState;
+    TInt iErrorCode;
+    TRecorderState iRecordState;
+    LocalTimer* iPositionUpdateTimer;
+    TUint64 iTimerDelay;
+    void* iAdaptContext;
+    XAuint32 iFileFormat;
+    TInt iPauseSupportMP4;
+    CActiveSchedulerWait* iActiveSchedulerWait;
+    CAudioInput* iAudioInputRecord;
 #ifdef USE_LOCAL_WINDOW_RESOURCES
     CMediaClientVideoDisplay* iMediaClientVideoDisplay;
     TRect m_clipRect;
-    TRect m_videoExtent;    
+    TRect m_videoExtent;
     TRect m_cropRegion;
     TVideoAspectRatio m_pixelAspectRatio;
     RWindow m_Window;
@@ -214,8 +213,8 @@ private:
     TReal32 m_scaleWidth;
     TReal32 m_scaleHeight;
     TInt m_horizPos;
-    TInt m_vertPos; 
-    TInt m_displayId;   
+    TInt m_vertPos;
+    TInt m_displayId;
     /*TBool m_bWindowReferencePassed;*/
     RWsSession m_ws;
 #endif /* USE_LOCAL_WINDOW_RESOURCES */
@@ -249,17 +248,15 @@ private:
     /* Property set by client */
     RWsSession* m_pWs;
     /* Property set by client */
-    RWindow* m_pWindow;   
+    RWindow* m_pWindow;
     };
 
 #else  /* __cplusplus */
-
 
 extern int mmf_backend_engine_init(void** engine);
 extern int mmf_backend_engine_deinit(void* engine);
 
 extern int mmf_set_recorder_uri(void* context, char* uri, XAuint32 format);
-
 
 extern void mmf_close(void* context);
 
@@ -305,15 +302,15 @@ extern XAresult mmf_seekitf_set_repeats(void * context, XAboolean repeat);
 
 extern XAresult mmf_streaminformationitf_get_numstreams(void * context, XAuint32* numstreams);
 extern XAresult mmf_streaminformationitf_get_streaminfo(void * context, XAuint32 streamindex,
-                                                                XAuint32* streamtype);
+        XAuint32* streamtype);
 extern XAresult mmf_streaminformationitf_get_videoframesize(void * context, XAuint32* height,
-                                                            XAuint32* width, XAuint32* frameRate);
+        XAuint32* width, XAuint32* frameRate);
 extern XAresult mmf_streaminformationitf_set_activestream(void * context, XAuint32 streamindex,
-                                                                XAboolean active);
+        XAboolean active);
 
 extern XAresult mmf_volumeitf_set_volume(void * context, XAuint32 volume);
 extern XAresult mmf_volumeitf_get_volume(void * context, XAuint32* volume);
 extern XAresult mmf_volumeitf_get_maxvolume(void * context, XAuint32* volume);
 #endif /* __cplusplus */
 
-#endif /* XA_CMMFBackendEngine_H */
+#endif /* CMMFBackendEngine_H */

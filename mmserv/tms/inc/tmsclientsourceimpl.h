@@ -24,6 +24,7 @@
 namespace TMS {
 
 // FORWARD DECLARATIONS
+class TMSGlobalContext;
 class TMSCallProxy;
 
 // TMSClientSourceImpl class
@@ -32,7 +33,7 @@ class TMSClientSourceImpl : public TMSClientSource
 public:
     virtual ~TMSClientSourceImpl();
     static gint Create(TMSSource*& tmssource);
-    gint SetProxy(TMSCallProxy* aProxy, gint strmid, gpointer queuehandler);
+    gint SetProxy(TMSGlobalContext* context, gpointer queuehandler);
 
 private:
     TMSClientSourceImpl();

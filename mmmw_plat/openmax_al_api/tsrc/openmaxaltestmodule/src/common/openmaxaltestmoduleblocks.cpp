@@ -937,6 +937,7 @@ TInt COpenMAXALTestModule::StoreInterface(TInt interface, void* id)
 /*            XA_IID_OUTPUTMIX;*/
             break;
         case 27:
+        	m_RadioItf = XARadioItf(id);
 /*            XA_IID_RADIO;*/
             break;
         case 28:

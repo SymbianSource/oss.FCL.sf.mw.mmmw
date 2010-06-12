@@ -94,7 +94,7 @@ GLDEF_C  TInt CTneServer::ThreadFunction(TAny*  aName)
 	{
     		cleanup =CTrapCleanup::New(); 
     	 	pA = new CActiveScheduler;    
-    		pS = new CTneServer(EPriorityStandard);
+    		pS = new CTneServer(EPriorityHigh);
     		
     	 }
      
@@ -162,7 +162,7 @@ TInt  StartThread(RThread& aServerThread,  HBufC *pServerName)
 	////////////////////////ServerSession//////////////////////////////
 	
 	
-CTneSession::CTneSession(): 
+CTneSession::CTneSession():CActive(EPriorityStandard),
         iWidth(0),                 
         iHeight(0) ,                                            
         iDuration(0)  ,                                        
@@ -173,24 +173,29 @@ CTneSession::CTneSession():
         iFs(NULL),                                                    
         iYUVBuffer(NULL),
         iClientYUVBufferPtrPtr(NULL),                         
-        m_bOpenFileLPending(EFalse),                          
+        iReOpenFileLPending(EFalse),                          
         iGetThumbPending(EFalse),                        
         iCloseHandle(EFalse),        	                        
         ibOpenFilePending(EFalse),  
         iThumbIndex(0),
         iUtil(NULL),                                                
         m_State( ENotReady),
-        m_bMetaDataReady(EFalse)                                   
-        {
-     FLOG(_L("CTneSession::CTneSession()in this=%x"), this);                      
-     FLOG(_L("CTneSession::CTneSession()out this=%x"), this); 
-          }                           
+        m_bMetaDataReady(EFalse),
+        iPosition(0)
+{
+    CActiveScheduler::Add(this);
+    FLOG(_L("CTneSession::CTneSession()in this=%x"), this);                      
+    FLOG(_L("CTneSession::CTneSession()out this=%x"), this); 
+}                           
                          
                          
                                      
    CTneSession::~CTneSession() 
 {                          
-	 FLOG(_L("CTneSession::~CTneSession()in this=%x"), this); 	
+	 FLOG(_L("CTneSession::~CTneSession()in this=%x"), this); 
+	 
+	 Cancel();
+	 
      if(iYUVBuffer)        
      {    	               
         User::Free(iYUVBuffer);
@@ -212,7 +217,9 @@ CTneSession::CTneSession():
 	    delete iFs;
 	    iFs = NULL;
     }
-	 CompleteRequest(KErrCancel);
+	 CompleteRequest(iClientRequest,KErrCancel);
+	 CompleteRequest(iMetaDataRequest,KErrCancel); 
+	 CompleteRequest(iThumbnailRequest,KErrCancel); 
 	 CompleteCancelRequest();	 
 	 CActiveScheduler::Stop();
    
@@ -237,7 +244,6 @@ void CTneSession::DispatchMessageL(const RMessage2& aMessage)
     RFile* pFileHandle;	
     TFileName *pFileName;
     TInt aPosition;
-    TNEMetaData* pMetaData;
     TNEThumbRequest *pThumbRequestData;
     RFile64 aFilehandle;
     
@@ -247,24 +253,23 @@ void CTneSession::DispatchMessageL(const RMessage2& aMessage)
         {        	        
     case  EOpenFileRFmsg:
         m_State = EStartGettingMetadata;
-        bCompleteRequest = ETrue;
+        bCompleteRequest = EFalse;
+        CompleteRequest(iClientRequest,KErrNotReady); // Any previous pending request
         iClientRequest = aMessage;
      	pFileHandle = ( RFile* ) aMessage.Ptr0(); // Handle to read Message data     
      	aPosition  = (TInt  ) aMessage.Ptr1();
      	
      	lError = iFileHandle.Duplicate(*pFileHandle);
+     	iPosition = aPosition;
+     	     	
      	if (lError == KErrNone)
      	{
             iCloseHandle = ETrue;
-            lError = DoOpenFile(iFileHandle, aPosition);            
+            iStatus = KRequestPending;
+            SetActive();
+            TRequestStatus* pStatus = &iStatus;
+            User::RequestComplete(pStatus, KErrNone);          
         }
-       
-        if( m_State == EStartGettingThumbNailWithIndex)
-        {
-            lError = ReOpenFile(iFileHandle);            
-        }
-                
-        CompleteCancelRequest(); // it will check also if cancel needs to be done.
         
         break;
         
@@ -272,51 +277,41 @@ void CTneSession::DispatchMessageL(const RMessage2& aMessage)
     case  EOpenFIleNamemsg:
         iFs = NULL;
         m_State = EStartGettingMetadata;
+        CompleteRequest(iClientRequest,KErrNotReady); // Any previous pending request
         iClientRequest = aMessage;
      	pFileName = (TFileName* ) aMessage.Ptr0();    	      
      	aPosition  = (TInt  ) aMessage.Ptr1();
-     
-     iFs = new RFs;
-     if(iFs == NULL)
-	 {
-	 	lError = KErrNoMemory;
-	 	    	bCompleteRequest = ETrue;
- 	 }
-    else if ( (lError  = iFs->Connect())!= KErrNone)
-    {
-    	    	bCompleteRequest = ETrue;
-     }
-     else if ((lError = aFilehandle.Open(*iFs,*pFileName, EFileShareReadersOnly | EFileStream | EFileRead))!= KErrNone)
-    {
-    	    	bCompleteRequest = ETrue;
-      }
-	else if ((lError = iFileHandle.Duplicate(aFilehandle))!= KErrNone)
-	{
-    	    	bCompleteRequest = ETrue;
-    	    	   aFilehandle.Close();
+     	
+     	iFs = new RFs;
+     	if(iFs == NULL)
+     	{
+     	    lError = KErrNoMemory;
+     	    bCompleteRequest = ETrue;
+     	}
+     	else if ( (lError  = iFs->Connect())!= KErrNone)
+     	{
+     	    bCompleteRequest = ETrue;
+     	}
+     	else if ((lError = aFilehandle.Open(*iFs,*pFileName, EFileShareReadersOnly | EFileStream | EFileRead))!= KErrNone)
+     	{
+     	    bCompleteRequest = ETrue;
+     	}
+     	else if ((lError = iFileHandle.Duplicate(aFilehandle))!= KErrNone)
+     	{
+     	    bCompleteRequest = ETrue;
+     	    aFilehandle.Close();
+     	}
+     	else
+     	{
+     	    bCompleteRequest = EFalse;
+     	    aFilehandle.Close();
+     	    iStatus = KRequestPending;
+     	    iCloseHandle = ETrue;
+     	    SetActive();
+     	    TRequestStatus* pStatus = &iStatus;
+     	    User::RequestComplete(pStatus, KErrNone);
+     	}
 
-      }
-     else if ( (lError = DoOpenFile(iFileHandle, aPosition)) != KErrNone )
-        {
-            bCompleteRequest = ETrue;
-            aFilehandle.Close();      
-            iCloseHandle = ETrue;
-        }
-        else 
-        {
-            bCompleteRequest = ETrue;
-            aFilehandle.Close();
-            iCloseHandle = ETrue;
-        }
-
-        
-        if( m_State == EStartGettingThumbNailWithIndex)
-        {
-            lError = ReOpenFile(iFileHandle);            
-        }
-                
-        CompleteCancelRequest(); // it will check also if cancel needs to be done.
-        
         if (lError  !=  KErrNone)
         {
             bCompleteRequest = ETrue;
@@ -324,18 +319,16 @@ void CTneSession::DispatchMessageL(const RMessage2& aMessage)
         
         break;
       case EGetMetaDatamsg:
-        iClientRequest = aMessage;
-      	pMetaData = ( TNEMetaData* ) aMessage.Ptr0(); 
-        pMetaData->iWidth = iWidth;
-        pMetaData->iHeight = iHeight;
-        pMetaData->iFrameCount = iFrameCount;
-        bCompleteRequest = ETrue;
-       
+        
+        CompleteRequest(iMetaDataRequest,KErrNotReady); // Any previous pending request
+        iMetaDataRequest = aMessage;
+        NotifyIfGetMetaDataPending(m_LastError);       
         break;
         
       case EGetThumbmsg:
         
-        iClientRequest = aMessage;
+        CompleteRequest(iThumbnailRequest,KErrNotReady); // Any previous pending request
+        iThumbnailRequest = aMessage;
         pThumbRequestData  = ( TNEThumbRequest * ) aMessage.Ptr0();
         // store thumb request parameters       	    
         iClientYUVBufferPtrPtr  = &(pThumbRequestData->iYUVBuffer);        
@@ -350,11 +343,26 @@ void CTneSession::DispatchMessageL(const RMessage2& aMessage)
             m_State = EStartGettingThumbNailWithIndex;
 			if (!ibOpenFilePending)
 			{
-			lError = ReOpenFile(iFileHandle); 
-			}                
+			    lError = ReOpenFile(iFileHandle);
+			    if(lError)
+			    {
+			        m_LastError = lError;
+			        CompleteRequest(iThumbnailRequest,m_LastError);
+			    }
+			}
+			else
+			{ // Previous thumbnail generation is in progress so cancel it	
+			    if(iUtil)
+			    {
+			        iUtil->CancelThumb();
+			    }
+			    // Once control returns and if m_State is EStartGettingThumbNailWithIndex call ReOpenFile
+			    iReOpenFileLPending = ETrue;
+			}
 		}
         break;
     case ECancelThumbmsg:
+        FLOG(_L("CTneSession::DispatchMessageL cancellation ++"));
         iGetThumbPending = EFalse;
         iCancelRequest = aMessage;        
         m_State = ECancelling;               
@@ -364,12 +372,15 @@ void CTneSession::DispatchMessageL(const RMessage2& aMessage)
         }
         // cancel any pending getthumb or openfile request.
         lError = KErrCancel;
-        CompleteRequest(lError); 
+        CompleteRequest(iClientRequest,lError); 
+        CompleteRequest(iThumbnailRequest,lError); 
         
         if (!ibOpenFilePending)
         {
            CompleteCancelRequest(); 
         }
+        FLOG(_L("CTneSession::DispatchMessageL cancellation --"));
+
         break;    
     
    default:
@@ -377,12 +388,12 @@ void CTneSession::DispatchMessageL(const RMessage2& aMessage)
         return;
         
       }
-
- 	if (bCompleteRequest)
- 	{
- 	    CompleteRequest(lError);
-	}
-	
+    
+    // If any error occured during file opening
+    if (bCompleteRequest)
+    {
+        CompleteRequest(iClientRequest,lError);
+    }
 	FLOG(_L("CTneSession::DispatchMessageL out type=%d"), aMessage.Function());
 }
 
@@ -425,10 +436,18 @@ TInt CTneSession::ReOpenFile(RFile &aFileHandle)
     		delete iUtil;
     		iUtil = NULL;    						    
     	}
-    	    		   
-    	lError = DoOpenFile(aFileHandle, uStartingTime);    	    	    	
-    }   
-    
+    	
+    	iPosition = uStartingTime;
+    	
+    	if(!IsActive())   		   
+    	{
+            iStatus = KRequestPending;
+            SetActive();
+            TRequestStatus* pStatus = &iStatus;
+            User::RequestComplete(pStatus, KErrNone);
+    	}
+    }
+   
     return lError; 	
 }
 
@@ -561,13 +580,14 @@ void CTneSession::MetaDataReady(TInt aError)
 	    // it will be completed after the DoOpenFile() returns.	 
 	    if (aError != KErrNone)
 	    {
-	     	CompleteRequest(aError);
+	     	CompleteRequest(iClientRequest,aError);
 	    }
 	   
     }
     FLOG(_L("CTneSession::MetaDataReady out aError=%d"), aError);      
-    m_bMetaDataReady = ETrue;          	
-
+    m_bMetaDataReady = ETrue;    
+    
+    NotifyIfGetMetaDataPending(m_LastError);       
 }
 
 
@@ -583,6 +603,12 @@ void CTneSession::PacketReady(TInt aError,
     if (m_State == ECancelling)
     {
         FLOG(_L("CTneSession::PacketReady no op"));
+        // Calling cancel thumbnail
+        if(iUtil)
+        {
+            iUtil->CancelThumb();
+        }
+        
         return;
     }
     if(aDataSize < (iWidth*iHeight*3/2 ))  // check to avoid getting very low size
@@ -838,11 +864,11 @@ TInt CTneSession::GetStartingTime(TUint &uStartingTime)
 
 
 
-void CTneSession::CompleteRequest(TInt aError)
+void CTneSession::CompleteRequest(const RMessage2& aMessage, TInt aError)
 {
-     if(!iClientRequest.IsNull())
+     if(!aMessage.IsNull())
      {
-        iClientRequest.Complete(aError);
+         aMessage.Complete(aError);
      }
 }
 
@@ -852,18 +878,33 @@ void CTneSession::CompleteRequest(TInt aError)
 // ownership of pBitMap will be passed to Observer
 void CTneSession::NotifyIfGetThumbPending(TInt aError, TUint8 *&pYUVBuffer) 
 {
-	if (iGetThumbPending && !iClientRequest.IsNull())
+	if (iGetThumbPending && !iThumbnailRequest.IsNull())
 	{		
 		iGetThumbPending = EFalse;        
         *iClientYUVBufferPtrPtr = pYUVBuffer;
-        iClientRequest.Complete(aError);
+        iThumbnailRequest.Complete(aError);
     
 	}	
 }
 
+void CTneSession::NotifyIfGetMetaDataPending(TInt aError)
+{
+    if (m_bMetaDataReady && !iMetaDataRequest.IsNull())
+    {   
+        TNEMetaData* pMetaData;
+        pMetaData = ( TNEMetaData* ) iMetaDataRequest.Ptr0();
+        pMetaData->iWidth = iWidth;
+        pMetaData->iHeight = iHeight;
+        pMetaData->iFrameCount = iFrameCount;
+        iMetaDataRequest.Complete(aError);        
+    }
+    
+}
+
 void CTneSession::CompleteCancelRequest()
 {
-    
+    FLOG(_L("CTneSession::CompleteCancelRequest ++"));
+
      if (!iCancelRequest.IsNull())
      {
       
@@ -871,7 +912,63 @@ void CTneSession::CompleteCancelRequest()
         {
             delete iUtil;
             iUtil = NULL;
-          }
-            iCancelRequest.Complete(KErrNone);
-     }    
+        }
+        iCancelRequest.Complete(KErrNone);
+        FLOG(_L("CTneSession::CompleteCancelRequest message sent "));
+     }   
+     FLOG(_L("CTneSession::CompleteCancelRequest --"));
+
+}
+// Open the file
+void CTneSession::RunL()
+{
+    TInt lError = KErrNone;
+    m_bDone = EFalse;
+    m_uPacketsReceived = 0;
+    FLOG(_L("CTneSession::RunL ++"));
+
+    lError = DoOpenFile(iFileHandle, iPosition);
+    
+    if(lError)
+    {
+        if(iUtil)
+        {
+            iUtil->CancelThumb();
+            delete iUtil;
+            iUtil = NULL;
+        }
+    }
+    
+    CompleteRequest(iClientRequest,lError); // Complete client request 
+    ibOpenFilePending = EFalse;
+    // If any cancel call is pending
+    CompleteCancelRequest();
+    
+    // This mean App has requested thumbnail based on index when last file opening was still in progress
+    if(iReOpenFileLPending)
+    {
+      lError = ReOpenFile(iFileHandle);
+      // If some error sent notification to client
+      if(lError)
+      {
+          m_LastError = lError;
+          CompleteRequest(iThumbnailRequest,m_LastError);
+      }
+      iReOpenFileLPending = EFalse;
+    }
+    FLOG(_L("CTneSession::RunL -- "));
+}
+
+// Cancel file open and pending thumbnail 
+void CTneSession::DoCancel()
+{
+    CompleteRequest(iClientRequest,KErrCancel); // Complete any request
+    CompleteRequest(iMetaDataRequest,KErrCancel); // Complete any request 
+    CompleteRequest(iThumbnailRequest,KErrCancel); // Complete any request 
+    ibOpenFilePending = EFalse;
+    iReOpenFileLPending = EFalse;
+    iGetThumbPending = EFalse;
+    // If any cancel call is pending
+    CompleteCancelRequest();
+
 }

@@ -18,6 +18,7 @@
 #include <tms.h>
 #include <tmsclientsinkobsrvr.h>
 #include "tmscallproxy.h"
+#include "tmsglobalcontext.h"
 #include "tmsmembuffer.h"
 #include "tmsqueuehandler.h"
 #include "tmsclientsinkbodyimpl.h"
@@ -90,14 +91,11 @@ gint TMSClientSinkBodyImpl::RemoveObserver(TMSClientSinkObserver& obsrvr)
 // Push mode
 gint TMSClientSinkBodyImpl::BufferProcessed(TMSBuffer* buffer)
     {
-    // TODO send stream attributes here
     gint ret(TMS_RESULT_SUCCESS);
-
     if (iProxy)
         {
-        //TODO: must use strm_id instead of 1
-        ret = iProxy->BufferEmptied(TMS_CALL_IP, TMS_STREAM_UPLINK, 1,
-		        *buffer);
+        ret = iProxy->BufferEmptied(iContext->CallType, iContext->StreamType,
+                iContext->StreamId, *buffer);
         }
     else
         {
@@ -113,13 +111,14 @@ gint TMSClientSinkBodyImpl::GetType(TMSSinkType& sinktype)
     return ret;
     }
 
-void TMSClientSinkBodyImpl::SetProxy(TMSCallProxy* aProxy,
+void TMSClientSinkBodyImpl::SetProxy(TMSGlobalContext* context,
         gpointer queuehandler)
     {
-    iProxy = aProxy;
+    iProxy = context->CallProxy;
+    iContext = context;
     if (queuehandler)
         {
-        static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
+        static_cast<TMSQueueHandler*> (queuehandler)->AddObserver(*this,
                 TMS_SINK_CLIENT);
         }
     }
@@ -132,7 +131,7 @@ void TMSClientSinkBodyImpl::QueueEvent(TInt aEventType, TInt /*aError*/,
         switch (aEventType)
             {
             case TMS_EVENT_SINK_PROCESS_BUFFER:
-                iObserver->ProcessBuffer(static_cast<TMSBuffer*>(user_data));
+                iObserver->ProcessBuffer(static_cast<TMSBuffer*> (user_data));
                 break;
             default:
                 break;

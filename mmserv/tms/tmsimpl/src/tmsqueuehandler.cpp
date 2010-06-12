@@ -316,10 +316,8 @@ void TMSQueueHandler::DoFillBuffer(gint aBufLen, gint aStatus,
             err = TMS_RESULT_DOES_NOT_EXIST;
             }
         }
-    else
-        {
-        // TODO handle error here
-        }
+
+    // TODO: handle error here
     }
 
 // -----------------------------------------------------------------------------
@@ -376,10 +374,8 @@ void TMSQueueHandler::DoEmptyBuffer(gint aBufLen, gint aStatus,
             err = TMS_RESULT_DOES_NOT_EXIST;
             }
         }
-    else
-        {
-        //iObserver->Event(MVoIPUplinkObserver::KUplinkError, aStatus);
-        }
+	//TODO: Handle error here
+    //iObserver->Event(MVoIPUplinkObserver::KUplinkError, aStatus);
     }
 
 // -----------------------------------------------------------------------------

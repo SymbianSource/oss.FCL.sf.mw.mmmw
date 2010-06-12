@@ -137,7 +137,7 @@ public:
     IMPORT_C gint Stop();
 
     /**
-     * Pause ring tone playback.
+     * Pause video ring tone playback.
      *
      * @return
      *      TMS_RESULT_SUCCESS if the operation was successful otherwise

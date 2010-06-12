@@ -68,12 +68,12 @@ gint TMSClientSourceImpl::Create(TMSSource*& tmssource)
     return ret;
     }
 
-gint TMSClientSourceImpl::SetProxy(TMSCallProxy* aProxy, gint strmid,
+gint TMSClientSourceImpl::SetProxy(TMSGlobalContext* context,
         gpointer queuehandler)
     {
     gint ret = TMS_RESULT_SUCCESS;
-    static_cast<TMSClientSourceBodyImpl*>(this->iBody)->SetProxy(aProxy,
-            strmid, queuehandler);
+    static_cast<TMSClientSourceBodyImpl*>(this->iBody)->SetProxy(context,
+            queuehandler);
     return ret;
     }
 

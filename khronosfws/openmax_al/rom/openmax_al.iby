@@ -11,13 +11,9 @@
 *
 * Contributors:
 *
-* Description: OpenMAX AL
+* Description: OpenMAX AL iby file for exporting dll to ROM/ROFS.
 *
 */
-/*
- * openmax_al.iby
- *
- */
 
 #ifndef OPENMAX_AL_IBY
 #define OPENMAX_AL_IBY

@@ -1,10 +1,20 @@
-/**
- * src\adaptation\XAStreamInformationItfAdaptation.h
- * Part of OpenMAX AL Implementation
- * Copyright (c) 2009 Nokia Inc.
+/*
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
  *
- * This file contains implementation of XAStreamInformationItfAdaptation
- **/
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: StreamInformation Itf Adaptation header
+ *
+ */
+ 
 #ifndef XASTREAMINFORMATIONITFADAPTATION_H
 #define XASTREAMINFORMATIONITFADAPTATION_H
 

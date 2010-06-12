@@ -481,6 +481,65 @@ XAresult XARadioItfImpl_StopSeeking(XARadioItf self)
 }
 
 /**
+ * XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32 * pNumPresets)
+ * Description: Returns the number of preset slots the device has for storing the presets.
+ **/
+XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32 * pNumPresets)
+{
+    XAresult ret = XA_RESULT_FEATURE_UNSUPPORTED;
+
+    DEBUG_API("->XARadioItfImpl_GetNumberOfPresets");
+
+    return ret;
+}
+
+/**
+ * XAresult XARadioItfImpl_SetPreset(XARadioItf self,
+ *                                   XAuint32 preset,
+ *                                   XAuint32 freq,
+ *                                   XAuint8 range,
+ *                                   XAuint32 mode,
+ *                                   const XAchar * name)
+ * Description: Sets the preset.
+ **/
+XAresult XARadioItfImpl_SetPreset(XARadioItf self,
+                                  XAuint32 preset,
+                                  XAuint32 freq,
+                                  XAuint8 range,
+                                  XAuint32 mode,
+                                  const XAchar * name)
+{
+    XAresult ret = XA_RESULT_FEATURE_UNSUPPORTED;
+
+    return ret;
+}
+
+/**
+ * XAresult XARadioItfImpl_GetPreset(XARadioItf self,
+ *                                   XAuint32 preset,
+ *                                   XAuint32 * pFreq,
+ *                                   XAuint8 * pRange,
+ *                                   XAuint32 * pMode,
+ *                                   XAchar * pName,
+ *                                   XAuint16 * pNameLength)
+ * Description: Gets the settings stored into a preset.
+ **/
+XAresult XARadioItfImpl_GetPreset(XARadioItf self,
+                                  XAuint32 preset,
+                                  XAuint32 * pFreq,
+                                  XAuint8 * pRange,
+                                  XAuint32 * pMode,
+                                  XAchar * pName,
+                                  XAuint16 * pNameLength)
+{
+ 
+    XAresult ret = XA_RESULT_FEATURE_UNSUPPORTED;
+
+    DEBUG_API("<-XARadioItfImpl_GetPreset");
+    return ret;
+}
+
+/**
  * XAresult XARadioItfImpl_RegisterRadioCallback(XARadioItf self,
  *                                               xaRadioCallback callback,
  *                                               void * pContext)

@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors: 
+ *
+ * Description: Base Adaptation Macros common between adaptations.
+ *
+ */
 
 #ifndef XAADPTBASECTX_H_
 #define XAADPTBASECTX_H_
@@ -27,10 +27,11 @@
 /* ENUMERATIONS */
 
 /**
-GLOBAL ENUMERATIONS
+ GLOBAL ENUMERATIONS
  */
 
-typedef enum {
+typedef enum
+    {
     XAMediaPlayerAdaptation = 0,
     XAMediaRecorderAdaptation,
     XARadioAdaptation,
@@ -40,7 +41,7 @@ typedef enum {
     XALedArrayAdaptation,
     XAMDAdaptation,
     XAEngineAdaptation
-}AdaptationContextIDS;
+    } AdaptationContextIDS;
 
 #define XA_ADAPT_PU_INTERVAL 50                     /* position update interval */
 #define XA_ADAPT_ASYNC_TIMEOUT 3000                 /* timeout to wait async events */
@@ -63,13 +64,10 @@ typedef enum {
 #define RADIO_DEFAULT_FREQ_RANGE XA_FREQRANGE_FMEUROAMERICA
 #define RADIO_DEFAULT_FREQ 88000000
 
-
 /* TYPEDEFS */
 
 /* Adaptation device IDs */
-//#define XA_ADAPTID_ALSASRC          0xAD7E5001  //Krishna commented
-#define XA_ADAPTID_DEVSOUNDSRC          0xAD7E5001
-//#define XA_ADAPTID_ALSASINK         0xAD7E5002
+#define XA_ADAPTID_DEVSOUNDSRC      0xAD7E5001
 #define XA_ADAPTID_DEVSOUNDSINK     0xAD7E5002
 #define XA_ADAPTID_AUTOAUDIOSINK    0xAD7E5003
 #define XA_ADAPTID_AUDIOTESTSRC     0xAD7E5004
@@ -86,7 +84,6 @@ typedef enum {
 
 #define XA_ADAPTID_RAWVIDEO         0xAD7E500E
 
-//#define XA_ADAPT_DEFAULTAUDIOOUTPUT XA_ADAPTID_ALSASINK
 #define XA_ADAPT_DEFAULTAUDIOOUTPUT XA_ADAPTID_DEVSOUNDSINK
 
 #ifdef XA_USE_TEST_PLUGINS
@@ -94,7 +91,6 @@ typedef enum {
 #else
 #define XA_ADAPT_DEFAULTAUDIOINPUT  XA_ADAPTID_DEVSOUNDSRC
 #endif
-
 
 #define XA_ADAPT_OGGPROFILE_UNKNOWN 0x1
 
@@ -121,12 +117,12 @@ typedef enum {
 
 /* Adaptation event structure */
 typedef struct XAAdaptEvent_
-{
-    XAAdaptEventTypes  eventtype; /* what kind of event, e.g. playitf event  */
-    XAuint8            eventid;   /* eventtype-specific event, e.g. XA_PLAYEVENT macro */
-    XAuint32           datasize;  /* event data size */
-    void*              data;      /* event data if needed */
-} XAAdaptEvent;
+    {
+    XAAdaptEventTypes eventtype; /* what kind of event, e.g. playitf event  */
+    XAuint8 eventid; /* eventtype-specific event, e.g. XA_PLAYEVENT macro */
+    XAuint32 datasize; /* event data size */
+    void* data; /* event data if needed */
+    } XAAdaptEvent;
 
 /* Forward declaration of adaptation basecontext */
 typedef struct XAAdaptationBaseCtx_ XAAdaptationBaseCtx;
@@ -136,39 +132,37 @@ typedef struct XAAdaptationBaseCtx_ XAAdaptationBaseCtx;
  * Gst-Adaptation context structures.
  */
 typedef struct XAAdaptationBaseCtx_
-{
-/*     Common Variables for all adaptation elements */
-    XAuint32        ctxId;
-    GArray*         evtHdlrs;     /*array of event handlers */
-    FrameworkMap*   fwkmapper;
-    FWMgrFwType     fwtype;
+    {
+    /*     Common Variables for all adaptation elements */
+    XAuint32 ctxId;
+    GArray* evtHdlrs; /*array of event handlers */
+    FrameworkMap* fwkmapper;
+    FWMgrFwType fwtype;
     XACapabilities* capslist;
-    
-} XAAdaptationBaseCtx_;
 
+    } XAAdaptationBaseCtx_;
 
 /* Adaptation event callback */
-typedef void (*xaAdaptEventHandler) ( void *pHandlerCtx, XAAdaptEvent* event );
+typedef void (*xaAdaptEventHandler)(void *pHandlerCtx, XAAdaptEvent* event);
 
 typedef struct XAAdaptEvtHdlr_
-{
-    xaAdaptEventHandler handlerfunc;    /* function handling the callback */
-    void               *handlercontext; /* context of handler */
-    XAuint32            eventtypes;     /* what kind of events this handles */
-} XAAdaptEvtHdlr;
-
-
-
+    {
+    xaAdaptEventHandler handlerfunc; /* function handling the callback */
+    void *handlercontext; /* context of handler */
+    XAuint32 eventtypes; /* what kind of events this handles */
+    } XAAdaptEvtHdlr;
 
 /* FUNCTIONS */
-XAresult XAAdaptationBase_Init( XAAdaptationBaseCtx* pSelf, XAuint32 ctxId );
-XAresult XAAdaptationBase_PostInit( XAAdaptationBaseCtx* ctx );
-XAresult XAAdaptationBase_AddEventHandler( XAAdaptationBaseCtx* ctx, xaAdaptEventHandler evtHandler,
-                                    XAuint32 evtTypes,void *pHandlerCtx );
-XAresult XAAdaptationBase_RemoveEventHandler( XAAdaptationBaseCtx* ctx, xaAdaptEventHandler evtHandler );
-void XAAdaptationBase_SendAdaptEvents(XAAdaptationBaseCtx* ctx, XAAdaptEvent* event);
+XAresult XAAdaptationBase_Init(XAAdaptationBaseCtx* pSelf, XAuint32 ctxId);
+XAresult XAAdaptationBase_PostInit(XAAdaptationBaseCtx* ctx);
+XAresult XAAdaptationBase_AddEventHandler(XAAdaptationBaseCtx* ctx,
+        xaAdaptEventHandler evtHandler, XAuint32 evtTypes, void *pHandlerCtx);
+XAresult XAAdaptationBase_RemoveEventHandler(XAAdaptationBaseCtx* ctx,
+        xaAdaptEventHandler evtHandler);
+void XAAdaptationBase_SendAdaptEvents(XAAdaptationBaseCtx* ctx,
+        XAAdaptEvent* event);
 XAresult XAAdaptationBase_ThreadEntry(XAAdaptationBaseCtx *adaptCtx);
 XAresult XAAdaptationBase_ThreadExit(XAAdaptationBaseCtx *adaptCtx);
-void XAAdaptationBase_Free( XAAdaptationBaseCtx* ctx );
+void XAAdaptationBase_Free(XAAdaptationBaseCtx* ctx);
 
-#endif /* XAADPTBASE_H_ */
+#endif /* XAADPTBASECTX_H_ */

@@ -415,29 +415,35 @@ void COpenMAXALTestModule::HandleRadioItfCallback(
         XAuint32   	event
 )
 {
-    XAuint32   freq;
-    XAmillibel volume;     		
-    
+   
     switch (event)
         {
         case XA_RADIO_EVENT_ANTENNA_STATUS_CHANGED:
+            {
             TEventIf antennaStatusEvent( TEventIf::ESetEvent, _L("Event_XA_RADIO_EVENT_ANTENNA_STATUS_CHANGED:") );
             TestModuleIf().Event( antennaStatusEvent );
+            }
             break;
 
         case XA_RADIO_EVENT_FREQUENCY_CHANGED:
+            {
             TEventIf freqChangedEvent( TEventIf::ESetEvent, _L("Event_XA_RADIO_EVENT_FREQUENCY_CHANGED") );
             TestModuleIf().Event( freqChangedEvent );
+            }
             break;
 
         case XA_RADIO_EVENT_FREQUENCY_RANGE_CHANGED:
+            {
             TEventIf freqRangeChangedEvent( TEventIf::ESetEvent,_L("Event_XA_RADIO_EVENT_FREQUENCY_RANGE_CHANGED"));
             TestModuleIf().Event( freqRangeChangedEvent );     
+            }
             break;
 
         case XA_RADIO_EVENT_SEEK_COMPLETED:
+           	{
            	TEventIf seekEvent( TEventIf::ESetEvent, _L("Event_XA_RADIO_EVENT_SEEK_COMPLETED") );
             TestModuleIf().Event( seekEvent );          
+            }
             break; 
                
         default:

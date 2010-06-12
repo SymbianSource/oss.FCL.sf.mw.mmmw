@@ -24,7 +24,7 @@
 namespace TMS {
 
 // FORWARD DECLARATIONS
-class TMSCallProxy;
+class TMSGlobalContext;
 
 // TMSClientSinkImpl class
 class TMSClientSinkImpl : public TMSClientSink
@@ -32,7 +32,7 @@ class TMSClientSinkImpl : public TMSClientSink
 public:
     virtual ~TMSClientSinkImpl();
     static gint Create(TMSSink*& tmssink);
-    gint SetProxy(TMSCallProxy* aProxy, gpointer queuehandler);
+    gint SetProxy(TMSGlobalContext* context, gpointer queuehandler);
 
 private:
     TMSClientSinkImpl();

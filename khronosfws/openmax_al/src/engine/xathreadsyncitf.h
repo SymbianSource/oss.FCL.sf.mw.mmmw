@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: ThreadSync Itf Header
+ *
+ */
 
 #ifndef XATHREADSYNCITF_H
 #define XATHREADSYNCITF_H
@@ -29,7 +29,7 @@
 /** STRUCTURES **/
 /* Definition of XA%ExampleItf% implementation */
 typedef struct XAThreadSyncItfImpl_
-{
+    {
     /* parent interface */
     struct XAThreadSyncItf_ itf;
     /* pointer to self */
@@ -38,7 +38,7 @@ typedef struct XAThreadSyncItfImpl_
     /* variables */
     XAImplMutexHandle engCriticalSection;
     XAboolean engInCritical;
-} XAThreadSyncItfImpl;
+    } XAThreadSyncItfImpl;
 
 /** METHODS **/
 

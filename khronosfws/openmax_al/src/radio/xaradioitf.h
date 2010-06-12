@@ -23,11 +23,20 @@
 
 /** MACROS **/
 #define RADIO_DEFAULT_STEREO_MODE 2
+#define RADIO_NUM_OF_PRESETS 20
 /** TYPES **/
 
 /** ENUMERATIONS **/
 
 /** STRUCTURES **/
+typedef struct RadioPreset_
+{
+    XAuint32    freq;
+    XAuint8     range;
+    XAuint32    stereoMode;
+    char*       name;
+} RadioPreset;
+
 
 /* Definition of XAEqualizerItf implementation */
 typedef struct XARadioItfImpl_
@@ -44,6 +53,10 @@ typedef struct XARadioItfImpl_
     XARadioItf         cbPtrToSelf;
     xaRadioCallback    callback;
     void               *context;
+   	XAuint32    preset;
+   	XAuint32    numOfPresets;
+
+    RadioPreset presets[RADIO_NUM_OF_PRESETS];    
 
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
@@ -89,6 +102,23 @@ XAresult XARadioItfImpl_StopSeeking(XARadioItf self);
 XAresult XARadioItfImpl_RegisterRadioCallback(XARadioItf self,
                                               xaRadioCallback callback,
                                               void * pContext);
+                                              
+XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32 * pNumPresets);
+
+XAresult XARadioItfImpl_SetPreset(XARadioItf self,
+                                  XAuint32 preset,
+                                  XAuint32 freq,
+                                  XAuint8 range,
+                                  XAuint32 mode,
+                                  const XAchar * name);
+
+XAresult XARadioItfImpl_GetPreset(XARadioItf self,
+                                  XAuint32 preset,
+                                  XAuint32 * pFreq,
+                                  XAuint8 * pRange,
+                                  XAuint32 * pMode,
+                                  XAchar * pName,
+                                  XAuint16 * pNameLength);                                              
 
 /* XARadioItfImpl -specific methods */
 XARadioItfImpl* XARadioItfImpl_Create(XAAdaptationBaseCtx *adapCtx);

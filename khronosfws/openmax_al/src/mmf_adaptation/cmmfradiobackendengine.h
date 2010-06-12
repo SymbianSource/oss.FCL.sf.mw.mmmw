@@ -21,11 +21,11 @@
 #ifdef __cplusplus
 
 #include <e32base.h>
-#include <radioutility.h>
-#include <radiofmtunerutility.h>
-#include <radioplayerutility.h>
-#include <radiopresetutility.h>
-#include <radiofmpresetutility.h>
+#include <RadioUtility.h>
+#include <RadioFmTunerUtility.h>
+#include <RadioPlayerUtility.h>
+#include <RadioPresetUtility.h>
+#include <RadioFmPresetUtility.h>
 #include <FMRadioTunerControl.h>
 #include "xaadaptationmmf.h"
 

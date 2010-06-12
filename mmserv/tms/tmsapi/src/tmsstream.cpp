@@ -161,12 +161,12 @@ EXPORT_C gint TMSStream::GetStreamId()
     return status;
     }
 
-EXPORT_C gint TMSStream::Init()
+EXPORT_C gint TMSStream::Init(gint retrytime)
     {
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (iBody)
         {
-        status = iBody->Init(0);
+        status = iBody->Init(retrytime);
         }
     return status;
     }
@@ -181,12 +181,12 @@ EXPORT_C gint TMSStream::Pause()
     return status;
     }
 
-EXPORT_C gint TMSStream::Start()
+EXPORT_C gint TMSStream::Start(gint retrytime)
     {
     gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
     if (iBody)
         {
-        status = iBody->Start(0);
+        status = iBody->Start(retrytime);
         }
     return status;
     }

@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: Header File for common AL enums, functions.
+ *
+ */
 /*All global definitions and declarations here */
 
 #ifndef XAGLOBALS_H
@@ -23,13 +23,14 @@
 #include "xadebug.h"
 
 /**
-GLOBAL ENUMERATIONS
+ GLOBAL ENUMERATIONS
  */
 /**
  * enumeration for different adaptation event types.
  * add more types when needed, use single bit values.
  **/
-typedef enum {
+typedef enum
+    {
     XA_GENERICEVENTS = 0x1,
     XA_PLAYITFEVENTS = 0x2,
     XA_RECORDITFEVENTS = 0x4,
@@ -42,40 +43,34 @@ typedef enum {
     XA_METADATAEVENTS = 0x200,
     XA_VOLUMEITFEVENTS = 0x400,
     XA_NOKIALINEARVOLITFEVENTS = 0x800,
-    XA_NOKIAEXTVOLITFEVENTS = 0x1000,        
-    XA_ADDMORETYPES  = 0x2000    
-}XAAdaptEventTypes;
-
-
-typedef enum
-{
-    XACAP_DECODER  = 0x1,
-    XACAP_ENCODER  = 0x2,
-    XACAP_DEVSNK   = 0x4,
-    XACAP_DEVSRC   = 0x8,
-
-    XACAP_AUDIO    = 0x10,
-    XACAP_VIDEO    = 0x20,
-    XACAP_IMAGE    = 0x40
-} XACapsType;
-
+    XA_NOKIAEXTVOLITFEVENTS = 0x1000,
+    XA_ADDMORETYPES = 0x2000
+    } XAAdaptEventTypes;
 
 typedef enum
-{
-    XA_UNDEFINED = 0,
-    XA_READBUFFER,
-    XA_WRITEBUFFER,
-    XA_READ,
-    XA_WRITE
-} XAConfigExtensionCpKey;
+    {
+    XACAP_DECODER = 0x1,
+    XACAP_ENCODER = 0x2,
+    XACAP_DEVSNK = 0x4,
+    XACAP_DEVSRC = 0x8,
+
+    XACAP_AUDIO = 0x10,
+    XACAP_VIDEO = 0x20,
+    XACAP_IMAGE = 0x40
+    } XACapsType;
 
 typedef enum
-{
+    {
+    XA_UNDEFINED = 0, XA_READBUFFER, XA_WRITEBUFFER, XA_READ, XA_WRITE
+    } XAConfigExtensionCpKey;
+
+typedef enum
+    {
     XA_MEDIATYPE_AUDIO = 0,
     XA_MEDIATYPE_VIDEO,
     XA_MEDIATYPE_IMAGE,
     XA_MEDIATYPE_UNKNOWN
-} XAMediaType;
+    } XAMediaType;
 
 #define CPCONFIGKEY "TestAppPipeConfig"
 
@@ -103,8 +98,6 @@ typedef enum
  * GLOBAL METHODS
  */
 
-
-
 /*
  * Check if interface IDs are equal
  */
@@ -115,5 +108,5 @@ XAboolean XACommon_EqualIIds(XAInterfaceID idA, XAInterfaceID idB);
  */
 XAresult XACommon_CheckDataSource(XADataSource* source, XAMediaType* type);
 
-XAresult XACommon_ValidateDataLocator( XAuint32 pCounter, void* pSnk, ... );
+XAresult XACommon_ValidateDataLocator(XAuint32 pCounter, void* pSnk, ...);
 #endif /*XAGLOBALS_H */

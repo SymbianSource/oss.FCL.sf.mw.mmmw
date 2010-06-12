@@ -44,6 +44,7 @@ PRJ_TESTEXPORTS
 ../conf/openmaxaltestmodule_mo_mdextractionitf.cfg  /epoc32/winscw/c/testframework/openmaxaltestmodule_mo_mdextractionitf.cfg
 ../conf/openmaxaltestmodule_mp_mdextractionitf.cfg  /epoc32/winscw/c/testframework/openmaxaltestmodule_mp_mdextractionitf.cfg
 ../conf/openmaxaltestmodule_radioitf.cfg 	    /epoc32/winscw/c/testframework/openmaxaltestmodule_radioitf.cfg
+../conf/openmaxaltestmodule_mp_streaming.cfg        /epoc32/winscw/c/testframework/openmaxaltestmodule_mp_streaming.cfg
 ../data/c/omxaltestdata/test.wav                    /epoc32/winscw/c/testing/data/omxaltestdata/test.wav
 ../data/c/omxaltestdata/test.mp3                    /epoc32/winscw/c/testing/data/omxaltestdata/test.mp3
 ../data/c/omxaltestdata/test.3gp                    /epoc32/winscw/c/testing/data/omxaltestdata/test.3gp

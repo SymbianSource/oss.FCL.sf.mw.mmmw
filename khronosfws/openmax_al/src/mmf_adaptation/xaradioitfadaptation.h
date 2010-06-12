@@ -18,7 +18,7 @@
 #define XARADIOITFFADAPTATION_H
 
 #include "xaadaptationmmf.h"
-#include "XADebug.h"
+#include "xadebug.h"
 
 /* FUNCTIONS */
 
