@@ -128,7 +128,7 @@ void TMSEtelDtmfMonitor::RunL()
             {
             // Refresh and return (no observer notfiying).
             TRACE_PRN_N2(_L("**TMS TMSEtelDtmfMonitor::RunL: Unknown event \
-                    = %¨d, type = %d"), iEventData.iEvent,iEventData.iType);
+                    = %Â¨d, type = %d"), iEventData.iEvent,iEventData.iType);
             StartMonitoring();
             return;
             }

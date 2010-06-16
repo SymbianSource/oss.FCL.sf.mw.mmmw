@@ -55,7 +55,7 @@
 /**
 * Prefix macro for strings
 */
-#define _PREFIX_CHAR( aMsg ) (const char*)"[Radio_Client_Session]: " ##aMsg
+#define _PREFIX_CHAR( aMsg ) (const char*)"[Radio_Client_Session]: " #aMsg
 
 /**
 * Define needed directories if TRACE_INTO_FILE macro in use
