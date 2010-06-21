@@ -55,7 +55,7 @@ protected:
 
 /////////////////Session class///////////////////////////
 
-class CTneSession : public CSession2, public MHXThumbnailUtilityImplObserver
+class CTneSession : public CSession2,public CActive, public MHXThumbnailUtilityImplObserver
     
     {
 public:
@@ -72,15 +72,20 @@ public:
     void PacketReady(TInt aError, void *pData, TUint32 aDataSize);  
     void EndOfPackets();
    
+    // CActive methods
+     virtual void RunL();
+     virtual void DoCancel();
+     
 protected:
      
-    void    CompleteRequest(TInt aError);    // Completes the Rmessage corresponding to Getthumb
+    void    CompleteRequest(const RMessage2& aMessage, TInt aError);    // Completes the RMessage corresponding to Getthumb
     void    FetchBasicMetaData();               // Extract metadata from Util
     void    DoGetThumb();                           // Calls Notification of Thumbpending to client on Clients request to Get thumb
     TBool   IsGoodFrame(TUint8* aYUVDataPtr);  // checks on the value of each frame wrt  width and height 
     void    StopServer();
     
     void NotifyIfGetThumbPending(TInt aError, TUint8 *&pYUVBuffer); // Notifies client of thumb pending 
+    void NotifyIfGetMetaDataPending(TInt aError); // Notifies client of metadata pending 
     TInt ReOpenFile(RFile &aFileHandle); // Called in case the clip is required to be open not from 0 index but from middle of clip
     TInt DoOpenFile(RFile &aFileHandle, TUint uStartTime);
     TInt GetStartingTime(TUint &uStartingTime);
@@ -116,21 +121,25 @@ private:
         // Concatenated YUV data for decoded frame
         TUint8* 		                             iYUVBuffer;      
         TUint8**                                     iClientYUVBufferPtrPtr;
-        TBool		                                 m_bOpenFileLPending;
+        TBool		                                 iReOpenFileLPending;
         TBool                                        iGetThumbPending;
                                                
         TBool                                        iCloseHandle;
         TBool                                        ibOpenFilePending;
         TInt                                         iThumbIndex;
                                               
-        RMessage2	                                 iClientRequest;
-        RMessage2	                                 iCancelRequest;
+        RMessage2	                                 iClientRequest;   // This message will handle Open related request. 
+        RMessage2	                                 iCancelRequest;   // This message will handle Cancel request
+        RMessage2                                    iMetaDataRequest; // This message will handle MetaData Request
+        RMessage2                                    iThumbnailRequest;// This message will handle thumbnail message
+
         // helix thumbnail utility	           
         CHXThumbnailUtility*         	             iUtil;
         EThumbnailUtilState                          m_State;  
         RFile                                        iFileHandle;
 
         TBool                                        m_bMetaDataReady;
+        TUint                                        iPosition;
 
     };                                         
     

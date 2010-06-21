@@ -204,6 +204,8 @@ public:
 	TBool playVolume;
 	TBool metaInfo;
 	TBool playWindow;
+	
+	TBool iNegativePlayBackWindow;
 	TBool clearWindow;
 	TBool setBalance;
 	TBool iDontPlayAudioClip; // Binh

@@ -181,6 +181,9 @@ void CMetaDataParser3gp::ParseL(
 				}
 			}
 		}
+	
+	//check inline ID32 metadata
+    TRAP_IGNORE( GetID32L() );
  	}
 
 // -----------------------------------------------------------------------------
@@ -352,6 +355,15 @@ TBool CMetaDataParser3gp::ValidateL()
 	return EFalse;
 	}
 
+// -----------------------------------------------------------------------------
+// CMetaDataParserMP4::GetID32L
+// -----------------------------------------------------------------------------
+//
+void CMetaDataParser3gp::GetID32L()
+    {
+    MP4Err err = MP4ParseGetID32Location( iMP4Handle, iID32Offset );
+    User::LeaveIfError(TranslateMP4Err(err));
+    }
 
 
 //  End of File

@@ -109,6 +109,17 @@ void CMetaDataUtilityBody::OpenFileL(
 	if ( iParser )
 		{
 		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
+        if( iParser->ID32Offset() )
+            {						
+            CMetaDataParser* id32parser = 
+                    CMetaDataParserFactory::CreateID3ParserL(*iSource, iParser->ID32Offset() );
+            if( id32parser )
+                {
+                CleanupStack::PushL( id32parser );
+                id32parser->ParseL(aWantedFields, *iContainer);
+                CleanupStack::PopAndDestroy( id32parser );
+                }
+            }
 		}
 	}
 
@@ -131,6 +142,17 @@ void CMetaDataUtilityBody::OpenFileL(
 	if ( iParser )
 		{
 		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
+        if( iParser->ID32Offset() )
+            {
+            CMetaDataParser* id32parser = 
+                    CMetaDataParserFactory::CreateID3ParserL(*iSource, iParser->ID32Offset() );
+            if( id32parser )
+                {
+                CleanupStack::PushL( id32parser );
+                id32parser->ParseL(aWantedFields, *iContainer);
+                CleanupStack::PopAndDestroy( id32parser );
+                }   
+            }
 		}
 	}
 
@@ -153,6 +175,17 @@ void CMetaDataUtilityBody::OpenDesL(
 	if ( iParser )
 		{
 		iParser->CommonParseDesL(aWantedFields, *iContainer);
+        if( iParser->ID32Offset() )
+            {
+            CMetaDataParser* id32parser = 
+                    CMetaDataParserFactory::CreateID3ParserL(*iSource, iParser->ID32Offset() );
+            if( id32parser )
+                {
+                CleanupStack::PushL( id32parser );
+                id32parser->ParseL(aWantedFields, *iContainer);
+                CleanupStack::PopAndDestroy( id32parser );
+                }        
+            }
 		}
 	}
 
@@ -479,6 +512,17 @@ void CMetaDataUtilityBody::OpenFileL(
 	if ( iParser )
 	{
 		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
+		if( iParser->ID32Offset() )
+		    {
+		    CMetaDataParser* id32parser = 
+		            CMetaDataParserFactory::CreateID3ParserL(*iSource, iParser->ID32Offset() );
+            if( id32parser )
+                {
+                CleanupStack::PushL( id32parser );
+                id32parser->ParseL(aWantedFields, *iContainer);
+                CleanupStack::PopAndDestroy( id32parser );
+                }    
+		    }
 	}	
 	}
 // -----------------------------------------------------------------------------
@@ -510,6 +554,17 @@ void CMetaDataUtilityBody::OpenFileL(
 	if ( iParser )
 	{
 		iParser->CommonParseL((CMetaDataSourceFile*)iSource, aWantedFields, *iContainer);
+        if( iParser->ID32Offset() )
+            {
+            CMetaDataParser* id32parser = 
+                    CMetaDataParserFactory::CreateID3ParserL(*iSource, iParser->ID32Offset() );
+            if( id32parser )
+                {
+                CleanupStack::PushL( id32parser );
+                id32parser->ParseL(aWantedFields, *iContainer);
+                CleanupStack::PopAndDestroy( id32parser );
+                }
+            }
 	}
 	}
 
@@ -698,6 +753,17 @@ void CMetaDataUtilityBody::OpenDesL(
 	if ( iParser )
 		{
 		iParser->CommonParseDesL(aWantedFields, *iContainer);
+        if( iParser->ID32Offset() )
+            {
+            CMetaDataParser* id32parser = 
+                    CMetaDataParserFactory::CreateID3ParserL(*iSource, iParser->ID32Offset() );
+            if( id32parser )
+                {
+                CleanupStack::PushL( id32parser );
+                id32parser->ParseL(aWantedFields, *iContainer);
+                CleanupStack::PopAndDestroy( id32parser );
+                } 
+            }
 		}
 	}	
 	

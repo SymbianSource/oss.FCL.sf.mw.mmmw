@@ -80,7 +80,10 @@
 	_LIT(KTagExpectedDuration, "ExpectedDuration");
 	_LIT(KTagWindowStart, "StartPosition");
 	_LIT(KTagWindowEnd, "EndPosition");
+		
 
+	_LIT(KNegativeTag, "NegativeValue");
+	
 	_LIT(KTagMime, "MimeType");
 	_LIT(KTagIapId, "IapId");
 

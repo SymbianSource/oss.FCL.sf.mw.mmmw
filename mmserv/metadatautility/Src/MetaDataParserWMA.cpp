@@ -25,6 +25,7 @@
 #include	<e32svr.h>
 #endif
 
+#include <stdlib.h>
 #include <s32mem.h>
 
 // CONSTANTS

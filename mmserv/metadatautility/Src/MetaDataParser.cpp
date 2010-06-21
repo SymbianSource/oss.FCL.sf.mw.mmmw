@@ -19,10 +19,12 @@
 
 
 // INCLUDE FILES
+#include "MetaDataParser.h"
 #include <syslangutil.h>
 #include <languages.hrh>
 #include <TopCharacterSet.rsg>
 #include <data_caging_path_literals.hrh>
+#include <stdlib.h>
 #include <bautils.h>
 
 #include "MetaDataParser.h"
@@ -1257,7 +1259,23 @@ TBool CMetaDataParser::IsInTopCharacterSet(TUint aCharacterSetId)
 		}
 	return EFalse;
 	}
+// -----------------------------------------------------------------------------
+// CMetaDataParser::SetID32Offset()
+// -----------------------------------------------------------------------------
+//
+void CMetaDataParser::SetID32Offset( TUint aOffset )
+    {
+    iID32Offset = aOffset;
+    }
 
+// -----------------------------------------------------------------------------
+// CMetaDataParser::ID32Offset()
+// -----------------------------------------------------------------------------
+//
+TUint CMetaDataParser::ID32Offset()
+    {
+    return iID32Offset;
+    }
 
 // -----------------------------------------------------------------------------
 // CMetaDataParser::CommonParseL

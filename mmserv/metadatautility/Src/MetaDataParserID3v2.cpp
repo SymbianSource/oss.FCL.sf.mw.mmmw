@@ -77,10 +77,21 @@ CMetaDataParserID3v2::CMetaDataParserID3v2(
 CMetaDataParserID3v2* CMetaDataParserID3v2::CreateID3v2ParserL(
 	CMetaDataSource& aSource )
     {
+    return CreateID3v2ParserL( aSource, 0 );
+    }
+
+// -----------------------------------------------------------------------------
+// CMetaDataParserID3v2::CreateID3v2ParserL
+// Two-phased constructor.
+// -----------------------------------------------------------------------------
+//
+CMetaDataParserID3v2* CMetaDataParserID3v2::CreateID3v2ParserL(
+	CMetaDataSource& aSource, TUint aOffset )
+    {
 #ifdef _DEBUG
 	RDebug::Print(_L("CMetaDataParserID3v2::CreateID3v2ParserL"));
 #endif
-	TInt version = VersionL(aSource);
+	TInt version = VersionL(aSource, aOffset);
 
 	CMetaDataParserID3v2* parser = NULL;
 	switch ( version )
@@ -97,6 +108,12 @@ CMetaDataParserID3v2* CMetaDataParserID3v2::CreateID3v2ParserL(
 		default:	// KErrNotFound
 			break;
 		}
+	
+	if( parser )
+	    {
+	    parser->SetID32Offset( aOffset );
+	    }
+	
 	return parser;
     }
 
@@ -160,7 +177,7 @@ void CMetaDataParserID3v2::ParseL(
 		{
 		iTag = HBufC8::NewL(iFrameDataSize);
 		TPtr8 des( iTag->Des() );
-		iSource->ReadL(0, des);
+		iSource->ReadL(iID32Offset, des);
 		
 		iSourceDes = CMetaDataSourceDescriptor::NewL(des);
 		iSource = iSourceDes;
@@ -522,7 +539,7 @@ void CMetaDataParserID3v2::HandleV2GetGenreL( TInt aSize, TInt aKID3v2FrameHeade
 // -----------------------------------------------------------------------------
 //
 TInt CMetaDataParserID3v2::VersionL(
-	CMetaDataSource& aSource )
+	CMetaDataSource& aSource, TUint aOffset )
 	{
 	TInt size = 0;
 	aSource.Size( size );
@@ -533,7 +550,7 @@ TInt CMetaDataParserID3v2::VersionL(
 		}
 
 	TBuf8<KID3v2HeaderLength> header;
-	aSource.ReadL( header );
+	aSource.ReadL( aOffset, header );
 	// ID3v2 header consists of following parts:
     // - identifier "ID3", 3 bytes
     // - version, 2 bytes

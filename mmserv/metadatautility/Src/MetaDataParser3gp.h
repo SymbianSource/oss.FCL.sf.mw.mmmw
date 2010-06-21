@@ -23,6 +23,7 @@
 
 // INCLUDES
 #include <e32base.h>
+#include <mp4lib.h>
 #include "MetaDataParserMP4.h"
 #include "MetaDataFieldContainer.h"
 #include "MetaDataField.h"
@@ -93,6 +94,11 @@ class CMetaDataParser3gp : public CMetaDataParserMP4
         * @return void
 		*/
 		void GetAssetBoxL( TUint32 aBoxType, TMetaDataFieldId aFieldId );
+		
+		/**
+        * Sets ID32 metadata start offset (iID32Offset), if found.
+        */
+		void GetID32L();
 		
 	private:
 		// CenRep key for specific metadata mapping

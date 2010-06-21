@@ -113,8 +113,8 @@ class CReadWriteRequest : public CActive
             }
         
         
-        TBool Completed() ;
-        TInt SetStatus(TBool aStatus);
+        inline TBool Processing() const { return iState == EProcessing; }   
+        inline TBool Completed() const { return iState == ECompleted; }
         TDes8& BufferDes() ;
         TBool SourceType();
         const TDesC8& BufferDesC() ;
@@ -137,12 +137,19 @@ class CReadWriteRequest : public CActive
         TBool iSourceType;
         CTransferBufferCopy* iTransferBufferCopy;
         
-        TBool iCompleted ;
         TDes8* iBufferDes ;
         TInt iError ;
         TBool iUseTransferBuffer ;
         void SetTransferBuffer (TBool aTBuffer) ;
         TBool CanUseTransferBuffer () ;
+        enum TState
+            {
+            EActive,
+            EProcessing,
+            ECompleted
+            };
+        
+        TState iState;
     } ;
 
     /**

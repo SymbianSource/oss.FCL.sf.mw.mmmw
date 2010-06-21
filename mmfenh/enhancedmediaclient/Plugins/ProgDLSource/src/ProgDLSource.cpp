@@ -746,9 +746,12 @@ void CProgDLMultimediaSource::CancelRequests()
     for ( TInt ii = 0 ; ii < iRequests.Count() ; ii++ )
         {
         CReadWriteRequest* request = iRequests[ii];
-        delete request;
-        iRequests.Remove(ii);
-        ii--;
+        if(!request->Processing())
+            {
+            delete request;
+            iRequests.Remove(ii);
+            ii--;
+            }
         }
     }
 
@@ -822,19 +825,6 @@ TInt CProgDLMultimediaSource::SetAgentProperty(ContentAccess::TAgentProperty aPr
     return iFile->SetAgentProperty(aProperty, aValue);
     }
             
-/*
-*	Returns ETrue if the request can safely be deleted.
-*/
-TBool CReadWriteRequest::Completed() 
-    {
-    return iCompleted ;
-    }
-            
-TInt CReadWriteRequest::SetStatus(TBool aStatus)
-    {
-    iCompleted = aStatus;
-    return KErrNone;
-    }
 
 TBool CReadWriteRequest::SourceType() 
     {
@@ -899,7 +889,7 @@ void CReadWriteRequest::SetActive()
 */
 void CReadWriteRequest::DoCancel() 
     {
-    iCompleted = ETrue ;
+    iState = ECompleted;
     }
             
 /*
@@ -908,7 +898,7 @@ void CReadWriteRequest::DoCancel()
 TInt CReadWriteRequest::RunError( TInt aError ) 
     {
     //RunL can leave.
-    iCompleted = ETrue ;
+    iState = ECompleted;
     iError = aError; //keep this error internally for now
     return KErrNone ;
     }
@@ -918,6 +908,7 @@ TInt CReadWriteRequest::RunError( TInt aError )
 */
 void CReadRequest::RunL() 
     {
+    iState = EProcessing;
     //Copy the data from the normal buffer into the Transfer buffer
     if(iTransferBufferCopy)
         {
@@ -929,6 +920,7 @@ void CReadRequest::RunL()
         }
 
         STATIC_CAST(CProgDLMultimediaSource*,iParent)->ReadRequestStatus(STATIC_CAST(CReadWriteRequest*,this),iStatus);
+    iState = ECompleted;
     }
 
         // From CMultimediaDataSource begins
@@ -1122,6 +1114,9 @@ TInt CProgDLMultimediaSource::Stop()
             {
             TInt pos = 0;
             CancelRequests();
+            // Since the requests will not be deleted if it is still inside RunL() (iState is EProcessing), 
+            // iReadRequestPending should not be initialized to 0 always
+            iReadRequestPending = iRequests.Count();
             delete iFile;
             iFile = NULL;
             //iDLFileSize = -1;
@@ -1693,7 +1688,6 @@ TInt CProgDLMultimediaSource::ReadRequestStatus(CReadWriteRequest* aRequest, TRe
                 }
             }
         
-        aRequest->SetStatus(ETrue);
         return KErrNone;		
         }
     }

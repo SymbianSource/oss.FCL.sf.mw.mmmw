@@ -1934,7 +1934,7 @@ TInt CMmfTsPlay::TestCasePlayFileWindowL(CStifSectionParser *section , TTestResu
 
 	if ( !section->GetLine(KTagSoundFile, FileNamePtr, ENoTag) )
 		{
-		TBool UsingStartDefault, UsingEndDefault, UsingDefaultReportDelay;
+		TBool UsingStartDefault, UsingEndDefault, UsingDefaultReportDelay ,UsingNegativeTestCaseDefault;
 		TFileName FileName = FileNamePtr;
 	//	TInt WindowError;
 
@@ -1956,6 +1956,14 @@ TInt CMmfTsPlay::TestCasePlayFileWindowL(CStifSectionParser *section , TTestResu
 
 		ReportDelay = GetTimeIntervalL(section, KTagDelay, UsingDefaultReportDelay, (TTimeIntervalMicroSeconds32)KDefaultReportDelay);
 		iLogger->Log(_L("Setting delays to report position to [%d]"), ReportDelay.Int());
+		
+	
+		TInt NegativeTestCaseValue = GetIntL(section, KNegativeTag, UsingNegativeTestCaseDefault,0);
+		
+		if  (NegativeTestCaseValue == 1)
+		    {
+		     sndPlayer->iNegativePlayBackWindow = true;
+		    }
 
 		CParameters *reportParams = new(ELeave)CParameters(CSimpleSoundPlayer::KPlayerActionReportPosition);
 		CleanupStack::PushL(reportParams);
@@ -1975,8 +1983,14 @@ TInt CMmfTsPlay::TestCasePlayFileWindowL(CStifSectionParser *section , TTestResu
 
 		TTimeIntervalMicroSeconds ExpectedDuration = TTimeIntervalMicroSeconds(I64INT(EndPosition.Int64()) - I64INT(StartPosition.Int64()));
 		iLogger->Log(_L("ExpectedDuration: %d") ,ExpectedDuration.Int64() );
-
-		if (  Abs(ExpectedDuration.Int64() - PerceivedDuration.Int64()) > ErrorRange.Int64() )
+		
+	    if((ExpectedDuration > (sndPlayer->GetDuration())) && (sndPlayer->iNegativePlayBackWindow)) 
+		   {
+		   iLogger->Log(_L("ExpectedDuration is greater than the actual duration of the file"));
+		   iLogger->Log(_L("Negative Test was successful"));		   
+		   aResult.iResultDes.Copy(KTestCaseResultSuccess());
+       } 
+	    else if (  Abs(ExpectedDuration.Int64() - PerceivedDuration.Int64()) > ErrorRange.Int64() )
 			{	//Durations too different
 			iLogger->Log(_L("The clips duration is too different from the actual duration + position") );
 			aResult.iResult = KErrExpectedValueDifferent;
