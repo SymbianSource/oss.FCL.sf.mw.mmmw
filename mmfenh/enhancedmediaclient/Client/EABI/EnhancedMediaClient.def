@@ -48,7 +48,7 @@ EXPORTS
 	_ZTIN10multimedia23CListenerLocationEffectE @ 47 NONAME
 	_ZTIN10multimedia24CSourceOrientationEffectE @ 48 NONAME
 	_ZTIN10multimedia25CDataBufferProcessedEventE @ 49 NONAME
-	_ZTIN10multimedia25CMMFFindAndOpenController7CConfigE @ 50 NONAME
+	_ZTIN10multimedia25CMMFFindAndOpenController7CConfigE @ 50 NONAME ABSENT
 	_ZTIN10multimedia26CDistanceAttenuationEffectE @ 51 NONAME
 	_ZTIN10multimedia26CListenerOrientationEffectE @ 52 NONAME
 	_ZTIN10multimedia8CAsyncAOE @ 53 NONAME
@@ -89,7 +89,7 @@ EXPORTS
 	_ZTVN10multimedia23CListenerLocationEffectE @ 88 NONAME
 	_ZTVN10multimedia24CSourceOrientationEffectE @ 89 NONAME
 	_ZTVN10multimedia25CDataBufferProcessedEventE @ 90 NONAME
-	_ZTVN10multimedia25CMMFFindAndOpenController7CConfigE @ 91 NONAME
+	_ZTVN10multimedia25CMMFFindAndOpenController7CConfigE @ 91 NONAME ABSENT
 	_ZTVN10multimedia26CDistanceAttenuationEffectE @ 92 NONAME
 	_ZTVN10multimedia26CListenerOrientationEffectE @ 93 NONAME
 	_ZTVN10multimedia8CAsyncAOE @ 94 NONAME

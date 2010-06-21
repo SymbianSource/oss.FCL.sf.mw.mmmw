@@ -36,6 +36,6 @@ EXPORTS
 	_ZN25CMMFFindAndOpenController9OpenByUrlERK7TDesC16iRK6TDesC8 @ 35 NONAME
 	_ZN40CMMFMdaObjectStateChangeObserverCallback4NewLER29MMdaObjectStateChangeObserver @ 36 NONAME
 	_ZN40CMMFMdaObjectStateChangeObserverCallback8CallBackEP5CBaseiii @ 37 NONAME
-	_ZTIN25CMMFFindAndOpenController7CConfigE @ 38 NONAME ; #<TI>#
-	_ZTVN25CMMFFindAndOpenController7CConfigE @ 39 NONAME ; #<VT>#
+	_ZTIN25CMMFFindAndOpenController7CConfigE @ 38 NONAME ABSENT ; #<TI>#
+	_ZTVN25CMMFFindAndOpenController7CConfigE @ 39 NONAME ABSENT ; #<VT>#
 
