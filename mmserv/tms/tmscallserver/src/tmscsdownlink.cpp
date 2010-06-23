@@ -16,6 +16,7 @@
  */
 
 #include <AudioPreference.h>
+#include "tmsutility.h"
 #include "tmscsdownlink.h"
 #include "tmscsdevsoundobserver.h"
 
@@ -25,20 +26,44 @@ const gint KDefaultVolume = 4;
 const gint KDefaultMaxVolume = 10;
 
 // -----------------------------------------------------------------------------
+// Constructor
+// -----------------------------------------------------------------------------
+//
+TMSCSDownlink::TMSCSDownlink(TMSCSDevSoundObserver& observer) :
+    TMSCSDevSound(observer)
+    {
+    }
+
+// -----------------------------------------------------------------------------
+// Second phase constructor
+// -----------------------------------------------------------------------------
+//
+void TMSCSDownlink::ConstructL(const gint retrytime)
+    {
+    TMSCSDevSound::ConstructL(TMS_STREAM_DOWNLINK, retrytime);
+
+    if (iDevSound)
+        {
+        iDevSound->SetVolume(KDefaultVolume);
+        }
+    }
+
+// -----------------------------------------------------------------------------
 // Static constructor
 // -----------------------------------------------------------------------------
 //
-TMSCSDownlink* TMSCSDownlink::NewL(TMSCSPDevSoundObserver& aObserver)
+TMSCSDownlink* TMSCSDownlink::NewL(TMSCSDevSoundObserver& observer,
+        const gint retrytime)
     {
-    TMSCSDownlink* self = new (ELeave) TMSCSDownlink(aObserver);
+    TMSCSDownlink* self = new (ELeave) TMSCSDownlink(observer);
     CleanupStack::PushL(self);
-    self->ConstructL();
+    self->ConstructL(retrytime);
     CleanupStack::Pop(self);
     return self;
     }
 
 // -----------------------------------------------------------------------------
-// Destructor.
+// Destructor
 // -----------------------------------------------------------------------------
 //
 TMSCSDownlink::~TMSCSDownlink()
@@ -49,19 +74,19 @@ TMSCSDownlink::~TMSCSDownlink()
 // Sets volume
 // -----------------------------------------------------------------------------
 //
-void TMSCSDownlink::SetVolume(gint aVolume)
+void TMSCSDownlink::SetVolume(gint volume)
     {
     if (iDevSound)
         {
         gint maxVolume(iDevSound->MaxVolume());
         maxVolume = (maxVolume > 0) ? maxVolume : KDefaultMaxVolume;
-        gint scaledVolume = (aVolume * maxVolume) / KDefaultMaxVolume;
+        gint scaledVolume = (volume * maxVolume) / KDefaultMaxVolume;
         iDevSound->SetVolume(scaledVolume);
         }
     }
 
 // -----------------------------------------------------------------------------
-// Gives volume
+// Returns volume
 // -----------------------------------------------------------------------------
 //
 gint TMSCSDownlink::Volume()
@@ -75,7 +100,7 @@ gint TMSCSDownlink::Volume()
     }
 
 // -----------------------------------------------------------------------------
-// Gives max volume
+// Returns device's max volume
 // -----------------------------------------------------------------------------
 //
 gint TMSCSDownlink::MaxVolume()
@@ -95,13 +120,14 @@ gint TMSCSDownlink::MaxVolume()
 //
 void TMSCSDownlink::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
     {
-    //CSPLOGSTRING( CSPINT, "TMSCSDownlink:: activated" );
+    TRACE_PRN_N(_L("TMSCSDownlink::BufferToBeFilled"));
+
     // We dont react to devsound messages unless we are activating.
-    if (IsActivationOngoing())
+    if (iActivationOngoing)
         {
         iActive = ETrue;
         iActivationOngoing = EFalse;
-        iObserver.DownlinkActivatedSuccessfully();
+        iObserver.DownlinkActivationCompleted(KErrNone);
         }
     }
 
@@ -112,23 +138,27 @@ void TMSCSDownlink::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
 //
 void TMSCSDownlink::PlayError(TInt aError)
     {
-    //CSPLOGSTRING( CSPINT, "TMSCSDownlink::PlayError" );
+    TRACE_PRN_N1(_L("TMSCSDownlink::PlayError[%d]"), aError);
 
-    // We dont react to devsound messages unless we are activating.
-    if (IsActivationOngoing())
+    // We don't react to devsound errors unless we are activating.
+    if (iActivationOngoing && aError == KErrAccessDenied)
         {
-        //CSPLOGSTRING( CSPINT, "TMSCSDownlink::PlayError activation failed" );
-        if (aError == KErrAccessDenied)
+        if (iStartRetryTime != 0)
             {
+            StartTimer();
+            }
+        else
+            {
+            CancelTimer();
             iActivationOngoing = EFalse;
-            iObserver.DownlinkActivationFailed();
+            iObserver.DownlinkActivationCompleted(aError);
             }
         }
     }
 
 // -----------------------------------------------------------------------------
-// From class CSPDevsound
-// Tries to activate Downlink stream.
+// From class TMSCSDevSound
+// Activates Downlink stream.
 // -----------------------------------------------------------------------------
 //
 void TMSCSDownlink::DoActivateL()
@@ -136,30 +166,6 @@ void TMSCSDownlink::DoActivateL()
     if (iDevSound)
         {
         iDevSound->PlayInitL();
-        }
-    }
-
-// -----------------------------------------------------------------------------
-// Constructor
-// -----------------------------------------------------------------------------
-//
-TMSCSDownlink::TMSCSDownlink(TMSCSPDevSoundObserver& aObserver) :
-    TMSCSPDevSound(aObserver)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// Second phase constructor
-// -----------------------------------------------------------------------------
-//
-void TMSCSDownlink::ConstructL()
-    {
-    TMSCSPDevSound::ConstructL(EMMFStatePlaying, KAudioPrefCSCallDownlink,
-            KAudioPriorityCSCallDownlink);
-
-    if (iDevSound)
-        {
-        iDevSound->SetVolume(KDefaultVolume);
         }
     }
 

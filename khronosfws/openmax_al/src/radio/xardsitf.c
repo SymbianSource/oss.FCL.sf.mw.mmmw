@@ -63,7 +63,7 @@ XAresult XARDSItfImpl_QueryRDSSignal(XARDSItf self, XAboolean * isSignal)
     }
 
 
-    ret = XARDSItfAdapt_QueryRDSSignal((XAAdaptationGstCtx*)impl->adapCtx, isSignal);
+//    ret = XARDSItfAdapt_QueryRDSSignal((XAAdaptationGstCtx*)impl->adapCtx, isSignal);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_QueryRDSSignal");
@@ -88,7 +88,7 @@ XAresult XARDSItfImpl_GetProgrammeServiceName(XARDSItf self, XAchar * ps)
     }
 
 
-    ret = XARDSItfAdapt_GetProgrammeServiceName((XAAdaptationGstCtx*)impl->adapCtx, ps);
+//    ret = XARDSItfAdapt_GetProgrammeServiceName((XAAdaptationGstCtx*)impl->adapCtx, ps);
 
     DEBUG_API("<-XARDSItfImpl_GetProgrammeServiceName");
     return ret;
@@ -115,7 +115,7 @@ XAresult XARDSItfImpl_GetRadioText(XARDSItf self, XAchar * rt)
     }
 
 
-    ret = XARDSItfAdapt_GetRadioText((XAAdaptationGstCtx*)impl->adapCtx, rt);
+//    ret = XARDSItfAdapt_GetRadioText((XAAdaptationGstCtx*)impl->adapCtx, rt);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_GetRadioText");
@@ -153,8 +153,8 @@ XAresult XARDSItfImpl_GetRadioTextPlus(XARDSItf self,
     }
 
 
-    ret = XARDSItfAdapt_GetRadioTextPlus((XAAdaptationGstCtx*)impl->adapCtx, contentType, informationElement,
-                                        descriptor, descriptorContentType);
+ //   ret = XARDSItfAdapt_GetRadioTextPlus((XAAdaptationGstCtx*)impl->adapCtx, contentType, informationElement,
+ //                                       descriptor, descriptorContentType);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_GetRadioTextPlus");
@@ -183,7 +183,7 @@ XAresult XARDSItfImpl_GetProgrammeType(XARDSItf self, XAuint32 * pty)
     }
 
 
-    ret = XARDSItfAdapt_GetProgrammeType((XAAdaptationGstCtx*)impl->adapCtx, pty);
+//    ret = XARDSItfAdapt_GetProgrammeType((XAAdaptationGstCtx*)impl->adapCtx, pty);
 
     DEBUG_API("<-XARDSItfImpl_GetProgrammeType");
     return ret;
@@ -217,7 +217,7 @@ XAresult XARDSItfImpl_GetProgrammeTypeString(XARDSItf self,
     }
 
 
-    ret = XARDSItfAdapt_GetProgrammeTypeString((XAAdaptationGstCtx*)impl->adapCtx, isLengthMax16, pty);
+//    ret = XARDSItfAdapt_GetProgrammeTypeString((XAAdaptationGstCtx*)impl->adapCtx, isLengthMax16, pty);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_GetProgrammeTypeString");
@@ -248,7 +248,7 @@ XAresult XARDSItfImpl_GetProgrammeIdentificationCode(XARDSItf self, XAint16 * pi
     }
 
 
-    ret = XARDSItfAdapt_GetProgrammeIdentificationCode((XAAdaptationGstCtx*)impl->adapCtx, pi);
+//    ret = XARDSItfAdapt_GetProgrammeIdentificationCode((XAAdaptationGstCtx*)impl->adapCtx, pi);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_GetProgrammeIdentificationCode");
@@ -276,7 +276,7 @@ XAresult XARDSItfImpl_GetClockTime(XARDSItf self, XAtime * dateAndTime)
     }
 
 
-    ret = XARDSItfAdapt_GetClockTime((XAAdaptationGstCtx*)impl->adapCtx, dateAndTime);
+ //   ret = XARDSItfAdapt_GetClockTime((XAAdaptationGstCtx*)impl->adapCtx, dateAndTime);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_GetClockTime");
@@ -304,7 +304,7 @@ XAresult XARDSItfImpl_GetTrafficAnnouncement(XARDSItf self, XAboolean * ta)
     }
 
 
-    ret = XARDSItfAdapt_GetTrafficAnnouncement((XAAdaptationGstCtx*)impl->adapCtx, ta);
+//    ret = XARDSItfAdapt_GetTrafficAnnouncement((XAAdaptationGstCtx*)impl->adapCtx, ta);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_GetTrafficAnnouncement");
@@ -332,7 +332,7 @@ XAresult XARDSItfImpl_GetTrafficProgramme(XARDSItf self, XAboolean * tp)
     }
 
 
-    ret = XARDSItfAdapt_GetTrafficProgramme((XAAdaptationGstCtx*)impl->adapCtx, tp);
+//    ret = XARDSItfAdapt_GetTrafficProgramme((XAAdaptationGstCtx*)impl->adapCtx, tp);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_GetTrafficProgramme");
@@ -369,7 +369,7 @@ XAresult XARDSItfImpl_SeekByProgrammeType(XARDSItf self,
     }
 
 
-    ret = XARDSItfAdapt_SeekByProgrammeType((XAAdaptationGstCtx*)impl->adapCtx, pty, upwards);
+ //   ret = XARDSItfAdapt_SeekByProgrammeType((XAAdaptationGstCtx*)impl->adapCtx, pty, upwards);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_SeekByProgrammeType");
@@ -402,7 +402,7 @@ XAresult XARDSItfImpl_SeekTrafficAnnouncement(XARDSItf self, XAboolean upwards)
     }
 
 
-    ret = XARDSItfAdapt_SeekTrafficAnnouncement((XAAdaptationGstCtx*)impl->adapCtx, upwards);
+ //   ret = XARDSItfAdapt_SeekTrafficAnnouncement((XAAdaptationGstCtx*)impl->adapCtx, upwards);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_SeekTrafficAnnouncement");
@@ -435,7 +435,7 @@ XAresult XARDSItfImpl_SeekTrafficProgramme(XARDSItf self, XAboolean upwards)
     }
 
 
-    ret = XARDSItfAdapt_SeekTrafficProgramme((XAAdaptationGstCtx*)impl->adapCtx, upwards);
+ //   ret = XARDSItfAdapt_SeekTrafficProgramme((XAAdaptationGstCtx*)impl->adapCtx, upwards);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_SeekTrafficProgramme");
@@ -465,7 +465,7 @@ XAresult XARDSItfImpl_SetAutomaticSwitching(XARDSItf self, XAboolean automatic)
     }
 
 
-    ret = XARDSItfAdapt_SetAutomaticSwitching((XAAdaptationGstCtx*)impl->adapCtx, automatic);
+ //   ret = XARDSItfAdapt_SetAutomaticSwitching((XAAdaptationGstCtx*)impl->adapCtx, automatic);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_SetAutomaticSwitching");
@@ -493,7 +493,7 @@ XAresult XARDSItfImpl_GetAutomaticSwitching(XARDSItf self, XAboolean * automatic
     }
 
 
-    ret = XARDSItfAdapt_GetAutomaticSwitching((XAAdaptationGstCtx*)impl->adapCtx, automatic);
+//    ret = XARDSItfAdapt_GetAutomaticSwitching((XAAdaptationGstCtx*)impl->adapCtx, automatic);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_GetAutomaticSwitching");
@@ -522,7 +522,7 @@ XAresult XARDSItfImpl_SetAutomaticTrafficAnnouncement(XARDSItf self, XAboolean a
     }
 
 
-    ret = XARDSItfAdapt_SetAutomaticTrafficAnnouncement((XAAdaptationGstCtx*)impl->adapCtx, automatic);
+//    ret = XARDSItfAdapt_SetAutomaticTrafficAnnouncement((XAAdaptationGstCtx*)impl->adapCtx, automatic);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_SetAutomaticTrafficAnnouncement");
@@ -552,7 +552,7 @@ XAresult XARDSItfImpl_GetAutomaticTrafficAnnouncement(XARDSItf self, XAboolean *
     }
 
 
-    ret = XARDSItfAdapt_GetAutomaticTrafficAnnouncement((XAAdaptationGstCtx*)impl->adapCtx, automatic);
+ //   ret = XARDSItfAdapt_GetAutomaticTrafficAnnouncement((XAAdaptationGstCtx*)impl->adapCtx, automatic);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_GetAutomaticTrafficAnnouncement");
@@ -597,7 +597,7 @@ XAresult XARDSItfImpl_GetODAGroup(XARDSItf self,
     if (callback)
     {
 
-        ret = XARDSItfAdapt_GetODAGroup((XAAdaptationGstCtx*)impl->adapCtx, AID);
+ //       ret = XARDSItfAdapt_GetODAGroup((XAAdaptationGstCtx*)impl->adapCtx, AID);
 
     }
 
@@ -635,7 +635,7 @@ XAresult XARDSItfImpl_SubscribeODAGroup(XARDSItf self,
     }
 
 
-    ret = XARDSItfAdapt_SubscribeODAGroup((XAAdaptationGstCtx*)impl->adapCtx, group, useErrorCorrection);
+//    ret = XARDSItfAdapt_SubscribeODAGroup((XAAdaptationGstCtx*)impl->adapCtx, group, useErrorCorrection);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_SubscribeODAGroup");
@@ -667,7 +667,7 @@ XAresult XARDSItfImpl_UnsubscribeODAGroup(XARDSItf self, XAint16 group)
     }
 
 
-    ret = XARDSItfAdapt_UnsubscribeODAGroup((XAAdaptationGstCtx*)impl->adapCtx, group);
+ //   ret = XARDSItfAdapt_UnsubscribeODAGroup((XAAdaptationGstCtx*)impl->adapCtx, group);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_UnsubscribeODAGroup");
@@ -699,7 +699,7 @@ XAresult XARDSItfImpl_ListODAGroupSubscriptions(XARDSItf self,
     }
 
 
-    XARDSItfAdapt_ListODAGroupSubscriptions((XAAdaptationGstCtx*)impl->adapCtx, pGroups, pLength);
+//    XARDSItfAdapt_ListODAGroupSubscriptions((XAAdaptationGstCtx*)impl->adapCtx, pGroups, pLength);
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARDSItfImpl_ListODAGroupSubscriptions");

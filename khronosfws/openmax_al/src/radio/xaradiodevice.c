@@ -42,8 +42,7 @@ static const XAInterfaceID* XARadioDeviceItfIIDs[RADIO_ITFCOUNT]=
 /* XAResult XARadioDeviceImpl_Create
  * Description: Create object
  */
-XAresult XARadioDeviceImpl_CreateRadioDevice(FrameworkMap* mapper,
-                                             XAObjectItf* pDevice,
+XAresult XARadioDeviceImpl_CreateRadioDevice(XAObjectItf* pDevice,
                                              XAuint32 numInterfaces,
                                              const XAInterfaceID * pInterfaceIds,
                                              const XAboolean * pInterfaceRequired)
@@ -120,25 +119,14 @@ XAresult XARadioDeviceImpl_CreateRadioDevice(FrameworkMap* mapper,
             }
         }
     }
-    
-    /* This code is put here to return Feature Not Supported since adaptation is not present*/
-    /*************************************************/
-    DEBUG_ERR("Required interface not found - abort creation!");
-    XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
-    XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
-    DEBUG_API("<-XARadioDeviceImpl_CreateRadioDevice");
-    return XA_RESULT_FEATURE_UNSUPPORTED;  
-    /*************************************************/
-    
-/*    // Initialize XARadioDeviceImpl variables 
-    pImpl->adaptationCtx = XARadioAdapt_Create();
 
-     //Set ObjectItf to point to newly created object 
     *pDevice = (XAObjectItf)&(pBaseObj->self);
+    pImpl->adaptationCtx = XARadioAdapt_Create();   
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
+
     DEBUG_API("<-XARadioDeviceImpl_Create");
-    return XA_RESULT_SUCCESS;*/
+    return XA_RESULT_SUCCESS;
 }
 
 /* XAResult XARadioDeviceImpl_QueryNumSupportedInterfaces

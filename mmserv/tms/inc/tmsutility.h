@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __TMSUTILITY_H__
-#define __TMSUTILITY_H__
+#ifndef TMSUTILITY_H
+#define TMSUTILITY_H
 
 #include <e32std.h>
 #include <tms.h>
@@ -40,7 +40,9 @@ namespace TMS {
 #define TRACE_PRN_N(str)              RDebug::Print(str)
 #define TRACE_PRN_N1(str, val1)       RDebug::Print(str, val1)
 #define TRACE_PRN_N2(str, val1, val2) RDebug::Print(str, val1, val2)
+
 #else
+
 #define TRACE_PRN_FN_ENT
 #define TRACE_PRN_FN_EXT
 #define TRACE_PRN_IF_ERR(err)
@@ -50,11 +52,11 @@ namespace TMS {
 #define TRACE_PRN_N(str)
 #define TRACE_PRN_N1(str, val1)
 #define TRACE_PRN_N2(str, val1, val2)
+
 #endif //_DEBUG
 
-
 // MACRO DEFINITIONS
-#define RET_ERR_IF_ERR(err) if ( err != 0) return err;
+#define RET_ERR_IF_ERR(err) if (err != 0) return err;
 #define RET_REASON_IF_ERR(s) if(s!=0) return s
 
 #define TMSRESULT(result) TMSUtility::TMSResult(result)
@@ -82,5 +84,5 @@ public:
 
 } //namespace TMS
 
-#endif //__TMSUTILITY_H__
+#endif //TMSUTILITY_H
 

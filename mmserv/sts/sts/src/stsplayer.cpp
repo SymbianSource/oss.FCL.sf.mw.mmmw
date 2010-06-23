@@ -15,30 +15,51 @@
  * This file provides the implementation for creating and deleting a
  * an MMF based player for playing and stopping a tone playback.
  */
-
 #include "stsplayer.h"
+#include <AudioPreference.h>
+#include <MProEngEngine.h>
+#include <MProEngProfile.h>
+#include <MProEngTones.h>
+#include <MProEngToneSettings.h>
+#include <ProEngFactory.h>
+#include <systemtoneservice.h>
+
 
 _LIT(KDefaultFile,"z:\\data\\sounds\\digital\\clock.aac");
+
+
+
+
 
 /*static*/CStsPlayer* CStsPlayer::CreateTonePlayer(
         MStsPlayerObserver& aObserver, CSystemToneService::TToneType aTone,
         unsigned int aContext)
     {
     CStsPlayer* self = 0;
-    switch (aTone)
+     
+    self = new CStsPlayer(aObserver, KDefaultFile, 0, aContext);
+    
+    if( self != 0)
+    	{
+    		TRAPD(err,self->LoadActiveProfileSettingsL());
+             
+    		if( err == KErrNone )
+       		self->SetToneSettings(aTone);
+    		else 
         {
-        default:
-            self = new CStsPlayer(aObserver, KDefaultFile, 0, aContext);
-            break;
-        }
-    if (self != 0)
-        {
-        bool successful = self->Init();
-        if (!successful)
+          delete self;
+          self = 0;
+         }
+        	        
+    		if (self != 0)
+         {
+            bool successful = self->Init();
+            if (!successful)
             {
-            delete self;
-            self = 0;
+               delete self;
+               self = 0;
             }
+          }
         }
     return self;
     }
@@ -48,43 +69,181 @@ _LIT(KDefaultFile,"z:\\data\\sounds\\digital\\clock.aac");
         unsigned int aContext)
     {
     CStsPlayer* self = 0;
-    switch (aAlarm)
-        {
-        case CSystemToneService::EClockAlarm:
-            self = new CStsPlayer(aObserver, KDefaultFile, 10, aContext);
-            break;
-        default:
-            self = new CStsPlayer(aObserver, KDefaultFile, 10, aContext);
-            break;
-        }
-    if (self != 0)
-        {
-        bool successful = self->Init();
-        if (!successful)
+   	
+   	self = new CStsPlayer(aObserver, KDefaultFile, 10, aContext);
+   	
+   	if( self != 0)
+    	{		
+   			TRAPD(err,self->LoadActiveProfileSettingsL());
+   			
+   			if( err == KErrNone )
+   	    	self->SetAlarmSettings(aAlarm); 
+   			else 
+   	  	 {
+   	    	 delete self;
+   	     	 self = 0;
+   	   		}           
+   
+    	if (self != 0)
+      	  {
+        	  bool successful = self->Init();
+          	if (!successful)
             {
-            delete self;
-            self = 0;
-            }
+             	  delete self;
+               	self = 0;
+            }	
+        	}
         }
     return self;
     }
+
+void CStsPlayer::LoadActiveProfileSettingsL()
+	{
+		if(!iEngine)
+		   	{
+		   		iEngine =  ProEngFactory::NewEngineL();
+        	}
+		
+        if (iEngine)
+            iProfile = iEngine->ActiveProfileL();
+	    
+	    if (iProfile)
+	        {
+             MProEngToneSettings& settings  = iProfile->ToneSettings();
+             iWarningToneEnabled = settings.WarningAndGameTones();
+	        }
+     
+     
+     
+     
+  }
+
+void CStsPlayer::SetToneSettings(CSystemToneService::TToneType aTone)
+	{
+		
+    if(iProfile)
+    
+    {
+    	MProEngTones&         tones = iProfile->ProfileTones();
+		
+			switch (aTone)
+				{
+				case CSystemToneService::EEmailAlert:
+				    iFileName.Set(tones.EmailAlertTone());
+				    iAudioPreference = KAudioPrefNewSMS;
+				    iAudioPriority = KAudioPriorityRecvMsg ;
+				    break;
+				case CSystemToneService::ESmsAlert:
+				    iFileName.Set(tones.MessageAlertTone());
+				    iAudioPreference = KAudioPrefNewSMS;
+				    iAudioPriority = KAudioPriorityRecvMsg;
+				    break; 
+				case CSystemToneService::EMmsAlert:
+				    iFileName.Set(tones.MessageAlertTone());
+				    iAudioPreference = KAudioPrefNewSMS;
+				    iAudioPriority = KAudioPriorityRecvMsg;
+				    break;
+				case CSystemToneService::EChatAlert:
+				    iFileName.Set(tones.MessageAlertTone());
+				    iAudioPreference = KAudioPrefNewSMS ;
+				    iAudioPriority = KAudioPriorityRecvMsg;
+				    break; 
+				case CSystemToneService::EWarningBeep:
+				    iAudioPreference = KAudioPrefWarning;
+				    iAudioPriority =  KAudioPriorityWarningTone ;
+				    if (iWarningToneEnabled)
+				        iFileName.Set(KDefaultFile);
+				    else
+				        iVolume = 0;
+				        
+				    break;
+				default:
+					iAudioPreference = KAudioPrefDefaultTone;
+				    iAudioPriority = KAudioPriorityWarningTone ;
+				    break;
+				}
+			}
+			
+		else
+		{			 
+				 iAudioPreference = KAudioPrefDefaultTone;
+				 iAudioPriority = KAudioPriorityWarningTone ;
+		}
+		
+	}	
+	
+	
+void CStsPlayer::SetAlarmSettings(CSystemToneService::TAlarmType aAlarm)
+	{
+		if(iProfile)
+    
+   		 {
+    		MProEngTones&         tones = iProfile->ProfileTones();
+		 
+		 	switch (aAlarm)
+        	{
+        	case CSystemToneService::EIncomingCall:
+            	iFileName.Set(tones.RingingTone1());
+            	iAudioPreference = KAudioPrefIncomingCall ;
+				iAudioPriority = KAudioPriorityRingingTone ;
+            	break;
+       		case CSystemToneService::EIncomingCallLine2:
+            	iFileName.Set(tones.RingingTone2());
+            	iAudioPreference = KAudioPrefIncomingCall;
+				iAudioPriority = KAudioPriorityRingingTone ;
+            	break;  
+            case CSystemToneService::EIncomingDataCall:
+            	iFileName.Set(tones.VideoCallRingingTone());
+            	iAudioPreference = KAudioPrefIncomingDataCall;
+		    	iAudioPriority = KAudioPriorityRealOnePlayer;
+            	break;
+        	default:
+        		iAudioPreference = KAudioPrefAlarmClock  ;
+				iAudioPriority = KAudioPriorityAlarm;
+            	break;
+       		}
+      	}
+      else
+		{			 
+				 iAudioPreference = KAudioPrefDefaultTone;
+				 iAudioPriority = KAudioPriorityWarningTone ;
+		}  
+	}	
+
+
+
 
 CStsPlayer::CStsPlayer(MStsPlayerObserver& aObserver, const TDesC& aFileName,
         int aRepeatNumberOfTimes, unsigned int aContext) :
     iObserver(aObserver), iPlayer(0), iFileName(aFileName),
             iRepeatNumberOfTimes(aRepeatNumberOfTimes), iContext(aContext)
     {
+    	iEngine =  ProEngFactory::NewEngineL();
     }
 
 bool CStsPlayer::Init()
     {
-    TRAPD(result, iPlayer = CMdaAudioPlayerUtility::NewL(*this));
-    return result == KErrNone;
+
+    
+        TRAPD(result, iPlayer = CMdaAudioPlayerUtility::NewL(*this));
+        return result == KErrNone;
+    
     }
+
 
 CStsPlayer::~CStsPlayer()
     {
-    delete iPlayer;
+    	if (iProfile)
+        {
+        iProfile->Release();
+        }
+    	if (iEngine)
+        {
+        iEngine->Release();
+        }
+        
+    delete iPlayer; 
+    
     }
 
 void CStsPlayer::Play()
@@ -111,6 +270,8 @@ void CStsPlayer::MapcInitComplete(TInt aError,
     if (aError == KErrNone)
         {
         TTimeIntervalMicroSeconds delay = 0;
+        // Set PriorityPref
+        iPlayer->SetPriority(iAudioPriority,iAudioPreference);
         iPlayer->SetRepeats(iRepeatNumberOfTimes, delay);
         iPlayer->Play();
         }
@@ -118,6 +279,7 @@ void CStsPlayer::MapcInitComplete(TInt aError,
         {
         //TODO: add trace
         // Since there is an error, indicate that the playback is complete
+        RDebug::Print(_L("InitCompleteReturned"), aError);
         iObserver.PlayComplete(iContext);
         }
     }

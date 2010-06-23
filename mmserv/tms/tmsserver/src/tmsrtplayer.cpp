@@ -594,18 +594,18 @@ void TMSRingTonePlayer::PlayAudioRingToneL()
         if (!iAudioPlayer)
             {
             CreateAudioPlayerL();
-            if (!iTimer->IsActive())
+            if (!iTimer->IsRunning())
                 {
                 // If InitComplete event doesn't occur within permittable time,
                 // this will trigger fallback routine.
-                iTimer->After(KTMSMaxRingingWaiting, this);
+                iTimer->NotifyAfter(KTMSMaxRingingWaiting, *this);
                 }
             }
 
         // Start playing.
         if (!iAudioPlayer)
             {
-            iTimer->Cancel();
+            iTimer->CancelNotify();
             PlayDefaultToneL();
             }
         else
@@ -739,9 +739,9 @@ void TMSRingTonePlayer::PlayTtsTone()
         iTtsDelaysCount = KTMSTtsDelaysCount;
 
         // Start TTS timer just before RT
-        if (!iTtsDelayTimer->IsActive())
+        if (!iTtsDelayTimer->IsRunning())
             {
-            iTtsDelayTimer->After(KTMSTtsDelays[iTtsDelayIndex],
+            iTtsDelayTimer->NotifyAfter(KTMSTtsDelays[iTtsDelayIndex],
                     TCallBack(HandleTtsDelayTimeout, this));
             }
         iTtsVolume = iRtParam.iVolume;
@@ -771,7 +771,7 @@ void TMSRingTonePlayer::PlayBackupToneL()
         iTonePlayingStatus = EBackupTonePlaying;
         iTtsToneToBePlayed = EFalse;
         iTTsTimeOutCounter = 0;
-        iTtsDelayTimer->Cancel();
+        iTtsDelayTimer->CancelNotify();
         if (iTtsPlayer)
             {
             iTtsPlayer->StopPlaying();
@@ -809,11 +809,11 @@ void TMSRingTonePlayer::PlayDefaultToneL()
     if (!iDefaultPlayer)
         {
         CreateDefaultRtPlayerL();
-        if (!iTimer->IsActive())
+        if (!iTimer->IsRunning())
             {
             // If InitComplete event doesn't occur within permittable time,
             // this will trigger fallback routine.
-            iTimer->After(KTMSMaxRingingWaiting, this);
+            iTimer->NotifyAfter(KTMSMaxRingingWaiting, *this);
             }
         }
 
@@ -821,7 +821,7 @@ void TMSRingTonePlayer::PlayDefaultToneL()
     if (!iDefaultPlayer)
         {
         // Default player not ready, play backup.
-        iTimer->Cancel();
+        iTimer->CancelNotify();
         PlayBackupToneL();
         }
     else
@@ -844,14 +844,14 @@ void TMSRingTonePlayer::StopPlaying()
 
     iTtsToneToBePlayed = EFalse;
     iTTsTimeOutCounter = 0;
-    iTtsDelayTimer->Cancel();
+    iTtsDelayTimer->CancelNotify();
     if (iTtsPlayer)
         {
         iTtsPlayer->StopPlaying();
         delete iTtsPlayer;
         iTtsPlayer = NULL;
         }
-    iTimer->Cancel();
+    iTimer->CancelNotify();
 
     switch (iTonePlayingStatus)
         {
@@ -1240,7 +1240,7 @@ void TMSRingTonePlayer::HandleRtAudioError(TInt aEvent, TInt aError,
         if (ignore) ;
         }
 
-    iTimer->Cancel();
+    iTimer->CancelNotify();
     DoHandlePlayerError(!deleteAll, EFalse);
     iRtObserver.RtPlayerEvent(aEvent, aError);
     }
@@ -1256,7 +1256,7 @@ void TMSRingTonePlayer::HandleRtAudioInitComplete(TInt aEvent, TInt aError,
             (iTonePlayingStatus == EDefaultTonePlaying &&
             aPlayer == EPlayerDefault))
         {
-        iTimer->Cancel();
+        iTimer->CancelNotify();
         }
     else
         {
@@ -1302,10 +1302,10 @@ void TMSRingTonePlayer::HandleRtAudioPlayComplete(TInt aEvent, TInt aError,
             // Need to restart TTS sequence TTS has completed its iterations,
             // set index to zero.
             iTtsDelayIndex = 0;
-            if (!iTtsDelayTimer->IsActive())
+            if (!iTtsDelayTimer->IsRunning())
                 {
                 // Restart TTS sequence
-                iTtsDelayTimer->After(KTMSTtsDelays[iTtsDelayIndex],
+                iTtsDelayTimer->NotifyAfter(KTMSTtsDelays[iTtsDelayIndex],
                         TCallBack(HandleTtsDelayTimeout, this));
                 }
             }
@@ -1332,10 +1332,10 @@ void TMSRingTonePlayer::ResumeTTS()
         // Caller name is said once. Increase tone player volume.
         SolveNewVolumeAndRamptime(ESaidOnce);
 
-        if (!iTtsDelayTimer->IsActive())
+        if (!iTtsDelayTimer->IsRunning())
             {
             // There are more TTS iterations to be played.
-            iTtsDelayTimer->After(KTMSTtsDelays[iTtsDelayIndex],
+            iTtsDelayTimer->NotifyAfter(KTMSTtsDelays[iTtsDelayIndex],
                     TCallBack(HandleTtsDelayTimeout, this));
             }
         }
@@ -1347,10 +1347,10 @@ void TMSRingTonePlayer::ResumeTTS()
     }
 
 // -----------------------------------------------------------------------------
-// TMSRingTonePlayer::HandleTimeOutL
+// TMSRingTonePlayer::TimerEvent
 // -----------------------------------------------------------------------------
 //
-void TMSRingTonePlayer::HandleTimeOutL()
+void TMSRingTonePlayer::TimerEvent()
     {
     DoHandlePlayerError(ETrue, ETrue);
     }

@@ -1,19 +1,19 @@
-@rem
-@rem Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-@rem All rights reserved.
-@rem This component and the accompanying materials are made available
-@rem under the terms of "Eclipse Public License v1.0"
-@rem which accompanies this distribution, and is available
-@rem at the URL "http://www.eclipse.org/legal/epl-v10.html".
-@rem
-@rem Initial Contributors:
-@rem Nokia Corporation - initial contribution.
-@rem
-@rem Contributors:
-@rem
-@rem Description: 
-@rem
-
+@REM
+@REM Copyright (c) 2002-2004 Nokia Corporation and/or its subsidiary(-ies).
+@REM All rights reserved.
+@REM This component and the accompanying materials are made available
+@REM under the terms of "Eclipse Public License v1.0"
+@REM which accompanies this distribution, and is available
+@REM at the URL "http://www.eclipse.org/legal/epl-v10.html".
+@REM
+@REM Initial Contributors:
+@REM Nokia Corporation - initial contribution.
+@REM
+@REM Contributors:
+@REM
+@REM Description:  Wins Command file for Preset Utility
+@REM
+@REM
 @echo Initializing test environment for presetutilitytestmodule...
 copy ..\conf\PresetUtilityTestModule.cfg \epoc32\winscw\c\TestFramework\PresetUtilityTestModule.cfg
 copy ..\init\PresetUtilityTestModule.ini \epoc32\wins\c\TestFramework\TestFramework.ini

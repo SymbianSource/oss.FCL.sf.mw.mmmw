@@ -24,6 +24,16 @@
 using namespace TMS;
 
 // -----------------------------------------------------------------------------
+// TMSIPCallStreamBase::TMSIPCallStreamBase
+// Constructor
+// -----------------------------------------------------------------------------
+//
+TMSIPCallStreamBase::TMSIPCallStreamBase(TMSIPDevSoundObserver& observer) :
+    iObserver(observer)
+    {
+    }
+
+// -----------------------------------------------------------------------------
 // TMSIPCallStreamBase::~TMSIPCallStreamBase
 // Destructor
 // -----------------------------------------------------------------------------

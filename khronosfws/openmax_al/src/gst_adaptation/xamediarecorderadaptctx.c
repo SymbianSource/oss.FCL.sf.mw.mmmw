@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description: Media Recorder Adaptation for GST
 *
 */
 

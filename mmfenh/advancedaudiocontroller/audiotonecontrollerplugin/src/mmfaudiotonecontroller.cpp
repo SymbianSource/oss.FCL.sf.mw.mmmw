@@ -114,6 +114,7 @@ CMMFController* CMMFAudioToneController::NewL()
 void CMMFAudioToneController::ConstructL()
 	{
 	iSourceAndSinkAdded = EFalse;
+    iDataSink           = NULL;
 
 	// Construct custom command parsers
 	CMMFAudioPlayDeviceCustomCommandParser* audPlayDevParser = CMMFAudioPlayDeviceCustomCommandParser::NewL(*this);
@@ -138,7 +139,15 @@ void CMMFAudioToneController::ConstructL()
         {
         User::LeaveIfError(iFactory->CreateAudioOutputControlUtility(iAudioOutputControlUtility));                
         }    
-//end drm cr
+ //end drm cr
+   
+   
+  //For Error : Update s60 tone controller to update the DRM rights 
+  CMMFDRMCustomCommandParser* drmParser = CMMFDRMCustomCommandParser::NewL(*this);
+	CleanupStack::PushL(drmParser);
+	AddCustomCommandParserL(*drmParser);
+	CleanupStack::Pop(drmParser);
+	
 	// [ assert the invariant now that we are constructed ]
 	__ASSERT_ALWAYS( Invariant(), Panic( EStateNotConstructed));
 	}
@@ -235,6 +244,9 @@ void CMMFAudioToneController::AddDataSinkL(MDataSink& aSink)
 	//Only support playing to audio output 
 	if (aSink.DataSinkType() != KUidMmfAudioOutput)
 		User::Leave( KErrNotSupported );
+			
+			
+    iDataSink = &aSink;
 
 	iMMFDevSound = CMMFDevSound::NewL();
 
@@ -280,6 +292,22 @@ void CMMFAudioToneController::PrimeL(TMMFMessage& aMessage)
 			User::Leave(err);
 			}
 		}
+		
+	//For Error : Update s60 tone controller to update the DRM rights 
+	 if (iDataSource->DataSourceType()==KUidMmfFileSource)
+       {
+       CMMFFile* file = static_cast<CMMFFile*>(iDataSource);
+       // we only support protected files for playback
+       if (file->IsProtectedL())
+           {
+           if (iDataSink->DataSinkType()!=KUidMmfAudioOutput)
+             {       
+               // Conversion is not allowed for DRM protected files
+               User::Leave(KErrNotSupported);
+              }        
+           }
+       }
+	   
 	// for drm CR/Error 417-45879/ESLM-82JAHL
     if (iDataSource->DataSourceType()==KUidMmfFileSource)
         {
@@ -381,6 +409,18 @@ void CMMFAudioToneController::PlayL()
 	            }
 	        }
 	
+	//For Error : Update s60 tone controller to update the DRM rights 
+	//Getting the Intent for Play if AutomaticIntent is Enabled		
+	if (!iDisableAutoIntent && iDataSource->DataSourceType()==KUidMmfFileSource)
+	   {
+	   CMMFFile* file = static_cast<CMMFFile*>(iDataSource);
+	   TInt err = file->ExecuteIntent(ContentAccess::EPlay);
+	   if (err != KErrNone)
+	      {
+	      User::LeaveIfError(err);
+	      }
+	   }
+	
 	if(State() == EPausePlaying && iIsResumeSupported)
 		{
 		User::LeaveIfError(iMMFDevSound->Resume());
@@ -414,6 +454,18 @@ void CMMFAudioToneController::PauseL()
 
 	__ASSERT_ALWAYS(iMMFDevSound, Panic(EMMFAudioControllerPanicDataSinkDoesNotExist));
 
+   //For Error : Update s60 tone controller to update the DRM rights 
+	 //Getting the Intent for Pause if AutomaticIntent is Enabled
+     if (!iDisableAutoIntent && iDataSource->DataSourceType()==KUidMmfFileSource)
+	    {
+	    CMMFFile* file = static_cast<CMMFFile*>(iDataSource);
+	    TInt err = file->ExecuteIntent(ContentAccess::EPause);
+	
+	    if (err != KErrNone)
+	       {
+	        User::LeaveIfError(err);
+	       }
+	    }
 	if(iIsResumeSupported)
 		{
 		iMMFDevSound->Pause();
@@ -450,6 +502,19 @@ void CMMFAudioToneController::StopL()
 	// Due to the asynchronous nature of the controller
 	// interaction the response to stopped when stopped 
 	// should not be an error ]
+    
+	
+	//For Error : Update s60 tone controller to update the DRM rights 
+	//Getting the Intent for Stop if AutomaticIntent is Enabled
+    if (!iDisableAutoIntent && iDataSource->DataSourceType()==KUidMmfFileSource)
+	   {
+	   CMMFFile* file = static_cast<CMMFFile*>(iDataSource);
+	   TInt err = file->ExecuteIntent(ContentAccess::EStop);
+	      if (err != KErrNone)
+		    {
+			 User::LeaveIfError(err);
+			}
+	   }
 	if (State() != EStopped)
 		{
 		//[ update state to stopped propogate to devsound ]
@@ -1061,3 +1126,63 @@ TInt CMMFAudioToneController::MapcSetRepeats(TInt aRepeatNumberOfTimes, const TT
 		}
 	return err;
 	}
+
+//For Error : Update s60 tone controller to update the DRM rights 
+//Methods from MMMFDRMCustomCommandImplementor
+//Checking for the Intents if AutomaticIntent is Disabled
+
+TInt CMMFAudioToneController::MdcExecuteIntent(ContentAccess::TIntent aIntent)
+    {
+    
+    if (iDataSource->DataSourceType()==KUidMmfFileSource)
+         {
+         CMMFFile* file = static_cast<CMMFFile*>(iDataSource);
+         TInt err = file->ExecuteIntent(aIntent);
+         return err;
+         }
+    else
+         {
+         // Evaluating intent will always succeed on sinks that 
+         // don't support DRM
+         return KErrNone;
+         }   
+    
+    }
+
+TInt CMMFAudioToneController::MdcEvaluateIntent(ContentAccess::TIntent aIntent)
+    {
+    if (iDataSource->DataSourceType()==KUidMmfFileSource)
+         {
+         CMMFFile* file = static_cast<CMMFFile*>(iDataSource);
+         TInt err = file->EvaluateIntent(aIntent);
+         return err;
+         }
+    else
+         {
+         // Evaluating intent will always succeed on sinks that 
+         // don't support DRM
+         return KErrNone;
+         } 
+      }
+
+TInt CMMFAudioToneController::MdcDisableAutomaticIntent(TBool aDisableAutoIntent)
+    {
+    iDisableAutoIntent = aDisableAutoIntent;
+    return KErrNone;
+    }
+    
+    
+TInt CMMFAudioToneController::MdcSetAgentProperty(ContentAccess::TAgentProperty aProperty, TInt aValue)
+    {
+    if (iDataSource->DataSourceType()==KUidMmfFileSource)
+        {
+        CMMFFile* file = static_cast<CMMFFile*>(iDataSource);
+        TInt err = file->SetAgentProperty(aProperty, aValue);
+        return err;
+        }
+    else
+        {
+        return KErrNone;
+        }
+    }
+

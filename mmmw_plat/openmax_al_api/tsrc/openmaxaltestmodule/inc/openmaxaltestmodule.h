@@ -98,6 +98,7 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         virtual ~COpenMAXALTestModule();
 
         virtual void HandlePlayItfCallback( XAPlayItf caller, XAuint32 event );
+        virtual void HandleRadioItfCallback(XARadioItf caller, XAuint32 event );
         virtual void HandleObjectCallback(XAObjectItf caller,XAuint32 event,
                                 XAresult result,XAuint32 param, void * pInterface);
      
@@ -354,6 +355,21 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         
         virtual TInt al_dynsrcitf_SetSource( CStifItemParser& aItem );
         
+        virtual TInt al_radioitf_SetFreqRange(CStifItemParser& aItem );
+        virtual TInt al_radioitf_GetFreqRange(CStifItemParser& aItem );
+        virtual TInt al_radioitf_IsFreqRangeSupported(CStifItemParser& aItem );
+        virtual TInt al_radioitf_GetFreqRangeProperties(CStifItemParser& aItem );
+        virtual TInt al_radioitf_SetFrequency(CStifItemParser& aItem );
+        virtual TInt al_radioitf_CancelSetFrequency(CStifItemParser& aItem );
+        virtual TInt al_radioitf_GetFrequency(CStifItemParser& aItem );
+        virtual TInt al_radioitf_SetSquelch(CStifItemParser& aItem );
+        virtual TInt al_radioitf_GetSquelch(CStifItemParser& aItem );
+        virtual TInt al_radioitf_SetStereoMode(CStifItemParser& aItem );
+        virtual TInt al_radioitf_GetStereoMode(CStifItemParser& aItem );
+        virtual TInt al_radioitf_GetSignalStrength(CStifItemParser& aItem );
+        virtual TInt al_radioitf_Seek(CStifItemParser& aItem );
+        virtual TInt al_radioitf_StopSeeking(CStifItemParser& aItem ); 
+       	virtual TInt al_radioitf_RegisterRadioCallback(CStifItemParser& aItem ); 
         virtual TInt al_strminfoitf_QueryMediaContainerInformation( CStifItemParser& aItem );
         virtual TInt al_strminfoitf_QueryStreamType( CStifItemParser& aItem );
         virtual TInt al_strminfoitf_QueryStreamInformation( CStifItemParser& aItem );
@@ -387,6 +403,7 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
 
         virtual TInt al_nokialinearvolumeitf_SetVolumeLevel( CStifItemParser& aItem );
         virtual TInt al_nokialinearvolumeitf_GetVolumeLevel( CStifItemParser& aItem );
+        virtual TInt al_nokialinearvolumeitf_SetGetVolumeLevel( CStifItemParser& aItem );        
         virtual TInt al_nokialinearvolumeitf_GetStepCount( CStifItemParser& aItem );
         virtual TInt al_nokialinearvolumeitf_RegisterVolumeCallback( CStifItemParser& aItem );
         virtual TInt al_nokialinearvolumeitf_SetCallbackEventsMask( CStifItemParser& aItem );
@@ -467,6 +484,7 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
 
         XAPlayItf m_PlayItf;
         XASeekItf m_SeekItf;
+        XARadioItf m_RadioItf;
         XADynamicSourceItf m_DynSrcItf;
         
         XAVolumeItf m_VolumeItf;

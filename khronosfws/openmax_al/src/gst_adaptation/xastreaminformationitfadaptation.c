@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
-
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: StreamInformation Itf Adaptation Source
+ *
+ */
 
 #include "xadebug.h"
 #include "xathreadsafety.h"
@@ -78,9 +77,8 @@ XAresult  XAStreamInformationItfAdapt_QueryMediaContainerInformation(
     }
 
     /* Get media container type */
-    DEBUG_INFO_A2("Adaptation Context- ID is [%u] Extended ID[%u]",
-                (unsigned int)adaptCtx->ctxId,
-                (unsigned int)((XAMediaPlayerAdaptationCtx*) adaptCtx)->extendedCtxId);
+    DEBUG_INFO_A1("Adaptation Context- ID is [%u] ",
+                (unsigned int)adaptCtx->ctxId );
 
     /* Initialize to unspecified */
     *containerType = XA_CONTAINERTYPE_UNSPECIFIED;

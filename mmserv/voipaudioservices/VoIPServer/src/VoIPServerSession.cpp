@@ -1907,14 +1907,12 @@ void CVoIPAudioServerSession::InitializeComplete(TInt aError)
     if (aError == KErrNone)
         {
         TMMFPrioritySettings pSet;
-        iShared.iMutex.Wait();
-        pSet.iPref = iShared.iPreference;
-        pSet.iPriority = iShared.iPriority;
-        iShared.iMutex.Signal();
 
         if (iDTMFTonePlayer && iDTMFTonePlayerInitRequest)
             {
             // initialized DTMF player
+            pSet.iPref = KAudioDTMFString;
+            pSet.iPriority = KAudioPriorityDTMFString;
             iDTMFTonePlayer->SetPrioritySettings(pSet);
             iDTMFTonePlayer->SetVolume(iMaxVolume);
             iToneLenOn = KDTMFToneLengthOn;
@@ -1934,6 +1932,10 @@ void CVoIPAudioServerSession::InitializeComplete(TInt aError)
         else if (iDevSound && iDevSoundInitRequest)
             {
             // initialized standard player to check G711 frame rate
+            iShared.iMutex.Wait();
+            pSet.iPref = iShared.iPreference;
+            pSet.iPriority = iShared.iPriority;
+            iShared.iMutex.Signal();
             iDevSound->SetPrioritySettings(pSet);
             iDevSoundInitRequest = EFalse;
 

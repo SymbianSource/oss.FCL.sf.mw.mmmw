@@ -44,7 +44,6 @@ SOURCE          tmspubsublistener.cpp
 SOURCE          tmsrtcontainer.cpp
 SOURCE          tmsrtaudiohdlr.cpp
 SOURCE          tmsrtplayer.cpp
-SOURCE          tmstimer.cpp
 SOURCE          tmsasyncreqao.cpp
 
 USERINCLUDE     ../inc
@@ -67,6 +66,7 @@ LIBRARY         efsrv.lib
 LIBRARY         libglib.lib
 LIBRARY         mmfdevsound.lib
 LIBRARY         tmscallserver.lib
+LIBRARY         tmsutility.lib
 LIBRARY         centralrepository.lib
 LIBRARY         cenrepnotifhandler.lib
 LIBRARY         profileengine.lib

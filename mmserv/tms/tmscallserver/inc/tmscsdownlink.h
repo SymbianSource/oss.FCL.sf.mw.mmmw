@@ -23,26 +23,24 @@
 
 namespace TMS {
 
-//
-class TMSCSPDevSoundObserver;
-
 /**
- *  Provides Downlink functionality.
+ *  Provides Downlink stream functionality.
  *
  */
-NONSHARABLE_CLASS(TMSCSDownlink) : public TMSCSPDevSound
+NONSHARABLE_CLASS(TMSCSDownlink) : public TMSCSDevSound
     {
 public:
 
-    static TMSCSDownlink* NewL(TMSCSPDevSoundObserver& aObserver);
+    static TMSCSDownlink* NewL(TMSCSDevSoundObserver& observer,
+            const gint retrytime);
 
     virtual ~TMSCSDownlink();
 
     /**
      * Sets volume.
-     * @param aVolume Volume.
+     * @param volume Volume.
      */
-    void SetVolume(gint aVolume);
+    void SetVolume(gint volume);
 
     /**
      * Gets volume.
@@ -60,31 +58,29 @@ public:
 
     /**
      * From MDevSoundObserver.
-     * Indication from devsound that stream (Downlink) has been activated
+     * Indication from the devsound that Downlink has been activated
      * successfully.
      */
     void BufferToBeFilled(CMMFBuffer* /*aBuffer*/);
 
     /**
      * From MDevSoundObserver.
-     * Indication from devsound that activation of stream( Downlink)
-     * failed.
+     * Indication from devsound that Downlink activation has failed.
      */
     void PlayError(TInt aErrorCode);
 
 private:
 
     /**
-     * From CSPDevSound.
+     * From TMSCSDevSound.
      * Tries to activate the mic stream.
      */
     void DoActivateL();
 
 protected:
 
-    TMSCSDownlink(TMSCSPDevSoundObserver& aObserver);
-
-    void ConstructL();
+    TMSCSDownlink(TMSCSDevSoundObserver& observer);
+    void ConstructL(const gint retrytime);
     };
 
 } //namespace TMS

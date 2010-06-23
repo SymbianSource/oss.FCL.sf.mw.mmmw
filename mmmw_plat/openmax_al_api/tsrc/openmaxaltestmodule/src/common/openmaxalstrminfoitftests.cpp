@@ -100,7 +100,6 @@ TInt COpenMAXALTestModule::al_strminfoitf_QueryStreamType( CStifItemParser& aIte
     {
     TInt status(KErrNone);
     XAresult res;
-    TInt async(0);
     TInt index(0);
     XAuint32 streamType;
 
@@ -222,7 +221,6 @@ TInt COpenMAXALTestModule::al_strminfoitf_QueryActiveStreams( CStifItemParser& a
     {
     TInt status(KErrNone);
     XAresult res;
-    TInt streamindex(0);
     XAuint32 size(0);
     TInt inpsize;
     XAboolean arr[2];

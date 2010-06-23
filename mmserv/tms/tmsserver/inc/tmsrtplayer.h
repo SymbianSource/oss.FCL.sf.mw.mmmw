@@ -47,7 +47,7 @@ class TMSRtParam;
  */
 class TMSRingTonePlayer : public CBase,
                           public TMSRtAudioHdlrObsrv,
-                          public TMSTimerObsrv,
+                          public TMSTimerObserver,
                           public TMSAsyncReqObsrv
     {
 public:
@@ -226,9 +226,9 @@ private:
             TInt aPlayer);
 
     /**
-     * @see TMSTimerObsrv
+     * From TMSTimerObserver
      */
-    virtual void HandleTimeOutL();
+    virtual void TimerEvent();
 
     /**
      * Enumerates how many times TTS has played

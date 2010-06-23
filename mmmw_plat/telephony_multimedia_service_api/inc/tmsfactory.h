@@ -394,6 +394,8 @@ public:
     IMPORT_C gint DeleteDTMF(TMSDTMF*& dtmf);
 
     /**
+     * FEATURE IS CURRENTLY NOT SUPPORTED
+     *
      * Creates TMSRTPSession object.
      *
      * @param  rtpsession
@@ -406,22 +408,21 @@ public:
      *      Buffer processing mode: either PULL or PUSH.
      *
      * @return
-     *      TMS_RESULT_SUCCESS when object is created successfully.
-     *      TMS_RESULT_INSUFFICIENT_MEMORY when object creation failed due to
-     *      insufficient memory.
+     *      TMS_RESULT_FEATURE_NOT_SUPPORTED
      */
     IMPORT_C gint CreateRTPSession(TMSRTPSession*& rtpsession, guint8* sdp,
             guint mode);
 
     /**
+     * FEATURE IS CURRENTLY NOT SUPPORTED
+     *
      * Deletes TMSRTPSession object.
      *
      * @param  rtpsession
      *      RTP Session object to be deleted.
      *
      * @return
-     *      TMS_RESULT_SUCCESS when object is deleted successfully.
-     *      TMS_RESULT_INVALID_ARGUMENT if RTP session object is invalid.
+     *      TMS_RESULT_FEATURE_NOT_SUPPORTED
      */
     IMPORT_C gint DeleteRTPSession(TMSRTPSession*& rtpsession);
 

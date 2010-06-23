@@ -18,6 +18,8 @@
 #ifndef DTMFTONEPLAYEROBSERVER_H
 #define DTMFTONEPLAYEROBSERVER_H
 
+#include <glib.h>
+
 namespace TMS {
 
 /**
@@ -26,8 +28,8 @@ namespace TMS {
 class TMSDTMFTonePlayerObserver
     {
 public:
-    virtual void DTMFInitCompleted(TInt error) = 0;
-    virtual void DTMFToneFinished(TInt error) = 0;
+    virtual void DTMFInitCompleted(gint status) = 0;
+    virtual void DTMFToneFinished(gint status) = 0;
     };
 } //namespace TMS
 

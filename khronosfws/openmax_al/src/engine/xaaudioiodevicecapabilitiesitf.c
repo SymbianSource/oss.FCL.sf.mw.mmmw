@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description:
+* Description: Audio IO Device capabilities Itf
 *
 */
 

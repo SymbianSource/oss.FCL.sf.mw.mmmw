@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: 
+ *
+ */
 
 #ifndef XAOBJECTITF_H
 #define XAOBJECTITF_H
@@ -34,18 +34,18 @@ typedef void (*xaFreeResourcesImpl)(XAObjectItf self);
 
 /** STRUCTURES **/
 typedef struct XAObjItfMapEntry_
-{
+    {
     XAInterfaceID iid;
-    XAuint8       mapIdx;
-    void          *pItf;
-    XAboolean     locEnabled;
-    XAboolean     required;
-    XAboolean     isDynamic;
-} XAObjItfMapEntry;
+    XAuint8 mapIdx;
+    void *pItf;
+    XAboolean locEnabled;
+    XAboolean required;
+    XAboolean isDynamic;
+    } XAObjItfMapEntry;
 
 /* Definition of XAObjectItf implementation */
 typedef struct XAObjectItfImpl_
-{
+    {
     /* parent interface */
     struct XAObjectItf_ itf;
     /* pointer to self */
@@ -72,8 +72,7 @@ typedef struct XAObjectItfImpl_
     xaDoRealizeImpl DoRealizeImpl;
     xaDoResumeImpl DoResumeImpl;
     xaFreeResourcesImpl FreeResourcesImpl;
-} XAObjectItfImpl;
-
+    } XAObjectItfImpl;
 
 /** METHODS **/
 
@@ -85,43 +84,37 @@ XAresult XAObjectItfImpl_Resume(XAObjectItf self, XAboolean async);
 XAresult XAObjectItfImpl_GetState(XAObjectItf self, XAuint32 *pState);
 
 XAresult XAObjectItfImpl_GetInterface(XAObjectItf self,
-                                       const XAInterfaceID iid,
-                                       void *pInterface);
+        const XAInterfaceID iid, void *pInterface);
 
 XAresult XAObjectItfImpl_RegisterCallback(XAObjectItf self,
-                                           xaObjectCallback callback,
-                                           void *pContext);
+        xaObjectCallback callback, void *pContext);
 
 void XAObjectItfImpl_AbortAsyncOperation(XAObjectItf self);
 
 void XAObjectItfImpl_Destroy(XAObjectItf self);
 
 XAresult XAObjectItfImpl_SetPriority(XAObjectItf self, XAint32 priority,
-                                      XAboolean preemptable);
+        XAboolean preemptable);
 
 XAresult XAObjectItfImpl_GetPriority(XAObjectItf self, XAint32 *pPriority,
-                                      XAboolean *pPreemptable);
+        XAboolean *pPreemptable);
 
 XAresult XAObjectItfImpl_SetLossOfControlInterfaces(XAObjectItf self,
-                                                     XAint16 numInterfaces,
-                                                     XAInterfaceID *pInterfaceIDs,
-                                                     XAboolean enabled);
+        XAint16 numInterfaces, XAInterfaceID *pInterfaceIDs,
+        XAboolean enabled);
 
 /* XAObjectItfImpl -specific methods */
 
 /* Allocate and initialize base object */
-XAresult XAObjectItfImpl_Init(XAObjectItfImpl* self,
-                              XAuint32 itfCount,
-                              const XAInterfaceID** itfIIDs,
-                              xaDoRealizeImpl doRealizeImpl,
-                              xaDoResumeImpl doResumeImpl,
-                              xaFreeResourcesImpl freeResourcesImpl);
+XAresult XAObjectItfImpl_Init(XAObjectItfImpl* self, XAuint32 itfCount,
+        const XAInterfaceID** itfIIDs, xaDoRealizeImpl doRealizeImpl,
+        xaDoResumeImpl doResumeImpl, xaFreeResourcesImpl freeResourcesImpl);
 
 /* methods for asynchronous service */
 void* XAObjectItfImpl_AsyncRealize(void* args);
 void* XAObjectItfImpl_AsyncResume(void* args);
 
 XAObjItfMapEntry* XAObjectItfImpl_GetItfEntry(const XAObjectItf self,
-                                              const XAInterfaceID iid);
+        const XAInterfaceID iid);
 
 #endif /* XAOBJECTITF_H */

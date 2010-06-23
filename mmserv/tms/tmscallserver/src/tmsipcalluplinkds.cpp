@@ -31,7 +31,8 @@ using namespace TMS;
 // Standard Constructor
 // -----------------------------------------------------------------------------
 //
-TMSIPUplink::TMSIPUplink()
+TMSIPUplink::TMSIPUplink(TMSIPDevSoundObserver& observer) :
+    TMSIPCallStreamBase(observer)
     {
     }
 
@@ -59,12 +60,13 @@ TMSIPUplink::~TMSIPUplink()
 // Symbian two-phase constructor
 // -----------------------------------------------------------------------------
 //
-TMSIPUplink* TMSIPUplink::NewL(const guint32 codecID,
-        const TMMFPrioritySettings priority)
+TMSIPUplink* TMSIPUplink::NewL(TMSIPDevSoundObserver& observer,
+        const guint32 codecID, const TMMFPrioritySettings priority,
+        const gint retrytime)
     {
-    TMSIPUplink* self = new (ELeave) TMSIPUplink();
+    TMSIPUplink* self = new (ELeave) TMSIPUplink(observer);
     CleanupStack::PushL(self);
-    self->ConstructL(codecID, priority);
+    self->ConstructL(codecID, priority, retrytime);
     CleanupStack::Pop(self);
     return self;
     }
@@ -75,17 +77,15 @@ TMSIPUplink* TMSIPUplink::NewL(const guint32 codecID,
 // -----------------------------------------------------------------------------
 //
 void TMSIPUplink::ConstructL(const guint32 codecID,
-        const TMMFPrioritySettings priority)
+        const TMMFPrioritySettings priority, const gint /*retrytime*/)
     {
     TRACE_PRN_FN_ENT;
-
     iCodecID = codecID;
     iPriority = priority;
 
     // Client must set these before querying!
     iG711EncodeMode = TMS_G711_CODEC_MODE_ALAW;
     iILBCEncodeMode = TMS_ILBC_CODEC_MODE_20MS_FRAME;
-
     TRAPD(err, InitDevSoundL(EMMFStateRecording, priority));
     if (err != TMS_RESULT_SUCCESS)
         {
@@ -93,7 +93,6 @@ void TMSIPUplink::ConstructL(const guint32 codecID,
         }
 
     iMaxBufLen = ConfigureMedia(iCodecID);
-
     TRACE_PRN_FN_EXT;
     }
 
@@ -102,7 +101,7 @@ void TMSIPUplink::ConstructL(const guint32 codecID,
 //
 // -----------------------------------------------------------------------------
 //
-void TMSIPUplink::Start()
+void TMSIPUplink::Start(const gint /*retrytime*/)
     {
     TRACE_PRN_FN_ENT;
 
@@ -116,17 +115,10 @@ void TMSIPUplink::Start()
 
         if (err != TMS_RESULT_SUCCESS)
             {
-            //TODO: Notify main thread
             iStatus = EReady;
+            iObserver.UplinkStarted(err);
             }
-#ifdef _DEBUG
-        else
-            {
-            iSamplesRecCount = 0;
-            }
-#endif
         }
-
     TRACE_PRN_FN_EXT;
     }
 
@@ -144,10 +136,6 @@ void TMSIPUplink::Stop()
         iDevSound->Stop();
         iStatus = EReady;
         }
-    else
-        {
-        //TODO: Notify main thread
-        }
     TRACE_PRN_FN_EXT;
     }
 
@@ -158,9 +146,8 @@ void TMSIPUplink::Stop()
 //
 void TMSIPUplink::BufferToBeEmptied(CMMFBuffer* aBuffer)
     {
-    iDevSoundBufPtr = static_cast<CMMFDataBuffer*>(aBuffer);
+    iDevSoundBufPtr = static_cast<CMMFDataBuffer*> (aBuffer);
     TDes8& data = iDevSoundBufPtr->Data();
-
     iBufLen = iDevSoundBufPtr->BufferSize();
     TRACE_PRN_N1(_L("TMS->UPL: BTBE->LEN [%d]"), iBufLen);
 
@@ -353,7 +340,6 @@ gint TMSIPUplink::GetDataXferChunkHndl(const TUint32 key, RChunk& chunk)
             status = TMS_RESULT_ILLEGAL_OPERATION;
             }
         }
-
     return status;
     }
 
@@ -386,7 +372,6 @@ gint TMSIPUplink::SetIlbcCodecMode(const gint mode)
                 }
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -433,7 +418,6 @@ gint TMSIPUplink::SetG711CodecMode(const gint mode)
                 }
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -465,7 +449,6 @@ gint TMSIPUplink::GetSupportedBitrates(RArray<guint>& bitrates)
         {
         err = iSpeechEncoderConfig->GetSupportedBitrates(bitrates);
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -484,7 +467,6 @@ gint TMSIPUplink::SetBitrate(guint bitrate)
         err = iSpeechEncoderConfig->SetBitrate(bitrate);
         TRACE_PRN_N1(_L("TMS->UPL: SetBitrate [%d]"), bitrate);
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -503,7 +485,6 @@ gint TMSIPUplink::GetBitrate(guint& bitrate)
         err = iSpeechEncoderConfig->GetBitrate(bitrate);
         TRACE_PRN_N1(_L("TMS->UPL: GetBitrate [%d]"), bitrate);
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -634,36 +615,30 @@ void TMSIPUplink::InitializeComplete(TInt aError)
     {
     TRACE_PRN_FN_ENT;
 
-    gint err = aError;
+    gint status = aError;
 
-    if (err == TMS_RESULT_SUCCESS && iDevSound)
+    if (status == TMS_RESULT_SUCCESS && iDevSound)
         {
         TMMFCapabilities conf;
         conf = iDevSound->Config();
         conf.iRate = EMMFSampleRate8000Hz;
         conf.iChannels = EMMFMono;
-        TRAP(err, iDevSound->SetConfigL(conf));
-        if (err == TMS_RESULT_SUCCESS)
+        TRAP(status, iDevSound->SetConfigL(conf));
+        if (status == TMS_RESULT_SUCCESS)
             {
             // We are ready to stream even in case of CI setting failure
             iStatus = EReady;
             iMaxGain = iDevSound->MaxGain();
             }
 
-        // Init Custom Interface API to the Encoder
-        err = SetCodecCi();
-        if (err != TMS_RESULT_SUCCESS)
-            {
-            // DEBUG only
-            // Can ignore error - although encoder is not fully configured but
-            // it can still run in the default mode.
-            TRACE_PRN_IF_ERR(err);
-            }
+        // Init Custom Interface API to the Encoder. Any return error can
+        // be ignored as codec can still run in the default mode even if not
+        // fully configured.
+        SetCodecCi();
         }
 
-    // TODO: Notify client
-
-    TRACE_PRN_IF_ERR(err);
+    iObserver.UplinkInitCompleted(status);
+    TRACE_PRN_IF_ERR(status);
     TRACE_PRN_FN_EXT;
     }
 
@@ -674,16 +649,11 @@ void TMSIPUplink::InitializeComplete(TInt aError)
 // The state of recorder is rolled back to EReady.
 // -----------------------------------------------------------------------------
 //
-void TMSIPUplink::RecordError(TInt /*aError*/)
+void TMSIPUplink::RecordError(TInt aError)
     {
-    //TRACE_PRN_IF_ERR(aError);
-
-#ifdef _DEBUG
-    iSamplesRecCount = 0;
-#endif
     iStatus = EReady;
-
-    // TODO: Notify client
+    iObserver.UplinkStarted(aError);
+    TRACE_PRN_IF_ERR(aError);
     }
 
 // End of file

@@ -11,7 +11,9 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:  Internal Header to Include Khronos Headers in One Place.
+*               Also redefining the XA_API macro to export the IID value
+*               to DEF files.
 *
 */
 #ifndef _OPENMAXAL_WRAPPER_H_

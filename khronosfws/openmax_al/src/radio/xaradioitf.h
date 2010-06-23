@@ -22,15 +22,13 @@
 #include "xaradioitfadaptation.h"
 
 /** MACROS **/
-#define RADIO_PRESET_NAME_MAX_LENGTH 20
-
+#define RADIO_DEFAULT_STEREO_MODE 2
+#define RADIO_NUM_OF_PRESETS 20
 /** TYPES **/
 
 /** ENUMERATIONS **/
 
 /** STRUCTURES **/
-
-/* Definition of radio preset */
 typedef struct RadioPreset_
 {
     XAuint32    freq;
@@ -38,6 +36,7 @@ typedef struct RadioPreset_
     XAuint32    stereoMode;
     char*       name;
 } RadioPreset;
+
 
 /* Definition of XAEqualizerItf implementation */
 typedef struct XARadioItfImpl_
@@ -51,14 +50,13 @@ typedef struct XARadioItfImpl_
     XAboolean   squelch;
     XAuint32    stereoMode;
 
-    XAuint32    preset;
-    XAuint32    numOfPresets;
-
-    RadioPreset presets[RADIO_NUM_OF_PRESETS];
-
     XARadioItf         cbPtrToSelf;
     xaRadioCallback    callback;
     void               *context;
+   	XAuint32    preset;
+   	XAuint32    numOfPresets;
+
+    RadioPreset presets[RADIO_NUM_OF_PRESETS];    
 
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
@@ -101,6 +99,10 @@ XAresult XARadioItfImpl_Seek(XARadioItf self, XAboolean upwards);
 
 XAresult XARadioItfImpl_StopSeeking(XARadioItf self);
 
+XAresult XARadioItfImpl_RegisterRadioCallback(XARadioItf self,
+                                              xaRadioCallback callback,
+                                              void * pContext);
+                                              
 XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32 * pNumPresets);
 
 XAresult XARadioItfImpl_SetPreset(XARadioItf self,
@@ -116,16 +118,13 @@ XAresult XARadioItfImpl_GetPreset(XARadioItf self,
                                   XAuint8 * pRange,
                                   XAuint32 * pMode,
                                   XAchar * pName,
-                                  XAuint16 * pNameLength);
-
-XAresult XARadioItfImpl_RegisterRadioCallback(XARadioItf self,
-                                              xaRadioCallback callback,
-                                              void * pContext);
+                                  XAuint16 * pNameLength);                                              
 
 /* XARadioItfImpl -specific methods */
 XARadioItfImpl* XARadioItfImpl_Create(XAAdaptationBaseCtx *adapCtx);
 void XARadioItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
 
 void XARadioItfImpl_Free(XARadioItfImpl* self);
+
 
 #endif /* XARADIOITF_H */

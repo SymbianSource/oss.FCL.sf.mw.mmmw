@@ -89,6 +89,7 @@ struct TMSCliSrvStreamInitDataStruct
     TMSStreamType StreamType;
     gint StreamId;
     TMSFormatType FormatType;
+    gint RetryTime;
     };
 typedef TPckgBuf<TMSCliSrvStreamInitDataStruct>
         TMSCliSrvStreamInitDataStructBufPckg;
@@ -98,6 +99,7 @@ struct TMSCliSrvStreamOpDataStruct
     TMSCallType CallType;
     TMSStreamType StreamType;
     gint StreamId;
+    gint RetryTime;
     };
 typedef TPckgBuf<TMSCliSrvStreamOpDataStruct>
         TMSCliSrvStreamOpDataStructBufPckg;

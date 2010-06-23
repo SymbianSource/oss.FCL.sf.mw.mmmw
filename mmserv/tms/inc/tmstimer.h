@@ -19,75 +19,66 @@
 #ifndef TMSTIMER_H
 #define TMSTIMER_H
 
-//  INCLUDES
+// INCLUDES
 #include <e32base.h>
+#include <glib.h>
 
 namespace TMS {
 
 /**
-*  Mixin class for phone timer
-*/
-class TMSTimerObsrv
+ *  TMSTimerObserver observer.
+ */
+class TMSTimerObserver
     {
+public:
 
-    public: // New functions
-
-        /**
-        * Destructor
-        */
-        virtual ~TMSTimerObsrv(){};
-
-        /**
-        * This function is called after on timeout
-        */
-        virtual void HandleTimeOutL() = 0;
+    /**
+     * Called upon timer timeout.
+     */
+    virtual void TimerEvent() = 0;
     };
 
 // CLASS DECLARATION
-
 /**
- *  Utility class for timer
+ *  TMSTimer - Timer service.
  */
-class TMSTimer : public CTimer
+class TMSTimer : protected CTimer
     {
 public:
-    // Constructors and destructor
 
     /**
      * Two-phased constructor.
      */
-    IMPORT_C static TMSTimer* NewL(
-            TInt aPriority = CActive::EPriorityStandard);
+    IMPORT_C static TMSTimer* NewL(gint aPriority = CActive::EPriorityStandard);
 
     /**
      * Destructor.
      */
     IMPORT_C virtual ~TMSTimer();
 
-public:
-    // New functions
-
     /**
-     * The Callback function is called after the interval
+     * Call callback method upon timer timeout event.
      * All former request will be canceled first
      */
-    IMPORT_C void After(TTimeIntervalMicroSeconds32 anInterval,
-            TCallBack aCallBack);
+    IMPORT_C void NotifyAfter(gint timeout, TCallBack aCallBack);
 
     /**
-     * Use the maxin class to notify the timer
+     * Call client observer upon timer timeout event.
      * All former request will be canceled first
      */
-    IMPORT_C void After(TTimeIntervalMicroSeconds32 anInterval,
-            TMSTimerObsrv* aObserver);
+    IMPORT_C void NotifyAfter(gint timeout, TMSTimerObserver& observer);
 
     /**
-     * Cancel the timer if needed
+     * Cancel the timer
      */
-    IMPORT_C void CancelTimer();
+    IMPORT_C void CancelNotify();
+
+    /**
+     * Determines if the timer is running.
+     */
+    IMPORT_C gboolean IsRunning();
 
 protected:
-    // Functions from base classes
 
     /**
      * From CTimer::RunL()
@@ -109,10 +100,10 @@ private:
     /**
      * C++ default constructor.
      */
-    TMSTimer(TInt aPriority);
+    TMSTimer(gint aPriority);
 
     /**
-     * By default Symbian OS constructor is private.
+     * Symbian OS constructor.
      */
     void ConstructL();
 
@@ -123,17 +114,15 @@ private:
     TMSTimer& operator = (const TMSTimer&);
 
 private:
-    // Data
 
-    // Used by After( anInterval, aCallBack )
+    // Optional callback instead of observer
     TCallBack iCallBack;
 
-    // Used by After( anInterval, aObserver )
-    TMSTimerObsrv* iTimerObserver;
+    // Observer for notify service.
+    TMSTimerObserver* iObserver;
     };
 
-} // namespace TMS
+} //namespace TMS
 
-#endif // TMSTIMER_H
+#endif //TMSTIMER_H
 
-// End of File

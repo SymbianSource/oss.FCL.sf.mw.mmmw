@@ -65,14 +65,14 @@ static const XAchar* noneString = (XAchar *)"None";
 static XAint16 subscribedODAGroups[MAX_ODA_GROUP_SUBSCRIPTIONS];
 static XAuint16 subscribedODAGroupCount = 0;
 
-static XAuint32 freqSetAfterSeek;
+//static XAuint32 freqSetAfterSeek;
 
 const RDSData* GetCurrentRdsData( XAAdaptationGstCtx *bCtx );
 void * XARDSItfAdapt_AsyncSeek(void* args);
 void * XARDSItfAdapt_AsyncGetODAGroup(void* args);
 
 /* exposing radio itf adaptation internal function here */
-XAresult XARadioItfAdapt_SyncSetFrequency(XAAdaptationGstCtx *bCtx, XAuint32 freq);
+//XAresult XARadioItfAdapt_SyncSetFrequency(XAAdaptationGstCtx *bCtx, XAuint32 freq);
 
 
 /*
@@ -429,11 +429,11 @@ XAresult XARDSItfAdapt_SeekByProgrammeType(XAAdaptationGstCtx *bCtx,
 
     if (pty == XA_RDSPROGRAMMETYPE_RDSPTY_POPMUSIC)
     {
-        freqSetAfterSeek = rdsData[POPMUSIC_CHANNEL].frequency;
+        //freqSetAfterSeek = rdsData[POPMUSIC_CHANNEL].frequency;
     }
     else
     {
-        freqSetAfterSeek = mCtx->frequency;
+        //freqSetAfterSeek = mCtx->frequency;
     }
 
     mCtx->state = XA_RADIO_SEEKING;
@@ -475,7 +475,7 @@ XAresult XARDSItfAdapt_SeekTrafficAnnouncement(XAAdaptationGstCtx *bCtx, XAboole
         mCtx->state = XA_RADIO_IDLE;
     }
 
-    freqSetAfterSeek = rdsData[TRAFFIC_ANNOUNCEMENT_CHANNEL].frequency;
+    //freqSetAfterSeek = rdsData[TRAFFIC_ANNOUNCEMENT_CHANNEL].frequency;
 
     mCtx->state = XA_RADIO_SEEKING;
     pt_ret = pthread_create(&(mCtx->emulationThread), NULL, (XARDSItfAdapt_AsyncSeek),(void*)bCtx);
@@ -516,7 +516,7 @@ XAresult XARDSItfAdapt_SeekTrafficProgramme(XAAdaptationGstCtx *bCtx, XAboolean 
         mCtx->state = XA_RADIO_IDLE;
     }
 
-    freqSetAfterSeek = rdsData[TRAFFIC_PROGRAMME_CHANNEL].frequency;
+    //freqSetAfterSeek = rdsData[TRAFFIC_PROGRAMME_CHANNEL].frequency;
 
     mCtx->state = XA_RADIO_SEEKING;
     pt_ret = pthread_create(&(mCtx->emulationThread), NULL, (XARDSItfAdapt_AsyncSeek),(void*)bCtx);
@@ -548,7 +548,7 @@ void * XARDSItfAdapt_AsyncSeek(void* args)
 
     DEBUG_INFO("Seek done!");
 
-    ret = XARadioItfAdapt_SyncSetFrequency( bCtx, freqSetAfterSeek );
+    //ret = XARadioItfAdapt_SyncSetFrequency( bCtx, freqSetAfterSeek );
     if (ret != XA_RESULT_SUCCESS)
     {
         DEBUG_ERR("XARadioItfAdapt_SyncSetFrequency FAILED");

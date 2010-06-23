@@ -18,8 +18,11 @@
 
 
 #include <e32base.h>
+#include <e32svr.h>
+#include <StifParser.h>
+#include <StifLogger.h>
+#include <StifTestInterface.h>
 #include <systemtoneservice.h>
-
 
  
 
@@ -28,10 +31,9 @@ class CStsActiveObj : public CActive
 {
     
     public:
-    CStsActiveObj( MStsPlayAlarmObserver* aObserver);
+    static CStsActiveObj* NewL( MStsPlayAlarmObserver* aObserver,CStifLogger* aLogger );
     ~CStsActiveObj();
-
-    
+       
     public:     // Functions from base classes
 
     /**
@@ -48,11 +50,23 @@ class CStsActiveObj : public CActive
     * RunError derived from CActive handles errors from active handler.
     */
     TInt RunError( TInt aError );
-   
+    
+    private:
+
+        /**
+        * By default Symbian OS constructor is private.
+        */
+        void ConstructL(MStsPlayAlarmObserver* aObserver, CStifLogger* aLogger);
+
+        /**
+        * C++ constructor.
+        */
+        CStsActiveObj();
     
 
     private:    // Data
     MStsPlayAlarmObserver*   iObserver;
+    CStifLogger* 			 iLog;
    
 
 };

@@ -63,13 +63,13 @@ public:
 
     /**
      * HandleDTMFEvents.
-     * @param aEvent Event type
-     * @param aError Error code
-     * @param aTone Character
+     * @param event Event type
+     * @param status Error code
+     * @param tone Character
      * @return none
      */
-    virtual void HandleDTMFEvent(const TMSDTMFObserver::TCCPDtmfEvent aEvent,
-            const TInt aError, const TChar aTone) /*const*/ = 0;
+    virtual void HandleDTMFEvent(const TMSDTMFObserver::TCCPDtmfEvent event,
+            const gint status, const TChar tone) /*const*/ = 0;
     };
 
 } //namespace TMS

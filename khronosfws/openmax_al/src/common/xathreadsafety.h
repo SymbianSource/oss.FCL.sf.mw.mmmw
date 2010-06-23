@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: Thread Safety Header
+ *
+ */
 
 #ifndef XATHREADSAFETY_H_
 #define XATHREADSAFETY_H_
@@ -26,17 +26,17 @@
 /*parse media object names for debug prints*/
 
 static const char* mediaobjectnames[9] =
-{
-    "XATSMediaPlayer",
-    "XATSMediaRecorder",
-    "XATSEngine",
-    "XATSRadio",
-    "XATSCamera",
-    "XATSOutputMix",
-    "XATSVibra",
-    "XATSLEDArray",
-    "XATSMetaDataExtractor"
-};
+    {
+            "XATSMediaPlayer",
+            "XATSMediaRecorder",
+            "XATSEngine",
+            "XATSRadio",
+            "XATSCamera",
+            "XATSOutputMix",
+            "XATSVibra",
+            "XATSLEDArray",
+            "XATSMetaDataExtractor"
+    };
 #define MEDIAOBJECTNAME(i) ((i<XATSCount)?mediaobjectnames[i]:"INVALID")
 #endif /*_DEBUG*/
 
@@ -139,7 +139,7 @@ static const char* mediaobjectnames[9] =
 /* ENUMERATIONS */
 
 typedef enum
-{
+    {
     XATSMediaPlayer = 0,
     XATSMediaRecorder,
     XATSEngine,
@@ -150,12 +150,12 @@ typedef enum
     XATSLEDArray,
     XATSMetaDataExtractor,
     XATSCount
-}XAThreadSafetyMediaObjects;
+    } XAThreadSafetyMediaObjects;
 
 /* FUNCTIONS */
-XAresult XAThreadSafety_Init( XAboolean tsEnable);
+XAresult XAThreadSafety_Init(XAboolean tsEnable);
 XAresult XAThreadSafety_Destroy(void);
-XAresult XAThreadSafety_Unlock( XAThreadSafetyMediaObjects mediaObject );
-XAresult XAThreadSafety_TryLock( XAThreadSafetyMediaObjects mediaObject );
+XAresult XAThreadSafety_Unlock(XAThreadSafetyMediaObjects mediaObject);
+XAresult XAThreadSafety_TryLock(XAThreadSafetyMediaObjects mediaObject);
 
 #endif /* XATHREADSAFETY_H_ */

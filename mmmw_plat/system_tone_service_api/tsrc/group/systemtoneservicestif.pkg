@@ -47,7 +47,9 @@
 
 ; Install files
 "\epoc32\release\armv5\udeb\systemtoneservicestif.dll"   -   "!:\Sys\Bin\systemtoneservicestif.dll"
-  
+"..\conf\systemtoneservicestif.cfg"                      -   "C:\testframework\systemtoneservicestif.cfg" 
+"..\init\TestFramework.ini"                              -   "C:\TestFramework\TestFramework.ini"
+ 
 ; Embedded SIS 
 ; None
 

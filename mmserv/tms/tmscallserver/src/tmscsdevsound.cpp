@@ -16,46 +16,93 @@
  */
 
 #include <AudioPreference.h>
-#include <glib.h>
+#include <tms.h>
 #include <S60FourCC.h>
+#include "tmsutility.h"
 #include "tmscsdevsound.h"
 #include "tmscsdevsoundobserver.h"
 
 using namespace TMS;
 
+// CONSTANTS
+const gint KTimeoutInitial = 200000; // 200 ms initial timeout
+const gint KTimeoutMultiplier = 2;   // Double the timeout for each retry
+const gint KMicroSecMultiply = 1000000; //1 sec
+
 // -----------------------------------------------------------------------------
-// TMSCSPDevSound
+// TMSCSDevSound
 // -----------------------------------------------------------------------------
 //
-TMSCSPDevSound::TMSCSPDevSound(TMSCSPDevSoundObserver& aObserver) :
-    iObserver(aObserver)
+TMSCSDevSound::TMSCSDevSound(TMSCSDevSoundObserver& observer) :
+    iObserver(observer)
     {
+    iTimer = NULL;
+    iTimeout = KTimeoutInitial;
+    iInitRetryTime = 0;
+    iStartRetryTime = 0;
     }
 
 // -----------------------------------------------------------------------------
 // ConstructL
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::ConstructL(TMMFState aMode, gint aAudioPreference,
-        gint aAudioPriority)
+void TMSCSDevSound::ConstructL(const TMSStreamType strmtype,
+        const gint retrytime)
     {
+    TRACE_PRN_FN_ENT;
+    iInitRetryTime = retrytime;
+    iStreamType = strmtype;
+
+    if (strmtype == TMS_STREAM_UPLINK)
+        {
+        iMode = EMMFStateRecording;
+        iPriority = KAudioPriorityCSCallUplink;
+        iPreference = KAudioPrefCSCallUplink;
+        }
+    else if (strmtype == TMS_STREAM_DOWNLINK)
+        {
+        iMode = EMMFStatePlaying;
+        iPriority = KAudioPriorityCSCallDownlink;
+        iPreference = KAudioPrefCSCallDownlink;
+        }
+
+    if (iInitRetryTime != 0)
+        {
+        iTimer = TMSTimer::NewL();
+        }
+
+    InitializeL();
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// InitializeL
+// -----------------------------------------------------------------------------
+//
+void TMSCSDevSound::InitializeL()
+    {
+    TRACE_PRN_FN_ENT;
     TMMFPrioritySettings audioPriority;
     TFourCC modemFourCC;
     modemFourCC.Set(KS60FourCCCodeModem);
+
+    delete iDevSound;
+    iDevSound = NULL;
     iDevSound = CMMFDevSound::NewL();
     if (iDevSound)
         {
 #ifndef __WINSCW__
-        iDevSound->InitializeL(*this, modemFourCC, aMode);
-#else //For testing TMS in WINSCW
-        iDevSound->InitializeL(*this, KMMFFourCCCodePCM16, aMode);
+        iDevSound->InitializeL(*this, modemFourCC, iMode);
+#else
+        //For testing TMS in WINSCW
+        iDevSound->InitializeL(*this, KMMFFourCCCodePCM16, iMode);
 #endif
-        iStreamType = aAudioPreference;
-        audioPriority.iPriority = aAudioPriority;
-        audioPriority.iPref = aAudioPreference;
-        audioPriority.iState = aMode;
+        audioPriority.iPriority = iPriority;
+        audioPriority.iPref = iPreference;
+        audioPriority.iState = iMode;
         iDevSound->SetPrioritySettings(audioPriority);
         }
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -63,18 +110,24 @@ void TMSCSPDevSound::ConstructL(TMMFState aMode, gint aAudioPreference,
 // Not implemented
 // -----------------------------------------------------------------------------
 //
-TMSCSPDevSound::~TMSCSPDevSound()
+TMSCSDevSound::~TMSCSDevSound()
     {
+    TRACE_PRN_FN_ENT;
+    CancelTimer();
+    delete iTimer;
     delete iDevSound;
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
 // Tries to activate the audio stream if not active or activating
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::Activate()
+void TMSCSDevSound::Activate(const gint retrytime)
     {
-    if (!IsActive() && !IsActivationOngoing())
+    iStartRetryTime = retrytime;
+
+    if (!iActive && !iActivationOngoing)
         {
         iActivationOngoing = ETrue;
         TRAP_IGNORE(DoActivateL());
@@ -85,122 +138,129 @@ void TMSCSPDevSound::Activate()
 // Deactivates the audio device.
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::Deactivate()
+void TMSCSDevSound::Deactivate(gboolean reset)
     {
-    if (iDevSound && (IsActive() || IsActivationOngoing()))
+    TRACE_PRN_FN_ENT;
+    if (reset)
+        {
+        iTimeout = KTimeoutInitial;
+        }
+    CancelTimer();
+    if (iDevSound && (iActive || iActivationOngoing))
         {
         iDevSound->Stop();
         iActive = EFalse;
         iActivationOngoing = EFalse;
         }
-    }
-
-// -----------------------------------------------------------------------------
-// ActivationOngoing
-// -----------------------------------------------------------------------------
-//
-TBool TMSCSPDevSound::IsActivationOngoing() const
-    {
-    return iActivationOngoing;
-    }
-
-// -----------------------------------------------------------------------------
-// IsActive
-// -----------------------------------------------------------------------------
-//
-TBool TMSCSPDevSound::IsActive() const
-    {
-    return iActive;
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
 // DevSound
 // -----------------------------------------------------------------------------
 //
-CMMFDevSound& TMSCSPDevSound::DevSound()
+CMMFDevSound& TMSCSDevSound::DevSound()
     {
     return *iDevSound;
     }
 
 // -----------------------------------------------------------------------------
 // From class MDevSoundObserver
-// Not implemented
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::InitializeComplete(TInt aError)
+void TMSCSDevSound::InitializeComplete(TInt aError)
     {
-    if (iStreamType == KAudioPrefCSCallDownlink)
+    TRACE_PRN_FN_ENT;
+    if (aError != TMS_RESULT_SUCCESS && iInitRetryTime != 0)
         {
-        iObserver.DownlinkInitCompleted(aError);
+        StartTimer();
         }
     else
         {
-        iObserver.UplinkInitCompleted(aError);
+        iTimeout = KTimeoutInitial;
+        CancelTimer();
+        NotifyEvent(aError);
+        }
+    TRACE_PRN_FN_EXT;
+    }
+
+
+// -----------------------------------------------------------------------------
+// TMSCSDevSound::NotifyEvent
+// -----------------------------------------------------------------------------
+//
+void TMSCSDevSound::NotifyEvent(gint error)
+    {
+    if (iStreamType == TMS_STREAM_DOWNLINK)
+        {
+        iObserver.DownlinkInitCompleted(error);
+        }
+    else if (iStreamType == TMS_STREAM_UPLINK)
+        {
+        iObserver.UplinkInitCompleted(error);
         }
     }
 
 // -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
+// TMSCSDevSound::CancelTimer
+// Resets timer
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
+void TMSCSDevSound::CancelTimer()
     {
+    iInitRetryTime = 0;
+    if (iTimer)
+        {
+        if (iTimer->IsRunning())
+            {
+            iTimer->CancelNotify();
+            }
+        }
     }
 
 // -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
+// TMSCSDevSound::StartTimer
+// Activates timer
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::PlayError(TInt /*aError*/)
+void TMSCSDevSound::StartTimer()
     {
+    if (iTimer && (iInitRetryTime != 0 || iStartRetryTime != 0))
+        {
+        iTimer->NotifyAfter(iTimeout, *this);
+        }
     }
 
 // -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
+// From TMSTimerObserver
+// Notification upon TMSTimer timeout.
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::ToneFinished(TInt /*aError*/)
+void TMSCSDevSound::TimerEvent()
     {
-    }
+    iTimeout *= KTimeoutMultiplier;
 
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::BufferToBeEmptied(CMMFBuffer* /*aBuffer*/)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::RecordError(TInt /*aError*/)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::ConvertError(TInt /*aError*/)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::DeviceMessage(TUid /*aMessageType*/,
-        const TDesC8& /*aMsg*/)
-    {
+    if (!iActivationOngoing) //Initializing
+        {
+        if (iTimeout > (iInitRetryTime * KMicroSecMultiply))
+            {
+            iInitRetryTime = 0;
+            }
+        TRAPD(status, InitializeL());
+        if (status != TMS_RESULT_SUCCESS)
+            {
+            NotifyEvent(status);
+            }
+        }
+    else //Activating
+        {
+        if (iTimeout > (iStartRetryTime * KMicroSecMultiply))
+            {
+            iStartRetryTime = 0;
+            }
+        Deactivate(FALSE);
+        Activate(iStartRetryTime);
+        }
     }
 
 //  End of File

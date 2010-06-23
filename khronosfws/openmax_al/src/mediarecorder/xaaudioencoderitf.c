@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: 
+ *
+ */
 
 #include <assert.h>
 #include "xamediarecorderadaptctxmmf.h"
@@ -28,17 +28,17 @@
  * Description: Validate interface pointer and cast it to implementation pointer.
  **/
 static XAAudioEncoderItfImpl* GetImpl(XAAudioEncoderItf self)
-{
-    if( self )
     {
-        XAAudioEncoderItfImpl* impl = (XAAudioEncoderItfImpl*)(*self);
-        if( impl && (impl == impl->self) )
+    if (self)
         {
+        XAAudioEncoderItfImpl* impl = (XAAudioEncoderItfImpl*) (*self);
+        if (impl && (impl == impl->self))
+            {
             return impl;
+            }
         }
-    }
     return NULL;
-}
+    }
 
 /*****************************************************************************
  * Base interface XAAudioEncoderItf implementation
@@ -50,8 +50,8 @@ static XAAudioEncoderItfImpl* GetImpl(XAAudioEncoderItf self)
  * Description: Set audio encoder settings.
  **/
 XAresult XAAudioEncoderItfImpl_SetEncoderSettings(XAAudioEncoderItf self,
-                                                  XAAudioEncoderSettings *pSettings)
-{
+        XAAudioEncoderSettings *pSettings)
+    {
     XAMediaRecorderAdaptationMMFCtx* mCtx;
     XAresult ret = XA_RESULT_SUCCESS;
     XAuint32 recState = XA_RECORDSTATE_STOPPED;
@@ -61,7 +61,7 @@ XAresult XAAudioEncoderItfImpl_SetEncoderSettings(XAAudioEncoderItf self,
     DEBUG_API("->XAAudioEncoderItfImpl_SetEncoderSettings");
     XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaRecorder );
 
-    if( !impl || !pSettings )
+    if (!impl || !pSettings)
         {
         /* invalid parameter */
         XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
@@ -70,11 +70,12 @@ XAresult XAAudioEncoderItfImpl_SetEncoderSettings(XAAudioEncoderItf self,
         return XA_RESULT_PARAMETER_INVALID;
         }
 
-    if(impl->adapCtx->fwtype == FWMgrFWMMF)
+    if (impl->adapCtx->fwtype == FWMgrFWMMF)
         {
-        mCtx = (XAMediaRecorderAdaptationMMFCtx*) impl->pObjImpl->adaptationCtx;
-        
-        if(mCtx->xaRecordState != recState)
+        mCtx
+                = (XAMediaRecorderAdaptationMMFCtx*) impl->pObjImpl->adaptationCtx;
+
+        if (mCtx->xaRecordState != recState)
             {
             XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
             DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");
@@ -83,56 +84,60 @@ XAresult XAAudioEncoderItfImpl_SetEncoderSettings(XAAudioEncoderItf self,
             }
 
         XAAudioEncoderItfImpl_GetEncoderSettings(self, &currentSettings);
-        if(pSettings->encoderId == currentSettings.encoderId)
+        if (pSettings->encoderId == currentSettings.encoderId)
             {
-            if(pSettings->channelsIn !=  currentSettings.channelsIn)
+            if (pSettings->channelsIn != currentSettings.channelsIn)
                 {
-                ret = mmf_set_destination_channels(mCtx->mmfContext, &(pSettings->channelsIn));
-                }
-            
-            if(pSettings->channelsOut != currentSettings.channelsOut)
-                {
-                ret = mmf_set_destination_channels(mCtx->mmfContext, &(pSettings->channelsOut));
-                }
-            
-            if(pSettings->sampleRate != currentSettings.sampleRate)
-                {
-                ret = mmf_set_destination_samplerate(mCtx->mmfContext, &(pSettings->sampleRate));
+                ret = mmf_set_destination_channels(mCtx->mmfContext,
+                        &(pSettings->channelsIn));
                 }
 
-            if(pSettings->bitRate != currentSettings.bitRate)
+            if (pSettings->channelsOut != currentSettings.channelsOut)
                 {
-                ret = mmf_set_destination_bitrate(mCtx->mmfContext, &(pSettings->bitRate));
+                ret = mmf_set_destination_channels(mCtx->mmfContext,
+                        &(pSettings->channelsOut));
                 }
-            
-            if(pSettings->rateControl != currentSettings.rateControl)
+
+            if (pSettings->sampleRate != currentSettings.sampleRate)
+                {
+                ret = mmf_set_destination_samplerate(mCtx->mmfContext,
+                        &(pSettings->sampleRate));
+                }
+
+            if (pSettings->bitRate != currentSettings.bitRate)
+                {
+                ret = mmf_set_destination_bitrate(mCtx->mmfContext,
+                        &(pSettings->bitRate));
+                }
+
+            if (pSettings->rateControl != currentSettings.rateControl)
                 {
                 ret = XA_RESULT_PARAMETER_INVALID;
                 }
-            if(pSettings->channelMode != currentSettings.channelMode)
+            if (pSettings->channelMode != currentSettings.channelMode)
                 {
                 ret = XA_RESULT_PARAMETER_INVALID;
                 }
-            if(pSettings->encodeOptions != currentSettings.encodeOptions)
+            if (pSettings->encodeOptions != currentSettings.encodeOptions)
                 {
                 ret = XA_RESULT_PARAMETER_INVALID;
                 }
-            if(pSettings->blockAlignment != currentSettings.blockAlignment)
+            if (pSettings->blockAlignment != currentSettings.blockAlignment)
                 {
                 ret = XA_RESULT_PARAMETER_INVALID;
-                }    
-            if(pSettings->bitsPerSample != currentSettings.bitsPerSample)
+                }
+            if (pSettings->bitsPerSample != currentSettings.bitsPerSample)
                 {
                 ret = XA_RESULT_PARAMETER_INVALID;
-                }    
-            if(pSettings->profileSetting != currentSettings.profileSetting)
+                }
+            if (pSettings->profileSetting != currentSettings.profileSetting)
                 {
                 ret = XA_RESULT_PARAMETER_INVALID;
-                }    
-            if(pSettings->levelSetting != currentSettings.levelSetting)
+                }
+            if (pSettings->levelSetting != currentSettings.levelSetting)
                 {
                 ret = XA_RESULT_PARAMETER_INVALID;
-                }    
+                }
             }
         else
             {
@@ -142,16 +147,21 @@ XAresult XAAudioEncoderItfImpl_SetEncoderSettings(XAAudioEncoderItf self,
     else
         {
         XACapabilities temp;
-    
-        ret = XACapabilitiesMgr_GetCapsById(impl->pObjImpl->adaptationCtx->capslist, (XACapsType)(XACAP_ENCODER|XACAP_AUDIO), pSettings->encoderId, &temp);
-        if( ret == XA_RESULT_SUCCESS )
+
+        ret = XACapabilitiesMgr_GetCapsById(
+                impl->pObjImpl->adaptationCtx->capslist,
+                (XACapsType) (XACAP_ENCODER | XACAP_AUDIO),
+                pSettings->encoderId, &temp);
+        if (ret == XA_RESULT_SUCCESS)
             {
-            ret = XARecordItfAdapt_GetRecordState( (XAAdaptationGstCtx*)impl->adapCtx, &recState );
-            if( ret == XA_RESULT_SUCCESS )
+            ret = XARecordItfAdapt_GetRecordState(
+                    (XAAdaptationGstCtx*) impl->adapCtx, &recState);
+            if (ret == XA_RESULT_SUCCESS)
                 {
-                if( XA_RECORDSTATE_STOPPED == recState )
+                if (XA_RECORDSTATE_STOPPED == recState)
                     {
-                    ret = XAAudioEncoderItfAdapt_SetEncoderSettings( impl->adapCtx, pSettings);
+                    ret = XAAudioEncoderItfAdapt_SetEncoderSettings(
+                            impl->adapCtx, pSettings);
                     }
                 else
                     {
@@ -167,12 +177,12 @@ XAresult XAAudioEncoderItfImpl_SetEncoderSettings(XAAudioEncoderItf self,
             DEBUG_API("<-XAAudioEncoderItfImpl_SetEncoderSettings");
             return XA_RESULT_FEATURE_UNSUPPORTED;
             }
-        }    
-    
+        }
+
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
     DEBUG_API("<-XAAudioEncoderItfImpl_SetEncoderSettings");
     return ret;
-}
+    }
 
 /**
  * XAresult XAAudioEncoderItfImpl_GetEncoderSettings(XAAudioEncoderItf self,
@@ -180,8 +190,8 @@ XAresult XAAudioEncoderItfImpl_SetEncoderSettings(XAAudioEncoderItf self,
  * Description: Get audio encoder settings.
  **/
 XAresult XAAudioEncoderItfImpl_GetEncoderSettings(XAAudioEncoderItf self,
-                                                  XAAudioEncoderSettings *pSettings)
-{
+        XAAudioEncoderSettings *pSettings)
+    {
     XAresult ret = XA_RESULT_SUCCESS;
     XAuint32 encoderId;
     XAuint32 channelsIn;
@@ -189,26 +199,24 @@ XAresult XAAudioEncoderItfImpl_GetEncoderSettings(XAAudioEncoderItf self,
     XAmilliHertz sampleRate;
     XAuint32 bitRate;
     XAMediaRecorderAdaptationMMFCtx* mCtx;
-   
+
     XAAudioEncoderItfImpl *impl = GetImpl(self);
-    
+
     DEBUG_API("->XAAudioEncoderItfImpl_GetEncoderSettings");
-    if(!impl || !pSettings )
-    {
+    if (!impl || !pSettings)
+        {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
-    }
+        }
 
     mCtx = (XAMediaRecorderAdaptationMMFCtx*) (impl->pObjImpl->adaptationCtx);
-    
 
-
-    if(impl->adapCtx->fwtype == FWMgrFWMMF)
+    if (impl->adapCtx->fwtype == FWMgrFWMMF)
         {
         mmf_get_codec_id(mCtx->mmfContext, &encoderId);
-        
-        switch(encoderId)
+
+        switch (encoderId)
             {
             case 0x36315020:
                 pSettings->encoderId = XA_AUDIOCODEC_PCM;
@@ -232,9 +240,9 @@ XAresult XAAudioEncoderItfImpl_GetEncoderSettings(XAAudioEncoderItf self,
                 pSettings->streamFormat = XA_AUDIOSTREAMFORMAT_RAW;
                 break;
             }
-        
+
         mmf_get_channels(mCtx->mmfContext, &channelsIn);
-        pSettings->channelsIn =  channelsIn;
+        pSettings->channelsIn = channelsIn;
         mmf_get_channels(mCtx->mmfContext, &channelsOut);
         pSettings->channelsOut = channelsOut;
         mmf_get_samplerate(mCtx->mmfContext, &sampleRate);
@@ -248,11 +256,11 @@ XAresult XAAudioEncoderItfImpl_GetEncoderSettings(XAAudioEncoderItf self,
         }
     else
         {
-        ret = XAAudioEncoderItfAdapt_GetEncoderSettings(impl->adapCtx, pSettings);
-        }
-    DEBUG_API("<-XAAudioEncoderItfImpl_GetEncoderSettings");
+        ret = XAAudioEncoderItfAdapt_GetEncoderSettings(impl->adapCtx,
+                pSettings);
+        }DEBUG_API("<-XAAudioEncoderItfImpl_GetEncoderSettings");
     return ret;
-}
+    }
 
 /*****************************************************************************
  * XAAudioEncoderItfImpl -specific methods
@@ -261,39 +269,43 @@ XAresult XAAudioEncoderItfImpl_GetEncoderSettings(XAAudioEncoderItf self,
 /* XAAudioEncoderItfImpl* XAAudioEncoderItfImpl_Create()
  * Description: Allocate and initialize XAAudioEncoderItfImpl
  */
-XAAudioEncoderItfImpl* XAAudioEncoderItfImpl_Create( XAMediaRecorderImpl* impl )
-{
-    XAAudioEncoderItfImpl* self = (XAAudioEncoderItfImpl*)
-        calloc(1,sizeof(XAAudioEncoderItfImpl));
-    //XAMediaRecorderAdaptationCtx* mCtx = (XAMediaRecorderAdaptationCtx*)(impl->adaptationCtx);
-    
-    DEBUG_API("->XAAudioEncoderItfImpl_Create");
-    if( self )
+XAAudioEncoderItfImpl* XAAudioEncoderItfImpl_Create(XAMediaRecorderImpl* impl)
     {
+    XAAudioEncoderItfImpl* self = (XAAudioEncoderItfImpl*) calloc(1,
+            sizeof(XAAudioEncoderItfImpl));
+    //XAMediaRecorderAdaptationCtx* mCtx = (XAMediaRecorderAdaptationCtx*)(impl->adaptationCtx);
+
+    DEBUG_API("->XAAudioEncoderItfImpl_Create");
+    if (self)
+        {
         //if(mCtx->fwtype == FWMgrFWMMF)
             {
             /* init itf default implementation */
-            self->itf.GetEncoderSettings = XAAudioEncoderItfImpl_GetEncoderSettings;
-            self->itf.SetEncoderSettings = XAAudioEncoderItfImpl_SetEncoderSettings;
+            self->itf.GetEncoderSettings
+                    = XAAudioEncoderItfImpl_GetEncoderSettings;
+            self->itf.SetEncoderSettings
+                    = XAAudioEncoderItfImpl_SetEncoderSettings;
             }
-        
+
         self->pObjImpl = impl;
         /* init variables */
         self->adapCtx = impl->adaptationCtx;
 
         self->self = self;
-    }
-    DEBUG_API("<-XAAudioEncoderItfImpl_Create");
+        }DEBUG_API("<-XAAudioEncoderItfImpl_Create");
     return self;
-}
+    }
 
 /* void XAAudioEncoderItfImpl_Free(XAAudioEncoderItfImpl* self)
  * Description: Free all resources reserved at XAAudioEncoderItfImpl_Create
  */
 void XAAudioEncoderItfImpl_Free(XAAudioEncoderItfImpl* self)
-{
+    {
     DEBUG_API("->XAAudioEncoderItfImpl_Free");
     assert( self==self->self );
-    free( self );
+    if(self)
+        {
+        free(self);
+        }
     DEBUG_API("<-XAAudioEncoderItfImpl_Free");
-}
+    }

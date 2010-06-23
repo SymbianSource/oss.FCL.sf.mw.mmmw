@@ -1,32 +1,33 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:
+ *
+ */
 
-#include "cmmfbackendengine.h"
 #include <string.h>
 #include <ctype.h>
 #include <uri8.h>
 #include <uri16.h>
+#include "cmmfbackendengine.h"
 #include "markerpositiontimer.h"
 #include "positionupdatetimer.h"
 #include "profileutilmacro.h"
 
-extern "C" {
+extern "C"
+    {
 #include "xaadaptationmmf.h"
-}
+    }
 
 #define RET_IF_ERR(res, val) if (res != KErrNone) return val
 
@@ -47,11 +48,10 @@ CMMFBackendEngine::~CMMFBackendEngine()
     Destroy();
     }
 
-CMMFBackendEngine::CMMFBackendEngine()
-:iPositionUpdatePeriod(1000), /* default is 1000 millisec */
- iUriPtr(NULL,0)
+CMMFBackendEngine::CMMFBackendEngine() :
+    iPositionUpdatePeriod(1000), /* default is 1000 millisec */
+    iUriPtr(NULL, 0)
     {
-/*    m_bWindowReferencePassed = FALSE;*/
     iRecordState = ERecorderNotReady;
     iPositionUpdateTimer = NULL;
     iMediaPlayerState = XA_PLAYSTATE_PLAYERUNINITIALIZED;
@@ -69,7 +69,7 @@ void CMMFBackendEngine::InitAudioRecorderUtilityL()
     if (!iAudioRecorder)
         {
         iBaseAudioRecorder = CMdaAudioRecorderUtility::NewL(*this);
-        iAudioRecorder = (CMdaAudioRecorderUtility*)iBaseAudioRecorder;
+        iAudioRecorder = (CMdaAudioRecorderUtility*) iBaseAudioRecorder;
         }
     }
 
@@ -78,7 +78,7 @@ void CMMFBackendEngine::InitAudioPlayerUtilityL()
     if (!iAudioPlayer)
         {
         iBaseAudioPlayer = CMdaAudioPlayerUtility::NewL(*this);
-        iAudioPlayer = (CMdaAudioPlayerUtility*)iBaseAudioPlayer;
+        iAudioPlayer = (CMdaAudioPlayerUtility*) iBaseAudioPlayer;
         }
     InitPlayerTimersL();
     }
@@ -87,8 +87,9 @@ void CMMFBackendEngine::InitVideoPlayerUtilityL()
     {
     if (!iVideoPlayer)
         {
-        iBaseVideoPlayer = CVideoPlayerUtility2::NewL(*this, EMdaPriorityNormal, EMdaPriorityPreferenceTimeAndQuality);
-        iVideoPlayer = (CVideoPlayerUtility2*)iBaseVideoPlayer;
+        iBaseVideoPlayer = CVideoPlayerUtility2::NewL(*this,
+                EMdaPriorityNormal, EMdaPriorityPreferenceTimeAndQuality);
+        iVideoPlayer = (CVideoPlayerUtility2*) iBaseVideoPlayer;
         iVideoPlayer->RegisterForVideoLoadingNotification(*this);
         }
     InitPlayerTimersL();
@@ -98,19 +99,22 @@ void CMMFBackendEngine::InitPlayerTimersL()
     {
     if (!iMarkerPositionTimer)
         {
-        iMarkerPositionTimer = CMarkerPositionTimer::NewL(iAudioPlayer, iVideoPlayer);
+        iMarkerPositionTimer = CMarkerPositionTimer::NewL(iAudioPlayer,
+                iVideoPlayer);
         iMarkerPositionTimer->SetContext(iAdaptContext);
         }
     if (!iPlayItfPositionUpdateTimer)
         {
-        iPlayItfPositionUpdateTimer = CPositionUpdateTimer::NewL(iAudioPlayer, iVideoPlayer);
+        iPlayItfPositionUpdateTimer = CPositionUpdateTimer::NewL(
+                iAudioPlayer, iVideoPlayer);
         iPlayItfPositionUpdateTimer->SetContext(iAdaptContext);
         }
     iMarkerPositionTimer->Stop();
     iPlayItfPositionUpdateTimer->Stop();
     }
 
-TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
+TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format,
+        TFuncInUse func)
     {
     TInt err(KErrNone);
     _LIT8(KFileSlash,"file:///");
@@ -120,7 +124,7 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
         if (iRecordState == ERecorderNotReady)
             {
             iFileFormat = format;
-            iAPIBeingUsed = DetermineAPIToUse(uri, EPlay);
+            iAPIBeingUsed = DetermineAPIToUse(uri, ERecord);
             err = XA_RESULT_INTERNAL_ERROR;
             if (iAPIBeingUsed == EAudioRecorderUtility)
                 {
@@ -130,23 +134,23 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
                 /* Initalize Recorder related objects */
                 TRAP(err, InitAudioRecorderUtilityL());
                 RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
-    
-                TRAP(err, iAudioRecorder->OpenFileL(iFileName));
+
+                TRAP(err, iAudioRecorder->OpenFileL(iUriPtr));
                 RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
                 /* Wait until we receive moscostatechanged callback */
-                if(!iActiveSchedulerWait->IsStarted())
+                if (iActiveSchedulerWait && !iActiveSchedulerWait->IsStarted())
                     {
                     iActiveSchedulerWait->Start();
                     }
                 RET_IF_ERR(iErrorCode, XA_RESULT_INTERNAL_ERROR);
-               }
+                }
             }
         }
     else
         {
         /* The second one is needed for dynamic source interface */
-        if ((iMediaPlayerState == XA_PLAYSTATE_PLAYERUNINITIALIZED) ||
-                (iMediaPlayerState == XA_PLAYSTATE_STOPPED))
+        if ((iMediaPlayerState == XA_PLAYSTATE_PLAYERUNINITIALIZED)
+                || (iMediaPlayerState == XA_PLAYSTATE_STOPPED))
             {
             iFileFormat = format;
             iAPIBeingUsed = DetermineAPIToUse(uri, EPlay);
@@ -162,13 +166,13 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
 
                 TAG_TIME_PROFILING_BEGIN;
                 TRAP(err, iAudioPlayer->OpenFileL(iUriPtr));
-                RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
-                TAG_TIME_PROFILING_END;
+                RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR); 
+                TAG_TIME_PROFILING_END; 
                 PRINT_TO_CONSOLE_TIME_DIFF;
 
                 /* Wait until we receive mapc init complete */
                 PRINT_TO_CONSOLE_HOME_TIME;
-                if (!iActiveSchedulerWait->IsStarted())
+                if (iActiveSchedulerWait && !iActiveSchedulerWait->IsStarted())
                     {
                     iActiveSchedulerWait->Start();
                     }
@@ -183,16 +187,27 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
                 TRAP(err, InitVideoPlayerUtilityL());
                 RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
 
-                /* Open file */
-                TAG_TIME_PROFILING_BEGIN;
-                TRAP(err, iVideoPlayer->OpenFileL(iUriPtr));
-                RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR);
-                TAG_TIME_PROFILING_END;
-                PRINT_TO_CONSOLE_TIME_DIFF;
-
+                if (iUriType == ELocal)
+                    {
+                    /* Open file */
+                    TAG_TIME_PROFILING_BEGIN;
+                    TRAP(err, iVideoPlayer->OpenFileL(iUriPtr));
+                    RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR); 
+                    TAG_TIME_PROFILING_END; 
+                    PRINT_TO_CONSOLE_TIME_DIFF;
+                    }
+                else
+                    {
+                    /* Open URL */
+                    TAG_TIME_PROFILING_BEGIN;
+                    TRAP(err, iVideoPlayer->OpenUrlL(iUriPtr));
+                    RET_IF_ERR(err, XA_RESULT_INTERNAL_ERROR); 
+                    TAG_TIME_PROFILING_END; 
+                    PRINT_TO_CONSOLE_TIME_DIFF;
+                    }
                 /* Wait until we receive  MvpuoOpenComplete */
                 PRINT_TO_CONSOLE_HOME_TIME;
-                if (!iActiveSchedulerWait->IsStarted())
+                if (iActiveSchedulerWait && !iActiveSchedulerWait->IsStarted())
                     {
                     iActiveSchedulerWait->Start();
                     }
@@ -201,18 +216,18 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
                 /* Prepare utility */
                 TAG_TIME_PROFILING_BEGIN_NO_VAR_DEF;
                 iVideoPlayer->Prepare();
-                TAG_TIME_PROFILING_END_NO_VAR_DEF;
+                TAG_TIME_PROFILING_END_NO_VAR_DEF; 
                 PRINT_TO_CONSOLE_TIME_DIFF;
 
                 /* Wait until we receive  MvpuoPrepareComplete */
                 PRINT_TO_CONSOLE_HOME_TIME_NO_VAR_DEF;
-                if (!iActiveSchedulerWait->IsStarted())
+                if (iActiveSchedulerWait && !iActiveSchedulerWait->IsStarted())
                     {
                     iActiveSchedulerWait->Start();
                     }
                 RET_IF_ERR(iErrorCode, XA_RESULT_INTERNAL_ERROR);
                 }
-           }
+            }
         }
     if (err != KErrNone)
         {
@@ -224,22 +239,43 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format, TFuncInUse func)
 TInt CMMFBackendEngine::DetermineAPIToUse(char* uri, TFuncInUse aFunc)
     {
     char* dotPtr = NULL;
-    char ext[MAX_EXTENSION_SIZE] = { 0 };
+    char ext[MAX_EXTENSION_SIZE] =
+        {
+        0
+        };
     int extLen;
 
-    dotPtr = strrchr(uri, (int)'.');
+    int colpos;
+    char urischeme[MAX_EXTENSION_SIZE] =
+        {
+        0
+        };
+    int urischemeLen;
+
+    dotPtr = strrchr(uri, (int) '.');
     if (!dotPtr)
         {
         return KErrNotFound;
         }
 
-    strncpy(ext, dotPtr,strlen(dotPtr));
+    strncpy(ext, dotPtr, strlen(dotPtr));
     /*Null terminate the string*/
     ext[strlen(dotPtr)] = '\0';
     extLen = sizeof(ext);
-    for(unsigned int i=0; i < extLen; i++)
+    for (unsigned int i = 0; i < extLen; i++)
         {
         ext[i] = tolower(ext[i]);
+        }
+
+    colpos = strcspn(uri, ":");
+
+    strncpy(urischeme, uri, colpos + 1);
+    /*Null terminate the string*/
+    urischeme[colpos + 1] = '\0';
+    urischemeLen = sizeof(urischeme);
+    for (unsigned int i = 0; i < urischemeLen; i++)
+        {
+        urischeme[i] = tolower(urischeme[i]);
         }
 
     if (aFunc == ERecord)
@@ -248,16 +284,20 @@ TInt CMMFBackendEngine::DetermineAPIToUse(char* uri, TFuncInUse aFunc)
         }
     else
         {
-        if (!strcasecmp(ext, ".mp3") ||
-           !strcasecmp(ext, ".amr") ||
-           !strcasecmp(ext, ".aac") ||
-           !strcasecmp(ext, ".mid") ||
-		   !strcasecmp(ext, ".wav") ||
-           !strcasecmp(ext, ".awb"))
+        if (!strcmp(urischeme, "file:"))
             {
-            return EAudioPlayerUtility;
+            if (!strcmp(ext, ".mp3") || !strcmp(ext, ".amr")
+                    || !strcmp(ext, ".aac") || !strcmp(ext, ".mid")
+                    || !strcmp(ext, ".wav") || !strcmp(ext, ".awb"))
+                {
+                return EAudioPlayerUtility;
+                }
+            else
+                {
+                return EVideoPlayerUtility;
+                }
             }
-          else
+        else
             {
             return EVideoPlayerUtility;
             }
@@ -274,7 +314,7 @@ void CMMFBackendEngine::MvpuoOpenComplete(TInt aError)
         {
         iMMFPlayerState = EPlayerOpened;
         }
-    if (iActiveSchedulerWait->IsStarted())
+    if (iActiveSchedulerWait && iActiveSchedulerWait->IsStarted())
         {
         iActiveSchedulerWait->AsyncStop();
         }
@@ -294,8 +334,8 @@ void CMMFBackendEngine::MvpuoPrepareComplete(TInt aError)
         {
         iMMFPlayerState = EPlayerPrepared;
         TAG_TIME_PROFILING_BEGIN;
-        TRAP(iErrorCode, iMediaDuration = iVideoPlayer->DurationL());
-        TAG_TIME_PROFILING_END;
+        TRAP(iErrorCode, iMediaDuration = iVideoPlayer->DurationL()); 
+        TAG_TIME_PROFILING_END; 
         PRINT_TO_CONSOLE_TIME_DIFF;
         if (iErrorCode == KErrNone)
             {
@@ -306,22 +346,22 @@ void CMMFBackendEngine::MvpuoPrepareComplete(TInt aError)
             if (m_pWs && m_pScr && m_pWindow)
                 {
                 TRect videoExtent = TRect(m_pWindow->Size());
-                TRect clipRect = TRect(m_pWindow->Size());        
+                TRect clipRect = TRect(m_pWindow->Size());
                 TAG_TIME_PROFILING_BEGIN;
                 TRAP_IGNORE(iVideoPlayer->AddDisplayWindowL(*m_pWs, *m_pScr, *m_pWindow, videoExtent, clipRect));
-                TRAP_IGNORE(iVideoPlayer->SetAutoScaleL(*m_pWindow, autoScale));
-                TAG_TIME_PROFILING_END;
+                TRAP_IGNORE(iVideoPlayer->SetAutoScaleL(*m_pWindow, autoScale)); 
+                TAG_TIME_PROFILING_END; 
                 PRINT_TO_CONSOLE_TIME_DIFF;
                 }
             }
         }
-    if (iActiveSchedulerWait->IsStarted())
+    if (iActiveSchedulerWait && iActiveSchedulerWait->IsStarted())
         {
         iActiveSchedulerWait->AsyncStop();
         }
     }
 
-void CMMFBackendEngine::MvpuoFrameReady(CFbsBitmap& /*aFrame*/,TInt /*aError*/)
+void CMMFBackendEngine::MvpuoFrameReady(CFbsBitmap& /*aFrame*/, TInt /*aError*/)
     {
 
     }
@@ -340,8 +380,12 @@ void CMMFBackendEngine::MvpuoPlayComplete(TInt aError)
         {
         iPlaybackHead = 0;
         iMediaPlayerState = XA_PLAYSTATE_STOPPED;
-        XAAdaptEvent event = {XA_PLAYITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL};
-        XAAdaptationBase_SendAdaptEvents((XAAdaptationBaseCtx*)iAdaptContext, &event );
+        XAAdaptEvent event =
+            {
+            XA_PLAYITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL
+            };
+        XAAdaptationBase_SendAdaptEvents(
+                (XAAdaptationBaseCtx*) iAdaptContext, &event);
         }
     iMMFPlayerState = EPlayerPrepared;
     iMarkerPositionTimer->Stop();
@@ -352,24 +396,28 @@ void CMMFBackendEngine::MvpuoEvent(class TMMFEvent const & event)
     {
     //RDebug::Print(_L("CMMFBackendEngine::MvpuoEvent (0x%x %d)"), event.iEventType, event.iErrorCode);
 
-    if (event.iEventType == KMMFEventCategoryVideoPlayerGeneralError &&
-        event.iErrorCode == KErrHardwareNotAvailable)
+    if (event.iEventType == KMMFEventCategoryVideoPlayerGeneralError
+            && event.iErrorCode == KErrHardwareNotAvailable)
         {
         //RDebug::Print(_L("CMMFBackendEngine::MvpuoEvent: Hardware Not Available"));
         }
 
-    else if (event.iEventType == KMMFEventCategoryVideoPlayerGeneralError &&
-             event.iErrorCode == KErrMMPartialPlayback)
+    else if (event.iEventType == KMMFEventCategoryVideoPlayerGeneralError
+            && event.iErrorCode == KErrMMPartialPlayback)
         {
         //RDebug::Print(_L("CMMFBackendEngine::MvpuoEvent: Partial playback"));
-        }    
-    if (event.iEventType == KMMFEventCategoryVideoPlayerGeneralError &&
-        event.iErrorCode == -12014)
+        }
+    if (event.iEventType == KMMFEventCategoryVideoPlayerGeneralError
+            && event.iErrorCode == -12014)
         {
         //RDebug::Print(_L("CMMFBackendEngine::MvpuoEvent: Audio Device taken"));
         PausePlayback();
-        XAAdaptEvent event = {XA_PLAYITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL};
-        XAAdaptationBase_SendAdaptEvents((XAAdaptationBaseCtx*)iAdaptContext, &event );
+        XAAdaptEvent event =
+            {
+            XA_PLAYITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL
+            };
+        XAAdaptationBase_SendAdaptEvents(
+                (XAAdaptationBaseCtx*) iAdaptContext, &event);
         }
     else if (event.iEventType == KMMFRefreshMetaData)
         {
@@ -394,7 +442,7 @@ void CMMFBackendEngine::MvloLoadingComplete()
 
 //MMdaAudioPlayerCallback
 void CMMFBackendEngine::MapcInitComplete(TInt aError,
-                                          const TTimeIntervalMicroSeconds& aDuration)
+        const TTimeIntervalMicroSeconds& aDuration)
     {
     PRINT_TO_CONSOLE_HOME_TIME;
 
@@ -413,12 +461,11 @@ void CMMFBackendEngine::MapcInitComplete(TInt aError,
         iMarkerPositionTimer->UseAudioPlayer();
         iPlayItfPositionUpdateTimer->UseAudioPlayer();
         }
-    if (iActiveSchedulerWait->IsStarted())
+    if (iActiveSchedulerWait && iActiveSchedulerWait->IsStarted())
         {
         iActiveSchedulerWait->AsyncStop();
         }
     }
-
 
 void CMMFBackendEngine::MapcPlayComplete(TInt aError)
     {
@@ -439,22 +486,27 @@ void CMMFBackendEngine::MapcPlayComplete(TInt aError)
         iAudioPlayer->GetPosition(iPlaybackHead);
         iMediaPlayerState = XA_PLAYSTATE_PAUSED;
         iMMFPlayerState = EPlayerPaused;
-        XAAdaptEvent event = {XA_PLAYITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL};
-        XAAdaptationBase_SendAdaptEvents((XAAdaptationBaseCtx*)iAdaptContext, &event );
+        XAAdaptEvent event =
+            {
+            XA_PLAYITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL
+            };
+        XAAdaptationBase_SendAdaptEvents(
+                (XAAdaptationBaseCtx*) iAdaptContext, &event);
         }
     iMarkerPositionTimer->Stop();
     iPlayItfPositionUpdateTimer->Stop();
     }
 
 // from MMdaObjectStateChangeObserver
-void CMMFBackendEngine::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousState, TInt aCurrentState, TInt aErrorCode)
+void CMMFBackendEngine::MoscoStateChangeEvent(CBase* /*aObject*/,
+        TInt aPreviousState, TInt aCurrentState, TInt aErrorCode)
     {
     TInt err(KErrNone);
     iPreviousRecordState = aPreviousState;
     iCurrentRecordState = aCurrentState;
     iErrorCode = aErrorCode;
     //RDebug::Print(_L("CMMFBackendEngine::MoscoStateChangeEvent 1 Error[%d]"),aErrorCode);
-    if (iCurrentRecordState == CMdaAudioClipUtility::EOpen)  //EOpen
+    if (iCurrentRecordState == CMdaAudioClipUtility::EOpen) //EOpen
         {
         //outputfile is open and ready for recording
         iRecordState = CMMFBackendEngine::ERecorderOpen;
@@ -463,21 +515,27 @@ void CMMFBackendEngine::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrevious
             if (iPreviousRecordState == CMdaAudioClipUtility::ENotReady)
                 {
                 //RDebug::Print(_L("CMMFBackendEngine::MoscoStateChangeEvent 2"));
-                TRAP(err,iaudioInputRecord = CAudioInput::NewL( *iAudioRecorder ));
-                RArray<CAudioInput::TAudioInputPreference> inputArray;
-                inputArray.Append( CAudioInput::EDefaultMic );
-                // Set Audio Input
-                iaudioInputRecord->SetAudioInputL( inputArray.Array( ) );
-                inputArray.Close();
-                TMMFMessageDestination destination(KUidMetaDataWriteCustomCommand);
-                TMMFMessageDestinationPckg pckg = TMMFMessageDestinationPckg(destination);
-                TInt ret = iAudioRecorder->RecordControllerCustomCommandSync(pckg, 0, KNullDesC8, KNullDesC8);
+                TRAP(err,iAudioInputRecord = CAudioInput::NewL( *iAudioRecorder ));
+                if (err == KErrNone)
+                    {
+                    RArray<CAudioInput::TAudioInputPreference> inputArray;
+                    inputArray.Append(CAudioInput::EDefaultMic);
+                    // Set Audio Input
+                    TRAP(err, iAudioInputRecord->SetAudioInputL( inputArray.Array( ) ));
+                    inputArray.Close();
+                    }
+                TMMFMessageDestination destination(
+                        KUidMetaDataWriteCustomCommand);
+                TMMFMessageDestinationPckg pckg = TMMFMessageDestinationPckg(
+                        destination);
+                TInt ret = iAudioRecorder->RecordControllerCustomCommandSync(
+                        pckg, 0, KNullDesC8, KNullDesC8);
                 //RDebug::Print(_L("CMMFBackendEngine::MoscoStateChangeEvent 3 [%d]"),ret);
                 if (ret != KErrNone && iFileFormat == XA_CONTAINERTYPE_MP4)
                     {
                     iPauseSupportMP4 = FALSE;
                     }
-                if (iActiveSchedulerWait->IsStarted())
+                if (iActiveSchedulerWait && iActiveSchedulerWait->IsStarted())
                     {
                     iActiveSchedulerWait->AsyncStop();
                     }
@@ -485,25 +543,34 @@ void CMMFBackendEngine::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrevious
             }
         else
             {
-            XAAdaptEvent event = {XA_RECORDITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL};
-            XAAdaptationBase_SendAdaptEvents((XAAdaptationBaseCtx*)iAdaptContext, &event );
+            XAAdaptEvent event =
+                {
+                XA_RECORDITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL
+                };
+            XAAdaptationBase_SendAdaptEvents(
+                    (XAAdaptationBaseCtx*) iAdaptContext, &event);
             }
         }
-    else if (iCurrentRecordState == CMdaAudioClipUtility::ERecording)  //ERecording
+    else if (iCurrentRecordState == CMdaAudioClipUtility::ERecording) //ERecording
         {
         iRecordState = CMMFBackendEngine::ERecorderRecording;
         iPositionUpdateTimer->Start(iTimerDelay);
-        XAAdaptEvent event = {XA_RECORDITFEVENTS, XA_RECORDEVENT_HEADMOVING, 0, NULL};
-        XAAdaptationBase_SendAdaptEvents((XAAdaptationBaseCtx*)iAdaptContext, &event );
+        XAAdaptEvent event =
+            {
+            XA_RECORDITFEVENTS, XA_RECORDEVENT_HEADMOVING, 0, NULL
+            };
+        XAAdaptationBase_SendAdaptEvents(
+                (XAAdaptationBaseCtx*) iAdaptContext, &event);
         }
-    else   //ENotReady
+    else //ENotReady
         {
         //outputfile is not open
         iRecordState = CMMFBackendEngine::ERecorderNotReady;
         }
     }
 
-TInt CMMFBackendEngine::SetRecorderState(TRecorderState state, XAboolean stopCalled)
+TInt CMMFBackendEngine::SetRecorderState(TRecorderState state,
+        XAboolean stopCalled)
     {
     TInt err(KErrNone);
 
@@ -512,14 +579,15 @@ TInt CMMFBackendEngine::SetRecorderState(TRecorderState state, XAboolean stopCal
         return XA_RESULT_INTERNAL_ERROR;
         }
 
-    switch(state)
+    switch (state)
         {
         case ERecorderNotReady:
             iAudioRecorder->Close();
             iRecordState = ERecorderNotReady;
             break;
         case ERecorderOpen:
-            if (iFileFormat == XA_CONTAINERTYPE_MP4 && !iPauseSupportMP4 && !stopCalled)
+            if (iFileFormat == XA_CONTAINERTYPE_MP4 && !iPauseSupportMP4
+                    && !stopCalled)
                 {
                 err = KErrNotSupported;
                 return err;
@@ -529,7 +597,8 @@ TInt CMMFBackendEngine::SetRecorderState(TRecorderState state, XAboolean stopCal
             iRecordState = ERecorderOpen;
             break;
         case ERecorderRecording:
-            TRAP(err, iAudioRecorder->RecordL());
+            TRAP(err, iAudioRecorder->RecordL())
+            ;
             break;
         }
     return err;
@@ -548,22 +617,29 @@ void CMMFBackendEngine::Close()
 
     if (iBaseVideoPlayer && iVideoPlayer)
         {
-        switch(iMMFPlayerState)
+        switch (iMMFPlayerState)
             {
             case EPlayerPlaying:
             case EPlayerPaused:
             case EPlayerPrepared:
                 iVideoPlayer->Stop();
             case EPlayerOpened:
-            if (m_pWs && m_pScr && m_pWindow)
-                {
-                iVideoPlayer->RemoveDisplayWindow(*m_pWindow);
-                }
+                if (m_pWs && m_pScr && m_pWindow)
+                    {
+                    iVideoPlayer->RemoveDisplayWindow(*m_pWindow);
+                    }
                 iVideoPlayer->Close();
             case EPlayerClosed:
             default:
                 break;
             };
+        }
+
+    // deleting the AudioInput object
+    if (iAudioInputRecord)
+        {
+        delete iAudioInputRecord;
+        iAudioInputRecord = NULL;
         }
 
     if (iBaseAudioPlayer && iAudioPlayer)
@@ -576,7 +652,7 @@ void CMMFBackendEngine::Close()
         iAudioRecorder->Close();
         }
 
-    if(iPositionUpdateTimer)
+    if (iPositionUpdateTimer)
         {
         iPositionUpdateTimer->Stop();
         }
@@ -600,8 +676,6 @@ void CMMFBackendEngine::Destroy()
     delete iBaseVideoPlayer;
     iBaseVideoPlayer = NULL;
     iVideoPlayer = NULL;
-    delete iaudioInputRecord;
-    iaudioInputRecord = NULL;
     delete iBaseAudioPlayer;
     iBaseAudioPlayer = NULL;
     iAudioPlayer = NULL;
@@ -644,30 +718,28 @@ TInt CMMFBackendEngine::GetCodecId(XAuint32* codecid)
     {
     TInt err(KErrNone);
 
-    if(iAPIBeingUsed == EAudioRecorderUtility)
+    if (iAPIBeingUsed == EAudioRecorderUtility)
         {
-        if(iRecordState != CMMFBackendEngine::ERecorderNotReady)
+        if (iRecordState != CMMFBackendEngine::ERecorderNotReady)
             {
             TFourCC dest;
             TRAP(err, dest = iAudioRecorder->DestinationDataTypeL());
-            if(err == KErrNone)
+            if (err == KErrNone)
                 {
                 *codecid = dest.FourCC();
                 }
             }
         }
-    else if(iAPIBeingUsed == EAudioPlayerUtility)
+    else if (iAPIBeingUsed == EAudioPlayerUtility)
         {
-        if(iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
+        if (iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
             {
             TMMFMessageDestinationPckg pckg(KUidInterfaceMMFAudioController);
             TPckgBuf<TMMFAudioConfig> configPackage;
-            TInt err =  iAudioPlayer->CustomCommandSync(pckg,
-                                                        EMMFAudioControllerGetSourceDataType,
-                                                        KNullDesC8,
-                                                        KNullDesC8,
-                                                        configPackage);
-            if(err == KErrNone)
+            TInt err = iAudioPlayer->CustomCommandSync(pckg,
+                    EMMFAudioControllerGetSourceDataType, KNullDesC8,
+                    KNullDesC8, configPackage);
+            if (err == KErrNone)
                 {
                 *codecid = configPackage().iSourceDataTypeCode.FourCC();
                 }
@@ -680,22 +752,22 @@ TInt CMMFBackendEngine::GetBitRate(XAuint32* bitrate)
     {
     TInt err(KErrNone);
     TUint br(0);
-    if(iAPIBeingUsed == EAudioRecorderUtility)
+    if (iAPIBeingUsed == EAudioRecorderUtility)
         {
-        if(iRecordState != CMMFBackendEngine::ERecorderNotReady)
+        if (iRecordState != CMMFBackendEngine::ERecorderNotReady)
             {
             TRAP(err, br = iAudioRecorder->DestinationBitRateL());
-            if(err == KErrNone)
+            if (err == KErrNone)
                 {
                 *bitrate = br;
                 }
             }
         }
-    else if(iAPIBeingUsed == EAudioPlayerUtility)
+    else if (iAPIBeingUsed == EAudioPlayerUtility)
         {
-        if(iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
+        if (iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
             {
-            TInt err =  iAudioPlayer->GetBitRate(br);
+            TInt err = iAudioPlayer->GetBitRate(br);
             *bitrate = br;
             }
         }
@@ -706,31 +778,29 @@ TInt CMMFBackendEngine::GetSampleRate(XAmilliHertz* samplerate)
     {
     TInt err(KErrNone);
     TUint sr(0);
-    if(iAPIBeingUsed == EAudioRecorderUtility)
+    if (iAPIBeingUsed == EAudioRecorderUtility)
         {
-        if(iRecordState != CMMFBackendEngine::ERecorderNotReady)
+        if (iRecordState != CMMFBackendEngine::ERecorderNotReady)
             {
             TRAP(err, sr = iAudioRecorder->DestinationSampleRateL());
-            if(err == KErrNone)
+            if (err == KErrNone)
                 {
-                *samplerate = sr;
+                *samplerate = sr * 1000;
                 }
             }
         }
-    else if(iAPIBeingUsed == EAudioPlayerUtility)
+    else if (iAPIBeingUsed == EAudioPlayerUtility)
         {
-        if(iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
+        if (iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
             {
             TMMFMessageDestinationPckg pckg(KUidInterfaceMMFAudioController);
             TPckgBuf<TMMFAudioConfig> configPackage;
-            TInt err =  iAudioPlayer->CustomCommandSync(pckg,
-                                                        EMMFAudioControllerGetSourceSampleRate,
-                                                        KNullDesC8,
-                                                        KNullDesC8,
-                                                        configPackage);
-            if(err == KErrNone)
+            TInt err = iAudioPlayer->CustomCommandSync(pckg,
+                    EMMFAudioControllerGetSourceSampleRate, KNullDesC8,
+                    KNullDesC8, configPackage);
+            if (err == KErrNone)
                 {
-                *samplerate = configPackage().iSampleRate;
+                *samplerate = configPackage().iSampleRate * 1000;
                 }
             }
         }
@@ -741,29 +811,27 @@ TInt CMMFBackendEngine::GetChannels(XAuint32* channels)
     {
     TInt err(KErrNone);
     TUint ch(0);
-    if(iAPIBeingUsed == EAudioRecorderUtility)
+    if (iAPIBeingUsed == EAudioRecorderUtility)
         {
-        if(iRecordState != CMMFBackendEngine::ERecorderNotReady)
+        if (iRecordState != CMMFBackendEngine::ERecorderNotReady)
             {
             TRAP(err,ch = iAudioRecorder->DestinationNumberOfChannelsL());
-            if(err == KErrNone)
+            if (err == KErrNone)
                 {
                 *channels = ch;
                 }
             }
         }
-    else if(iAPIBeingUsed == EAudioPlayerUtility)
+    else if (iAPIBeingUsed == EAudioPlayerUtility)
         {
-        if(iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
+        if (iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
             {
             TMMFMessageDestinationPckg pckg(KUidInterfaceMMFAudioController);
             TPckgBuf<TMMFAudioConfig> configPackage;
-            TInt err =  iAudioPlayer->CustomCommandSync(  pckg,
-                                                        EMMFAudioControllerGetSourceNumChannels,
-                                                        KNullDesC8,
-                                                        KNullDesC8,
-                                                        configPackage   );
-            if(err == KErrNone)
+            TInt err = iAudioPlayer->CustomCommandSync(pckg,
+                    EMMFAudioControllerGetSourceNumChannels, KNullDesC8,
+                    KNullDesC8, configPackage);
+            if (err == KErrNone)
                 {
                 *channels = configPackage().iChannels;
                 }
@@ -775,10 +843,10 @@ TInt CMMFBackendEngine::GetChannels(XAuint32* channels)
 TInt CMMFBackendEngine::SetDestinationBitRate(XAuint32* bitrate)
     {
     TInt err(KErrNone);
-    if(iRecordState == CMMFBackendEngine::ERecorderOpen)
+    if (iRecordState == CMMFBackendEngine::ERecorderOpen)
         {
         TRAP(err, iAudioRecorder->SetDestinationBitRateL(*bitrate));
-        if(err != KErrNone)
+        if (err != KErrNone)
             {
             return XA_RESULT_PARAMETER_INVALID;
             }
@@ -789,10 +857,10 @@ TInt CMMFBackendEngine::SetDestinationBitRate(XAuint32* bitrate)
 TInt CMMFBackendEngine::SetDestinationSampleRate(XAmilliHertz* samplerate)
     {
     TInt err(KErrNone);
-    if(iRecordState == CMMFBackendEngine::ERecorderOpen)
+    if (iRecordState == CMMFBackendEngine::ERecorderOpen)
         {
-        TRAP(err, iAudioRecorder->SetDestinationSampleRateL(*samplerate));
-        if(err != KErrNone)
+        TRAP(err, iAudioRecorder->SetDestinationSampleRateL(*samplerate/1000));
+        if (err != KErrNone)
             {
             return XA_RESULT_PARAMETER_INVALID;
             }
@@ -815,21 +883,21 @@ TInt CMMFBackendEngine::SetDestinationChannels(XAuint32* channels)
     }
 
 /*
-XAresult CMMFBackendEngine::SetWindowHandle(void* display_info)
-    {
-    XADataLocator_NativeDisplay* nativeDisplay;
-    XADataSink* videoSink = (XADataSink*)display_info;
+ XAresult CMMFBackendEngine::SetWindowHandle(void* display_info)
+ {
+ XADataLocator_NativeDisplay* nativeDisplay;
+ XADataSink* videoSink = (XADataSink*)display_info;
 
-    nativeDisplay = (XADataLocator_NativeDisplay*) (videoSink->pLocator);
+ nativeDisplay = (XADataLocator_NativeDisplay*) (videoSink->pLocator);
 
-    m_pWindow = ((RWindow*)(nativeDisplay->hWindow));
-    m_pWs =     ((RWsSession*)(nativeDisplay->hDisplay));
+ m_pWindow = ((RWindow*)(nativeDisplay->hWindow));
+ m_pWs =     ((RWsSession*)(nativeDisplay->hDisplay));
 
-    m_bWindowReferencePassed = TRUE;
-    return XA_RESULT_SUCCESS;
-    }
+ m_bWindowReferencePassed = TRUE;
+ return XA_RESULT_SUCCESS;
+ }
 
-*/
+ */
 XAresult CMMFBackendEngine::CreateAndConfigureWindowL()
     {
 #ifdef USE_LOCAL_WINDOW_RESOURCES
@@ -875,20 +943,20 @@ XAresult CMMFBackendEngine::SetNativeDisplayInformation(void* display_info)
     //display_info is of type XADataSink
     //display_info.pLocator is of type XADataLocator_NativeDisplay
     XADataLocator_NativeDisplay* nativeDisplay;
-    XADataSink* videoSink = (XADataSink*)display_info;
+    XADataSink* videoSink = (XADataSink*) display_info;
 
     if (videoSink)
         {
         nativeDisplay = (XADataLocator_NativeDisplay*) (videoSink->pLocator);
-        m_pWindow = ((RWindow*)(nativeDisplay->hWindow));
-        m_pWs = ((RWsSession*)(nativeDisplay->hDisplay));
-    /*
-        m_cropRegion = TRect(m_pWindow->Size());
-        m_videoExtent = TRect(m_pWindow->Size());
-        m_cropRect = TRect(m_pWindow->Size());
-        m_clipRect = TRect(m_pWindow->Size());
-        m_cropRegion = TRect(m_pWindow->Size());
-    */
+        m_pWindow = ((RWindow*) (nativeDisplay->hWindow));
+        m_pWs = ((RWsSession*) (nativeDisplay->hDisplay));
+        /*
+         m_cropRegion = TRect(m_pWindow->Size());
+         m_videoExtent = TRect(m_pWindow->Size());
+         m_cropRect = TRect(m_pWindow->Size());
+         m_clipRect = TRect(m_pWindow->Size());
+         m_cropRegion = TRect(m_pWindow->Size());
+         */
         if (m_pWs)
             {
             delete m_pScr;
@@ -911,24 +979,22 @@ XAresult CMMFBackendEngine::ResumePlayback()
         case XA_PLAYSTATE_PAUSED:
             /* If we are already at the end of clip, do nothing
              * check ::MapcPlayComplete for documentation */
-            if ((iPlaybackHead < iMediaDuration) &&
-                    ((iAPIBeingUsed == EAudioPlayerUtility) ||
-                     (iAPIBeingUsed == EVideoPlayerUtility)) )
+            if ((iPlaybackHead < iMediaDuration) && ((iAPIBeingUsed
+                    == EAudioPlayerUtility) || (iAPIBeingUsed
+                    == EVideoPlayerUtility)))
                 {
                 if (iAPIBeingUsed == EAudioPlayerUtility)
                     {
                     TAG_TIME_PROFILING_BEGIN;
                     iAudioPlayer->Play();
-                    TAG_TIME_PROFILING_END;
-                    PRINT_TO_CONSOLE_TIME_DIFF;                    
+                    TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
                     }
                 else if (iAPIBeingUsed == EVideoPlayerUtility)
                     {
                     TAG_TIME_PROFILING_BEGIN;
                     //iVideoPlayer->Play( iPlaybackHead, iMediaDuration);
                     iVideoPlayer->Play();
-                    TAG_TIME_PROFILING_END;
-                    PRINT_TO_CONSOLE_TIME_DIFF;
+                    TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
                     }
                 postHeadMovingEvent = ETrue;
                 iMediaPlayerState = XA_PLAYSTATE_PLAYING;
@@ -959,16 +1025,15 @@ XAresult CMMFBackendEngine::PausePlayback()
         {
         case XA_PLAYSTATE_PLAYING:
         case XA_PLAYSTATE_STOPPED:
-            if ((iAPIBeingUsed == EAudioPlayerUtility) ||
-                (iAPIBeingUsed == EVideoPlayerUtility) )
+            if ((iAPIBeingUsed == EAudioPlayerUtility) || (iAPIBeingUsed
+                    == EVideoPlayerUtility))
                 {
                 TInt pauseOpRes(KErrNone);
                 if (iAPIBeingUsed == EAudioPlayerUtility)
                     {
                     TAG_TIME_PROFILING_BEGIN;
                     pauseOpRes = iAudioPlayer->Pause();
-                    TAG_TIME_PROFILING_END;
-                    PRINT_TO_CONSOLE_TIME_DIFF;
+                    TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
                     }
                 else if (iAPIBeingUsed == EVideoPlayerUtility)
                     {
@@ -981,11 +1046,9 @@ XAresult CMMFBackendEngine::PausePlayback()
                             {
                             iPlaybackHead = 0;
                             }
-                        }
-                    TAG_TIME_PROFILING_END;
-                    PRINT_TO_CONSOLE_TIME_DIFF;
+                        } TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
                     }
-                if ( pauseOpRes == KErrNone)
+                if (pauseOpRes == KErrNone)
                     {
                     iMediaPlayerState = XA_PLAYSTATE_PAUSED;
                     iMMFPlayerState = EPlayerPaused;
@@ -1011,15 +1074,14 @@ XAresult CMMFBackendEngine::StopPlayback()
         {
         case XA_PLAYSTATE_PAUSED:
         case XA_PLAYSTATE_PLAYING:
-            if ((iAPIBeingUsed == EAudioPlayerUtility) ||
-                (iAPIBeingUsed == EVideoPlayerUtility) )
+            if ((iAPIBeingUsed == EAudioPlayerUtility) || (iAPIBeingUsed
+                    == EVideoPlayerUtility))
                 {
                 if (iAPIBeingUsed == EAudioPlayerUtility)
                     {
                     TAG_TIME_PROFILING_BEGIN;
                     iAudioPlayer->Stop();
-                    TAG_TIME_PROFILING_END;
-                    PRINT_TO_CONSOLE_TIME_DIFF;
+                    TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
 
                     iMMFPlayerState = EPlayerOpened;
                     }
@@ -1027,9 +1089,8 @@ XAresult CMMFBackendEngine::StopPlayback()
                     {
                     TAG_TIME_PROFILING_BEGIN;
                     iVideoPlayer->Stop();
-                    TAG_TIME_PROFILING_END;
-                    PRINT_TO_CONSOLE_TIME_DIFF;
-                    
+                    TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
+
                     iMMFPlayerState = EPlayerPrepared;
                     }
                 iMediaPlayerState = XA_PLAYSTATE_STOPPED;
@@ -1110,7 +1171,7 @@ XAresult CMMFBackendEngine::GetPosition(XAmillisecond *pMsec)
                 TRAP(err, pos = iVideoPlayer->PositionL());
                 if (err == KErrNone)
                     {
-                    *pMsec = pos.Int64() / divider; 
+                    *pMsec = pos.Int64() / divider;
                     retVal = XA_RESULT_SUCCESS;
                     }
                 }
@@ -1132,13 +1193,12 @@ XAresult CMMFBackendEngine::SetPosition(XAmillisecond pMsec)
         case XA_PLAYSTATE_STOPPED:
         case XA_PLAYSTATE_PAUSED:
         case XA_PLAYSTATE_PLAYING:
-            if(iAPIBeingUsed == EAudioPlayerUtility)
+            if (iAPIBeingUsed == EAudioPlayerUtility)
                 {
                 pos = pMsec * multiplier;
                 TAG_TIME_PROFILING_BEGIN;
                 iAudioPlayer->SetPosition(pos);
-                TAG_TIME_PROFILING_END;
-                PRINT_TO_CONSOLE_TIME_DIFF;
+                TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
 
                 retVal = XA_RESULT_SUCCESS;
                 }
@@ -1146,8 +1206,8 @@ XAresult CMMFBackendEngine::SetPosition(XAmillisecond pMsec)
                 {
                 pos = pMsec * multiplier;
                 TAG_TIME_PROFILING_BEGIN;
-                TRAPD(err, iVideoPlayer->SetPositionL(pos));
-                TAG_TIME_PROFILING_END;
+                TRAPD(err, iVideoPlayer->SetPositionL(pos)); 
+                TAG_TIME_PROFILING_END; 
                 PRINT_TO_CONSOLE_TIME_DIFF;
                 if (err == KErrNone)
                     {
@@ -1171,7 +1231,7 @@ XAresult CMMFBackendEngine::SetRepeats(XAboolean repeat)
         case XA_PLAYSTATE_STOPPED:
         case XA_PLAYSTATE_PAUSED:
         case XA_PLAYSTATE_PLAYING:
-            if(iAPIBeingUsed == EAudioPlayerUtility)
+            if (iAPIBeingUsed == EAudioPlayerUtility)
                 {
                 numRepeats = repeat ? -2 : 0;
                 iAudioPlayer->SetRepeats(numRepeats, 0);
@@ -1188,7 +1248,8 @@ XAresult CMMFBackendEngine::SetRepeats(XAboolean repeat)
     return retVal;
     }
 
-XAresult CMMFBackendEngine::SetPlayWindow(XAmillisecond start, XAmillisecond end)
+XAresult CMMFBackendEngine::SetPlayWindow(XAmillisecond start,
+        XAmillisecond end)
     {
     XAresult retVal(XA_RESULT_INTERNAL_ERROR);
     TInt64 multiplier(1000);
@@ -1200,11 +1261,11 @@ XAresult CMMFBackendEngine::SetPlayWindow(XAmillisecond start, XAmillisecond end
         case XA_PLAYSTATE_STOPPED:
         case XA_PLAYSTATE_PAUSED:
         case XA_PLAYSTATE_PLAYING:
-            if(iAPIBeingUsed == EAudioPlayerUtility)
+            if (iAPIBeingUsed == EAudioPlayerUtility)
                 {
                 startpos = start * multiplier;
                 endpos = end * multiplier;
-                retVal = iAudioPlayer->SetPlayWindow(startpos,endpos);
+                retVal = iAudioPlayer->SetPlayWindow(startpos, endpos);
                 }
             else
                 {
@@ -1268,7 +1329,8 @@ XAresult CMMFBackendEngine::DoHandlePlayItfAttributesChanged()
 
     iPlayItfPositionUpdateTimer->SetCallbackEventMask(iPlayItfEventFlags);
     iPlayItfPositionUpdateTimer->RegisterCallback(iPlayItfCBFunction);
-    iPlayItfPositionUpdateTimer->SetPositionUpdatePeriod(iPositionUpdatePeriod);
+    iPlayItfPositionUpdateTimer->SetPositionUpdatePeriod(
+            iPositionUpdatePeriod);
 
     switch (iMediaPlayerState)
         {
@@ -1288,11 +1350,14 @@ XAresult CMMFBackendEngine::DoHandlePlayItfAttributesChanged()
 
 void CMMFBackendEngine::DoPostEvent(XAuint32 event)
     {
-    if ((iPlayItfEventFlags & event) &&
-        (iPlayItfCBFunction != NULL))
+    if ((iPlayItfEventFlags & event) && (iPlayItfCBFunction != NULL))
         {
-        XAAdaptEvent xaevent = {XA_PLAYITFEVENTS, event, 0, 0 };
-        XAAdaptationBase_SendAdaptEvents((XAAdaptationBaseCtx*)iAdaptContext, &xaevent );
+        XAAdaptEvent xaevent =
+            {
+            XA_PLAYITFEVENTS, event, 0, 0
+            };
+        XAAdaptationBase_SendAdaptEvents(
+                (XAAdaptationBaseCtx*) iAdaptContext, &xaevent);
         }
     }
 
@@ -1301,7 +1366,7 @@ XAresult CMMFBackendEngine::GetNumStreams(XAuint32* numstreams)
     XAresult retVal(XA_RESULT_SUCCESS);
     TInt bitRate(0);
     TInt numS(0);
-    if(iAPIBeingUsed == EAudioPlayerUtility)
+    if (iAPIBeingUsed == EAudioPlayerUtility)
         {
         numS = 1;
         *numstreams = numS;
@@ -1309,15 +1374,15 @@ XAresult CMMFBackendEngine::GetNumStreams(XAuint32* numstreams)
     else if (iAPIBeingUsed == EVideoPlayerUtility)
         {
         TRAPD(err, bitRate = iVideoPlayer->VideoBitRateL());
-        if(!err && bitRate)
+        if (!err && bitRate)
             {
             numS++;
             *numstreams = numS;
             }
-        
+
         bitRate = 0;
         TRAP(err, bitRate = iVideoPlayer->AudioBitRateL());
-        if(!err && bitRate)
+        if (!err && bitRate)
             {
             numS++;
             *numstreams = numS;
@@ -1326,16 +1391,17 @@ XAresult CMMFBackendEngine::GetNumStreams(XAuint32* numstreams)
     return retVal;
     }
 
-XAresult CMMFBackendEngine::GetStreamInfo(XAuint32 streamindex, XAuint32* streamtype)
+XAresult CMMFBackendEngine::GetStreamInfo(XAuint32 streamindex,
+        XAuint32* streamtype)
     {
     XAresult retVal(XA_RESULT_SUCCESS);
-    if(iAPIBeingUsed == EAudioPlayerUtility)
+    if (iAPIBeingUsed == EAudioPlayerUtility)
         {
         *streamtype = XA_DOMAINTYPE_AUDIO;
         }
     else if (iAPIBeingUsed == EVideoPlayerUtility)
         {
-        switch(streamindex)
+        switch (streamindex)
             {
             case 1:
                 *streamtype = XA_DOMAINTYPE_VIDEO;
@@ -1351,18 +1417,18 @@ XAresult CMMFBackendEngine::GetStreamInfo(XAuint32 streamindex, XAuint32* stream
     return retVal;
     }
 
-
-XAresult CMMFBackendEngine::GetVideoFrameSize(XAuint32* height, XAuint32* width, XAuint32* frameRate)
+XAresult CMMFBackendEngine::GetVideoFrameSize(XAuint32* height,
+        XAuint32* width, XAuint32* frameRate)
     {
     XAresult retVal(XA_RESULT_SUCCESS);
-    if(iAPIBeingUsed == EVideoPlayerUtility)
+    if (iAPIBeingUsed == EVideoPlayerUtility)
         {
-        if(iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
+        if (iMediaPlayerState != XA_PLAYSTATE_PLAYERUNINITIALIZED)
             {
             TSize size;
             TReal32 framerate(0);
             TRAPD(err, iVideoPlayer->VideoFrameSizeL(size));
-            if(!err)
+            if (!err)
                 {
                 *height = size.iHeight;
                 *width = size.iWidth;
@@ -1373,7 +1439,7 @@ XAresult CMMFBackendEngine::GetVideoFrameSize(XAuint32* height, XAuint32* width,
                 }
 
             TRAP(err, framerate = iVideoPlayer->VideoFrameRateL());
-            if(!err)
+            if (!err)
                 {
                 *frameRate = framerate;
                 }
@@ -1390,24 +1456,27 @@ XAresult CMMFBackendEngine::GetVideoFrameSize(XAuint32* height, XAuint32* width,
     return retVal;
     }
 
-XAresult CMMFBackendEngine::SetActiveState(XAuint32 streamindex, XAboolean active)
+XAresult CMMFBackendEngine::SetActiveState(XAuint32 streamindex,
+        XAboolean active)
     {
     XAresult retVal(XA_RESULT_SUCCESS);
     TInt err(KErrNone);
-    if(iAPIBeingUsed == EAudioPlayerUtility)
+    if (iAPIBeingUsed == EAudioPlayerUtility)
         {
         retVal = XA_RESULT_FEATURE_UNSUPPORTED;
         }
     else if (iAPIBeingUsed == EVideoPlayerUtility)
         {
-        switch(streamindex)
+        switch (streamindex)
             {
             case 1:
-                TRAP(err, iVideoPlayer->SetVideoEnabledL(active));
+                TRAP(err, iVideoPlayer->SetVideoEnabledL(active))
+                ;
                 retVal = err;
                 break;
             case 2:
-                TRAP(err, iVideoPlayer->SetAudioEnabledL(active));
+                TRAP(err, iVideoPlayer->SetAudioEnabledL(active))
+                ;
                 retVal = err;
                 break;
             default:
@@ -1423,7 +1492,7 @@ TInt CMMFBackendEngine::InitializeURIForMMFUtil(char *uri)
     /* Initializes and save uri param into iUri structure */
     TInt err(KErrNone);
     TInt uriLen;
-    
+
     if (!uri)
         return KErrArgument;
 
@@ -1432,26 +1501,25 @@ TInt CMMFBackendEngine::InitializeURIForMMFUtil(char *uri)
         delete iUri;
         iUri = NULL;
         }
-    
+
     uriLen = strlen(uri);
-    TPtr8 uriParam((TUint8*)uri, uriLen, uriLen);
-    
+    TPtr8 uriParam((TUint8*) uri, uriLen, uriLen);
+
     TRAP(err, iUri = HBufC::NewL(uriLen));
     if (err != KErrNone)
         return err;
 
     iUriPtr.Set(iUri->Des());
     iUriPtr.Copy(uriParam); /* Copy data*/
-    iUriPtr.LowerCase();
-
+    //iUriPtr.LowerCase();
     /* For file scheme convert from file:///c:/folder/file.ext
      * format to c:\\folder\\file.ext using TUriParser. */
     _LIT(KFileScheme,"file:///");
     if (iUriPtr.Find(KFileScheme) >= 0)
         {
-        TPtr tmp(const_cast<TUint16 *>(iUriPtr.Ptr()) + KFileScheme().Length(),
-                iUriPtr.Length(),
-                iUriPtr.Length());
+        iUriType = ELocal;
+        TPtr tmp(const_cast<TUint16 *> (iUriPtr.Ptr())
+                + KFileScheme().Length(), iUriPtr.Length(), iUriPtr.Length());
         /* Convert from c:/folder/file.ext format to
          * c:\\folder\\file.ext using TUriParser.
          * TUriParser8 accepts uri in format file:///c/folder/file.ext,
@@ -1477,15 +1545,18 @@ TInt CMMFBackendEngine::InitializeURIForMMFUtil(char *uri)
         file = NULL;
 
         }
+    else
+        {
+        iUriType = EStreaming;
+        }
     return err;
     }
-
 
 XAresult CMMFBackendEngine::SetVolume(XAuint32 volume)
     {
     XAresult retVal(XA_RESULT_SUCCESS);
     TInt err(KErrNone);
-    if(iAPIBeingUsed == EAudioPlayerUtility)
+    if (iAPIBeingUsed == EAudioPlayerUtility)
         {
         retVal = iAudioPlayer->SetVolume(volume);
         }
@@ -1494,17 +1565,17 @@ XAresult CMMFBackendEngine::SetVolume(XAuint32 volume)
         TRAP(err, iVideoPlayer->SetVolumeL(volume));
         retVal = err;
         }
-    else if(iAPIBeingUsed == EAudioRecorderUtility)
+    else if (iAPIBeingUsed == EAudioRecorderUtility)
         {
         retVal = iAudioRecorder->SetVolume(volume);
         }
-    return retVal;    
+    return retVal;
     }
 
 XAresult CMMFBackendEngine::GetMaxVolume(XAuint32* maxvolume)
     {
     XAresult retVal(XA_RESULT_SUCCESS);
-    if(iAPIBeingUsed == EAudioPlayerUtility)
+    if (iAPIBeingUsed == EAudioPlayerUtility)
         {
         *maxvolume = iAudioPlayer->MaxVolume();
         }
@@ -1512,21 +1583,21 @@ XAresult CMMFBackendEngine::GetMaxVolume(XAuint32* maxvolume)
         {
         *maxvolume = iVideoPlayer->MaxVolume();
         }
-    else if(iAPIBeingUsed == EAudioRecorderUtility)
+    else if (iAPIBeingUsed == EAudioRecorderUtility)
         {
         *maxvolume = iAudioRecorder->MaxVolume();
         }
-    return retVal;     
+    return retVal;
     }
 
 XAresult CMMFBackendEngine::GetVolume(XAuint32* volume)
     {
     XAresult retVal(XA_RESULT_SUCCESS);
     TInt mmfvolume(0);
-    if(iAPIBeingUsed == EAudioPlayerUtility)
+    if (iAPIBeingUsed == EAudioPlayerUtility)
         {
         retVal = iAudioPlayer->GetVolume(mmfvolume);
-        if(retVal == XA_RESULT_SUCCESS)
+        if (retVal == XA_RESULT_SUCCESS)
             {
             *volume = mmfvolume;
             }
@@ -1535,228 +1606,252 @@ XAresult CMMFBackendEngine::GetVolume(XAuint32* volume)
         {
         *volume = iVideoPlayer->Volume();
         }
-    else if(iAPIBeingUsed == EAudioRecorderUtility)
+    else if (iAPIBeingUsed == EAudioRecorderUtility)
         {
         retVal = iAudioRecorder->GetVolume(mmfvolume);
-        if(retVal == XA_RESULT_SUCCESS)
+        if (retVal == XA_RESULT_SUCCESS)
             {
             *volume = mmfvolume;
             }
         }
-    return retVal;     
+    return retVal;
     }
 
-extern "C" {
+extern "C"
+    {
 
     int mmf_backend_engine_init(void** engine)
-    {
+        {
         TRAPD(err, *engine = CMMFBackendEngine::NewL());
         return err;
-    }
+        }
 
     void mmf_backend_engine_deinit(void* engine)
-    {
-        delete ((CMMFBackendEngine*)engine);
-    }
+        {
+        delete ((CMMFBackendEngine*) engine);
+        }
 
     int mmf_set_recorder_uri(void* context, char* uri, XAuint32 format)
-    {
-        return ((CMMFBackendEngine*)(context))->SetFileName(uri,format,CMMFBackendEngine::ERecord);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->SetFileName(uri, format,
+                CMMFBackendEngine::ERecord);
+        }
 
     int mmf_set_adapt_context(void* context, void* adaptcontext)
-    {
-        return ((CMMFBackendEngine*)(context))->SetAdaptContext(adaptcontext);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->SetAdaptContext(adaptcontext);
+        }
 
     void mmf_close(void* context)
-    {
-        ((CMMFBackendEngine*)context)->Close();
-    }
+        {
+        ((CMMFBackendEngine*) context)->Close();
+        }
 
     int mmf_start_recording(void* context)
-    {
-        return ((CMMFBackendEngine*)(context))->SetRecorderState(CMMFBackendEngine::ERecorderRecording,FALSE);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->SetRecorderState(
+                CMMFBackendEngine::ERecorderRecording, FALSE);
+        }
 
-    int mmf_stop_recording(void* context, XAboolean stopCalled )
-    {
-        return ((CMMFBackendEngine*)(context))->SetRecorderState(CMMFBackendEngine::ERecorderOpen, stopCalled);
-    }
+    int mmf_stop_recording(void* context, XAboolean stopCalled)
+        {
+        return ((CMMFBackendEngine*) (context))->SetRecorderState(
+                CMMFBackendEngine::ERecorderOpen, stopCalled);
+        }
 
     int mmf_get_record_position(void* context, XAuint64* position)
-    {
-        return ((CMMFBackendEngine*)(context))->GetRecordPosition(position);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->GetRecordPosition(position);
+        }
 
-    int mmf_set_record_position_update_period(void* context, XAmillisecond msec)
-    {
-        return ((CMMFBackendEngine*)(context))->SetPositionUpdatePerioed(msec);
-    }
+    int mmf_set_record_position_update_period(void* context,
+            XAmillisecond msec)
+        {
+        return ((CMMFBackendEngine*) (context))->SetPositionUpdatePerioed(
+                msec);
+        }
 
     int mmf_get_codec_id(void* context, XAuint32* encoderId)
-    {
-        return ((CMMFBackendEngine*)(context))->GetCodecId(encoderId);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->GetCodecId(encoderId);
+        }
 
     int mmf_get_channels(void* context, XAuint32* channelsIn)
-    {
-        return ((CMMFBackendEngine*)(context))->GetChannels(channelsIn);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->GetChannels(channelsIn);
+        }
 
     int mmf_get_samplerate(void* context, XAmilliHertz* sampleRate)
-    {
-        return ((CMMFBackendEngine*)(context))->GetSampleRate(sampleRate);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->GetSampleRate(sampleRate);
+        }
 
     int mmf_get_bitrate(void* context, XAuint32* bitRate)
-    {
-        return ((CMMFBackendEngine*)(context))->GetBitRate(bitRate);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->GetBitRate(bitRate);
+        }
 
     int mmf_set_destination_channels(void* context, XAuint32* channelsIn)
-    {
-        return ((CMMFBackendEngine*)(context))->SetDestinationChannels(channelsIn);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->SetDestinationChannels(
+                channelsIn);
+        }
 
-    int mmf_set_destination_samplerate(void* context, XAmilliHertz* sampleRate)
-    {
-        return ((CMMFBackendEngine*)(context))->SetDestinationSampleRate(sampleRate);
-    }
+    int mmf_set_destination_samplerate(void* context,
+            XAmilliHertz* sampleRate)
+        {
+        return ((CMMFBackendEngine*) (context))->SetDestinationSampleRate(
+                sampleRate);
+        }
 
     int mmf_set_destination_bitrate(void* context, XAuint32* bitRate)
-    {
-        return ((CMMFBackendEngine*)(context))->SetDestinationBitRate(bitRate);
-    }
+        {
+        return ((CMMFBackendEngine*) (context))->SetDestinationBitRate(
+                bitRate);
+        }
 
     XAresult mmf_set_play_adapt_context(void * context, void * adaptcontext)
-    {
-        return ((CMMFBackendEngine *)(context))->SetPlayAdaptContext(adaptcontext);
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->SetPlayAdaptContext(
+                adaptcontext);
+        }
 
     XAresult mmf_set_player_uri(void * context, char * uri, XAuint32 format)
-    {
-        return ((CMMFBackendEngine *)(context))->SetFileName(uri,format,CMMFBackendEngine::EPlay);
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->SetFileName(uri, format,
+                CMMFBackendEngine::EPlay);
+        }
 
-/*
-    XAresult mmf_set_window_handle(void * context, void *  display_info)
-    {
-        return ((CMMFBackendEngine *)(context))->SetWindowHandle(display_info);
-    }
+    /*
+     XAresult mmf_set_window_handle(void * context, void *  display_info)
+     {
+     return ((CMMFBackendEngine *)(context))->SetWindowHandle(display_info);
+     }
 
-*/
+     */
     XAresult mmf_setup_native_display(void * context, void * display_info)
-    {
-        return ((CMMFBackendEngine *)(context))->SetNativeDisplayInformation(display_info);
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->SetNativeDisplayInformation(
+                display_info);
+        }
 
     XAresult mmf_playitf_resume_playback(void * context)
-    {
-        return ((CMMFBackendEngine *)(context))->ResumePlayback();
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->ResumePlayback();
+        }
 
     XAresult mmf_playitf_pause_playback(void * context)
-    {
-        return ((CMMFBackendEngine *)(context))->PausePlayback();
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->PausePlayback();
+        }
 
     XAresult mmf_playitf_stop_playback(void * context)
-    {
-        return ((CMMFBackendEngine *)(context))->StopPlayback();
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->StopPlayback();
+        }
 
     XAresult mmf_playitf_get_play_state(void * context, XAuint32 * pState)
-    {
-        return ((CMMFBackendEngine *)(context))->GetPlayState(pState);
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->GetPlayState(pState);
+        }
 
     XAresult mmf_playitf_get_duration(void * context, XAmillisecond * pMsec)
-    {
-        return ((CMMFBackendEngine *)(context))->GetDuration(pMsec);
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->GetDuration(pMsec);
+        }
 
     XAresult mmf_playitf_get_position(void * context, XAmillisecond * pMsec)
-    {
-        return ((CMMFBackendEngine *)(context))->GetPosition(pMsec);
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->GetPosition(pMsec);
+        }
 
-    XAresult mmf_playitf_register_callback(void * context, xaPlayCallback callback)
-    {
-        return ((CMMFBackendEngine *)(context))->RegisterCallback(callback);
-    }
+    XAresult mmf_playitf_register_callback(void * context,
+            xaPlayCallback callback)
+        {
+        return ((CMMFBackendEngine *) (context))->RegisterCallback(callback);
+        }
 
-    XAresult mmf_playitf_set_callback_events_mask(void * context, XAuint32 eventflags)
-    {
-        return ((CMMFBackendEngine *)(context))->SetCallbackEventsMask(eventflags);
-    }
+    XAresult mmf_playitf_set_callback_events_mask(void * context,
+            XAuint32 eventflags)
+        {
+        return ((CMMFBackendEngine *) (context))->SetCallbackEventsMask(
+                eventflags);
+        }
 
-    XAresult mmf_playitf_set_marker_position(void * context, XAmillisecond mSec)
-    {
-        return ((CMMFBackendEngine *)(context))->SetMarkerPosition(mSec);
-    }
+    XAresult mmf_playitf_set_marker_position(void * context,
+            XAmillisecond mSec)
+        {
+        return ((CMMFBackendEngine *) (context))->SetMarkerPosition(mSec);
+        }
 
     XAresult mmf_playitf_clear_marker_position(void * context)
-    {
-        return ((CMMFBackendEngine *)(context))->ClearMarkerPosition();
+        {
+        return ((CMMFBackendEngine *) (context))->ClearMarkerPosition();
 
-    }
+        }
 
-    XAresult mmf_playitf_set_position_update_period(void * context, XAmillisecond mSec)
-    {
-        return ((CMMFBackendEngine *)(context))->SetPositionUpdatePeriod(mSec);
-    }
+    XAresult mmf_playitf_set_position_update_period(void * context,
+            XAmillisecond mSec)
+        {
+        return ((CMMFBackendEngine *) (context))->SetPositionUpdatePeriod(
+                mSec);
+        }
 
     XAresult mmf_seekitf_set_position(void * context, XAmillisecond pMsec)
-    {
-        return ((CMMFBackendEngine *)(context))->SetPosition(pMsec);
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->SetPosition(pMsec);
+        }
 
-    XAresult mmf_seekitf_set_playwindow(void * context, XAmillisecond start, XAmillisecond end)
-    {
-        return ((CMMFBackendEngine *)(context))->SetPlayWindow(start,end);
-    }
+    XAresult mmf_seekitf_set_playwindow(void * context, XAmillisecond start,
+            XAmillisecond end)
+        {
+        return ((CMMFBackendEngine *) (context))->SetPlayWindow(start, end);
+        }
 
     XAresult mmf_seekitf_set_repeats(void * context, XAboolean repeat)
-    {
-        return ((CMMFBackendEngine *)(context))->SetRepeats(repeat);
-    }
+        {
+        return ((CMMFBackendEngine *) (context))->SetRepeats(repeat);
+        }
 
-    XAresult mmf_streaminformationitf_get_streaminfo(void * context, XAuint32 streamindex,
-                                                                    XAuint32* streamtype)
-    {
-        return ((CMMFBackendEngine *)(context))->GetStreamInfo(streamindex, streamtype);
-    }
+    XAresult mmf_streaminformationitf_get_streaminfo(void * context,
+            XAuint32 streamindex, XAuint32* streamtype)
+        {
+        return ((CMMFBackendEngine *) (context))->GetStreamInfo(streamindex,
+                streamtype);
+        }
 
-    XAresult mmf_streaminformationitf_get_numstreams(void * context, XAuint32* numstreams)
-    {
-        return ((CMMFBackendEngine *)(context))->GetNumStreams(numstreams);
-    }
+    XAresult mmf_streaminformationitf_get_numstreams(void * context,
+            XAuint32* numstreams)
+        {
+        return ((CMMFBackendEngine *) (context))->GetNumStreams(numstreams);
+        }
 
-    XAresult mmf_streaminformationitf_get_videoframesize(void * context, XAuint32* height,
-                                                        XAuint32* width, XAuint32* frameRate)
-    {
-        return ((CMMFBackendEngine *)(context))->GetVideoFrameSize(height,width,frameRate);
-    }
+    XAresult mmf_streaminformationitf_get_videoframesize(void * context,
+            XAuint32* height, XAuint32* width, XAuint32* frameRate)
+        {
+        return ((CMMFBackendEngine *) (context))->GetVideoFrameSize(height,
+                width, frameRate);
+        }
 
-    XAresult mmf_streaminformationitf_set_activestream(void * context, XAuint32 streamindex,
-                                                                    XAboolean active)
-    {
-        return ((CMMFBackendEngine *)(context))->SetActiveState(streamindex, active);
-    }
-    
+    XAresult mmf_streaminformationitf_set_activestream(void * context,
+            XAuint32 streamindex, XAboolean active)
+        {
+        return ((CMMFBackendEngine *) (context))->SetActiveState(streamindex,
+                active);
+        }
+
     XAresult mmf_volumeitf_set_volume(void * context, XAuint32 volume)
-    {
-        return ((CMMFBackendEngine *)(context))->SetVolume(volume);
-    }    
+        {
+        return ((CMMFBackendEngine *) (context))->SetVolume(volume);
+        }
 
     XAresult mmf_volumeitf_get_maxvolume(void * context, XAuint32* volume)
-    {
-        return ((CMMFBackendEngine *)(context))->GetMaxVolume(volume);
-    }    
-    
+        {
+        return ((CMMFBackendEngine *) (context))->GetMaxVolume(volume);
+        }
+
     XAresult mmf_volumeitf_get_volume(void * context, XAuint32* volume)
-    {
-        return ((CMMFBackendEngine *)(context))->GetVolume(volume);
-    }     
-}
+        {
+        return ((CMMFBackendEngine *) (context))->GetVolume(volume);
+        }
+    }

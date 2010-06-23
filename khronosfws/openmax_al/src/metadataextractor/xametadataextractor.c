@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: Metadata Extractor Object Impl
+ *
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,18 +32,16 @@
 #include "xaadaptationmmf.h"
 #include "xametadataadaptctxmmf.h"
 
-
 /* Static mapping of enumeration XAMetadataInterfaces to interface iids */
-static const XAInterfaceID* xaMetadataExtractorItfIIDs[MDE_ITFCOUNT]=
-{
-    &XA_IID_OBJECT,
-    &XA_IID_DYNAMICINTERFACEMANAGEMENT,
-    &XA_IID_METADATAEXTRACTION,
-    &XA_IID_METADATATRAVERSAL,
-    &XA_IID_CONFIGEXTENSION,
-    &XA_IID_DYNAMICSOURCE
-};
-
+static const XAInterfaceID* xaMetadataExtractorItfIIDs[MDE_ITFCOUNT] =
+    {
+            &XA_IID_OBJECT,
+            &XA_IID_DYNAMICINTERFACEMANAGEMENT,
+            &XA_IID_METADATAEXTRACTION,
+            &XA_IID_METADATATRAVERSAL,
+            &XA_IID_CONFIGEXTENSION,
+            &XA_IID_DYNAMICSOURCE
+    };
 
 /*****************************************************************************
  * Global methods
@@ -54,195 +52,191 @@ static const XAInterfaceID* xaMetadataExtractorItfIIDs[MDE_ITFCOUNT]=
  * Add this method to XAGlobals.h
  */
 XAresult XAMetadataExtractorImpl_Create(FrameworkMap* mapper,
-                                        XACapabilities* capabilities,
-                                        XAObjectItf *pMetadataExtractor,
-                                        XADataSource *pDataSource,
-                                        XAuint32 numInterfaces,
-                                        const XAInterfaceID * pInterfaceIds,
-                                        const XAboolean * pInterfaceRequired)
-{
+        XACapabilities* capabilities, XAObjectItf *pMetadataExtractor,
+        XADataSource *pDataSource, XAuint32 numInterfaces,
+        const XAInterfaceID * pInterfaceIds,
+        const XAboolean * pInterfaceRequired)
+    {
     XAMetadataExtractorImpl* pImpl = NULL;
     XAObjectItfImpl* pBaseObj = NULL;
     XAuint8 itfIndex = 0;
     FWMgrFwType fwType;
-    const char *uri = NULL;    
+    const char *uri = NULL;
     XAresult res = XA_RESULT_SUCCESS;
 
     DEBUG_API("->XAMetadataExtractorImpl_Create");
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaPlayer);
 
-    if( !pMetadataExtractor )
-    {
+    if (!pMetadataExtractor)
+        {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         /* invalid parameter */
         DEBUG_API("<-XAMetadataExtractorImpl_Create");
         return XA_RESULT_PARAMETER_INVALID;
-    }
+        }
 
-    res = XACommon_CheckDataSource(pDataSource,NULL);
-    if(res!=XA_RESULT_SUCCESS)
-    {
+    res = XACommon_CheckDataSource(pDataSource, NULL);
+    if (res != XA_RESULT_SUCCESS)
+        {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
         DEBUG_API("<-XAMetadataExtractorImpl_Create");
         return res;
-    }
+        }
 
     /* instantiate object implementation */
-    pImpl = (XAMetadataExtractorImpl*)calloc(1,sizeof(XAMetadataExtractorImpl));
-    if(!pImpl)
-    {
+    pImpl = (XAMetadataExtractorImpl*) calloc(1,
+            sizeof(XAMetadataExtractorImpl));
+    if (!pImpl)
+        {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
         DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
         /* memory allocation failed */
         DEBUG_API("<-XAMetadataExtractorImpl_Create");
         return XA_RESULT_MEMORY_FAILURE;
-    }
+        }
     pBaseObj = &pImpl->baseObj;
 
     /* Initialize base object default implementation */
-    XAObjectItfImpl_Init(pBaseObj,
-                         MDE_ITFCOUNT,
-                         xaMetadataExtractorItfIIDs,
-                         XAMetadataExtractorImpl_DoRealize,
-                         XAMetadataExtractorImpl_DoResume,
-                         XAMetadataExtractorImpl_FreeResources);
+    XAObjectItfImpl_Init(pBaseObj, MDE_ITFCOUNT, xaMetadataExtractorItfIIDs,
+            XAMetadataExtractorImpl_DoRealize,
+            XAMetadataExtractorImpl_DoResume,
+            XAMetadataExtractorImpl_FreeResources);
 
     /* Mark interfaces that need to be exposed */
     /* Implicit and mandated interfaces */
-    pBaseObj->interfaceMap[MDE_METADATAEXTRACTIONITF].required = XA_BOOLEAN_TRUE;
-    pBaseObj->interfaceMap[MDE_METADATATRAVERSALITF].required = XA_BOOLEAN_TRUE;
+    pBaseObj->interfaceMap[MDE_METADATAEXTRACTIONITF].required
+            = XA_BOOLEAN_TRUE;
+    pBaseObj->interfaceMap[MDE_METADATATRAVERSALITF].required
+            = XA_BOOLEAN_TRUE;
     pBaseObj->interfaceMap[MDE_DYNAMICSOURCEITF].required = XA_BOOLEAN_TRUE;
     pBaseObj->interfaceMap[MDE_DIMITF].required = XA_BOOLEAN_TRUE;
 
     /* Explicit interfaces */
-    if ((numInterfaces != 0) && pInterfaceIds && pInterfaceRequired )
-    {
-        /* Check required interfaces */
-        for(itfIndex = 0; itfIndex < numInterfaces; itfIndex++)
+    if ((numInterfaces != 0) && pInterfaceIds && pInterfaceRequired)
         {
-            /* If mapEntry is null then required interface is not supported.*/
-            XAObjItfMapEntry *entry =
-                XAObjectItfImpl_GetItfEntry((XAObjectItf)&(pBaseObj), pInterfaceIds[itfIndex]);
-            if( !entry  )
+        /* Check required interfaces */
+        for (itfIndex = 0; itfIndex < numInterfaces; itfIndex++)
             {
-                if( pInterfaceRequired[itfIndex] )
+            /* If mapEntry is null then required interface is not supported.*/
+            XAObjItfMapEntry *entry = XAObjectItfImpl_GetItfEntry(
+                    (XAObjectItf) &(pBaseObj), pInterfaceIds[itfIndex]);
+            if (!entry)
                 {
+                if (pInterfaceRequired[itfIndex])
+                    {
                     /* required interface cannot be accommodated - fail creation */
-                    XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
+                    XAObjectItfImpl_Destroy((XAObjectItf) &(pBaseObj));
                     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
                     DEBUG_ERR("Required interface not found - abort creation!");
                     DEBUG_API("<-XAMetadataExtractorImpl_Create");
                     return XA_RESULT_FEATURE_UNSUPPORTED;
-                }
+                    }
                 else
-                {
+                    {
                     DEBUG_INFO("Requested (not required) interface not found - continue creation");
+                    }
                 }
-            }
             else
-            {
+                {
                 entry->required = XA_BOOLEAN_TRUE;
+                }
             }
         }
-    }
 
-   
     // Mark interfaces that can be handled dynamically 
-    pBaseObj->interfaceMap[MDE_CONFIGEXTENSIONITF].isDynamic = XA_BOOLEAN_TRUE;
+    pBaseObj->interfaceMap[MDE_CONFIGEXTENSIONITF].isDynamic
+            = XA_BOOLEAN_TRUE;
 
-     //Set ObjectItf to point to newly created object 
-    *pMetadataExtractor = (XAObjectItf)&(pBaseObj->self);
+    //Set ObjectItf to point to newly created object 
+    *pMetadataExtractor = (XAObjectItf) &(pBaseObj->self);
 
-	//store member variables
-	pImpl->dataSrc = pDataSource;
+    //store member variables
+    pImpl->dataSrc = pDataSource;
 
-	/* Determine framework type that can handle recording */
-    fwType = (FWMgrFwType)FWMgrMOUnknown;
+    /* Determine framework type that can handle recording */
+    fwType = (FWMgrFwType) FWMgrMOUnknown;
     /**/
     if (pDataSource->pLocator)
-    {
-        XADataLocator_URI* dataLoc = (XADataLocator_URI*)pDataSource->pLocator;
-        if (dataLoc->locatorType == XA_DATALOCATOR_URI)
         {
-            uri = (char*)dataLoc->URI;
+        XADataLocator_URI* dataLoc =
+                (XADataLocator_URI*) pDataSource->pLocator;
+        if (dataLoc->locatorType == XA_DATALOCATOR_URI)
+            {
+            uri = (char*) dataLoc->URI;
+            }
         }
-    }
-	
+
     fwType = XAFrameworkMgr_GetFramework(mapper, uri, FWMgrMOPlayer);
 
     if (fwType == FWMgrMOUnknown)
-    {
-        XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
+        {
+        XAObjectItfImpl_Destroy((XAObjectItf) &(pBaseObj));
         XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
         DEBUG_API("<-XAMetadataExtractorImpl_Create");
         return XA_RESULT_CONTENT_UNSUPPORTED;
-    }
-    
-    if(fwType == FWMgrFWMMF)
-    {    
+        }
+
+    if (fwType == FWMgrFWMMF)
+        {
         pImpl->adaptationCtxMMF = XAMetadataAdaptCtxMMF_Create(pDataSource);
-        
-        pImpl->curAdaptCtx = pImpl->adaptationCtxMMF;    
-    }
+
+        pImpl->curAdaptCtx = pImpl->adaptationCtxMMF;
+        }
     else
-    {
-		// Create metadata adaptation context 
-		pImpl->adaptationCtxGst = XAMetadataAdaptCtx_Create(pDataSource);
-       
-       	pImpl->curAdaptCtx   = pImpl->adaptationCtxGst;
-    }
+        {
+        // Create metadata adaptation context 
+        pImpl->adaptationCtxGst = XAMetadataAdaptCtx_Create(pDataSource);
+
+        pImpl->curAdaptCtx = pImpl->adaptationCtxGst;
+        }
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
     DEBUG_API("<-XAMetadataExtractorImpl_Create");
     return XA_RESULT_SUCCESS;
-}
+    }
 
 /* XAResult XAMetadataExtractorImpl_QueryNumSupportedInterfaces
  * Description: Statically query number of supported interfaces
  */
 XAresult XAMetadataExtractorImpl_QueryNumSupportedInterfaces(
-                                    XAuint32 *pNumSupportedInterfaces)
-{
+        XAuint32 *pNumSupportedInterfaces)
+    {
     XAresult res = XA_RESULT_SUCCESS;
     DEBUG_API("->XAMetadataExtractorImpl_QueryNumSupportedInterfaces");
-    if(pNumSupportedInterfaces)
-    {
+    if (pNumSupportedInterfaces)
+        {
         *pNumSupportedInterfaces = MDE_ITFCOUNT;
         res = XA_RESULT_SUCCESS;
-    }
+        }
     else
-    {
+        {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         res = XA_RESULT_PARAMETER_INVALID;
-    }
-    DEBUG_API_A1("<-XAMetadataExtractorImpl_QueryNumSupportedInterfaces (%d)", (int)res);
+        }DEBUG_API_A1("<-XAMetadataExtractorImpl_QueryNumSupportedInterfaces (%d)", (int)res);
     return res;
-}
+    }
 /* XAResult XAMetadataExtractorImpl_QuerySupportedInterfaces
  * Description: Statically query supported interfaces
  */
-XAresult XAMetadataExtractorImpl_QuerySupportedInterfaces(
-                                    XAuint32 index,
-                                    XAInterfaceID * pInterfaceId)
-{
+XAresult XAMetadataExtractorImpl_QuerySupportedInterfaces(XAuint32 index,
+        XAInterfaceID * pInterfaceId)
+    {
     XAresult res = XA_RESULT_SUCCESS;
     DEBUG_API("->XAMetadataExtractorImpl_QuerySupportedInterfaces");
 
-    if (index >= MDE_ITFCOUNT || !pInterfaceId )
-    {
+    if (index >= MDE_ITFCOUNT || !pInterfaceId)
+        {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         res = XA_RESULT_PARAMETER_INVALID;
-    }
+        }
     else
-    {
+        {
         *pInterfaceId = *(xaMetadataExtractorItfIIDs[index]);
         res = XA_RESULT_SUCCESS;
-    }
-    DEBUG_API_A1("<-XAMetadataExtractorImpl_QuerySupportedInterfaces (%d)", (int)res);
+        }DEBUG_API_A1("<-XAMetadataExtractorImpl_QuerySupportedInterfaces (%d)", (int)res);
     return res;
-}
-
+    }
 
 /*****************************************************************************
  * base object XAObjectItfImpl methods
@@ -253,11 +247,11 @@ XAresult XAMetadataExtractorImpl_QuerySupportedInterfaces(
  * Create and initialize implementation-specific variables.
  * Called from base object XAObjectItfImpl
  */
-XAresult XAMetadataExtractorImpl_DoRealize( XAObjectItf self )
-{
+XAresult XAMetadataExtractorImpl_DoRealize(XAObjectItf self)
+    {
     XAuint8 itfIdx = 0;
-    XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
-    XAMetadataExtractorImpl* pObjImpl = (XAMetadataExtractorImpl*)(pObj);
+    XAObjectItfImpl* pObj = (XAObjectItfImpl*) (*self);
+    XAMetadataExtractorImpl* pObjImpl = (XAMetadataExtractorImpl*) (pObj);
     void *pItf = NULL;
     XAresult ret = XA_RESULT_SUCCESS;
 
@@ -265,124 +259,129 @@ XAresult XAMetadataExtractorImpl_DoRealize( XAObjectItf self )
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaPlayer);
 
     /* check casting from correct pointer type */
-    if( !pObjImpl || pObj != pObjImpl->baseObj.self )
-    {
+    if (!pObjImpl || pObj != pObjImpl->baseObj.self)
+        {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         /* invalid parameter */
         DEBUG_API("<-XAMetadataExtractorImpl_DoRealize");
         return XA_RESULT_PARAMETER_INVALID;
-    }
+        }
 
     /* Realize all implicit and explicitly wanted interfaces */
-    for(itfIdx=0; itfIdx<MDE_ITFCOUNT; itfIdx++)
-    {
-        if(!(pObj->interfaceMap[itfIdx].pItf) &&
-            pObj->interfaceMap[itfIdx].required )
+    for (itfIdx = 0; itfIdx < MDE_ITFCOUNT; itfIdx++)
         {
-            switch(itfIdx)
+        if (!(pObj->interfaceMap[itfIdx].pItf)
+                && pObj->interfaceMap[itfIdx].required)
             {
+            switch (itfIdx)
+                {
                 case MDE_DIMITF:
                     pItf = XADIMItfImpl_Create();
-                    if(pItf)
-                    {
+                    if (pItf)
+                        {
                         XADIMItfImpl_Init(pItf, self,
-                                      XAMetadataExtractorImpl_DoAddItf,
-                                      XAMetadataExtractorImpl_DoResumeItf,
-                                      XAMetadataExtractorImpl_DoRemoveItf);
-                    }
+                                XAMetadataExtractorImpl_DoAddItf,
+                                XAMetadataExtractorImpl_DoResumeItf,
+                                XAMetadataExtractorImpl_DoRemoveItf);
+                        }
                     break;
 
                 case MDE_METADATAEXTRACTIONITF:
-                    pItf = XAMetadataExtractionItfImpl_Create( pObjImpl->curAdaptCtx );
+                    pItf = XAMetadataExtractionItfImpl_Create(
+                            pObjImpl->curAdaptCtx);
                     break;
                 case MDE_METADATATRAVERSALITF:
-                    pItf = XAMetadataTraversalItfImpl_Create( pObjImpl->curAdaptCtx );
+                    pItf = XAMetadataTraversalItfImpl_Create(
+                            pObjImpl->curAdaptCtx);
                     break;
                 case MDE_CONFIGEXTENSIONITF:
                     pItf = XAConfigExtensionsItfImpl_Create();
-                    XAConfigExtensionsItfImpl_SetContext( pItf, pObjImpl->curAdaptCtx );
+                    XAConfigExtensionsItfImpl_SetContext(pItf,
+                            pObjImpl->curAdaptCtx);
                     break;
                 case MDE_DYNAMICSOURCEITF:
-                    pItf = XADynamicSourceItfImpl_Create( pObjImpl->curAdaptCtx );
+                    pItf = XADynamicSourceItfImpl_Create(
+                            pObjImpl->curAdaptCtx);
                     break;
 
                 default:
                     break;
-            }
-            if(!pItf)
-            {
+                }
+            if (!pItf)
+                {
                 XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
                 DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
                 /* memory allocation failed */
                 DEBUG_API("<-XAMetadataExtractorImpl_DoRealize");
                 return XA_RESULT_MEMORY_FAILURE;
-            }
+                }
             else
-            {
+                {
                 pObj->interfaceMap[itfIdx].pItf = pItf;
+                }
             }
         }
-    }
     /*Initialize adaptation context*/
     /* init adaptation */
 
-    if(pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
-    {
-       ret = XAMetadataAdaptCtxMMF_PostInit( (XAAdaptationMMFCtx*)pObjImpl->adaptationCtxMMF );
-    }
+    if (pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+        {
+        ret = XAMetadataAdaptCtxMMF_PostInit(
+                (XAAdaptationMMFCtx*) pObjImpl->adaptationCtxMMF);
+        }
     else
-    {
-	    ret = XAMetadataAdaptCtx_PostInit( (XAAdaptationGstCtx*)pObjImpl->adaptationCtxGst );
-    }
+        {
+        ret = XAMetadataAdaptCtx_PostInit(
+                (XAAdaptationGstCtx*) pObjImpl->adaptationCtxGst);
+        }
 
-    if ( ret != XA_RESULT_SUCCESS )
-    {
+    if (ret != XA_RESULT_SUCCESS)
+        {
         XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
         DEBUG_ERR("Adaptation init failed!");
         DEBUG_API("<-XAMetadataExtractorImpl_DoRealize");
         return ret;
-    }
+        }
     pObj->state = XA_OBJECT_STATE_REALIZED;
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
     DEBUG_API("<-XAMetadataExtractorImpl_DoRealize");
     return XA_RESULT_SUCCESS;
-}
+    }
 
 /* XAresult XAMetadataExtractorImpl_DoResume
  * Description: Resume object from suspended state
  */
 XAresult XAMetadataExtractorImpl_DoResume(XAObjectItf self)
-{
+    {
     DEBUG_API("->XAMetadataExtractorImpl_DoResume");
     DEBUG_API("<-XAMetadataExtractorImpl_DoResume");
     /* "suspended" state not supported by this implementation */
     return XA_RESULT_PRECONDITIONS_VIOLATED;
-}
+    }
 
 /* void XAMetadataExtractorImpl_FreeResources
  * Description: Free all resources reserved at XAMetadataExtractorImpl_DoRealize()
  */
 void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
-{
-    XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
-    
+    {
+    XAObjectItfImpl* pObj = (XAObjectItfImpl*) (*self);
+
     XAuint8 itfIdx = 0;
     void *pItf = NULL;
-    XAMetadataExtractorImpl* pImpl = (XAMetadataExtractorImpl*)(*self);
+    XAMetadataExtractorImpl* pImpl = (XAMetadataExtractorImpl*) (*self);
     DEBUG_API("->XAMetadataExtractorImpl_FreeResources");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS(XATSMediaPlayer);
 
-    
     assert( pObj && pImpl && pObj == pObj->self );
 
-    for(itfIdx = 0; itfIdx < MDE_ITFCOUNT; itfIdx++)
-    {
-        pItf = pObj->interfaceMap[itfIdx].pItf;
-        if(pItf)
+    for (itfIdx = 0; itfIdx < MDE_ITFCOUNT; itfIdx++)
         {
-            switch(itfIdx)
+        pItf = pObj->interfaceMap[itfIdx].pItf;
+        if (pItf)
             {
+            switch (itfIdx)
+                {
                 case MDE_METADATAEXTRACTIONITF:
                     XAMetadataExtractionItfImpl_Free(pItf);
                     break;
@@ -398,31 +397,33 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
                 case MDE_CONFIGEXTENSIONITF:
                     XAConfigExtensionsItfImpl_Free(pItf);
                     break;
-            }
+                }
             pObj->interfaceMap[itfIdx].pItf = NULL;
+            }
         }
-    }
-	
-	if(pImpl->curAdaptCtx)
-	{
-		if(pImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
-		{
-			XAMetadataAdaptCtxMMF_Destroy( (XAAdaptationMMFCtx*)pImpl->adaptationCtxMMF );
-			pImpl->adaptationCtxMMF = NULL;
-		}
-		else
-		{
-			XAMetadataAdaptCtx_Destroy( (XAAdaptationGstCtx*)pImpl->adaptationCtxGst );
-			pImpl->adaptationCtxGst = NULL;
-		}
-	}
-	
-	pImpl->curAdaptCtx = NULL;
+
+    if (pImpl->curAdaptCtx)
+        {
+        if (pImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
+            {
+            XAMetadataAdaptCtxMMF_Destroy(
+                    (XAAdaptationMMFCtx*) pImpl->adaptationCtxMMF);
+            pImpl->adaptationCtxMMF = NULL;
+            }
+        else
+            {
+            XAMetadataAdaptCtx_Destroy(
+                    (XAAdaptationGstCtx*) pImpl->adaptationCtxGst);
+            pImpl->adaptationCtxGst = NULL;
+            }
+        }
+
+    pImpl->curAdaptCtx = NULL;
 
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS(XATSMediaPlayer);
     DEBUG_API("<-XAMetadataExtractorImpl_FreeResources");
     return;
-}
+    }
 
 /*****************************************************************************
  * MetadataExtractorImpl -specific methods
@@ -431,85 +432,91 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
 /* XAMetadataExtractorImpl_DoAddItf
  * Dynamically add an interface, object specific parts
  */
-XAresult XAMetadataExtractorImpl_DoAddItf(XAObjectItf self, XAObjItfMapEntry *mapEntry  )
-{
+XAresult XAMetadataExtractorImpl_DoAddItf(XAObjectItf self,
+        XAObjItfMapEntry *mapEntry)
+    {
 
-    XAObjectItfImpl* pObj = (XAObjectItfImpl*)(*self);
-    XAMetadataExtractorImpl* pImpl = (XAMetadataExtractorImpl*)(pObj);
+    XAObjectItfImpl* pObj = (XAObjectItfImpl*) (*self);
+    XAMetadataExtractorImpl* pImpl = (XAMetadataExtractorImpl*) (pObj);
 
     XAresult ret = XA_RESULT_SUCCESS;
     DEBUG_API("->XAMetadataExtractorImpl_DoAddItf");
 
-    if(mapEntry)
-    {
-        switch( mapEntry->mapIdx )
+    if (mapEntry)
         {
+        switch (mapEntry->mapIdx)
+            {
             case MDE_CONFIGEXTENSIONITF:
                 mapEntry->pItf = XAConfigExtensionsItfImpl_Create();
 
-                XAConfigExtensionsItfImpl_SetContext( mapEntry->pItf, pImpl->adaptationCtxGst);
+                XAConfigExtensionsItfImpl_SetContext(mapEntry->pItf,
+                        pImpl->adaptationCtxGst);
 
                 break;
             default:
-                DEBUG_ERR("XAMetadataExtractorImpl_DoAddItf unknown id");
+                DEBUG_ERR("XAMetadataExtractorImpl_DoAddItf unknown id")
+                ;
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
                 break;
-        }
-        if( !mapEntry->pItf && ret == XA_RESULT_SUCCESS)
-        {
+            }
+        if (!mapEntry->pItf && ret == XA_RESULT_SUCCESS)
+            {
             DEBUG_ERR("XAMetadataExtractorImpl_DoAddItf itf creation failed");
             ret = XA_RESULT_MEMORY_FAILURE;
+            }
         }
-    }
     else
-    {
+        {
         ret = XA_RESULT_PARAMETER_INVALID;
-    }
+        }
 
     DEBUG_API("<-XAMetadataExtractorImpl_DoAddItf");
     return ret;
-}
+    }
 
 /* XAMetadataExtractorImpl_DoResumeItf
  * Try to resume lost interface, object specific parts
  */
-XAresult XAMetadataExtractorImpl_DoResumeItf(XAObjectItf self, XAObjItfMapEntry *mapEntry  )
-{
+XAresult XAMetadataExtractorImpl_DoResumeItf(XAObjectItf self,
+        XAObjItfMapEntry *mapEntry)
+    {
     XAresult ret = XA_RESULT_SUCCESS;
     DEBUG_API("->XAMetadataExtractorImpl_DoResumeItf");
     /* For now, no difference between suspended and unrealised itfs */
-    ret = XAMetadataExtractorImpl_DoAddItf(self,mapEntry);
+    ret = XAMetadataExtractorImpl_DoAddItf(self, mapEntry);
     DEBUG_API("<-XAMetadataExtractorImpl_DoResumeItf");
     return ret;
-}
+    }
 
 /* XAMetadataExtractorImpl_DoRemoveItf
  * Dynamically remove an interface, object specific parts
  */
-XAresult XAMetadataExtractorImpl_DoRemoveItf(XAObjectItf self, XAObjItfMapEntry *mapEntry )
-{
+XAresult XAMetadataExtractorImpl_DoRemoveItf(XAObjectItf self,
+        XAObjItfMapEntry *mapEntry)
+    {
     XAresult ret = XA_RESULT_SUCCESS;
     DEBUG_API("->XAMetadataExtractorImpl_DoRemoveItf");
     ret = XA_RESULT_SUCCESS;
-    if(mapEntry)
-    {
-        switch( mapEntry->mapIdx )
+    if (mapEntry)
         {
+        switch (mapEntry->mapIdx)
+            {
             case MDE_CONFIGEXTENSIONITF:
                 XAConfigExtensionsItfImpl_Free(mapEntry->pItf);
                 break;
             default:
-                DEBUG_ERR("XAMetadataExtractorImpl_DoRemoveItf unknown id");
+                DEBUG_ERR("XAMetadataExtractorImpl_DoRemoveItf unknown id")
+                ;
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
                 break;
-        }
+            }
         mapEntry->pItf = NULL;
-    }
+        }
     else
-    {
+        {
         ret = XA_RESULT_PARAMETER_INVALID;
-    }
+        }
     DEBUG_API("<-XAMetadataExtractorImpl_DoRemoveItf");
     return ret;
-}
+    }
 /* END OF FILE */

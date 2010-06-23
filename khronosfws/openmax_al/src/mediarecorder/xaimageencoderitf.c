@@ -74,7 +74,9 @@ XAresult XAImageEncoderItfImpl_SetImageSettings(XAImageEncoderItf self,
         res = XACapabilitiesMgr_GetCapsById(NULL, (XACapsType)(XACAP_ENCODER|XACAP_IMAGE), pSettings->encoderId, &temp);
         if( res == XA_RESULT_SUCCESS )
             {
+#ifdef OMAX_CAMERABIN
             res = XAImageEncoderItfAdapt_SetImageSettings((XAAdaptationGstCtx*)impl->adaptCtx, pSettings);
+#endif
             }
         else
             {
@@ -108,7 +110,9 @@ XAresult XAImageEncoderItfImpl_GetImageSettings(XAImageEncoderItf self,
     }
     if(impl->adaptCtx->fwtype == FWMgrFWGST)
         {
+#ifdef OMAX_CAMERABIN
         res = XAImageEncoderItfAdapt_GetImageSettings((XAAdaptationGstCtx*)impl->adaptCtx, pSettings);
+#endif
         }
     else
         {
@@ -144,7 +148,9 @@ XAresult XAImageEncoderItfImpl_GetSizeEstimate(XAImageEncoderItf self,
 
     if(impl->adaptCtx->fwtype == FWMgrFWGST)
         {
+#ifdef OMAX_CAMERABIN
         XAImageEncoderItfAdapt_GetImageSettings((XAAdaptationGstCtx*)impl->adaptCtx, &curSettings);
+#endif
         }
     else
         {

@@ -1,38 +1,38 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: Handles marker timer implementation 
-*
-*/
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: Handles marker timer implementation 
+ *
+ */
 
 #include "markerpositiontimer.h"
 #include <mdaaudiosampleplayer.h>
 #include <videoplayer2.h>
 #include <e32math.h>
 
-extern "C" {
+extern "C"
+    {
 #include "xarecorditfadaptationmmf.h"
-}
+    }
 
 #define RET_ERR_IF_ERR(s) if (s!=KErrNone) return s;
 #define RET_IF_ERR(s) if (s!=KErrNone) return;
 
 CMarkerPositionTimer::CMarkerPositionTimer(
         CMdaAudioPlayerUtility* aAudioPlayer,
-        CVideoPlayerUtility2* aVideoPlayer)
-:CActive(CActive::EPriorityStandard),
- iAudioPlayer(aAudioPlayer),
- iVideoPlayer(aVideoPlayer)
+        CVideoPlayerUtility2* aVideoPlayer) :
+    CActive(CActive::EPriorityStandard), iAudioPlayer(aAudioPlayer),
+            iVideoPlayer(aVideoPlayer)
     {
     CActiveScheduler::Add(this);
     }
@@ -47,7 +47,8 @@ CMarkerPositionTimer* CMarkerPositionTimer::NewL(
         CMdaAudioPlayerUtility* aAudioPlayer,
         CVideoPlayerUtility2* aVideoPlayer)
     {
-    CMarkerPositionTimer* self = new (ELeave)CMarkerPositionTimer(aAudioPlayer, aVideoPlayer);
+    CMarkerPositionTimer* self = new (ELeave) CMarkerPositionTimer(
+            aAudioPlayer, aVideoPlayer);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -56,12 +57,12 @@ CMarkerPositionTimer* CMarkerPositionTimer::NewL(
 
 void CMarkerPositionTimer::ConstructL()
     {
-    User::LeaveIfError(iTimer.CreateLocal());    
+    User::LeaveIfError(iTimer.CreateLocal());
     }
 
 void CMarkerPositionTimer::SetContext(TAny* aCtx)
     {
-    iCtx = aCtx;    
+    iCtx = aCtx;
     }
 
 void CMarkerPositionTimer::SetMarkerPosition(XAmillisecond aMarkerPos)
@@ -81,11 +82,11 @@ void CMarkerPositionTimer::RegisterCallback(xaPlayCallback aCallback)
 
 void CMarkerPositionTimer::UseAudioPlayer()
     {
-    iPlayerToUse = static_cast<CBase*>(iAudioPlayer);
+    iPlayerToUse = static_cast<CBase*> (iAudioPlayer);
     }
 void CMarkerPositionTimer::UseVideoPlayer()
     {
-    iPlayerToUse = static_cast<CBase*>(iVideoPlayer);
+    iPlayerToUse = static_cast<CBase*> (iVideoPlayer);
     }
 
 void CMarkerPositionTimer::ResetPlayer()
@@ -100,10 +101,8 @@ TInt CMarkerPositionTimer::Start()
         {
         Cancel();
         }
-    if ((iMarkerPosition != XA_TIME_UNKNOWN) &&
-        (iCallbackEventMask & XA_PLAYEVENT_HEADATMARKER) &&
-        iCallback &&
-        iPlayerToUse)
+    if ((iMarkerPosition != XA_TIME_UNKNOWN) && (iCallbackEventMask
+            & XA_PLAYEVENT_HEADATMARKER) && iCallback && iPlayerToUse)
         {
         TTimeIntervalMicroSeconds32 delay;
         /* Convert milli to micro */
@@ -132,7 +131,7 @@ TInt CMarkerPositionTimer::Start()
                 iSyncToPlayHeadStartPos.Int64(),
                 delay.Int());
 #endif /* MARKERPOSITIONTIMERLOG */
-        if ( delay >= TTimeIntervalMicroSeconds32(0))
+        if (delay >= TTimeIntervalMicroSeconds32(0))
             {
             iStatus = KRequestPending;
             iTimer.After(iStatus, delay);
@@ -151,12 +150,9 @@ void CMarkerPositionTimer::RunL()
     {
     TInt retVal(KErrNone);
     /* Make sure some of the attributes are not unset */
-    if ((iStatus == KErrNone) &&
-            iCtx &&
-            (iMarkerPosition != XA_TIME_UNKNOWN) &&
-            (iCallbackEventMask & XA_PLAYEVENT_HEADATMARKER) &&
-            iCallback &&
-            iPlayerToUse)
+    if ((iStatus == KErrNone) && iCtx && (iMarkerPosition != XA_TIME_UNKNOWN)
+            && (iCallbackEventMask & XA_PLAYEVENT_HEADATMARKER) && iCallback
+            && iPlayerToUse)
         {
         TTimeIntervalMicroSeconds curPlayPos;
         if (iSyncToPlayHead)
@@ -168,9 +164,9 @@ void CMarkerPositionTimer::RunL()
             if (curPlayPos == iSyncToPlayHeadStartPos)
                 {
 #ifdef MARKERPOSITIONTIMERLOG
-            RDebug::Print(_L("CMarkerPositionTimer::RunL:CurPlayPos[%u]SyncPlayHead[%u]microSec. Restart"),
-                    iSyncToPlayHeadStartPos.Int64(),
-                    curPlayPos.Int64());
+                RDebug::Print(_L("CMarkerPositionTimer::RunL:CurPlayPos[%u]SyncPlayHead[%u]microSec. Restart"),
+                        iSyncToPlayHeadStartPos.Int64(),
+                        curPlayPos.Int64());
 #endif /* MARKERPOSITIONTIMERLOG */
                 Start();
                 return;
@@ -195,7 +191,7 @@ void CMarkerPositionTimer::RunL()
                     curPlayPos.Int64(),
                     delay.Int());
 #endif /* MARKERPOSITIONTIMERLOG */
-            if ( delay >= TTimeIntervalMicroSeconds32(0))
+            if (delay >= TTimeIntervalMicroSeconds32(0))
                 {
                 iStatus = KRequestPending;
                 iTimer.After(iStatus, delay);
@@ -208,8 +204,12 @@ void CMarkerPositionTimer::RunL()
         retVal = GetCurrentPlayPosition(curPlayPos);
         RDebug::Print(_L("CMarkerPositionTimer::RunL:CurPlayPos[%u]microSec. Posting XA_PLAYEVENT_HEADATMARKER."), curPlayPos.Int64());
 #endif /* MARKERPOSITIONTIMERLOG */
-        XAAdaptEvent xaevent = {XA_PLAYITFEVENTS, XA_PLAYEVENT_HEADATMARKER, 0, 0 };
-        XAAdaptationBase_SendAdaptEvents((XAAdaptationBaseCtx*)iCtx, &xaevent );
+        XAAdaptEvent xaevent =
+            {
+            XA_PLAYITFEVENTS, XA_PLAYEVENT_HEADATMARKER, 0, 0
+            };
+        XAAdaptationBase_SendAdaptEvents((XAAdaptationBaseCtx*) iCtx,
+                &xaevent);
         }
     }
 
@@ -223,7 +223,8 @@ TInt CMarkerPositionTimer::RunError(TInt /*aError*/)
     return KErrNone;
     }
 
-TInt CMarkerPositionTimer::GetCurrentPlayPosition(TTimeIntervalMicroSeconds& aPos)
+TInt CMarkerPositionTimer::GetCurrentPlayPosition(
+        TTimeIntervalMicroSeconds& aPos)
     {
     TTimeIntervalMicroSeconds pos;
     TInt err(KErrNone);

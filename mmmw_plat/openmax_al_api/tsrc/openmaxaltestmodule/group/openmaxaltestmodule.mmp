@@ -79,6 +79,9 @@ SOURCE 		openmaxalseekitftests.cpp
 SOURCEPATH      ../src/metadata
 SOURCE		openmaxalmetadataextractionitftests.cpp
 
+SOURCEPATH      ../src/radio
+SOURCE 		openmaxalradioitftests.cpp
+
 LIBRARY         euser.lib
 LIBRARY			libglib.lib
 LIBRARY         stiftestinterface.lib

@@ -27,7 +27,7 @@
 namespace TMS {
 
 // FORWARD DECLARATIONS
-class TMSBuffer; //TMSDataBuffer
+class TMSBuffer;
 class TMSGlobalContext;
 
 /**
@@ -73,24 +73,28 @@ public:
      */
     TRequestStatus* Status();
 
+    /*
+     * Add and remove observer to buffer events
+     */
     gint AddObserver(MQueueHandlerObserver& obsvr, gint aClientId);
     gint RemoveObserver(MQueueHandlerObserver& obsvr);
 
 private:
 
     /**
-     * constructor
+     * Constructors
      */
     TMSQueueHandler(RMsgQueue<TmsMsgBuf>* aMsgQueue,
             TMSGlobalContext* glblCtx);
 
     void ConstructL();
 
-    // from CActive
+    // From CActive
     void DoCancel();
     void RunL();
     TInt RunError(TInt aError);
 
+    // For buffer processing upon handler events
     void DoFillBuffer(gint aBufLen, gint aStatus, gboolean flag, guint32 key);
     void DoEmptyBuffer(gint aBufLen, gint aStatus, gboolean flag, guint32 key);
     gint FindStreamInList();
@@ -99,7 +103,6 @@ private:
     TMSStreamState ConvertToStreamState(gint request);
 
 private:
-    // data
 
     RPointerArray<MQueueHandlerObserver> iObserversList; // (not owned)
     MQueueHandlerObserver* iObserver; //not owned
@@ -109,7 +112,7 @@ private:
     RChunk iChunk;
     TPtr8 iChunkDataPtr;
     TMSBuffer* iBuffer;
-    TMSGlobalContext *iTMSGlobalContext;
+    TMSGlobalContext* iTMSGlobalContext;
     };
 
 } //namespace TMS
