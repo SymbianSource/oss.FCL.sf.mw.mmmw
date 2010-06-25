@@ -171,7 +171,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetVolume(const RMessage2& aMessage);
+    void GetVolumeL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -195,7 +195,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetGain(const RMessage2& aMessage);
+    void GetGainL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -219,7 +219,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetAudioDevice(const RMessage2& aMessage);
+    void GetAudioDeviceL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -260,7 +260,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetIlbcCodecMode(const RMessage2& aMessage);
+    void GetIlbcCodecModeL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -276,7 +276,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetG711CodecMode(const RMessage2& aMessage);
+    void GetG711CodecModeL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -284,7 +284,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetSupportedBitratesCount(const RMessage2& aMessage);
+    void GetSupportedBitratesCountL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -308,7 +308,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetBitrate(const RMessage2& aMessage);
+    void GetBitrateL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -316,7 +316,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void FrameModeRqrdForEC(const RMessage2& aMessage);
+    void FrameModeRqrdForEcL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -332,7 +332,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetFrameMode(const RMessage2& aMessage);
+    void GetFrameModeL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -356,7 +356,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetVad(const RMessage2& aMessage);
+    void GetVadL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -372,7 +372,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetCng(const RMessage2& aMessage);
+    void GetCngL(const RMessage2& aMessage);
 
     /**
      * ?description
@@ -388,7 +388,7 @@ public:
      * @param RMessage2&
      * @return void
      */
-    void GetPlc(const RMessage2& aMessage);
+    void GetPlcL(const RMessage2& aMessage);
 
     /**
      * ?description

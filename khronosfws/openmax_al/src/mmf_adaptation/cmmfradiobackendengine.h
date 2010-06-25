@@ -57,7 +57,7 @@ public:
 		TInt ForceMonoReception(XAuint32 aForcedMono);
 		void PlayRadio();		
 		void StopRadio();		
-    XAresult SetRadioAdaptContext(void * adaptcontext);  	
+        XAresult SetRadioAdaptContext(void * adaptcontext);  	
 		XAresult SetPlayerAdaptContext(void * adaptcontext);    					
 						
     /**
@@ -223,17 +223,18 @@ public:
     void MrpeoPresetChanged( TPresetChangeEvent aChange, TInt aIndex ); 
        
 private:
-		static CMMFRadioBackendEngine* s_instance;
+    static CMMFRadioBackendEngine* s_instance;
     CMMFRadioBackendEngine();
     void ConstructL();
+	XAresult TranslateError(TInt error);    
 
 private:      
-    CRadioUtility* 					iRadioUtility; 
-    CRadioFmTunerUtility* 	iFmTunerUtility;
-    CRadioPlayerUtility* 		iPlayerUtility;
-    TBool										iAutoFlag;
-    void* 									iRadioAdaptContext;
-    void* 									iPlayerAdaptContext;    
+    CRadioUtility* 				iRadioUtility; 
+    CRadioFmTunerUtility* 	    iFmTunerUtility;
+    CRadioPlayerUtility* 		iRadioPlayerUtility;
+    TBool						iForceStereo;
+    void* 						iRadioAdaptContext;
+    void* 						iPlayerAdaptContext;    
        
     };
     

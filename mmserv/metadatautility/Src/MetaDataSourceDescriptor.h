@@ -100,12 +100,10 @@ class CMetaDataSourceDescriptor : public CMetaDataSource
 		*/
 		TInt Size( TInt& aSize ) const;
 
-		const TDesC8& GetDescriptor() const;
-
 	private:
 
         /**
-                * C++ default constructor.
+        * C++ default constructor.
         */
 		CMetaDataSourceDescriptor();
 

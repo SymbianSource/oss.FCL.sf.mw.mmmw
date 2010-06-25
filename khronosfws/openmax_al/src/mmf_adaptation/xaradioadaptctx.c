@@ -38,6 +38,7 @@ XAAdaptationBaseCtx* XARadioAdapt_Create()
         	DEBUG_ERR("Failed to init base context!!!");
          	free(pSelf);
         	pSelf = NULL;
+        	return (XAAdaptationBaseCtx*)pSelf;
       	}
      		else
        	{

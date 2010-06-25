@@ -91,7 +91,8 @@ typedef struct XAMediaPlayerAdaptationMMFCtx_
     XAuint32 curMirror;
 
     XAint32 buffering;
-
+    XAuint32 rateprops;
+    XAint16 playrate;
     /* internals */
     XAboolean trackpositionenabled;
 

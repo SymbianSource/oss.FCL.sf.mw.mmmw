@@ -21,6 +21,7 @@
 #include "xaplaybackrateitf.h"
 
 #include "xaplaybackrateitfadaptation.h"
+#include "xaplaybackrateitfadaptationmmf.h"
 
 #include "xathreadsafety.h"
 
@@ -60,6 +61,10 @@ XAresult XAPlaybackRateItfImpl_SetRate(XAPlaybackRateItf self, XApermille rate)
         {
         res = XAPlaybackRateItfAdapt_SetRate((XAAdaptationGstCtx*)impl->adaptCtx, rate);
         }
+    else if(impl->adaptCtx->fwtype == FWMgrFWMMF)
+        {
+        res = XAPlaybackRateItfAdaptMMF_SetRate((XAAdaptationMMFCtx*)impl->adaptCtx, rate);
+        }
     else
         {
         DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
@@ -89,6 +94,10 @@ XAresult XAPlaybackRateItfImpl_GetRate(XAPlaybackRateItf self, XApermille *pRate
         return XA_RESULT_PARAMETER_INVALID;
     }
     if(impl->adaptCtx->fwtype == FWMgrFWGST)
+        {
+        *pRate = impl->currentRate;
+        }
+    else if(impl->adaptCtx->fwtype == FWMgrFWMMF)
         {
         *pRate = impl->currentRate;
         }
@@ -123,6 +132,11 @@ XAresult XAPlaybackRateItfImpl_SetPropertyConstraints(XAPlaybackRateItf self,
         /* set to adaptation */
         res = XAPlaybackRateItfAdapt_SetPropertyConstraints((XAAdaptationGstCtx*)impl->adaptCtx, constraints);
         }
+    else if(impl->adaptCtx->fwtype == FWMgrFWMMF)
+        {
+        /* set to adaptation */
+        res = XAPlaybackRateItfAdaptMMF_SetPropertyConstraints((XAAdaptationMMFCtx*)impl->adaptCtx, constraints);
+        }
     else
         {
         DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
@@ -152,6 +166,11 @@ XAresult XAPlaybackRateItfImpl_GetProperties(XAPlaybackRateItf self,
         {
         /* needs to be queried from adaptation */
         res = XAPlaybackRateItfAdapt_GetProperties((XAAdaptationGstCtx*)impl->adaptCtx, pProperties);
+        }
+    else if(impl->adaptCtx->fwtype == FWMgrFWMMF)
+        {
+        /* needs to be queried from adaptation */
+        res = XAPlaybackRateItfAdaptMMF_GetProperties((XAAdaptationMMFCtx*)impl->adaptCtx, pProperties);
         }
     else
         {
@@ -185,6 +204,11 @@ XAresult XAPlaybackRateItfImpl_GetCapabilitiesOfRate(XAPlaybackRateItf self,
         {
         /* needs to be queried from adaptation */
         res = XAPlaybackRateItfAdapt_GetCapabilitiesOfRate((XAAdaptationGstCtx*)impl->adaptCtx, rate, pCapabilities);
+        }
+    else if(impl->adaptCtx->fwtype == FWMgrFWMMF)
+        {
+        /* needs to be queried from adaptation */
+        res = XAPlaybackRateItfAdaptMMF_GetCapabilitiesOfRate((XAAdaptationMMFCtx*)impl->adaptCtx, rate, pCapabilities);
         }
     else
         {
@@ -220,6 +244,12 @@ XAresult XAPlaybackRateItfImpl_GetRateRange(XAPlaybackRateItf self,
         {
         /* needs to be queried from adaptation */
         res = XAPlaybackRateItfAdapt_GetRateRange((XAAdaptationGstCtx*)impl->adaptCtx, index, pMinRate,
+                                                  pMaxRate,pStepSize, pCapabilities);
+        }
+    else if(impl->adaptCtx->fwtype == FWMgrFWMMF)
+        {
+        /* needs to be queried from adaptation */
+        res = XAPlaybackRateItfAdaptMMF_GetRateRange((XAAdaptationMMFCtx*)impl->adaptCtx, index, pMinRate,
                                                   pMaxRate,pStepSize, pCapabilities);
         }
     else

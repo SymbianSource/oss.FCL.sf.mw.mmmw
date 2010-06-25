@@ -31,7 +31,10 @@ CMMFRadioBackendEngine* CMMFRadioBackendEngine::Instance()
 	if (!s_instance)
 	{	
 		s_instance = new CMMFRadioBackendEngine();
-		s_instance->ConstructL();
+		if (s_instance)
+		{
+			s_instance->ConstructL();
+		}
 	}
 	return s_instance;
 }
@@ -43,10 +46,10 @@ void CMMFRadioBackendEngine::DeleteInstance()
   	iFmTunerUtility->Close();
   	iFmTunerUtility = NULL;
   }	
-  if (iPlayerUtility)
+  if (iRadioPlayerUtility)
   {
-  	iPlayerUtility->Close();
-  	iPlayerUtility = NULL;
+  	iRadioPlayerUtility->Close();
+  	iRadioPlayerUtility = NULL;
   }
   
   if (iRadioUtility)
@@ -67,15 +70,21 @@ CMMFRadioBackendEngine::CMMFRadioBackendEngine()
 }
 
 void CMMFRadioBackendEngine::ConstructL()
-{
-	iAutoFlag = ETrue;
-		
+{		
  	iRadioUtility = CRadioUtility::NewL( ETrue );
- 	iFmTunerUtility = &iRadioUtility->RadioFmTunerUtilityL( *this );
- 	iFmTunerUtility->EnableTunerInOfflineMode( ETrue );
- 	iFmTunerUtility->RequestTunerControl();   
-    
- 	iPlayerUtility = &iRadioUtility->RadioPlayerUtilityL( *this );    
+ 	if (iRadioUtility)
+ 	{		
+ 		iFmTunerUtility = &iRadioUtility->RadioFmTunerUtilityL( *this );
+ 	}
+ 	if (iFmTunerUtility)
+ 	{
+ 		iFmTunerUtility->EnableTunerInOfflineMode( ETrue );
+ 		iFmTunerUtility->RequestTunerControl();  
+ 	} 
+  if (iRadioUtility)
+  {  
+ 		iRadioPlayerUtility = &iRadioUtility->RadioPlayerUtilityL( *this ); 
+ 	}   
  	 
 }
 void CMMFRadioBackendEngine::StationSeek(XAboolean aUpwards)
@@ -175,9 +184,9 @@ TInt CMMFRadioBackendEngine::GetMaxVolume(TInt& aMaxVol)
 {
 	TInt ret = KErrNotFound;
 
-	if (iPlayerUtility)
+	if (iRadioPlayerUtility)
 	{
-		ret = iPlayerUtility->GetMaxVolume(aMaxVol);
+		ret = iRadioPlayerUtility->GetMaxVolume(aMaxVol);
 	}		 
   return ret;
 }
@@ -186,9 +195,9 @@ TInt CMMFRadioBackendEngine::SetVolume(TInt aVol)
 {
 	TInt ret = KErrNotFound; 
 
-	if (iPlayerUtility)
+	if (iRadioPlayerUtility)
 	{
-		ret = iPlayerUtility->SetVolume(aVol);
+		ret = iRadioPlayerUtility->SetVolume(aVol);
 	}		 
   return ret;
 }
@@ -197,9 +206,9 @@ TInt CMMFRadioBackendEngine::SetMute(XAboolean aMute)
 {
 	TInt ret = KErrNotFound;
 
-	if (iPlayerUtility)
+	if (iRadioPlayerUtility)
 	{
-		ret = iPlayerUtility->Mute(aMute);
+		ret = iRadioPlayerUtility->Mute(aMute);
 	}		
   return ret;
 }
@@ -208,9 +217,9 @@ TInt CMMFRadioBackendEngine::GetVolume(TInt& aVol)
 {
 	TInt ret = KErrNotFound;
 
-	if (iPlayerUtility)
+	if (iRadioPlayerUtility)
 	{
-		ret = iPlayerUtility->GetVolume(aVol);
+		ret = iRadioPlayerUtility->GetVolume(aVol);
 	}		
   return ret;
 }
@@ -218,13 +227,11 @@ TInt CMMFRadioBackendEngine::GetVolume(TInt& aVol)
 TInt CMMFRadioBackendEngine::GetForcedMonoReception(XAuint32& aForcedMono) 
 {
 	TInt ret = KErrNotFound;
-	TBool forceMono = EFalse;
+	TBool forceMono;
 
 	if (iFmTunerUtility)
 	{
 		ret = iFmTunerUtility->GetForcedMonoReception(forceMono);
-		if (ret != KErrNone)
-			return ret;			
 	}		 
 		
 //  RDebug::Print(_L("CMMFRadioBackendEngine::GetForcedMonoReception RET: %d, aForcedMono = %d"), ret, aForcedMono);	 		
@@ -234,50 +241,69 @@ TInt CMMFRadioBackendEngine::GetForcedMonoReception(XAuint32& aForcedMono)
 	}
 	else
 	{
-		if (iAutoFlag)			
-			aForcedMono = XA_STEREOMODE_AUTO;
+		if (iForceStereo)			
+			aForcedMono = XA_STEREOMODE_STEREO;		
 		else	
-			aForcedMono = XA_STEREOMODE_STEREO;				
+			aForcedMono = XA_STEREOMODE_AUTO;					
 	}
   return ret;
 }
 
 void CMMFRadioBackendEngine::PlayRadio()
 {
-	if (iPlayerUtility)
+	if (iRadioPlayerUtility)
 	{
-		iPlayerUtility->Play();
+		iRadioPlayerUtility->Play();
 	}		
 }
 
 void CMMFRadioBackendEngine::StopRadio()
 {
-	if (iPlayerUtility)
+	if (iRadioPlayerUtility)
 	{
-		iPlayerUtility->Stop();
+		iRadioPlayerUtility->Stop();
 	}		
 }
 
 TInt CMMFRadioBackendEngine::ForceMonoReception(XAuint32 aForcedMono)
 {
 	TInt ret = KErrNotFound;
-
+	TBool currentMode;
+	
+	ret = GetForcedMonoReception((XAuint32&)currentMode);
+	if (ret != XA_RESULT_SUCCESS)
+		return ret;
+		
 	if (iFmTunerUtility)
 	{
 		if (aForcedMono == XA_STEREOMODE_MONO)
 		{
-			iAutoFlag = EFalse;
+			iForceStereo = EFalse;
 			ret = iFmTunerUtility->ForceMonoReception(ETrue);
 		}
 		else if (aForcedMono == XA_STEREOMODE_STEREO)
 		{
-			iAutoFlag = EFalse;
-			ret = iFmTunerUtility->ForceMonoReception(EFalse);
+			iForceStereo = ETrue;						
+			if (currentMode == XA_STEREOMODE_AUTO) // Transition from Auto to Stereo doesn't require Utility call:
+			{
+				MrftoForcedMonoChange(ETrue);
+			}	
+			else
+			{	
+				ret = iFmTunerUtility->ForceMonoReception(EFalse);
+			}
 		}	
 		else // (aForcedMono == XA_STEREOMODE_AUTO)
 		{
-			iAutoFlag = ETrue;
-			ret = iFmTunerUtility->ForceMonoReception(EFalse);
+			iForceStereo = EFalse;
+			if (currentMode == XA_STEREOMODE_STEREO) // Transition from Stereo to Auto doesn't require Utility call:	
+			{
+				MrftoForcedMonoChange(EFalse);
+			}	
+			else
+			{										
+				ret = iFmTunerUtility->ForceMonoReception(EFalse);
+			}
 		}							
 	}	
   DEBUG_API_A1("CMMFRadioBackendEngine::ForceMonoReception RET: %d", ret);	
@@ -297,6 +323,70 @@ XAresult CMMFRadioBackendEngine::SetPlayerAdaptContext(void * adaptcontext)
 	return XA_RESULT_SUCCESS;
 } 
 
+XAresult TranslateError(TInt error)
+    {
+    XAresult status(XA_RESULT_SUCCESS);
+    switch(error)
+        {
+        case KErrNone:
+            status = XA_RESULT_SUCCESS;
+            break;
+        // to do: investigate and add other possible errors:
+            
+       /* case XA_RESULT_PRECONDITIONS_VIOLATED:
+ 
+            break;
+        case XA_RESULT_PARAMETER_INVALID:
+
+            break;
+        case XA_RESULT_MEMORY_FAILURE:
+
+            break;
+        case XA_RESULT_RESOURCE_ERROR:
+
+            break;
+        case XA_RESULT_RESOURCE_LOST:
+ 
+            break;
+        case XA_RESULT_IO_ERROR:
+
+            break;
+        case XA_RESULT_BUFFER_INSUFFICIENT:
+
+            break;
+        case XA_RESULT_CONTENT_CORRUPTED:
+
+            break;
+        case XA_RESULT_CONTENT_UNSUPPORTED:
+ 
+            break;
+        case XA_RESULT_CONTENT_NOT_FOUND:
+
+            break;
+        case XA_RESULT_PERMISSION_DENIED:
+
+            break;
+        case XA_RESULT_FEATURE_UNSUPPORTED:
+
+            break;
+        case XA_RESULT_INTERNAL_ERROR:
+
+            break;
+        case XA_RESULT_UNKNOWN_ERROR:
+
+            break;
+        case XA_RESULT_OPERATION_ABORTED:
+
+            break;
+        case XA_RESULT_CONTROL_LOST:
+
+            break;
+            */
+        default:
+        	break;
+        } // end switch
+    return status;
+    }
 // -----------------------------------------------------------------------------
 // CMMFRadioBackendEngine::MrpeoPresetChanged
 // Observer for Presets
@@ -320,7 +410,7 @@ void CMMFRadioBackendEngine::MrftoSquelchChange(
 }    
 
 // ----------------------------------------------------
-// CMMFRadioBackendEngine::MTsoForcedMonoChanged
+// CMMFRadioBackendEngine::MrftoForcedMonoChanged
 // Called when a client enables/disabled forced mono reception
 // ----------------------------------------------------
 //

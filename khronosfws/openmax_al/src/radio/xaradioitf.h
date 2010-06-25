@@ -22,7 +22,6 @@
 #include "xaradioitfadaptation.h"
 
 /** MACROS **/
-#define RADIO_DEFAULT_STEREO_MODE 2
 #define RADIO_NUM_OF_PRESETS 20
 /** TYPES **/
 

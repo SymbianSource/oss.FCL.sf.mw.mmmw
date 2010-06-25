@@ -33,7 +33,11 @@ const TUint32 KTelIncallLoudspeakerVolume = 0x00000002;
 #include "tmspubsublistener.h"
 #include "tmsutility.h"
 
+#ifdef __WINSCW__
 const TInt KDefaultMaxGain = 64;
+#else
+const TInt KDefaultMaxGain = 1;
+#endif
 
 using namespace TMS;
 
@@ -65,35 +69,62 @@ TMSCenRepAudioHandler::~TMSCenRepAudioHandler()
     TRACE_PRN_FN_EXT;
     }
 
+// ---------------------------------------------------------------------------
+// TMSCenRepAudioHandler::HandleNotifyPSL
+// ---------------------------------------------------------------------------
+//
 void TMSCenRepAudioHandler::HandleNotifyPSL(const TUid /*aUid*/,
         const TInt& /*aKey*/, const TRequestStatus& /*aStatus*/)
     {
     TInt muteVal;
     TInt err = KErrNotFound;
+    if (iPublish)
+        {
+        if (iMuteListener)
+            {
+            err = iMuteListener->Get(muteVal);
+            }
+        if (err == KErrNone && muteVal == EPSTelMicMuteOn)
+            {
+#if !defined(__WINSCW__)
+            if (iTMSSer)
+                {
+                iTMSSer->SetGain(NULL, 0);
+                }
+#endif //__WINSCW__
+            }
+        else if (err == KErrNone)
+            {
+#if !defined(__WINSCW__)
+            // Change when gain is really changed
+            if (iTMSSer)
+                {
+                iTMSSer->SetGain(NULL, KDefaultMaxGain);
+                }
+#endif //__WINSCW__
+            }
+        }
+    iPublish = TRUE;
+    }
 
+// ---------------------------------------------------------------------------
+// TMSCenRepAudioHandler::SetMuteState
+// ---------------------------------------------------------------------------
+//
+void TMSCenRepAudioHandler::SetMuteState(TInt level)
+    {
     if (iMuteListener)
         {
-        err = iMuteListener->Get(muteVal);
-        }
-    if (err == KErrNone && muteVal == EPSTelMicMuteOn)
-        {
-#if !defined(__WINSCW__)
-        if (iTMSSer)
+        if (level == 0)
             {
-            iTMSSer->SetGain(NULL, 0);
+            iMuteListener->Set(EPSTelMicMuteOn);
             }
-#endif //__WINSCW__
-        }
-    else if (err == KErrNone)
-        {
-#if !defined(__WINSCW__)
-        // Change when gain is really changed
-        if (iTMSSer)
+        else
             {
-            iTMSSer->SetGain(NULL, KDefaultMaxGain);
+            iMuteListener->Set(EPSTelMicMuteOff);
             }
-#endif //__WINSCW__
         }
+    iPublish = FALSE;
     }
 
 // ---------------------------------------------------------------------------
@@ -189,6 +220,7 @@ void TMSCenRepAudioHandler::ConstructL()
         /*volGetRes =*/ iIncallLoudspeakerVolumeListener->Get(volLoud);
         }
 
+    iPublish = TRUE;
     TRACE_PRN_FN_EXT;
     }
 

@@ -39,9 +39,6 @@ XAresult XARadioItfAdapt_SetFrequency(XAAdaptationMMFCtx *bCtx, XAuint32 freq);
 XAresult XARadioItfAdapt_GetFrequency(XAuint32 * pFrequency);
 
 XAresult XARadioItfAdapt_CancelSetFrequency(void);
-
-XAresult XARadioItfAdapt_CancelStationSeek(void);
-
 XAresult XARadioItfAdapt_SetSquelch(XAboolean squelch);
 
 XAresult XARadioItfAdapt_GetSquelch(XAboolean* squelch);

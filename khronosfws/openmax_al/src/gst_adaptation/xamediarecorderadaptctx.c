@@ -34,8 +34,9 @@ XAresult XAMediaRecorderAdapt_CreatePipeline(
         XAMediaRecorderAdaptationCtx* ctx);
 void XAMediaRecorderAdapt_BufferAvailable(GstElement* sink,
         gpointer user_data);
+
 /** Creates the caps gst element */
-static XAresult XAMediaRecorderAdapt_CreateCapsFilter( XAMediaRecorderAdaptationCtx* ctx );
+/*static XAresult XAMediaRecorderAdapt_CreateCapsFilter( XAMediaRecorderAdaptationCtx* ctx );*/
 
 /*
  * gboolean XAMediaRecorderAdapt_GstBusCb( GstBus *bus, GstMessage *message, gpointer data )
@@ -205,11 +206,18 @@ XAAdaptationBaseCtx* XAMediaRecorderAdapt_Create(XADataSource* pAudioSrc,
             pSelf->videoEncSettings.height = 480;
             pSelf->videoEncSettings.frameRate = 15;
             pSelf->audioEncSettings.encoderId = XA_ADAPTID_UNINITED;
-            pSelf->audioEncSettings.channelsIn = 2;
-            pSelf->audioEncSettings.channelsOut = 2;
-            pSelf->audioEncSettings.bitsPerSample = 8;
-            pSelf->audioEncSettings.bitRate = 128;
-            pSelf->audioEncSettings.sampleRate = 44100;
+            pSelf->audioEncSettings.channelsIn = 0;
+            pSelf->audioEncSettings.channelsOut = 0;
+            pSelf->audioEncSettings.bitsPerSample = 0;
+            pSelf->audioEncSettings.bitRate = 0;
+            pSelf->audioEncSettings.sampleRate = 0;
+            pSelf->audioEncSettings.rateControl = 0;
+            pSelf->audioEncSettings.profileSetting = 0;
+            pSelf->audioEncSettings.levelSetting = 0;
+            pSelf->audioEncSettings.channelMode = 0;
+            pSelf->audioEncSettings.streamFormat = 0;
+            pSelf->audioEncSettings.encodeOptions = 0;
+            pSelf->audioEncSettings.blockAlignment = 0;
             }
 
         if (pImageVideoSrc)
@@ -653,19 +661,21 @@ XAresult XAMediaRecorderAdapt_CreatePipeline(
 #endif //USE_AUDIO_PP
         
         /* create audio filter for audio encoder settings */
-        ret = XAMediaRecorderAdapt_CreateCapsFilter(ctx);
-        if ( XA_RESULT_SUCCESS != ret )
-        {
-            DEBUG_ERR("cannot create caps filter");
-            return ret;
-        }
-        
-        /*LINK : audiosource -> audiofilter */
-        if(!gst_element_link(ctx->audiosource, ctx->audiofilter))
-            {
-            DEBUG_ERR("Could not link audiosource to audiofilter!!");
-            return XA_RESULT_INTERNAL_ERROR;
-            }
+       
+//        ret = XAMediaRecorderAdapt_CreateCapsFilter(ctx);
+//      
+//        if ( XA_RESULT_SUCCESS != ret )
+//        {
+//            DEBUG_ERR("cannot create caps filter");
+//            return ret;
+//        }
+//        
+//        /*LINK : audiosource -> audiofilter */
+//        if(!gst_element_link(ctx->audiosource, ctx->audiofilter))
+//            {
+//            DEBUG_ERR("Could not link audiosource to audiofilter!!");
+//            return XA_RESULT_INTERNAL_ERROR;
+//            }
        
 /*            if( !gst_element_link_pads_filtered(ctx->audiofilter, "src", ctx->codecbin, "sink", encSrcCaps) )
             {
@@ -685,7 +695,8 @@ XAresult XAMediaRecorderAdapt_CreatePipeline(
                 return XA_RESULT_INTERNAL_ERROR;
                 }
 #else
-        if(!gst_element_link(ctx->audiofilter, ctx->codecbin ))
+        //if(!gst_element_link(ctx->audiofilter, ctx->codecbin ))
+        if(!gst_element_link(ctx->audiosource, ctx->codecbin ))
             {
             DEBUG_ERR("Could not link audiosource to codecbin!!");
             return XA_RESULT_INTERNAL_ERROR;
@@ -949,7 +960,42 @@ XAresult XAMediaRecorderAdapt_CreatePipeline(
                             ret=XA_RESULT_FEATURE_UNSUPPORTED;
                             }
                         break;
-
+                        case XA_CONTAINERTYPE_AMR:
+                        if(encType == XACAP_AUDIO)
+                            {
+                            switch(encoderId)
+                                {
+                                case XA_AUDIOCODEC_AMR:
+                                ret=XA_RESULT_SUCCESS;
+                                break;
+                                default:
+                                ret=XA_RESULT_FEATURE_UNSUPPORTED;
+                                break;
+                                }
+                            }
+                        else
+                            {
+                            ret=XA_RESULT_FEATURE_UNSUPPORTED;
+                            }
+                        break;
+                        case XA_CONTAINERTYPE_MP4:
+                        if(encType == XACAP_AUDIO )
+                            {
+                            switch(encoderId)
+                                {
+                                case XA_AUDIOCODEC_AAC:
+                                ret=XA_RESULT_SUCCESS;
+                                break;
+                                default:
+                                ret=XA_RESULT_FEATURE_UNSUPPORTED;
+                                break;
+                                }
+                            }
+                        else
+                            {
+                            ret=XA_RESULT_FEATURE_UNSUPPORTED;
+                            }
+                        break;
                         default: /*switch (containertype)*/
                         ret = XA_RESULT_FEATURE_UNSUPPORTED;
                         break;
@@ -975,6 +1021,7 @@ XAresult XAMediaRecorderAdapt_CreatePipeline(
 XAresult XAMediaRecorderAdapt_ChangeEncoders( XAMediaRecorderAdaptationCtx* mCtx )
     {
     XAresult ret = XA_RESULT_SUCCESS;
+    GstElement  *encoderelement = NULL;
     XAAdaptationGstCtx* bCtx = &(mCtx->baseObj);
 
     DEBUG_API("->XAMediaRecorderAdapt_ChangeEncoders");
@@ -990,6 +1037,7 @@ XAresult XAMediaRecorderAdapt_ChangeEncoders( XAMediaRecorderAdaptationCtx* mCtx
             GstPad *src=NULL, *linkedsink=NULL;
             GstPad *moSrc=NULL, *moSink=NULL;
             GstCaps* encSrcCaps = NULL;
+            GstPad *afiltsrc=NULL, *afiltsink=NULL;
 
             /* pipeline must be unrolled for renegotiation */
             DEBUG_INFO("Unroll pipeline");
@@ -1010,24 +1058,45 @@ XAresult XAMediaRecorderAdapt_ChangeEncoders( XAMediaRecorderAdaptationCtx* mCtx
                 g_object_set( G_OBJECT(mCtx->videofilter), "caps",encSrcCaps,NULL);
                 gst_caps_unref(encSrcCaps);
                 }
-            if( mCtx->audiofilter )
+            if(!mCtx ->audiofilter)
                 {
-                encSrcCaps = gst_caps_new_full(
-                        gst_structure_new("audio/x-raw-int",
-                                "channels", G_TYPE_INT, mCtx->audioEncSettings.channelsOut,
-                                "rate", G_TYPE_INT, mCtx->audioEncSettings.sampleRate,
-                                "bitrate", G_TYPE_INT, mCtx->audioEncSettings.bitRate,
-                                NULL),
+                   //creating caps filter 
+                   mCtx->audiofilter = gst_element_factory_make("capsfilter", "audiofilter");
+                   if ( mCtx->audiofilter )
+                    {
+                       gst_bin_add(GST_BIN(bCtx->bin), mCtx->audiofilter);
+                       encSrcCaps = gst_caps_new_full(
+                       gst_structure_new("audio/x-raw-int",
+                               "channels", G_TYPE_INT, mCtx->audioEncSettings.channelsOut,
+                               "rate", G_TYPE_INT, (mCtx->audioEncSettings.sampleRate / 1000),
+                               "depth", G_TYPE_INT, mCtx->audioEncSettings.bitsPerSample,
+                               "signed",G_TYPE_BOOLEAN, TRUE,
+                               "endianness",G_TYPE_INT, mCtx->audioEncSettings.blockAlignment,
+                               NULL),
+                       gst_structure_new("audio/amr",
+                              "signed",G_TYPE_BOOLEAN, TRUE,
+                              "endianness",G_TYPE_INT, mCtx->audioEncSettings.blockAlignment,
+                              "depth", G_TYPE_INT, mCtx->audioEncSettings.bitsPerSample,
+                              "rate", G_TYPE_INT, (mCtx->audioEncSettings.sampleRate / 1000),
+                              "channels", G_TYPE_INT, mCtx->audioEncSettings.channelsOut,
+                              NULL),
                         gst_structure_new("audio/x-raw-float",
-                                "channels", G_TYPE_INT, mCtx->audioEncSettings.channelsOut,
-                                "width", G_TYPE_INT, mCtx->audioEncSettings.bitsPerSample,
-                                "rate", G_TYPE_INT, mCtx->audioEncSettings.sampleRate,
-                                "bitrate", G_TYPE_INT, mCtx->audioEncSettings.bitRate,
-                                NULL),
-                        NULL);
-                DEBUG_INFO_A1("new audio encoder config from settings: %s",gst_caps_to_string(encSrcCaps));
-                g_object_set( G_OBJECT(mCtx->audiofilter), "caps",encSrcCaps,NULL);
-                gst_caps_unref(encSrcCaps);
+                               "channels", G_TYPE_INT, mCtx->audioEncSettings.channelsOut,
+                               "width", G_TYPE_INT, mCtx->audioEncSettings.bitsPerSample,
+                               "rate", G_TYPE_INT , mCtx->audioEncSettings.sampleRate / 1000,
+                               NULL),
+                               NULL);
+                       DEBUG_INFO_A1("new audio encoder config from settings: %s",gst_caps_to_string(encSrcCaps));
+                       g_object_set( G_OBJECT(mCtx->audiofilter), "caps",encSrcCaps,NULL);
+                                                             
+                       gst_caps_unref(encSrcCaps);
+
+                    }else
+                        {
+                        DEBUG_ERR("cannot create caps filter");
+                        return XA_RESULT_INTERNAL_ERROR;
+                        }
+                    
                 }
 
             if(mCtx->isobjvsrc)
@@ -1089,19 +1158,41 @@ XAresult XAMediaRecorderAdapt_ChangeEncoders( XAMediaRecorderAdaptationCtx* mCtx
             mCtx->codecbin = newBin;
             gst_bin_add(GST_BIN(bCtx->bin), mCtx->codecbin);
             asink = gst_element_get_static_pad(mCtx->codecbin,"sink");
-            if(asink && linkedasrc)
+            afiltsink = gst_element_get_static_pad(mCtx->audiofilter,"sink");
+            afiltsrc = gst_element_get_static_pad(mCtx->audiofilter,"src");
+            if(linkedasrc && afiltsink)
                 {
-                gst_pad_link(linkedasrc,asink);
+                    if(gst_pad_link(linkedasrc , afiltsink ) != GST_PAD_LINK_OK)
+                        {
+                        DEBUG_ERR("Could not link audiosource to audiofilter!!");
+                        return XA_RESULT_INTERNAL_ERROR;
+                        }
+                }
+            if(asink && afiltsrc)
+                {
+                    if(gst_pad_link(afiltsrc , asink) != GST_PAD_LINK_OK)
+                        {
+                        DEBUG_ERR("Could not link audiosource to audiofilter!!");
+                        return XA_RESULT_INTERNAL_ERROR;
+                        }
                 }
             vsink = gst_element_get_static_pad(mCtx->codecbin,"v_sink");
             if(vsink && linkedvsrc)
                 {
-                gst_pad_link(linkedvsrc,vsink);
+                    if(gst_pad_link(linkedvsrc,vsink) != GST_PAD_LINK_OK)
+                                {
+                                DEBUG_ERR("Could not link linkedvsrc to vsink!!");
+                                return XA_RESULT_INTERNAL_ERROR;
+                                }
                 }
             src = gst_element_get_static_pad(mCtx->codecbin,"src");
             if(src && linkedsink)
                 {
-                gst_pad_link(src,linkedsink);
+                        if(gst_pad_link(src,linkedsink) != GST_PAD_LINK_OK)
+                            {
+                            DEBUG_ERR("Could not link codecbin src pad  to linkedsink!!");
+                            return XA_RESULT_INTERNAL_ERROR;
+                            }
                 }
 
             if(mCtx->isobjvsrc)
@@ -1109,10 +1200,36 @@ XAresult XAMediaRecorderAdapt_ChangeEncoders( XAMediaRecorderAdaptationCtx* mCtx
                 moSrc = gst_element_get_static_pad(mCtx->videosource,"MRObjSrc");
                 if(moSink&&moSrc)
                     {
-                    gst_pad_link(moSrc,moSink);
+                            if(gst_pad_link(moSrc,moSink) != GST_PAD_LINK_OK)
+                                {
+                                DEBUG_ERR("Could not link codecbin src pad  to linkedsink!!");
+                                return XA_RESULT_INTERNAL_ERROR;
+                                }
                     }
                 }
 
+            
+            //setting the Bitrate and other properties for elements
+                if(mCtx->audioEncSettings.encoderId == XA_AUDIOCODEC_AAC)
+                    {   
+                        encoderelement = gst_bin_get_by_name((GstBin*)mCtx->codecbin, "audioenc") ;
+                        if(encoderelement){   
+                            g_object_set(G_OBJECT(encoderelement),"bitrate" , mCtx->audioEncSettings.bitRate , NULL );
+                            g_object_set(G_OBJECT(encoderelement),"profile", mCtx->audioEncSettings.levelSetting , NULL );
+                            g_object_set(G_OBJECT(encoderelement),"output-format", mCtx->audioEncSettings.streamFormat , NULL );
+                            gst_object_unref (encoderelement);
+                     }else
+                         DEBUG_ERR("Encoder Element not found for AAC");
+                    }
+                else if(mCtx->audioEncSettings.encoderId == XA_AUDIOCODEC_AMR)
+                    {
+                        g_object_set(G_OBJECT(mCtx->audiosource),"speechbitrate", mCtx->audioEncSettings.bitRate , NULL );
+                    }
+                else
+                    {
+                        DEBUG_INFO("No properties for PCM or Wav")
+                    }       
+                
             /*re-roll*/
             DEBUG_INFO("Reroll pipeline");
             bCtx->binWantedState = GST_STATE_PAUSED;
@@ -1485,18 +1602,19 @@ GstElement* XAMediaRecorderAdapt_CreateEncodeBin( XAMediaRecorderAdaptationCtx* 
                                 {
                                 if(temp.adaptId)
                                     {
-                                    audioenc = gst_element_factory_make((char*)temp.adaptId, "nokiaaacenc");
+                                    audioenc = gst_element_factory_make((char*)temp.adaptId, "audioenc");
                                     }
                                 }
                             if(audioenc)
                                 {
-                                GstCaps* caps = gst_caps_new_simple((const char*)mime->mimeType,
-                                        "mpegversion", G_TYPE_INT, 4,
-                                        "channels", G_TYPE_INT, 1,
-                                        "rate", G_TYPE_INT, 16000,
-                                        NULL);
+//                                GstCaps* caps = gst_caps_new_simple((const char*)mime->mimeType,
+//                                        "mpegversion", G_TYPE_INT, 4,
+//                                        "channels", G_TYPE_INT, 1,
+//                                        "rate", G_TYPE_INT, 16000,
+//                                        NULL);
                                 gst_bin_add(GST_BIN(codecbin), audioenc);
-                                if(!gst_element_link_filtered(audioenc, mux,caps))
+                                //if(!gst_element_link_filtered(audioenc, mux,caps))
+                                if(!gst_element_link(audioenc, mux))
                                     {
                                     DEBUG_ERR("Could not link audioenc to mux!!");
                                     DEBUG_API("<-XAMediaRecorderAdapt_CreateEncodeBin");
@@ -1734,7 +1852,7 @@ void* XAMediaRecorderAdapt_RecordEventThr( void* ctx )
     return NULL;
     }
 
-XAresult XAMediaRecorderAdapt_CreateCapsFilter( XAMediaRecorderAdaptationCtx* ctx )
+/*XAresult XAMediaRecorderAdapt_CreateCapsFilter( XAMediaRecorderAdaptationCtx* ctx )
 {
 
     GstCaps* encSrcCaps = NULL;
@@ -1764,34 +1882,32 @@ XAresult XAMediaRecorderAdapt_CreateCapsFilter( XAMediaRecorderAdaptationCtx* ct
     if(!strcmp((const char*)pMime->mimeType, "audio/amr"))
         {
         encSrcCaps = gst_caps_new_simple ("audio/amr",
-                   "width", G_TYPE_INT, 8,
-                   "depth", G_TYPE_INT, 8,
+                   "width", G_TYPE_INT, ctx->audioEncSettings.bitsPerSample,
+                   "depth", G_TYPE_INT, ctx->audioEncSettings.bitsPerSample,
                    "signed",G_TYPE_BOOLEAN, TRUE,
                    "endianness",G_TYPE_INT, G_BYTE_ORDER,
-                   "rate", G_TYPE_INT,  8000,
-                   "channels", G_TYPE_INT, 1, NULL);
+                   "rate", G_TYPE_INT,  ctx->audioEncSettings.sampleRate,
+                   "channels", G_TYPE_INT, ctx->audioEncSettings.channelsOut, NULL);
         }
     else
         {
         encSrcCaps = gst_caps_new_full(
                 gst_structure_new("audio/x-raw-int",
-                    "width", G_TYPE_INT, 16,
-                    "depth", G_TYPE_INT, 16,
-                    "signed",G_TYPE_BOOLEAN, 1,
-                    "endianness",G_TYPE_INT, 1234,
-                    "rate", G_TYPE_INT, 16000,
-                    "bitrate", G_TYPE_INT, ctx->audioEncSettings.bitRate,
-                    "channels", G_TYPE_INT, 1, NULL),
-                /*gst_structure_new("audio/x-raw-int",
                   "channels", G_TYPE_INT, ctx->audioEncSettings.channelsOut,
+				  "width", G_TYPE_INT, ctx->audioEncSettings.bitsPerSample,
+				  "width", G_TYPE_INT, ctx->audioEncSettings.bitsPerSample,
                   "rate", G_TYPE_INT, ctx->audioEncSettings.sampleRate,
                   "bitrate", G_TYPE_INT, ctx->audioEncSettings.bitRate,
-                  NULL),*/
+                  "signed",G_TYPE_BOOLEAN, TRUE,
+                  "endianness",G_TYPE_INT, G_BYTE_ORDER,
+                  NULL),
                 gst_structure_new("audio/x-raw-float",
                     "channels", G_TYPE_INT, ctx->audioEncSettings.channelsOut,
                     "width", G_TYPE_INT, ctx->audioEncSettings.bitsPerSample,
                     "rate", G_TYPE_INT, ctx->audioEncSettings.sampleRate,
                     "bitrate", G_TYPE_INT, ctx->audioEncSettings.bitRate,
+                    "signed",G_TYPE_BOOLEAN, TRUE,
+                    "endianness",G_TYPE_INT, G_BYTE_ORDER,
                     NULL),
                 NULL);
 
@@ -1803,5 +1919,5 @@ XAresult XAMediaRecorderAdapt_CreateCapsFilter( XAMediaRecorderAdaptationCtx* ct
 
     gst_caps_unref(encSrcCaps);
     return XA_RESULT_SUCCESS;
-}
+}*/
 

@@ -165,9 +165,10 @@ protected:
     gint iInitRetryTime;
     gint iStartRetryTime;
     TMSTimer* iTimer;
-    gint iTimeout;
+    gint iPeriodic;
+    gint iElapsedTime;
     };
 
 } //namespace TMS
 
-#endif // TMSCSDEVSOUND_H
+#endif //TMSCSDEVSOUND_H

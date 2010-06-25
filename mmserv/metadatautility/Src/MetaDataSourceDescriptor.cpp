@@ -154,9 +154,4 @@ TInt CMetaDataSourceDescriptor::Size(
     return KErrNone;
     }
 
-const TDesC8& CMetaDataSourceDescriptor::GetDescriptor() const
-{
-	return iSource;
-}
-
 //  End of File

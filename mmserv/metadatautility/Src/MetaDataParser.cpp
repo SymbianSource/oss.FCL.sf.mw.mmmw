@@ -19,10 +19,12 @@
 
 
 // INCLUDE FILES
+#include "MetaDataParser.h"
 #include <syslangutil.h>
 #include <languages.hrh>
 #include <TopCharacterSet.rsg>
 #include <data_caging_path_literals.hrh>
+#include <stdlib.h>
 #include <bautils.h>
 
 #include "MetaDataParser.h"
@@ -30,7 +32,6 @@
 #include "MetaDataFieldContainer.h"
 
 _LIT(KCharacterSetRscFile, "TopCharacterSet.rsc");
-
 
 // ============================ MEMBER FUNCTIONS ===============================
 
@@ -173,7 +174,12 @@ void CMetaDataParser::MapID3GenreToStringL(TInt aNum, TDes& aGenrePtr)
 #ifdef _DEBUG
      RDebug::Print(_L("CMetaDataParser::MapID3GenreToStringL"));
 #endif
-   		switch(aNum)
+    
+	if(aNum < 0 || aNum > 125 && aNum != 199)
+		{
+		return;
+		}
+	switch(aNum)
 			{
 				case 0:
 					aGenrePtr.Append(KGenreBlues);
@@ -570,7 +576,12 @@ void CMetaDataParser::MapID3GenreToStringL(TInt aNum, TDes8& aGenrePtr)
 #ifdef _DEBUG
      RDebug::Print(_L("CMetaDataParser::MapID3GenreToStringL"));
 #endif
-		switch(aNum)
+
+	if(aNum < 0 || aNum > 125 && aNum != 199)
+		{
+		return;
+		}
+	switch(aNum)
 			{
 				case 0:
 					aGenrePtr.Append(KGenreBlues);
@@ -1248,7 +1259,23 @@ TBool CMetaDataParser::IsInTopCharacterSet(TUint aCharacterSetId)
 		}
 	return EFalse;
 	}
+// -----------------------------------------------------------------------------
+// CMetaDataParser::SetID32Offset()
+// -----------------------------------------------------------------------------
+//
+void CMetaDataParser::SetID32Offset( TUint aOffset )
+    {
+    iID32Offset = aOffset;
+    }
 
+// -----------------------------------------------------------------------------
+// CMetaDataParser::ID32Offset()
+// -----------------------------------------------------------------------------
+//
+TUint CMetaDataParser::ID32Offset()
+    {
+    return iID32Offset;
+    }
 
 // -----------------------------------------------------------------------------
 // CMetaDataParser::CommonParseL

@@ -146,8 +146,12 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
             if (mCtx->xaRecordState == XA_RECORDSTATE_STOPPED
                     && mCtx->encodingchanged)
                 {
-                XAMediaRecorderAdapt_ChangeEncoders(mCtx);
+                ret = XAMediaRecorderAdapt_ChangeEncoders(mCtx);
                 mCtx->encodingchanged = XA_BOOLEAN_FALSE;
+                if(ret != XA_RESULT_SUCCESS)
+                    {
+                      return ret;
+                    }
                 }
             bCtx->binWantedState = GST_STATE_PAUSED;
             if (mCtx->runpositiontimer > 0)
@@ -167,8 +171,12 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
             if (mCtx->xaRecordState == XA_RECORDSTATE_STOPPED
                     && (mCtx->encodingchanged))
                 {
-                XAMediaRecorderAdapt_ChangeEncoders(mCtx);
+                ret = XAMediaRecorderAdapt_ChangeEncoders(mCtx);
                 mCtx->encodingchanged = XA_BOOLEAN_FALSE;
+                if(ret != XA_RESULT_SUCCESS)
+                    {
+                      return ret;
+                    }
                 }
 
             if (mCtx->recThrCtx.bufInsufficientSem)

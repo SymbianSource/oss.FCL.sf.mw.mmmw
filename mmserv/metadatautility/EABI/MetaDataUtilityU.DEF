@@ -71,4 +71,6 @@ EXPORTS
 	_ZN16CMetaDataUtility14ParseChunkDataEv @ 70 NONAME
 	_ZN16CMetaDataUtility15IsChunkDataModeEv @ 71 NONAME
 	_ZN16CMetaDataUtility16ProcessChunkDataERK6TDesC8i @ 72 NONAME
+	_ZTI18CHXMetaDataUtility @ 73 NONAME
+	_ZTV18CHXMetaDataUtility @ 74 NONAME
 

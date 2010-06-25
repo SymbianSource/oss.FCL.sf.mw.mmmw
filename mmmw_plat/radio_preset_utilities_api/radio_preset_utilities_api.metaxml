@@ -3,12 +3,12 @@
   <name>Radio Preset Utilities API</name>
   <description>An API for applications to access radio preset functionality.</description>
   <type>c++</type>
-  <collection>radioutility</collection>
+  <collection>mmserv</collection>
   <libs>
     <lib name="FmPresetUtility.lib"/>
     <lib name="presetutility.lib"/>
   </libs>
-  <release category="platform" sinceversion=""/>
+  <release category="platform" sinceversion="3.2"/>
   <attributes>
     <!-- This indicates wether the api provedes separate html documentation -->
     <!-- or is the additional documentation generated from headers. -->

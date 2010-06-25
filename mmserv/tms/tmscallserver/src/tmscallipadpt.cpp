@@ -997,7 +997,7 @@ gint TMSCallIPAdpt::SetPlc(const TMSFormatType fmttype, const gboolean plc)
 gint TMSCallIPAdpt::OpenDownlink(const RMessage2& message, const gint retrytime)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    gint status(TMS_RESULT_SUCCESS);
 
     // Clients must have MultimediaDD capability to use this priority/pref.
     // TODO: Also, TMS will monitor for emergency call and if detected it
@@ -1012,11 +1012,10 @@ gint TMSCallIPAdpt::OpenDownlink(const RMessage2& message, const gint retrytime)
     iPriority.iPref = KAudioPrefVoipAudioDownlink;
     iPriority.iPriority = KAudioPriorityVoipAudioDownlink;
 
-    if (!iIPDownlink)
-        {
-        TRAP(status, iIPDownlink = TMSIPDownlink::NewL(*this, iDnFourCC,
-                iPriority, retrytime));
-        }
+    delete iIPDownlink;
+    iIPDownlink = NULL;
+    TRAP(status, iIPDownlink = TMSIPDownlink::NewL(*this, iDnFourCC, iPriority,
+            retrytime));
 
     if (iIPDownlink && status == TMS_RESULT_SUCCESS)
         {
@@ -1046,7 +1045,7 @@ gint TMSCallIPAdpt::OpenDownlink(const RMessage2& message, const gint retrytime)
 gint TMSCallIPAdpt::OpenUplink(const RMessage2& message, const gint retrytime)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    gint status(TMS_RESULT_SUCCESS);
 
     // Clients must have MultimediaDD capability to use this priority/pref
 
@@ -1059,11 +1058,10 @@ gint TMSCallIPAdpt::OpenUplink(const RMessage2& message, const gint retrytime)
     iPriority.iPref = KAudioPrefVoipAudioUplink;
     iPriority.iPriority = KAudioPriorityVoipAudioUplink;
 
-    if (!iIPUplink)
-        {
-        TRAP(status, iIPUplink = TMSIPUplink::NewL(*this, iUpFourCC, iPriority,
-                retrytime));
-        }
+    delete iIPUplink;
+    iIPUplink = NULL;
+    TRAP(status, iIPUplink = TMSIPUplink::NewL(*this, iUpFourCC, iPriority,
+            retrytime));
 
     if (iIPUplink && status == TMS_RESULT_SUCCESS)
         {

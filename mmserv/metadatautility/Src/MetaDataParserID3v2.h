@@ -53,6 +53,14 @@ class CMetaDataParserID3v2 : public CMetaDataParser
         * @return A pointer to a new instance of this class
         */
         static CMetaDataParserID3v2* CreateID3v2ParserL( CMetaDataSource& aSource );
+        
+        /**
+        * Two-phased constructor.
+        * @param aSource A pointer to a metadata source
+        * @param aOffset File offset of ID3 metadata 
+        * @return A pointer to a new instance of this class
+        */
+        static CMetaDataParserID3v2* CreateID3v2ParserL( CMetaDataSource& aSource, TUint aOffset  );
 
         /**
         * Destructor.
@@ -253,7 +261,7 @@ class CMetaDataParserID3v2 : public CMetaDataParser
 		* @param aSource Data source.
         * @return ID3 tag version, KErrNotFound if none found.
 		*/
-		static TInt VersionL( CMetaDataSource& aSource );
+		static TInt VersionL( CMetaDataSource& aSource, TUint aOffset );
 		
 		
 

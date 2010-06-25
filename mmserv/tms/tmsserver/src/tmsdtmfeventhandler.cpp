@@ -108,5 +108,14 @@ void TMSDtmfEventHandler::RunL()
     TRACE_PRN_FN_EXT;
     }
 
+// -----------------------------------------------------------------------------
+// TMSDtmfEventHandler::RunError
+// -----------------------------------------------------------------------------
+//
+TInt TMSDtmfEventHandler::RunError(TInt aError)
+    {
+    return aError;
+    }
+
 //  End of File
 

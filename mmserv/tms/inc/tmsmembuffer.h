@@ -93,7 +93,7 @@ private:
 
 private:
     guint iBufferSize;
-    guint iTimeStamp;
+    guint64 iTimeStamp;
     guint8* iDataPtr;
     gboolean iOwnsBuffer;
     };
@@ -101,3 +101,4 @@ private:
 } //namespace TMS
 
 #endif //TMS_MEM_BUFFER_H
+
