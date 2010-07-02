@@ -64,7 +64,7 @@ class CProgDLMultimediaSource : public CMultimediaDataSource
         // From CMultimediaDataSource ends
         
         TInt GetDRMProtection( TBool& aIsProtected );
-        TInt EvaluateIntent( ContentAccess::TIntent aIntent ) const;
+        TInt EvaluateIntent( ContentAccess::TIntent aIntent );
         TInt ExecuteIntent( ContentAccess::TIntent aIntent );
         TInt SetAgentProperty( ContentAccess::TAgentProperty aProperty,
             TInt aValue);

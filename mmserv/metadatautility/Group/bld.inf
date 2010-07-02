@@ -37,7 +37,9 @@ PRJ_EXPORTS
 
 PRJ_MMPFILES
 
-#ifndef  __3GP_EXTENTION
+#ifdef  __3GP_EXTENTION
+#include "../3GPExtParserLib/group/bld.inf"
+#else
 #include "../3GPExtParserLib_stub/group/bld.inf"
 #endif 
 

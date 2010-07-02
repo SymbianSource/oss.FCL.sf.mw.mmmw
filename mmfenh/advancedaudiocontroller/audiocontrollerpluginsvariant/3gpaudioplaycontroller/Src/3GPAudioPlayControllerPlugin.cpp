@@ -277,7 +277,13 @@ void C3GPAudioPlayControllerPlugin::DoReadHeaderL(CMMFDataBuffer* aBuffer)
         {
         iSharedBufferMaxNum = 3;
    	    }
-	
+   
+    if (iSourceType != KUidMmfFileSource) 
+               {
+               DP0(_L("CAACAudioPlayControllerPlugin::DoAddDataSourceL not file source,changing buffer size"));        
+              
+                iSharedBufferMaxSize = iSharedBufferMaxSizeForNonSeekableSrc;
+               }
     CMMFDataBuffer* tempBuffer = CreateSourceBufferOfSizeLC(KFirstBufferSize);
     tempBuffer->Data().Copy(iSharedBuffers[0]->Data());
 

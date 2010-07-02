@@ -990,7 +990,13 @@ void CDevSoundAudioOutput::SendEvent(
 	{
     iObserver->SendEvent(aEvent);
 	}
-
+TBool CDevSoundAudioOutput::IsTimePosSeekable()
+    {
+     if(!iDataSourceAdapter->IsTimeSeekable()&& (!iDataSourceAdapter->IsPositonSeekable()))
+         return EFalse;
+     else 
+         return ETrue;
+    }
 // -----------------------------------------------------------------------------
 // CDevSoundAudioOutput::ConvertFromDevSoundCapsToSampleRatesL
 // Internal function to convert sampling rate from DevSound representation to

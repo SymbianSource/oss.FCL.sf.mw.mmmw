@@ -177,6 +177,10 @@ TInt CClientProgDLSource::Open(const TDesC& aFileName,TInt32 aDLTxId )
 TInt CClientProgDLSource::MoveFile(const TDesC& aDestFileName )
     {
     TInt status(KErrNone);
+    
+    if (iServerSourceExists)
+        iCustomCommand->CustomCommandSync( iSourceHandle, ESetFileMoving, KNullDesC8, KNullDesC8 );
+
     iDestFileName.Copy(aDestFileName);
     status = iDownloadGateway->MoveFile(iDownloadId,aDestFileName);
     return status;
@@ -414,10 +418,11 @@ void CClientProgDLSource::MoveFileComplete(TInt aError)
             {
     	    des.Copy(iDestFileName);
             }
-	    else
+	    else if (aError == KErrAlreadyExists)
             {
             iDownloadGateway->GetLocalFileName(iDownloadId,des);
             }
+	    iDestFileName.Copy(des);
         TPckgBuf<TFileName> pckg(iDestFileName);
         iCustomCommand->CustomCommandSync( iSourceHandle, ESetUpdateFileName, pckg, KNullDesC8 );
         }

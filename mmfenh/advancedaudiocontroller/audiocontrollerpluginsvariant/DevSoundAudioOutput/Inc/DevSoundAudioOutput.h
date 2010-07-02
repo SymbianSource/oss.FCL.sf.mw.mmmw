@@ -392,7 +392,14 @@ class CDevSoundAudioOutput : public CAdvancedAudioOutput,
         * @return -
         */
 		virtual void SendEvent(const TMMFEvent& aEvent);
-
+		    /**
+        * From MAdvancedAudioDecoderObserver
+        * Callback function from CAdvancedAudioDecoder to check if the source is time or position seekable
+        * 
+        * @param None
+        * @return TBool
+        */
+		virtual TBool IsTimePosSeekable();
     private:
 
         /**
