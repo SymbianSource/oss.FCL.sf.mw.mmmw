@@ -139,11 +139,10 @@ XAresult XAAudioDecoderCapabilitiesItfImpl_GetAudioDecoderCapabilities(
                             ((XAAudioCodecDescriptor*) (temp.pEntry));
                     /* map applicable values to XAAudioCodecCapabilities */
                     pDescriptor->maxChannels = desc->maxChannels;
-                    pDescriptor->minSampleRate = desc->minSampleRate * 1000; /* milliHz */
-                    if (desc->maxSampleRate < (0xFFFFFFFF / 1000))
+                    pDescriptor->minSampleRate = desc->minSampleRate; /* milliHz */
+                    if (desc->maxSampleRate < (0xFFFFFFFF))
                         {
-                        pDescriptor->maxSampleRate = desc->maxSampleRate
-                                * 1000;
+                        pDescriptor->maxSampleRate = desc->maxSampleRate;
                         }
                     else
                         {
@@ -151,34 +150,16 @@ XAresult XAAudioDecoderCapabilitiesItfImpl_GetAudioDecoderCapabilities(
                         }
                     pDescriptor->minBitsPerSample = desc->minBitsPerSample;
                     pDescriptor->maxBitsPerSample = desc->maxBitsPerSample;
-                    pDescriptor->isFreqRangeContinuous = XA_BOOLEAN_TRUE;
+                    pDescriptor->isFreqRangeContinuous=desc->isFreqRangeContinuous;
                     pDescriptor->minBitRate = desc->minBitRate;
                     pDescriptor->maxBitRate = desc->maxBitRate;
                     pDescriptor->numBitratesSupported
                             = desc->numBitratesSupported;
-                    pDescriptor->isBitrateRangeContinuous = XA_BOOLEAN_TRUE;
-                    if (temp.xaid == XA_AUDIOCODEC_PCM)
-                        {
-                        pDescriptor->profileSetting = XA_AUDIOPROFILE_PCM;
-                        pDescriptor->modeSetting = 0; /* no chanmode for pcm defined */
-                        }
-                    else if (temp.xaid == XA_ADAPTID_VORBIS) /* for ogg */
-                        {
-                        if (desc->maxChannels == 1)
-                            {
-                            pDescriptor->profileSetting
-                                    =XA_AUDIOPROFILE_MPEG1_L3;
-                            pDescriptor->modeSetting
-                                    =XA_AUDIOCHANMODE_MP3_MONO;
-                            }
-                        else
-                            {
-                            pDescriptor->profileSetting
-                                    =XA_AUDIOPROFILE_MPEG2_L3;
-                            pDescriptor->modeSetting
-                                    =XA_AUDIOCHANMODE_MP3_STEREO;
-                            }
-                        }
+                    pDescriptor->isBitrateRangeContinuous=desc->isBitrateRangeContinuous;
+                    pDescriptor->profileSetting=desc->profileSetting;
+                    pDescriptor->modeSetting=desc->modeSetting; /* no chanmode for pcm defined */
+                    
+                    }
                     else
                         {
                         /* do nothing */
@@ -188,7 +169,7 @@ XAresult XAAudioDecoderCapabilitiesItfImpl_GetAudioDecoderCapabilities(
 
                 }
             }
-        }
+    
 
     DEBUG_API("<-XAAudioDecoderCapabilitiesItfImpl_GetAudioDecoderCapabilities");
     return res;

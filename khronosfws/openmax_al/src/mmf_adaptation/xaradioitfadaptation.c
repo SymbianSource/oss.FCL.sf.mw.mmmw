@@ -57,7 +57,13 @@ XAresult XARadioItfAdapt_IsFreqRangeSupported(XAuint8 range,
 {
     XAresult ret = XA_RESULT_SUCCESS;
     DEBUG_API("->XARadioItfAdapt_IsFreqRangeSupported");    
- 		*pSupported = XA_BOOLEAN_TRUE;    // No radio utility API for this, set to true automatically.
+    if ((range == XA_FREQRANGE_FMEUROAMERICA) || (range == XA_FREQRANGE_FMJAPAN)) 
+        {	
+ 			*pSupported = XA_BOOLEAN_TRUE;   
+ 		}
+ 		else
+ 			*pSupported = XA_BOOLEAN_FALSE;
+ 			 
     DEBUG_API("<-XARadioItfAdapt_IsFreqRangeSupported");
     return ret;
 }
@@ -122,18 +128,6 @@ XAresult XARadioItfAdapt_CancelSetFrequency()
 }
 
 /*
- * XAresult XARadioItfAdapt_CancelStationSeek()
- */
-XAresult XARadioItfAdapt_CancelStationSeek()
-{
-    XAresult ret = XA_RESULT_SUCCESS;         
-    DEBUG_API("->XARadioItfAdapt_CancelStationSeek");		
-		cancel_station_seek(cmmfradiobackendengine_init());    
-    DEBUG_API("<-XARadioItfAdapt_CancelStationSeek");
-    return ret;
-}
-
-/*
  * XAresult XARadioItfAdapt_SetSquelch(XAboolean squelch)
  */
 XAresult XARadioItfAdapt_SetSquelch(XAboolean squelch)
@@ -183,15 +177,11 @@ XAresult XARadioItfAdapt_GetSignalStrength(XAuint32 * pStrength)
  */
 XAresult XARadioItfAdapt_Seek(XAAdaptationMMFCtx *bCtx, XAboolean upwards)
 {
-	  XAboolean direction; 
     XAresult ret = XA_RESULT_SUCCESS;          
-    if (!upwards)
-    	direction = XA_BOOLEAN_FALSE;  
-    else
-    	direction = XA_BOOLEAN_TRUE;      			
+ 		
    	DEBUG_API("->XARadioItfAdapt_Seek");	    
     mmf_set_radio_adapt_context(cmmfradiobackendengine_init(), bCtx);     	
-		station_seek(cmmfradiobackendengine_init(), direction);   				
+		station_seek(cmmfradiobackendengine_init(), upwards);   				
     DEBUG_API("<-XARadioItfAdapt_Seek");
     return ret;
 }

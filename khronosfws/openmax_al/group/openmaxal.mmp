@@ -188,6 +188,7 @@ SOURCE          xadynamicsourceitfadaptationmmf.c
 SOURCE 	        xastreaminformationitfadaptationmmf.c
 SOURCE  	cmetadatautilityitf.cpp
 SOURCE		xametadataadaptctxmmf.c
+SOURCE		xaplaybackrateitfadaptationmmf.c
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../src

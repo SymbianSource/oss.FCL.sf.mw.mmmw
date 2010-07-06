@@ -133,112 +133,7 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
 
     /* query capabilities from adaptation using codec id */
     memset(pDescriptor, 0, sizeof(XAAudioCodecDescriptor));
-
-    switch (encoderId)
-        {
-        case XA_AUDIOCODEC_AMR:
-            {
-            impl->sampleRateArray[0] = 8000000;
-
-            impl->bitRateArray[0] = 4750;
-            impl->bitRateArray[1] = 5150;
-            impl->bitRateArray[2] = 5900;
-            impl->bitRateArray[3] = 6700;
-            impl->bitRateArray[4] = 7400;
-            impl->bitRateArray[5] = 7950;
-            impl->bitRateArray[6] = 10200;
-            impl->bitRateArray[7] = 12200;
-
-            pDescriptor->maxChannels = 1;
-            pDescriptor->minBitsPerSample = 8;
-            pDescriptor->maxBitsPerSample = 8;
-            pDescriptor->minSampleRate = 8000000; /*milliHz*/
-            pDescriptor->maxSampleRate = 8000000;
-            pDescriptor->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
-            pDescriptor->pSampleRatesSupported
-                    = (XAmilliHertz*) (&(impl->sampleRateArray));
-            pDescriptor->numSampleRatesSupported = 1;
-            pDescriptor->minBitRate = 4750;
-            pDescriptor->maxBitRate = 12200;
-            pDescriptor->isBitrateRangeContinuous = XA_BOOLEAN_FALSE;
-            pDescriptor->pBitratesSupported
-                    = (XAuint32*) (&(impl->bitRateArray));
-            pDescriptor->numBitratesSupported = 8;
-            pDescriptor->profileSetting = XA_AUDIOPROFILE_AMR;
-            pDescriptor->modeSetting = 0;
-            }
-            break;
-        case XA_AUDIOCODEC_AAC:
-            {
-            impl->sampleRateArray[0] = 8000000;
-            impl->sampleRateArray[1] = 11025000;
-            impl->sampleRateArray[2] = 16000000;
-            impl->sampleRateArray[3] = 22050000;
-            impl->sampleRateArray[4] = 32000000;
-            impl->sampleRateArray[5] = 44100000;
-            impl->sampleRateArray[6] = 48000000;
-
-            impl->bitRateArray[0] = 32000;
-            impl->bitRateArray[1] = 64000;
-            impl->bitRateArray[2] = 96000;
-            impl->bitRateArray[3] = 128000;
-            impl->bitRateArray[4] = 160000;
-            impl->bitRateArray[5] = 192000;
-            impl->bitRateArray[6] = 224000;
-            impl->bitRateArray[7] = 256000;
-
-            pDescriptor->maxChannels = 2;
-            pDescriptor->minBitsPerSample = 16;
-            pDescriptor->maxBitsPerSample = 16;
-            pDescriptor->minSampleRate = 8000 * 1000; /*milliHz*/
-            pDescriptor->maxSampleRate = 48000 * 1000;
-            pDescriptor->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
-            pDescriptor->pSampleRatesSupported
-                    = (XAmilliHertz*) (&(impl->sampleRateArray));
-            pDescriptor->numSampleRatesSupported = 7;
-            pDescriptor->minBitRate = 32000;
-            pDescriptor->maxBitRate = 256000;
-            pDescriptor->isBitrateRangeContinuous = XA_BOOLEAN_FALSE;
-            pDescriptor->pBitratesSupported
-                    = (XAuint32*) (&(impl->bitRateArray));
-            pDescriptor->numBitratesSupported = 8;
-            pDescriptor->profileSetting = XA_AUDIOPROFILE_AAC_AAC;
-            pDescriptor->modeSetting = XA_AUDIOMODE_AAC_LC;
-            }
-            break;
-        case XA_AUDIOCODEC_PCM:
-            {
-            impl->sampleRateArray[0] = 12000000;
-            impl->sampleRateArray[1] = 16000000;
-            impl->sampleRateArray[2] = 22050000;
-            impl->sampleRateArray[3] = 24000000;
-            impl->sampleRateArray[4] = 32000000;
-            impl->sampleRateArray[5] = 44100000;
-            impl->sampleRateArray[6] = 48000000;
-            impl->sampleRateArray[7] = 64000000;
-            impl->sampleRateArray[8] = 88200000;
-            impl->sampleRateArray[9] = 96000000;
-
-            pDescriptor->maxChannels = 2;
-            pDescriptor->minBitsPerSample = 16;
-            pDescriptor->maxBitsPerSample = 16;
-            pDescriptor->minSampleRate = 8000000; /*milliHz*/
-            pDescriptor->maxSampleRate = 96000000;
-            pDescriptor->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
-            pDescriptor->pSampleRatesSupported
-                    = (XAmilliHertz*) (&(impl->sampleRateArray));
-            pDescriptor->numSampleRatesSupported = 10;
-            pDescriptor->minBitRate = 0;
-            pDescriptor->maxBitRate = 0;
-            pDescriptor->isBitrateRangeContinuous = XA_BOOLEAN_FALSE;
-            pDescriptor->pBitratesSupported = NULL;
-            pDescriptor->numBitratesSupported = 0;
-            pDescriptor->profileSetting = XA_AUDIOPROFILE_PCM;
-            pDescriptor->modeSetting = 0;
-            }
-            break;
-        }
-
+ 
     res = XACapabilitiesMgr_GetCapsById(impl->capslist,
             (XACapsType) (XACAP_ENCODER | XACAP_AUDIO), encoderId, &temp);
     if (res == XA_RESULT_SUCCESS)
@@ -247,10 +142,10 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
                 ((XAAudioCodecDescriptor*) (temp.pEntry));
         /* map applicable values to XAAudioCodecCapabilities */
         pDescriptor->maxChannels = desc->maxChannels;
-        pDescriptor->minSampleRate = desc->minSampleRate * 1000; /* milliHz */
-        if (desc->maxSampleRate < (0xFFFFFFFF / 1000))
+        pDescriptor->minSampleRate = desc->minSampleRate ; /* milliHz */
+        if (desc->maxSampleRate < (0xFFFFFFFF))
             {
-            pDescriptor->maxSampleRate = desc->maxSampleRate * 1000;
+            pDescriptor->maxSampleRate = desc->maxSampleRate;
             }
         else
             {
@@ -258,36 +153,21 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
             }
         pDescriptor->minBitsPerSample = desc->minBitsPerSample;
         pDescriptor->maxBitsPerSample = desc->maxBitsPerSample;
-        pDescriptor->isFreqRangeContinuous = XA_BOOLEAN_TRUE;
+      pDescriptor->isFreqRangeContinuous=desc->isFreqRangeContinuous;
         pDescriptor->minBitRate = desc->minBitRate;
         pDescriptor->maxBitRate = desc->maxBitRate;
         pDescriptor->numBitratesSupported = desc->numBitratesSupported;
-        pDescriptor->isBitrateRangeContinuous = XA_BOOLEAN_TRUE;
-        if (temp.xaid == XA_AUDIOCODEC_PCM)
-            {
-            pDescriptor->profileSetting = XA_AUDIOPROFILE_PCM;
-            pDescriptor->modeSetting = 0; /* no chanmode for pcm defined */
-            }
-        else if (temp.xaid == XA_ADAPTID_VORBIS) /* for ogg */
-            {
-            if (desc->maxChannels == 1)
-                {
-                pDescriptor->profileSetting = XA_AUDIOPROFILE_MPEG1_L3;
-                pDescriptor->modeSetting = XA_AUDIOCHANMODE_MP3_MONO;
-                }
-            else
-                {
-                pDescriptor->profileSetting = XA_AUDIOPROFILE_MPEG2_L3;
-                pDescriptor->modeSetting = XA_AUDIOCHANMODE_MP3_STEREO;
-                }
-            }
-        else
-            {
-            /* do nothing */
-            }
-
-        }
-
+      pDescriptor->isBitrateRangeContinuous=desc->isBitrateRangeContinuous;
+      pDescriptor->profileSetting=desc->profileSetting;
+      pDescriptor->modeSetting=desc->modeSetting; /* no chanmode for pcm defined */
+    }
+      else
+      {
+          /* do nothing */
+      }
+      
+    
+   	
     DEBUG_API("<-XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities");
     return res;
     }

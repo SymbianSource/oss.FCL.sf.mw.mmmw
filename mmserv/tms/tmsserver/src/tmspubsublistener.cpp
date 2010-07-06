@@ -154,4 +154,14 @@ TInt TMSPubSubListener::Get(TDes16& aVal)
     return iProperty.Get(iUid, iId, aVal);
     }
 
+// -----------------------------------------------------------------------------
+// TMSPubSubListener::Set
+// Sets integer value.
+// -----------------------------------------------------------------------------
+//
+TInt TMSPubSubListener::Set(TInt aVal)
+    {
+    return iProperty.Set(iUid, iId, aVal);
+    }
+
 // End of File

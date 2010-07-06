@@ -47,6 +47,14 @@ class CMetaDataParserFactory : public CBase
 		* @return A pointer to a new instance of parser; NULL if parser is not created.
         */
         static CMetaDataParser* CreateID3ParserL( CMetaDataSource& aSource );
+        
+        /**
+        * Creates an instance of ID3 parser that can interpret the specified source.
+        * @param aSource Reference to a metadata source
+        * @param aOffset File offset of ID3 metadata
+        * @return A pointer to a new instance of parser; NULL if parser is not created.
+        */
+        static CMetaDataParser* CreateID3ParserL( CMetaDataSource& aSource, TUint aOffset );
 
         /**
         * Creates an instance of MP4 parser that can interpret the specified file.

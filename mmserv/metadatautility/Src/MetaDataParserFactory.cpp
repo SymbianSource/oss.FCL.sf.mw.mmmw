@@ -50,8 +50,22 @@ CMetaDataParser* CMetaDataParserFactory::CreateID3ParserL(
 #ifdef _DEBUG
 	RDebug::Print(_L("CMetaDataParserFactory::CreateID3ParserL"));
 #endif
+
+	return CreateID3ParserL( aSource, 0 );
+	}
+
+// -----------------------------------------------------------------------------
+// CMetaDataParserFactory::CreateID3ParserL
+// -----------------------------------------------------------------------------
+//
+CMetaDataParser* CMetaDataParserFactory::CreateID3ParserL(
+    CMetaDataSource& aSource, TUint aOffset )
+    {
+#ifdef _DEBUG
+    RDebug::Print(_L("CMetaDataParserFactory::CreateID3ParserL"));
+#endif
 	CMetaDataParser* parser = NULL;
-	TRAPD( err, parser = CMetaDataParserID3v2::CreateID3v2ParserL( aSource ));
+    TRAPD( err, parser = CMetaDataParserID3v2::CreateID3v2ParserL( aSource, aOffset ));
 	if ( !err && parser )
 		{
 		if ( parser->MetaDataExists() )

@@ -26,7 +26,6 @@ PRJ_TESTEXPORTS
 ../conf/openmaxaltestmodule_objectitf.cfg           /epoc32/winscw/c/testframework/openmaxaltestmodule_objectitf.cfg
 ../conf/openmaxaltestmodule_mr.cfg   					/epoc32/winscw/c/testframework/openmaxaltestmodule_mr.cfg
 ../conf/openmaxaltestmodule_mr_mdinsertionitf.cfg   	/epoc32/winscw/c/testframework/openmaxaltestmodule_mr_mdinsertionitf.cfg
-../conf/openmaxaltestmodule_mr_recorditf.cfg        	/epoc32/winscw/c/testframework/openmaxaltestmodule_mr_recorditf.cfg
 ../conf/openmaxaltestmodule_mr_audioencoderitf.cfg  	/epoc32/winscw/c/testframework/openmaxaltestmodule_mr_audioencoderitf.cfg
 ../conf/openmaxaltestmodule_engine_audenccapitf.cfg /epoc32/winscw/c/testframework/openmaxaltestmodule_engine_audenccapitf.cfg
 ../conf/openmaxaltestmodule_global.cfg              /epoc32/winscw/c/testframework/openmaxaltestmodule_global.cfg
@@ -45,6 +44,17 @@ PRJ_TESTEXPORTS
 ../conf/openmaxaltestmodule_mp_mdextractionitf.cfg  /epoc32/winscw/c/testframework/openmaxaltestmodule_mp_mdextractionitf.cfg
 ../conf/openmaxaltestmodule_radioitf.cfg 	    /epoc32/winscw/c/testframework/openmaxaltestmodule_radioitf.cfg
 ../conf/openmaxaltestmodule_mp_streaming.cfg        /epoc32/winscw/c/testframework/openmaxaltestmodule_mp_streaming.cfg
+../conf/openmaxaltestmodule_mp_playbackrateitf.cfg        /epoc32/winscw/c/testframework/openmaxaltestmodule_mp_playbackrateitf.cfg
+../conf/openmaxaltestmodule_mr_recorditf.cfg        /epoc32/winscw/c/testframework/openmaxaltestmodule_mr_recorditf.cfg
+../conf/openmaxaltestmodule_mr_recorditf_part2.cfg        /epoc32/winscw/c/testframework/openmaxaltestmodule_mr_recorditf_part2.cfg
+../conf/openmaxaltestmodule_mr_recorditf_part3.cfg        /epoc32/winscw/c/testframework/openmaxaltestmodule_mr_recorditf_part3.cfg
+../conf/openmaxaltestmodule_mr_recorditf_part4.cfg        /epoc32/winscw/c/testframework/openmaxaltestmodule_mr_recorditf_part4.cfg
+../conf/openmaxaltestmodule_mr_recorditf_aac_auto.cfg       /epoc32/winscw/c/testframework/openmaxaltestmodule_mr_recorditf_aac_auto.cfg
+../conf/openmaxaltestmodule_mr_record_aac_au_p2.cfg       /epoc32/winscw/c/testframework/openmaxaltestmodule_mr_record_aac_au_p2.cfg
+../conf/openmaxaltestmodule_mr_recorditf_aac_he.cfg       /epoc32/winscw/c/testframework/openmaxaltestmodule_mr_recorditf_aac_he.cfg
+../conf/openmaxaltestmodule_mr_record_aac_he_p2.cfg       /epoc32/winscw/c/testframework/openmaxaltestmodule_mr_record_aac_he_p2.cfg
+
+
 ../data/c/omxaltestdata/test.wav                    /epoc32/winscw/c/testing/data/omxaltestdata/test.wav
 ../data/c/omxaltestdata/test.mp3                    /epoc32/winscw/c/testing/data/omxaltestdata/test.mp3
 ../data/c/omxaltestdata/test.3gp                    /epoc32/winscw/c/testing/data/omxaltestdata/test.3gp

@@ -417,6 +417,13 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
 		virtual TInt al_metadataextractionitf_AddKeyFilter( CStifItemParser& aItem );
 		virtual TInt al_metadataextractionitf_ClearKeyFilter( CStifItemParser& aItem );
 		virtual TInt al_metadataextractionitf_GetCoverArt( CStifItemParser& aItem );
+		
+		virtual TInt al_playbackrateitf_SetRate( CStifItemParser& aItem );
+		virtual TInt al_playbackrateitf_GetRate( CStifItemParser& aItem );
+		virtual TInt al_playbackrateitf_SetPropertyConstraints( CStifItemParser& aItem );
+		virtual TInt al_playbackrateitf_GetProperties( CStifItemParser& aItem );
+		virtual TInt al_playbackrateitf_GetCapabilitiesOfRate( CStifItemParser& aItem );
+		virtual TInt al_playbackrateitf_GetRateRange( CStifItemParser& aItem );
 
         /**
          * Method used to log version of test class
@@ -486,6 +493,7 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         XASeekItf m_SeekItf;
         XARadioItf m_RadioItf;
         XADynamicSourceItf m_DynSrcItf;
+        XAPlaybackRateItf m_PlaybackRateItf;
         
         XAVolumeItf m_VolumeItf;
         XANokiaLinearVolumeItf  m_NokiaLinearVolumeItf;
@@ -534,7 +542,8 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         RWindowGroup iRwGroup;
         RWindow iRWindow;
         CWsScreenDevice* iDevice;
-
+		
+        XAAudioEncoderSettings m_audioensettings;
         // ?one_line_short_description_of_data
         //?data_declaration;
 

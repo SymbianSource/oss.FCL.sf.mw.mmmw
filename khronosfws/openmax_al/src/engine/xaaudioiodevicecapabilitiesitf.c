@@ -25,8 +25,6 @@
 #include "xacapabilitiesmgr.h"
 
 
-static XAchar deviceName1[] = "Default Mic";
-
 /* XAAudIODevCapaItfImpl* GetImpl
  * Description: Validate interface pointer and cast it to implementation pointer.
  */
@@ -124,57 +122,25 @@ XAresult XAAudIODevCapaItfImpl_QueryAudioInputCapabilities(
             XAAudioInputDescriptor* desc = ((XAAudioInputDescriptor*)(temp.pEntry));
             /* map applicable values to XAAudioCodecCapabilities */
             pDescriptor->maxChannels=desc->maxChannels;
-            pDescriptor->minSampleRate=desc->minSampleRate*1000; /* milliHz */
-            if (desc->maxSampleRate < (0xFFFFFFFF / 1000))
+            pDescriptor->minSampleRate=desc->minSampleRate; /* milliHz */
+            if (desc->maxSampleRate < (0xFFFFFFFF ))
             {
-                pDescriptor->maxSampleRate = desc->maxSampleRate*1000;
+                pDescriptor->maxSampleRate = desc->maxSampleRate;
             }
             else
             {
                 pDescriptor->maxSampleRate = 0xFFFFFFFF;
             }
-            pDescriptor->isFreqRangeContinuous=XA_BOOLEAN_TRUE;
-            pDescriptor->deviceConnection = XA_DEVCONNECTION_INTEGRATED;
-            pDescriptor->deviceScope = XA_DEVSCOPE_ENVIRONMENT;
-            pDescriptor->deviceLocation = XA_DEVLOCATION_HANDSET;
-            pDescriptor->deviceName = temp.adaptId;
+            pDescriptor->isFreqRangeContinuous=desc->isFreqRangeContinuous;
+            pDescriptor->deviceConnection = desc->deviceConnection;
+            pDescriptor->deviceScope = desc->deviceScope;
+            pDescriptor->deviceLocation = desc->deviceLocation;
+            pDescriptor->deviceName = desc->deviceName;
             /* other caps undefined */
-        }
-
-        switch (deviceId)
-                {
-                case 0xAD7E5001:
-                    {
-                    impl->sampleRateArray[0] = 8000000;
-                    impl->sampleRateArray[1] = 11025000;
-                    impl->sampleRateArray[2] = 12000000;
-                    impl->sampleRateArray[3] = 16000000;
-                    impl->sampleRateArray[4] = 22050000;
-                    impl->sampleRateArray[5] = 24000000;
-                    impl->sampleRateArray[6] = 32000000;
-                    impl->sampleRateArray[7] = 44100000;
-                    impl->sampleRateArray[8] = 48000000;
-                    impl->sampleRateArray[9] = 64000000;
-                    impl->sampleRateArray[10] = 88200000;
-                    impl->sampleRateArray[11] = 96000000;
-
-                    pDescriptor->deviceName = (XAchar *)deviceName1;
-                    pDescriptor->deviceConnection = XA_DEVCONNECTION_INTEGRATED;
-                    pDescriptor->deviceScope = XA_DEVSCOPE_ENVIRONMENT;
-                    pDescriptor->deviceLocation = XA_DEVLOCATION_HANDSET;
-                    pDescriptor->isForTelephony = XA_BOOLEAN_FALSE;
-                    pDescriptor->minSampleRate=8000000; /* milliHz */
-                    pDescriptor->maxSampleRate = 96000000;
-                    pDescriptor->isFreqRangeContinuous=XA_BOOLEAN_FALSE;
-                    pDescriptor->samplingRatesSupported = (XAmilliHertz*)(&(impl->sampleRateArray));
-                    pDescriptor->numOfSamplingRatesSupported = 12;
-                    pDescriptor->maxChannels = 2;
-                    }
-                    break;
-                default:
-                    res = XA_RESULT_PARAMETER_INVALID;
-                    break;
-                }
+            pDescriptor->isForTelephony = desc->isForTelephony;
+            pDescriptor->samplingRatesSupported = desc->samplingRatesSupported;
+            pDescriptor->numOfSamplingRatesSupported = desc->numOfSamplingRatesSupported;
+         }
     }
 
     DEBUG_API("<-XAAudIODevCapaItfImpl_QueryAudioInputCapabilities");
@@ -292,58 +258,25 @@ XAresult XAAudIODevCapaItfImpl_QueryAudioOutputCapabilities(
             XAAudioOutputDescriptor* desc = ((XAAudioOutputDescriptor*)(temp.pEntry));
             /* map applicable values to XAAudioCodecCapabilities */
             pDescriptor->maxChannels=desc->maxChannels;
-            pDescriptor->minSampleRate=desc->minSampleRate*1000; /* milliHz */
-            if (desc->maxSampleRate < (0xFFFFFFFF / 1000))
+            pDescriptor->minSampleRate=desc->minSampleRate; /* milliHz */
+            if (desc->maxSampleRate < (0xFFFFFFFF))
             {
-                pDescriptor->maxSampleRate = desc->maxSampleRate*1000;
+                pDescriptor->maxSampleRate = desc->maxSampleRate;
             }
             else
             {
                 pDescriptor->maxSampleRate = 0xFFFFFFFF;
             }
-            pDescriptor->isFreqRangeContinuous=XA_BOOLEAN_TRUE;
-            pDescriptor->deviceConnection = XA_DEVCONNECTION_INTEGRATED;
-            pDescriptor->deviceScope = XA_DEVSCOPE_ENVIRONMENT;
-            pDescriptor->deviceLocation = XA_DEVLOCATION_HANDSET;
-            pDescriptor->pDeviceName = temp.adaptId;
+            pDescriptor->isFreqRangeContinuous=desc->isFreqRangeContinuous;
+            pDescriptor->deviceConnection = desc->deviceConnection;
+            pDescriptor->deviceScope = desc->deviceScope;
+            pDescriptor->deviceLocation = desc->deviceLocation;
+            pDescriptor->pDeviceName = desc->pDeviceName;
             /* other caps undefined */
-        }
-
-
-        switch (deviceId)
-                {
-                case 0xAD7E5002:
-                    {
-                    impl->sampleRateArray[0] = 8000000;
-                    impl->sampleRateArray[1] = 11025000;
-                    impl->sampleRateArray[2] = 12000000;
-                    impl->sampleRateArray[3] = 16000000;
-                    impl->sampleRateArray[4] = 22050000;
-                    impl->sampleRateArray[5] = 24000000;
-                    impl->sampleRateArray[6] = 32000000;
-                    impl->sampleRateArray[7] = 44100000;
-                    impl->sampleRateArray[8] = 48000000;
-                    impl->sampleRateArray[9] = 64000000;
-                    impl->sampleRateArray[10] = 88200000;
-                    impl->sampleRateArray[11] = 96000000;
-
-                    pDescriptor->pDeviceName = (XAchar *)"Device Speaker";
-                    pDescriptor->deviceConnection = XA_DEVCONNECTION_INTEGRATED;
-                    pDescriptor->deviceScope = XA_DEVSCOPE_ENVIRONMENT;
-                    pDescriptor->deviceLocation = XA_DEVLOCATION_HANDSET;
-                    pDescriptor->isForTelephony = XA_BOOLEAN_FALSE;
-                    pDescriptor->minSampleRate=8000000; /* milliHz */
-                    pDescriptor->maxSampleRate = 96000000;
-                    pDescriptor->isFreqRangeContinuous=XA_BOOLEAN_FALSE;
-                    pDescriptor->samplingRatesSupported = (XAmilliHertz*)(&(impl->sampleRateArray));
-                    pDescriptor->numOfSamplingRatesSupported = 12;
-                    pDescriptor->maxChannels = 2;
-                    }
-                    break;
-                default:
-                    res = XA_RESULT_PARAMETER_INVALID;
-                    break;
-                }
+            pDescriptor->isForTelephony = desc->isForTelephony;
+            pDescriptor->samplingRatesSupported = desc->samplingRatesSupported;
+            pDescriptor->numOfSamplingRatesSupported = desc->numOfSamplingRatesSupported;
+         }
     }
 
     DEBUG_API("<-XAAudIODevCapaItfImpl_QueryAudioOutputCapabilities");

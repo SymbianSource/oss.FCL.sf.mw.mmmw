@@ -130,7 +130,7 @@ void CMetaDataParserID3v23::PrepareToParseL()
 #endif
 	// Most of validation was already done by builder.
 	TBuf8<KID3v2HeaderLength> header;
-	iSource->ReadL( 0, header );
+	iSource->ReadL( iID32Offset, header );
     // ID3v2.3 header consists of following parts:
 	// File identifier	"ID3"
 	// Version			$03 00

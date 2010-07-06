@@ -53,7 +53,7 @@ public:
     IMPORT_C gint Connect();
 
     /**
-     * @return The server version this session can connct to
+     * @return The server version this session can connect to
      */
     IMPORT_C TVersion Version() const;
 

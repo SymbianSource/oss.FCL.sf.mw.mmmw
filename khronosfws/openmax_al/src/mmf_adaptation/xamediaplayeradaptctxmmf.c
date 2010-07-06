@@ -80,6 +80,8 @@ XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc,
             pSelf->curRotation = 0;
             pSelf->isobjsrc = XA_BOOLEAN_FALSE;
             pSelf->cameraSinkSynced = XA_BOOLEAN_FALSE;
+            pSelf->rateprops = XA_RATEPROP_SMOOTHVIDEO | XA_RATEPROP_NOPITCHCORAUDIO;
+            pSelf->playrate = 1000;
             }
         }
     else

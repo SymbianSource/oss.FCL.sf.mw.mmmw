@@ -61,10 +61,10 @@ gint TMSMemBuffer::Create(guint size, guint8* dataptr, TMSBuffer*& tmsbuffer)
     if (self)
         {
         self->iDataPtr = dataptr;
+        self->iOwnsBuffer = FALSE;
+        self->iBufferSize = size;
         ret = TMS_RESULT_SUCCESS;
         }
-    self->iOwnsBuffer = FALSE;
-    self->iBufferSize = size;
     tmsbuffer = self;
     TRACE_PRN_FN_EXT;
     return ret;

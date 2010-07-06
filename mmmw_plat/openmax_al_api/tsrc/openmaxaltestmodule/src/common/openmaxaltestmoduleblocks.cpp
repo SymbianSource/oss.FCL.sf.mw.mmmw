@@ -320,6 +320,14 @@ TInt COpenMAXALTestModule::RunMethodL(
         ENTRY( "al_metadataextractionitf_GetCoverArt", COpenMAXALTestModule::al_metadataextractionitf_GetCoverArt ),        
          /*MetadataExtractionItf ends*/
         
+        /*PlaybackRateItf*/
+        ENTRY( "al_playbackrateitf_SetRate", COpenMAXALTestModule::al_playbackrateitf_SetRate ),
+        ENTRY( "al_playbackrateitf_GetRate", COpenMAXALTestModule::al_playbackrateitf_GetRate ),
+        ENTRY( "al_playbackrateitf_SetPropertyConstraints", COpenMAXALTestModule::al_playbackrateitf_SetPropertyConstraints ),
+        ENTRY( "al_playbackrateitf_GetProperties", COpenMAXALTestModule::al_playbackrateitf_GetProperties ),
+        ENTRY( "al_playbackrateitf_GetCapabilitiesOfRate", COpenMAXALTestModule::al_playbackrateitf_GetCapabilitiesOfRate ),
+        ENTRY( "al_playbackrateitf_GetRateRange", COpenMAXALTestModule::al_playbackrateitf_GetRateRange ),
+         /*PlaybackRateItf ends*/
         
         //ADD NEW ENTRY HERE
         // [test cases entries] - Do not remove
@@ -875,6 +883,7 @@ TInt COpenMAXALTestModule::StoreInterface(TInt interface, void* id)
             break;
         case 8:
 /*            XA_IID_PLAYBACKRATE;*/
+            m_PlaybackRateItf = XAPlaybackRateItf(id);
             break;
         case 9:
 /*            XA_IID_PREFETCHSTATUS;*/

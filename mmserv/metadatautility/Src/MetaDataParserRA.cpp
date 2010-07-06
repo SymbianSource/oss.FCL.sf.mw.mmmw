@@ -26,8 +26,6 @@
 #include <s32mem.h>
 #include <hxmetadatautil.h>
 #include "MetaDataSourceFile.h"
-#include "MetaDataSourceDescriptor.h"
-
 
 
 // ============================ MEMBER FUNCTIONS ===============================
@@ -53,7 +51,7 @@ void CMetaDataParserRA::ConstructL()
     {
 	if ( ValidateL() )
 		{
-	    iExists = TRUE;
+//	    iExists = TRUE;
 		iHxMetaDataUtility = CHXMetaDataUtility::NewL();
 		}
 	else
@@ -117,19 +115,16 @@ void CMetaDataParserRA::ParseL(
 	HXMetaDataKeys::EHXMetaDataId id;
 	TFileName fileName;
 	
-	//Determine CMetaDataSourceDescriptor or CMetaDataSourceFile
-	CMetaDataSourceDescriptor* srcDesc = dynamic_cast<CMetaDataSourceDescriptor *>(&iSource);
-	if(srcDesc)
-	{
-		const TDesC8& des = srcDesc->GetDescriptor();
-		TRAPD(err, iHxMetaDataUtility->OpenDesL(des));
-		User::LeaveIfError(err);
-	}
-	else if (((CMetaDataSourceFile&)iSource).IsFileHandler())	// Determine if user entered a TDesC filename or a RFile:
+	// Determine if user entered a TDesC filename or a RFile:
+	
+	if (((CMetaDataSourceFile&)iSource).IsFileHandler())
 	{
 		RFile rFile;
 		rFile.Duplicate( ((CMetaDataSourceFile&)iSource).FileHandler() );
-		TRAPD(err, iHxMetaDataUtility->OpenFileL(rFile));
+		TRAPD(err, iHxMetaDataUtility->OpenFileL((RFile &)rFile));	// casting necessary--compile error	
+#ifdef _DEBUG
+		RDebug::Print(_L("CMetaDataParserRA::ParseL: Open File err = %d"), err);
+#endif  
 		rFile.Close();
 		User::LeaveIfError(err);
 	}

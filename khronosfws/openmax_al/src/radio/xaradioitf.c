@@ -24,7 +24,7 @@
 #include "xaradioitfadaptation.h"
 #include "xathreadsafety.h"
 
-#define FREQINTERVAL 20
+#define FREQINTERVAL 200000
 
 /**
  * XARadioItfImpl* GetImpl(XARadioItf self)
@@ -54,7 +54,7 @@ static XARadioItfImpl* GetImpl(XARadioItf self)
  **/
 XAresult XARadioItfImpl_SetFreqRange(XARadioItf self, XAuint8 range)
 {
-    XAresult ret = XA_RESULT_SUCCESS;
+    XAresult ret = XA_RESULT_PARAMETER_INVALID;
     XAboolean isSupported = XA_BOOLEAN_FALSE;
     XARadioItfImpl* impl = GetImpl(self);
 
@@ -68,7 +68,7 @@ XAresult XARadioItfImpl_SetFreqRange(XARadioItf self, XAuint8 range)
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XARadioItfImpl_SetFreqRange");
 
-        return XA_RESULT_PARAMETER_INVALID;
+        return ret;
     }
 
     ret = XARadioItfAdapt_IsFreqRangeSupported(range, &isSupported);
@@ -76,6 +76,10 @@ XAresult XARadioItfImpl_SetFreqRange(XARadioItf self, XAuint8 range)
     if ( ret == XA_RESULT_SUCCESS && isSupported == XA_BOOLEAN_TRUE )
     {
         ret = XARadioItfAdapt_SetFreqRange((XAAdaptationMMFCtx*)impl->adapCtx, range);
+    }
+    else if (!isSupported)
+    {
+    	ret = XA_RESULT_PARAMETER_INVALID;
     }
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
@@ -204,6 +208,7 @@ XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
 XAresult XARadioItfImpl_SetFrequency(XARadioItf self, XAuint32 freq)
 {
     XAresult ret = XA_RESULT_SUCCESS;
+        
     XARadioItfImpl* impl = GetImpl(self);
     DEBUG_API("->XARadioItfImpl_SetFrequency");
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSRadio);
@@ -215,6 +220,8 @@ XAresult XARadioItfImpl_SetFrequency(XARadioItf self, XAuint32 freq)
         DEBUG_API("<-XARadioItfImpl_SetFrequency");
         return XA_RESULT_PARAMETER_INVALID;
     }
+    
+ 
 
     ret = XARadioItfAdapt_SetFrequency( (XAAdaptationMMFCtx*)impl->adapCtx, freq );
 
@@ -607,7 +614,7 @@ XARadioItfImpl* XARadioItfImpl_Create(XAAdaptationBaseCtx *adapCtx)
         /* init variables */
 
         self->squelch = XA_BOOLEAN_FALSE;
-        self->stereoMode = RADIO_DEFAULT_STEREO_MODE;
+        self->stereoMode = XA_STEREOMODE_STEREO;
         self->callback = NULL;
         self->context = NULL;
         self->cbPtrToSelf = NULL;

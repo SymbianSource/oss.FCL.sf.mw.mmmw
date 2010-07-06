@@ -89,7 +89,8 @@ XAresult XANokiaLinearVolumeItfImpl_SetVolumeLevel(
 
     if ((!impl) || (vol > MAX_PERCENTAGE_VOLUME))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaLinearVolumeItfImpl_SetVolumeLevel");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaLinearVolumeItfImpl_SetVolumeLevel");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -130,7 +131,20 @@ XAresult XANokiaLinearVolumeItfImpl_GetVolumeLevel(
         return XA_RESULT_PARAMETER_INVALID;
         }
 
-    *percentage = impl->volumeLevel;
+    ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
+    if (ret == XA_RESULT_SUCCESS)
+        {
+        if (impl->adapCtx && impl->adapCtx->fwtype == FWMgrFWMMF)
+            {
+            ret = XANokiaLinearVolumeItfAdapt_GetVolumeLevel(
+                    (XAAdaptationMMFCtx*) impl->adapCtx, percentage);
+            if (ret == XA_RESULT_SUCCESS)
+                {
+                impl->volumeLevel = *percentage;
+                }
+            }
+        XAAdaptationBase_ThreadExit(impl->adapCtx);
+        }
 
     DEBUG_API("<-XANokiaLinearVolumeItfImpl_GetVolumeLevel");
     return ret;

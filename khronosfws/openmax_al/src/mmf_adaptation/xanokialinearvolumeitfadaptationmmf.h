@@ -25,6 +25,8 @@
 /* MACROS */
 
 /* FUNCTIONS */
+XAresult XANokiaLinearVolumeItfAdapt_GetVolumeLevel(XAAdaptationMMFCtx *ctx,
+                                         XAuint32 * percentage);
 
 XAresult XANokiaLinearVolumeItfAdapt_SetVolumeLevel(XAAdaptationMMFCtx *ctx,
         XAuint32 percentage);

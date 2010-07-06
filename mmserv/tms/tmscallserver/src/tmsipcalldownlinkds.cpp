@@ -710,15 +710,13 @@ void TMSIPDownlink::GetAudioDeviceL(TMSAudioOutput& output)
 
         switch (outputDev)
             {
+            case CAudioOutput::EPublic:
+                output = TMS_AUDIO_OUTPUT_PUBLIC;
+                break;
             case CAudioOutput::ENoPreference:
             case CAudioOutput::EAll:
             case CAudioOutput::ENoOutput:
             case CAudioOutput::EPrivate:
-                output = TMS_AUDIO_OUTPUT_PRIVATE;
-                break;
-            case CAudioOutput::EPublic:
-                output = TMS_AUDIO_OUTPUT_PUBLIC;
-                break;
             default:
                 output = TMS_AUDIO_OUTPUT_PRIVATE;
                 break;

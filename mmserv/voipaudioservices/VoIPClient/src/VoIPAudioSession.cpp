@@ -152,12 +152,10 @@ EXPORT_C TInt RVoIPAudioSession::OpenDownlink(
 //
 EXPORT_C TInt RVoIPAudioSession::GetMaxVolume()
     {
-    TInt maxVol = 0;
     TPckgBuf<TInt> pckg;
     TIpcArgs args(&pckg);
-    SendClientRequest(EVoIPGetMaxVolume, args);
-    maxVol = pckg();
-    return maxVol;
+    TInt err = SendClientRequest(EVoIPGetMaxVolume, args);
+    return (err == KErrNone) ? pckg() : err;
     }
 
 // -----------------------------------------------------------------------------
@@ -338,12 +336,10 @@ EXPORT_C TInt RVoIPAudioSession::OpenUplink(
 //
 EXPORT_C TInt RVoIPAudioSession::GetMaxGain()
     {
-    TInt maxGain = 0;
     TPckgBuf<TInt> pckg;
     TIpcArgs args(&pckg);
-    SendClientRequest(EVoIPGetMaxGain, args);
-    maxGain = pckg();
-    return maxGain;
+    TInt err = SendClientRequest(EVoIPGetMaxGain, args);
+    return (err == KErrNone) ? pckg() : err;
     }
 
 // -----------------------------------------------------------------------------

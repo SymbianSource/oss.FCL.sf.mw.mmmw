@@ -23,6 +23,7 @@
 #include "markerpositiontimer.h"
 #include "positionupdatetimer.h"
 #include "profileutilmacro.h"
+#include <mmf/common/mmfvideoenums.h>
 
 extern "C"
     {
@@ -1617,6 +1618,68 @@ XAresult CMMFBackendEngine::GetVolume(XAuint32* volume)
     return retVal;
     }
 
+XAresult CMMFBackendEngine::SetPlaybackRate(XAint16 rate)
+    {
+    XAresult retVal(XA_RESULT_INTERNAL_ERROR);
+
+    switch (iMediaPlayerState)
+        {
+        case XA_PLAYSTATE_STOPPED:
+        case XA_PLAYSTATE_PAUSED:
+        case XA_PLAYSTATE_PLAYING:
+            if (iAPIBeingUsed == EAudioPlayerUtility)
+                {
+                retVal = XA_RESULT_FEATURE_UNSUPPORTED;
+                }
+            else
+                {
+                TRAPD(err, iVideoPlayer->SetPlayVelocityL(rate));
+                if(!err)
+                    {
+                    retVal = XA_RESULT_SUCCESS; 
+                    }
+                }
+            break;
+        case XA_PLAYSTATE_PLAYERUNINITIALIZED:
+        default:
+            break;
+        }
+    return retVal;
+    }
+
+XAresult CMMFBackendEngine::GetPlaybackRateCapabilities(XAboolean* forward,
+                                                        XAboolean* backward)
+    {
+    XAresult retVal(XA_RESULT_PARAMETER_INVALID);
+    
+    switch (iMediaPlayerState)
+        {
+        case XA_PLAYSTATE_STOPPED:
+        case XA_PLAYSTATE_PAUSED:
+        case XA_PLAYSTATE_PLAYING:
+            if (iAPIBeingUsed == EAudioPlayerUtility)
+                {
+                retVal = XA_RESULT_FEATURE_UNSUPPORTED;
+                }
+            else
+                {
+                TVideoPlayRateCapabilities capability;
+                TRAPD(err, iVideoPlayer->GetPlayRateCapabilitiesL(capability));
+                if(!err)
+                    {
+                    *forward = capability.iPlayForward;
+                    *backward = capability.iPlayBackward;
+                    retVal = XA_RESULT_SUCCESS; 
+                    }
+                }
+            break;
+        case XA_PLAYSTATE_PLAYERUNINITIALIZED:
+        default:
+            break;
+        }
+    return retVal;
+    }
+
 extern "C"
     {
 
@@ -1853,5 +1916,15 @@ extern "C"
     XAresult mmf_volumeitf_get_volume(void * context, XAuint32* volume)
         {
         return ((CMMFBackendEngine *) (context))->GetVolume(volume);
+        }
+
+    XAresult mmf_playbackrateitf_set_playbackrate(void * context, XAint16 rate)
+        {
+        return ((CMMFBackendEngine *) (context))->SetPlaybackRate(rate);
+        }
+
+    XAresult mmf_playbackrateitf_get_playbackratecaps(void * context, XAboolean* forward, XAboolean* backward)
+        {
+        return ((CMMFBackendEngine *) (context))->GetPlaybackRateCapabilities(forward,backward);
         }
     }

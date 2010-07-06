@@ -676,9 +676,7 @@ void TMSCallSession::HandleGlobalEffectVolumeSetVolL(const RMessage2& aMessage)
     iGlobalVol = aMessage.Int0();
     if (iCallAdpt)
         {
-        guint vol(0);
-        vol = aMessage.Int0();
-        status = iCallAdpt->SetGlobalVolume(vol);
+        status = iCallAdpt->SetGlobalVolume(iGlobalVol);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -744,9 +742,7 @@ void TMSCallSession::HandleGlobalEffectVolumeSetGainL(
     iGlobalGain = aMessage.Int0();
     if (iCallAdpt)
         {
-        guint gain;
-        gain = aMessage.Int0();
-        status = iCallAdpt->SetGlobalGain(gain);
+        status = iCallAdpt->SetGlobalGain(iGlobalGain);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;

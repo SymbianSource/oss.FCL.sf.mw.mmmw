@@ -136,6 +136,10 @@ public:
     XAresult SetVolume(XAuint32 volume);
     XAresult GetVolume(XAuint32* volume);
     XAresult GetMaxVolume(XAuint32* maxvolume);
+
+    XAresult SetPlaybackRate(XAint16 rate);
+    XAresult GetPlaybackRateCapabilities(XAboolean* forward, XAboolean* backward);
+
 public:
 
     // MMdaObjectStateChangeObserver
@@ -311,6 +315,10 @@ extern XAresult mmf_streaminformationitf_set_activestream(void * context, XAuint
 extern XAresult mmf_volumeitf_set_volume(void * context, XAuint32 volume);
 extern XAresult mmf_volumeitf_get_volume(void * context, XAuint32* volume);
 extern XAresult mmf_volumeitf_get_maxvolume(void * context, XAuint32* volume);
+extern XAresult mmf_playbackrateitf_set_playbackrate(void * context, XAint16 rate);
+extern XAresult mmf_playbackrateitf_get_playbackratecaps(void * context,
+                                XAboolean* forward, XAboolean* backward);
+
 #endif /* __cplusplus */
 
 #endif /* CMMFBackendEngine_H */

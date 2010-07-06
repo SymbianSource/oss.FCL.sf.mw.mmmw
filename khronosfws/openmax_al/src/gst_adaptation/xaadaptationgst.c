@@ -55,8 +55,6 @@ XAresult XAAdaptationGst_Init(XAAdaptationGstCtx* pSelf, XAuint32 ctxId)
             }
         else
             {
-            GError* gerror = 0;
-
             /*         Add default handler for Gst-bus messages */
             pSelf->busCb = XAAdaptationGst_GstBusCb;
 
@@ -65,13 +63,6 @@ XAresult XAAdaptationGst_Init(XAAdaptationGstCtx* pSelf, XAuint32 ctxId)
             // VASU MOD ENDS
 
             sem_init(&(pSelf->semAsyncWait), 0, 0);
-
-            if (!gst_init_check(NULL, NULL, &gerror))
-                {
-                DEBUG_ERR("Gst Initalization failure.");
-                return XA_RESULT_INTERNAL_ERROR;
-                }
-
             }
         }
     else
@@ -489,8 +480,9 @@ GstElement* XAAdaptationGst_CreateGstSource(XADataSource* xaSrc,
                             ;
                             gstSrc = gst_element_factory_make("devsoundsrc",
                                     name); //Krishna - changed to devsoundsrc
-                            g_object_set(G_OBJECT (gstSrc), "num-buffers",
-                                    80, NULL);
+							// no need to set num-buffers		
+                            /*g_object_set(G_OBJECT (gstSrc), "num-buffers",
+                                    80, NULL);*/
                             break;
                         case XA_ADAPTID_AUDIOTESTSRC:
                             /*fall through*/

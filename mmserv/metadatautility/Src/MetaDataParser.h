@@ -114,6 +114,9 @@ class CMetaDataParser : public CBase
 		void ReadCharacterSetResourceL( TInt aResourceId );
 		TBool IsInTopCharacterSet( TUint aCharacterSetId );
 
+		void SetID32Offset( TUint aOffset );
+		TUint ID32Offset();
+		
 		/**
         * Parses the common metadata, the metadata fields are
         * inserted into the container.
@@ -180,6 +183,7 @@ class CMetaDataParser : public CBase
 		CArrayFix<CCnvCharacterSetConverter::SCharacterSet>* iTopCharacterSet;
 
 		RResourceFile iRscFile;
+	    TUint32 iID32Offset;
 
 		//CArrayFixFlat<TInt>* installedLanguages;
 	};

@@ -75,6 +75,7 @@ SOURCE          openmaxalmetadatainsertionitfcallbacks.cpp
 SOURCEPATH 	../src/player
 SOURCE 		openmaxalplayitftests.cpp
 SOURCE 		openmaxalseekitftests.cpp
+SOURCE 		openmaxalplaybackrateitftests.cpp
 
 SOURCEPATH      ../src/metadata
 SOURCE		openmaxalmetadataextractionitftests.cpp
