@@ -91,14 +91,16 @@ XAresult XANokiaVolumeExtItfImpl_SetVolumeLevel(XANokiaVolumeExtItf self,
     if (XANokiaVolumeExtItfImpl_GetMaxVolumeLevel(self, &maximumLevel)
             != XA_RESULT_SUCCESS)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_SetVolumeLevel");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_SetVolumeLevel");
         /* cannot solve maximum volume level */
         return XA_RESULT_PARAMETER_INVALID;
         }
 
     if (!impl || level > maximumLevel)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_SetVolumeLevel");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_SetVolumeLevel");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -122,7 +124,8 @@ XAresult XANokiaVolumeExtItfImpl_GetVolumeLevel(XANokiaVolumeExtItf self,
 
     if (!impl || !pLevel)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_GetVolumeLevel");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_GetVolumeLevel");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -146,7 +149,8 @@ XAresult XANokiaVolumeExtItfImpl_GetMaxVolumeLevel(XANokiaVolumeExtItf self,
 
     if (!impl || !pMaxLevel)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_GetMaxVolumeLevel");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_GetMaxVolumeLevel");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -170,7 +174,8 @@ XAresult XANokiaVolumeExtItfImpl_SetMute(XANokiaVolumeExtItf self,
 
     if (!impl)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_SetMute");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_SetMute");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -211,7 +216,8 @@ XAresult XANokiaVolumeExtItfImpl_GetMute(XANokiaVolumeExtItf self,
 
     if (!impl || !pMute)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_GetMute");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_GetMute");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -235,7 +241,8 @@ XAresult XANokiaVolumeExtItfImpl_EnableStereoPosition(
 
     if (!impl)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_EnableStereoPosition");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_EnableStereoPosition");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -281,7 +288,8 @@ XAresult XANokiaVolumeExtItfImpl_IsEnabledStereoPosition(
 
     if (!impl || !pEnable)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_IsEnabledStereoPosition");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_IsEnabledStereoPosition");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -307,7 +315,8 @@ XAresult XANokiaVolumeExtItfImpl_SetStereoPosition(XANokiaVolumeExtItf self,
     if (!impl || (stereoPosition < STEREO_POSITION_LEFT) || (stereoPosition
             > STEREO_POSITION_RIGHT))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_SetStereoPosition");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_SetStereoPosition");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -351,7 +360,8 @@ XAresult XANokiaVolumeExtItfImpl_GetStereoPosition(XANokiaVolumeExtItf self,
 
     if (!impl || !pStereoPosition)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfImpl_GetStereoPosition");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_GetStereoPosition");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -486,7 +496,8 @@ void XANokiaVolumeExtItfImpl_AdaptCb(void *pHandlerCtx, XAAdaptEvent *event)
 
     if (!impl)
         {
-        DEBUG_ERR("XANokiaVolumeExtItfImpl_AdaptCb, invalid context pointer!");DEBUG_API("<-XANokiaVolumeExtItfImpl_AdaptCb");
+        DEBUG_ERR("XANokiaVolumeExtItfImpl_AdaptCb, invalid context pointer!");
+        DEBUG_API("<-XANokiaVolumeExtItfImpl_AdaptCb");
         return;
         }
     assert(event);

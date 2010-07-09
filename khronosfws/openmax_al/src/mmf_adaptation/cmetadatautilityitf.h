@@ -23,7 +23,7 @@
 #include <e32base.h>
 #include <e32std.h>
 #include <e32hashtab.h>
-#include <OpenMAXAL.h>
+#include <openmaxalwrapper.h>
 
 #include <hxmetadatautil.h>
 #include <MetaDataUtility.h>

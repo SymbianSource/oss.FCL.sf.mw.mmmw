@@ -30,12 +30,12 @@
 using namespace TMS;
 
 // CONSTANTS
-const TUint KTMSServerConnectRetries = 2;
-const TUint KSessionMessageSlots = 10;
-const TUint KUTF8Multiply = 2;
+const guint KTMSServerConnectRetries = 2;
+const guint KSessionMessageSlots = 10;
+const guint KUTF8Multiply = 2;
 
 // -----------------------------------------------------------------------------
-// StartServer
+// TMSProxy::StartServer
 //
 // Function that will launch TMS server executable in it its own process.
 // Start the server process/thread, which lives in an EPOCEXE object.
@@ -119,14 +119,13 @@ EXPORT_C gint TMSProxy::Connect()
     {
     TRACE_PRN_FN_ENT;
 
-    gint retry = KTMSServerConnectRetries;
+    guint retry = KTMSServerConnectRetries;
     gint err(TMS_RESULT_GENERAL_ERROR);
-    gint numMessageSlots = KSessionMessageSlots;
 
     for (;;)
         {
         // Try to create a new session with the server
-        err = CreateSession(KTMSServerName, Version(), numMessageSlots);
+        err = CreateSession(KTMSServerName, Version(), KSessionMessageSlots);
 
         if ((err != KErrNotFound) && (err != KErrServerTerminated))
             {
@@ -183,9 +182,8 @@ EXPORT_C void TMSProxy::Close()
 
 EXPORT_C gint TMSProxy::GetTMSCallSessionHandle()
     {
-    gint err(TMS_RESULT_SUCCESS);
-    err = SendReceive(ETMSCallSessionHandle);
-    return TMSRESULT(err);
+    gint handle = SendReceive(ETMSCallSessionHandle);
+    return handle;
     }
 
 EXPORT_C gint TMSProxy::GetSupportedDecoders(RArray<TUint32>& aDecoders,
@@ -414,7 +412,7 @@ EXPORT_C gint TMSProxy::InitRT(const TMSRingToneType type, GString* str,
         {
         // Convert buffer from UTF-8 to unicode (16-bit)
         // Note: UTF-8 strings can take up to 4 bytes per character
-        gint unilen = tts->len / KUTF8Multiply;
+        guint unilen = tts->len / KUTF8Multiply;
         TRAP(status, ttsBuf = HBufC::NewL(unilen));
         if (status == KErrNone)
             {
@@ -438,7 +436,7 @@ EXPORT_C gint TMSProxy::InitRT(const TMSRingToneType type, GString* str,
                 HBufC* buf(NULL);
                 // Convert buffer from UTF-8 to unicode (16-bit)
                 // Note: UTF-8 strings can take up to 4 bytes per character
-                gint unilen = str->len / KUTF8Multiply;
+                guint unilen = str->len / KUTF8Multiply;
 
                 TRAP(status, buf = HBufC::NewL(unilen));
                 if (buf && status == KErrNone)
@@ -534,6 +532,15 @@ EXPORT_C gint TMSProxy::MuteRT()
     {
     gint status(TMS_RESULT_SUCCESS);
     status = RSessionBase::SendReceive(ETMSRingToneMute);
+    return TMSRESULT(status);
+    }
+
+EXPORT_C gint TMSProxy::InitDTMFPlayer(TMSStreamType streamtype)
+    {
+    gint status(TMS_RESULT_SUCCESS);
+    TIpcArgs args;
+    args.Set(0, streamtype);
+    status = RSessionBase::SendReceive(ETMSInitDTMF, args);
     return TMSRESULT(status);
     }
 

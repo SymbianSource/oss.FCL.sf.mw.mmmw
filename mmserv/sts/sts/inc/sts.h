@@ -22,10 +22,15 @@
 #ifndef STS_H_
 #define STS_H_
 
+
 #include <systemtoneservice.h>
 #include <map>
 
 #include "stsplayer.h"
+
+class MProEngEngine;
+class MProEngProfile;
+
 
 class CSts : private MStsPlayerObserver
     {
@@ -41,6 +46,8 @@ protected:
     CSts();
     virtual ~CSts();
     bool Init();
+    void LoadActiveProfileSettingsL();
+    
 
 private:
     void CleanUpPlayers();
@@ -53,6 +60,16 @@ private:
     class CPlayerNode;
     typedef std::map<unsigned int, CPlayerNode*> TPlayerMap;
     TPlayerMap iPlayerMap;
+    
+    TPtrC iFileName;
+    MProEngEngine* iEngine;
+    MProEngProfile* iProfile;
+
+    TInt  iVolume;
+    TBool iWarningToneEnabled;
+    TUint iAudioPreference;
+    TUint iAudioPriority;
+    
     };
 
 #endif //STS_H

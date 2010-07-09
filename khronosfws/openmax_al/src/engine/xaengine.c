@@ -25,18 +25,10 @@
 #include "xathreadsyncitf.h"
 #include "xadynintmgmtitf.h"
 #include "xaaudioiodevicecapabilitiesitf.h"
-#include "xaaudiodecodercapabilitiesitf.h"
 #include "xaaudioencodercapabilitiesitf.h"
-#include "xaimagedecodercapabilitiesitf.h"
-#include "xaimageencodercapabilitiesitf.h"
-#include "xavideodecodercapabilitiesitf.h"
-#include "xavideoencodercapabilitiesitf.h"
-#include "xacameracapabilitiesitf.h"
-#include "xadevicevolumeitf.h"
 #include "xaconfigextensionsitf.h"
 #include "xathreadsafety.h"
 #include "xaframeworkmgr.h"  
-#include "xastaticcameracapsadaptation.h"
 
 /* Static mapping of enumeration XAEngineInterfaces to interface iids */
 static const XAInterfaceID* xaEngineItfIIDs[ENGINE_ITFCOUNT] =
@@ -80,7 +72,8 @@ XAresult XAEngineImpl_Create(XAObjectItf *pEngine, XAuint32 numOptions,
 
     if (!pEngine)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAEngineImpl_Create");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAEngineImpl_Create");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -107,7 +100,8 @@ XAresult XAEngineImpl_Create(XAObjectItf *pEngine, XAuint32 numOptions,
     pImpl = (XAEngineImpl*) calloc(1, sizeof(XAEngineImpl));
     if (!pImpl)
         {
-        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");DEBUG_API("<-XAEngineImpl_Create");
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAEngineImpl_Create");
         /* memory allocation failed */
         return XA_RESULT_MEMORY_FAILURE;
         }
@@ -142,7 +136,8 @@ XAresult XAEngineImpl_Create(XAObjectItf *pEngine, XAuint32 numOptions,
                     {
                     /* required interface cannot be accommodated - fail creation */
                     XAObjectItfImpl_Destroy((XAObjectItf) &(pBaseObj));
-                    DEBUG_ERR("Required interface not found - abort creation!");DEBUG_API("<-XAEngineImpl_Create");
+                    DEBUG_ERR("Required interface not found - abort creation!");
+                    DEBUG_API("<-XAEngineImpl_Create");
                     return XA_RESULT_FEATURE_UNSUPPORTED;
                     }
                 else
@@ -191,7 +186,8 @@ XAresult XAEngineImpl_QueryNumSupportedInterfaces(
         }
     else
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAEngineImpl_QueryNumSupportedInterfaces");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAEngineImpl_QueryNumSupportedInterfaces");
         return XA_RESULT_PARAMETER_INVALID;
         }
     }
@@ -293,41 +289,13 @@ XAresult XAEngineImpl_DoRealize(XAObjectItf self)
                     pItf = XAAudioEncoderCapabilitiesItfImpl_Create(
                             pObjImpl->capabilities);
                     break;
-                    /*
-                     case ENGINE_AUDIODECODERCAPAITF:
-                     pItf = XAAudioDecoderCapabilitiesItfImpl_Create();
-                     break;
-                     case ENGINE_CONFIGEXTENSIONSITF:
-                     pItf = XAConfigExtensionsItfImpl_Create();
-                     break;
-                     case ENGINE_DEVICEVOLUMEITF:
-                     pItf = XADeviceVolumeItfImpl_Create(pObjImpl->adaptationCtx);
-                     break;
-                     case ENGINE_CAMERACAPAITF:
-
-                     XAStaticCameraCaps_Init();
-                     pItf = XACameraCapabilitiesItfImpl_Create();
-                     
-                     break;
-                     case ENGINE_IMAGEDECODERCAPAITF:
-                     pItf = XAImageDecoderCapabilitiesItfImpl_Create();
-                     break;
-                     case ENGINE_IMAGEENCODERCAPAITF:
-                     pItf = XAImageEncoderCapabilitiesItfImpl_Create();
-                     break;
-                     case ENGINE_VIDEODECODERCAPAITF:
-                     pItf = XAVideoDecoderCapabilitiesItfImpl_Create();
-                     break;
-                     case ENGINE_VIDEOENCODERCAPAITF:
-                     pItf = XAVideoEncoderCapabilitiesItfImpl_Create();
-                     break;
-                     */
                 default:
                     break;
                 }
             if (!pItf)
                 {
-                DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");DEBUG_API("<-XAEngineImpl_DoRealize");
+                DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+                DEBUG_API("<-XAEngineImpl_DoRealize");
                 /* memory allocation failed */
                 return XA_RESULT_MEMORY_FAILURE;
                 }
@@ -348,7 +316,8 @@ XAresult XAEngineImpl_DoRealize(XAObjectItf self)
  */
 XAresult XAEngineImpl_DoResume(XAObjectItf self)
     {
-    DEBUG_API("->XAEngineImpl_DoResume");DEBUG_API("<-XAEngineImpl_DoResume");
+    DEBUG_API("->XAEngineImpl_DoResume");
+    DEBUG_API("<-XAEngineImpl_DoResume");
 
     return XA_RESULT_PRECONDITIONS_VIOLATED;
     }
@@ -387,34 +356,6 @@ void XAEngineImpl_FreeResources(XAObjectItf self)
                 case ENGINE_AUDIOENCODERCAPAITF:
                     XAAudioEncoderCapabilitiesItfImpl_Free(pItf);
                     break;
-                    /*
-                     case ENGINE_AUDIODECODERCAPAITF:
-                     XAAudioDecoderCapabilitiesItfImpl_Free(pItf);
-                     break;
-                     case ENGINE_CONFIGEXTENSIONSITF:
-                     XAConfigExtensionsItfImpl_Free(pItf);
-                     break;
-                     case ENGINE_DEVICEVOLUMEITF:
-                     XADeviceVolumeItfImpl_Free(pItf);
-                     break;
-                     case ENGINE_CAMERACAPAITF:
-
-                     XACameraCapabilitiesItfImpl_Free(pItf);
-                     
-                     break;
-                     case ENGINE_IMAGEDECODERCAPAITF:
-                     XAImageDecoderCapabilitiesItfImpl_Free(pItf);
-                     break;
-                     case ENGINE_IMAGEENCODERCAPAITF:
-                     XAImageEncoderCapabilitiesItfImpl_Free(pItf);
-                     break;
-                     case ENGINE_VIDEODECODERCAPAITF:
-                     XAVideoDecoderCapabilitiesItfImpl_Free(pItf);
-                     break;
-                     case ENGINE_VIDEOENCODERCAPAITF:
-                     XAVideoEncoderCapabilitiesItfImpl_Free(pItf);
-                     break;
-                     */
                 default:
                     break;
                 }

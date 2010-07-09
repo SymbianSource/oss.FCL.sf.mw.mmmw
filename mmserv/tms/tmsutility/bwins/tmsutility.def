@@ -8,7 +8,8 @@ EXPORTS
 	?FourCCToTMSFormat@TMSUtility@TMS@@SAHK@Z @ 7 NONAME ; int TMS::TMSUtility::FourCCToTMSFormat(unsigned long)
 	?NotifyAfter@TMSTimer@TMS@@QAEXHAAVTMSTimerObserver@2@@Z @ 8 NONAME ; void TMS::TMSTimer::NotifyAfter(int, class TMS::TMSTimerObserver &)
 	?ToTAROutput@TMSUtility@TMS@@SA?AW4TAudioOutput@CTelephonyAudioRouting@@H@Z @ 9 NONAME ; enum CTelephonyAudioRouting::TAudioOutput TMS::TMSUtility::ToTAROutput(int)
-	?ToFourCC@TMSUtility@TMS@@SAKH@Z @ 10 NONAME ; unsigned long TMS::TMSUtility::ToFourCC(int)
-	??1TMSTimer@TMS@@UAE@XZ @ 11 NONAME ; TMS::TMSTimer::~TMSTimer(void)
-	?NotifyAfter@TMSTimer@TMS@@QAEXHVTCallBack@@@Z @ 12 NONAME ; void TMS::TMSTimer::NotifyAfter(int, class TCallBack)
+	?SymbianResult@TMSUtility@TMS@@SAHH@Z @ 10 NONAME ; int TMS::TMSUtility::SymbianResult(int)
+	?ToFourCC@TMSUtility@TMS@@SAKH@Z @ 11 NONAME ; unsigned long TMS::TMSUtility::ToFourCC(int)
+	??1TMSTimer@TMS@@UAE@XZ @ 12 NONAME ; TMS::TMSTimer::~TMSTimer(void)
+	?NotifyAfter@TMSTimer@TMS@@QAEXHVTCallBack@@@Z @ 13 NONAME ; void TMS::TMSTimer::NotifyAfter(int, class TCallBack)
 

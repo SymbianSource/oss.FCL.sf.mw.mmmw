@@ -30,6 +30,9 @@
 #include "tmsglobaleffectssettings.h"
 #include "tmstareventhandler.h"
 #include "tmscenrepaudiohandler.h"
+#include "tmsdtmftoneplayer.h"
+#include "tmsdtmfprovider.h"
+#include "tmsdtmfnotifier.h"
 #include "tmsdtmfeventhandler.h"
 #include "tmsrtparam.h"
 #include "tmsserver.h"
@@ -86,6 +89,10 @@ TMSServer::~TMSServer()
     delete iDTMFHandler;
     DeinitRingTonePlayer();
     delete iTMSRtPlayer;
+    delete iDTMFUplinkPlayer;
+    delete iDTMFUplinkPlayerEtel;
+    delete iDTMFDnlinkPlayer;
+    delete iDTMFNotifier;
 
     TRACE_PRN_FN_EXT;
     }
@@ -136,6 +143,10 @@ void TMSServer::ConstructL()
     iAudioCenRepHandler = NULL;
     iDTMFHandler = NULL;
     iCurrentRouting = TMS_AUDIO_OUTPUT_PRIVATE;
+    iDTMFDnlinkPlayer = NULL;
+    iDTMFUplinkPlayer = NULL;
+    iDTMFUplinkPlayerEtel = NULL;
+    iDTMFNotifier = NULL;
 
     //TODO: EUnit fails to initialize ProfileEngine in RT in eshell mode
     TRAP_IGNORE(InitRingTonePlayerL());
@@ -190,46 +201,6 @@ TInt TMSServer::SessionCount() const
     }
 
 // -----------------------------------------------------------------------------
-// TMSServer::SetDnLinkSession
-//
-// -----------------------------------------------------------------------------
-//
-void TMSServer::SetDnLinkSession(const TBool aSession)
-    {
-    iDnlinkSession = aSession;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSServer::SetUpLinkSession
-//
-// -----------------------------------------------------------------------------
-//
-void TMSServer::SetUpLinkSession(const TBool aSession)
-    {
-    iUplinkSession = aSession;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSServer::HasDnLinkSession
-//
-// -----------------------------------------------------------------------------
-//
-TBool TMSServer::HasDnLinkSession() const
-    {
-    return iDnlinkSession;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSServer::HasUpLinkSession
-//
-// -----------------------------------------------------------------------------
-//
-TBool TMSServer::HasUpLinkSession() const
-    {
-    return iUplinkSession;
-    }
-
-// -----------------------------------------------------------------------------
 // TMSServer::GetNewTMSCallSessionHandleL
 //
 // -----------------------------------------------------------------------------
@@ -272,7 +243,7 @@ TInt TMSServer::StartTMSCallServer(TMSCallProxyLocal& aHandle)
 
     TInt status = TMS_RESULT_SUCCESS;
     TMSStartAndMonitorTMSCallThread* callServerThread = NULL;
-    TRAP(status, callServerThread =TMSStartAndMonitorTMSCallThread::NewL(
+    TRAP(status, callServerThread = TMSStartAndMonitorTMSCallThread::NewL(
             const_cast<TMSServer*>(this)));
     if (status != TMS_RESULT_SUCCESS)
         {
@@ -668,16 +639,12 @@ TInt TMSServer::SetLevel(CSession2* /*sid*/, TBool tmsclient, TInt level)
             }
 
         iSessionIter.SetToFirst();
-        TMSServerSession* serverSession =
-                static_cast<TMSServerSession*> (iSessionIter++);
-
-        while (serverSession != NULL)
+        TMSServerSession* ss = static_cast<TMSServerSession*> (iSessionIter++);
+        while (ss != NULL)
             {
-            serverSession->HandleGlobalEffectChange(
-                    TMS_EVENT_EFFECT_VOL_CHANGED, level, EFalse,
-                    iCurrentRouting);
-
-            serverSession = static_cast<TMSServerSession*> (iSessionIter++);
+            ss->HandleGlobalEffectChange(TMS_EVENT_EFFECT_VOL_CHANGED, level,
+                    EFalse, iCurrentRouting);
+            ss = static_cast<TMSServerSession*> (iSessionIter++);
             }
         }
 
@@ -744,15 +711,11 @@ TInt TMSServer::SetGain(CSession2* /*sid*/, TInt level)
         iAudioCenRepHandler->SetMuteState(level);
         iEffectSettings->SetGain(level);
         iSessionIter.SetToFirst();
-
-        TMSServerSession* serverSession =
-                static_cast<TMSServerSession*> (iSessionIter++);
-
-        while (serverSession != NULL)
+        TMSServerSession* ss = static_cast<TMSServerSession*> (iSessionIter++);
+        while (ss != NULL)
             {
-            serverSession->HandleGlobalEffectChange(
-                    TMS_EVENT_EFFECT_GAIN_CHANGED, level);
-            serverSession = static_cast<TMSServerSession*> (iSessionIter++);
+            ss->HandleGlobalEffectChange(TMS_EVENT_EFFECT_GAIN_CHANGED, level);
+            ss = static_cast<TMSServerSession*> (iSessionIter++);
             }
         }
 
@@ -885,20 +848,70 @@ TInt TMSServer::NotifyTarClients(TRoutingMsgBufPckg routingpckg)
     TInt status = SendMessageToCallServ(TMS_EFFECT_GLOBAL_VOL_SET, vol);
 
     iSessionIter.SetToFirst();
-    TMSServerSession* serverSession =
-            static_cast<TMSServerSession*> (iSessionIter++);
-    while (serverSession != NULL)
+    TMSServerSession* ss = static_cast<TMSServerSession*> (iSessionIter++);
+    while (ss != NULL)
         {
         // Send only if there is a subscriber to TMS routing notifications.
         if (iTarHandlerCount > 1)
             {
-            serverSession->HandleRoutingChange(routingpckg);
+            ss->HandleRoutingChange(routingpckg);
             }
-        serverSession->HandleGlobalEffectChange(TMS_EVENT_EFFECT_VOL_CHANGED,
-                vol, ETrue, iCurrentRouting);
-        serverSession = static_cast<TMSServerSession*> (iSessionIter++);
+        ss->HandleGlobalEffectChange(TMS_EVENT_EFFECT_VOL_CHANGED, vol, ETrue,
+                iCurrentRouting);
+        ss = static_cast<TMSServerSession*> (iSessionIter++);
         }
 
+    TRACE_PRN_FN_EXT;
+    return status;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::InitDTMF
+//
+// -----------------------------------------------------------------------------
+//
+TInt TMSServer::InitDTMF(const RMessage2& aMessage)
+    {
+    TRACE_PRN_FN_ENT;
+    TInt status(TMS_RESULT_SUCCESS);
+    TMSStreamType strmtype;
+    strmtype = (TMSStreamType) aMessage.Int0();
+
+    if (strmtype == TMS_STREAM_UPLINK)
+        {
+        if (!iDTMFUplinkPlayerEtel) //CS call
+            {
+            // Uses ETel for uplink
+            TRAP(status, iDTMFUplinkPlayerEtel = TMSDTMFProvider::NewL());
+            if (iDTMFUplinkPlayerEtel && status == TMS_RESULT_SUCCESS)
+                {
+                iDTMFUplinkPlayerEtel->AddObserver(*this);
+                }
+            }
+        if (!iDTMFUplinkPlayer) //IP call
+            {
+            TRAP(status, iDTMFUplinkPlayer = TMSAudioDtmfTonePlayer::NewL(*this,
+//                    KAudioPrefVoipAudioUplinkNonSignal,
+//                    KAudioPrefVoipAudioUplink,
+//                    KAudioPrefUnknownVoipAudioUplink
+//                    KAudioPriorityDTMFString));
+                    KAudioDTMFString, KAudioPriorityDTMFString));
+            }
+        }
+    else if (strmtype == TMS_STREAM_DOWNLINK)
+        {
+        if (!iDTMFDnlinkPlayer) //CS or IP call
+            {
+            TRAP(status, iDTMFDnlinkPlayer = TMSAudioDtmfTonePlayer::NewL(*this,
+                    KAudioDTMFString, KAudioPriorityDTMFString));
+            }
+        }
+    if (!iDTMFNotifier && status == TMS_RESULT_SUCCESS)
+        {
+        TRAP(status, iDTMFNotifier = TMSDtmfNotifier::NewL());
+        }
+
+    aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -915,31 +928,71 @@ TInt TMSServer::StartDTMF(const RMessage2& aMessage)
     TInt status(TMS_RESULT_SUCCESS);
     TInt len(0);
     TMSStreamType strmtype;
-
     strmtype = (TMSStreamType) aMessage.Int0();
     len = aMessage.GetDesLength(1);
-    HBufC* tone(NULL);
     if (len > 0)
         {
-        delete tone;
-        tone = NULL;
-        TRAP(status,tone = HBufC::NewL(len));
+        HBufC* tone(NULL);
+        TRAP(status, tone = HBufC::NewL(len));
         if (status == TMS_RESULT_SUCCESS)
             {
             TPtr ptr = tone->Des();
             status = aMessage.Read(1, ptr);
             TRACE_PRN_N(ptr);
+            TmsMsgBufPckg dtmfpckg;
+            dtmfpckg().iRequest = ECmdDTMFTonePlayFinished;
 
-            TIpcArgs args;
-            args.Set(0, strmtype);
-            args.Set(1, &ptr);
-            status = SendMessageToCallServ(TMS_DTMF_START, args);
-            delete tone;
-            tone = NULL;
+            if (strmtype == TMS_STREAM_UPLINK)
+                {
+//#ifdef __WINSCW__
+                // Just to test playback in wins
+//                iActiveCallType = TMS_CALL_IP;
+//#else
+                FindActiveCallType();
+//#endif
+                if (iActiveCallType == TMS_CALL_IP && iDTMFUplinkPlayer)
+                    {
+                    iDTMFUplinkPlayer->PlayDtmfTone(ptr);
+                    status = TMS_RESULT_SUCCESS;
+                    dtmfpckg().iRequest = ECmdDTMFToneUplPlayStarted;
+                    }
+                else if (iActiveCallType == TMS_CALL_CS &&
+                        iDTMFUplinkPlayerEtel)
+                    {
+                    status = iDTMFUplinkPlayerEtel->SendDtmfToneString(ptr);
+                    dtmfpckg().iRequest = ECmdDTMFToneUplPlayStarted;
+                    }
+                else
+                    {
+                    status = TMS_RESULT_INVALID_STATE;
+                    }
+                }
+            else if (strmtype == TMS_STREAM_DOWNLINK)
+                {
+                //status = TMS_RESULT_UNINITIALIZED_OBJECT;
+                if (iDTMFDnlinkPlayer)
+                    {
+                    iDTMFDnlinkPlayer->PlayDtmfTone(ptr);
+                    status = TMS_RESULT_SUCCESS;
+                    dtmfpckg().iRequest = ECmdDTMFToneDnlPlayStarted;
+                    }
+                }
+            else
+                {
+                status = TMS_RESULT_STREAM_TYPE_NOT_SUPPORTED;
+                }
+
+            if (iDTMFNotifier)
+                {
+                dtmfpckg().iStatus = TMSUtility::EtelToTMSResult(status);
+                iDTMFNotifier->SetDtmf(dtmfpckg);
+                }
             }
+        delete tone;
+        tone = NULL;
         }
-    aMessage.Complete(status);
 
+    aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -953,12 +1006,41 @@ TInt TMSServer::StopDTMF(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
 
-    TInt status(TMS_RESULT_SUCCESS);
+    TInt status(TMS_RESULT_INVALID_STATE);
     TMSStreamType streamtype;
     streamtype = (TMSStreamType) aMessage.Int0();
-    status = SendMessageToCallServ(TMS_DTMF_STOP, streamtype);
-    aMessage.Complete(status);
 
+    if (streamtype == TMS_STREAM_UPLINK)
+        {
+        if (iActiveCallType == TMS_CALL_IP && iDTMFUplinkPlayer)
+            {
+            iDTMFUplinkPlayer->Cancel();
+            status = TMS_RESULT_SUCCESS;
+            }
+        else if (iActiveCallType == TMS_CALL_CS &&
+                iDTMFUplinkPlayerEtel)
+            {
+            status = iDTMFUplinkPlayerEtel->StopDtmfTone();
+            status = TMSUtility::EtelToTMSResult(status);
+            }
+        }
+    else if (streamtype == TMS_STREAM_DOWNLINK)
+        {
+        if (iDTMFDnlinkPlayer)
+            {
+            iDTMFDnlinkPlayer->Cancel();
+            status = TMS_RESULT_SUCCESS;
+            }
+        }
+    if (iDTMFNotifier)
+        {
+        TmsMsgBufPckg dtmfpckg;
+        dtmfpckg().iStatus = status;
+        dtmfpckg().iRequest = ECmdDTMFTonePlayFinished;
+        iDTMFNotifier->SetDtmf(dtmfpckg);
+        }
+
+    aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -972,12 +1054,16 @@ TInt TMSServer::ContinueSendingDTMF(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
 
-    TInt status(TMS_RESULT_SUCCESS);
-    TBool continuesending;
-    continuesending = (TBool) aMessage.Int0();
-    status = SendMessageToCallServ(TMS_DTMF_CONTINUE, continuesending);
-    aMessage.Complete(status);
+    TInt status(TMS_RESULT_INVALID_STATE);
+    TBool continuesnd;
+    continuesnd = (TBool) aMessage.Int0();
+     if (iActiveCallType == TMS_CALL_CS && iDTMFUplinkPlayerEtel)
+        {
+        status = iDTMFUplinkPlayerEtel->ContinueDtmfStringSending(continuesnd);
+        status = TMSUtility::EtelToTMSResult(status);
+        }
 
+    aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -990,19 +1076,123 @@ TInt TMSServer::ContinueSendingDTMF(const RMessage2& aMessage)
 TInt TMSServer::NotifyDtmfClients(TmsMsgBufPckg dtmfpckg)
     {
     TRACE_PRN_FN_ENT;
-
     iSessionIter.SetToFirst();
-    TMSServerSession* serverSession =
-            static_cast<TMSServerSession*> (iSessionIter++);
-
-    while (serverSession != NULL)
+    TMSServerSession* ss = static_cast<TMSServerSession*> (iSessionIter++);
+    while (ss != NULL)
         {
-        serverSession->NotifyClient(dtmfpckg().iRequest, dtmfpckg().iStatus);
-        serverSession = static_cast<TMSServerSession*> (iSessionIter++);
+        ss->NotifyClient(dtmfpckg().iRequest, dtmfpckg().iStatus);
+        ss = static_cast<TMSServerSession*> (iSessionIter++);
         }
-
     TRACE_PRN_FN_EXT;
     return TMS_RESULT_SUCCESS;
+    }
+
+//From DTMFTonePlayerObserver
+// -----------------------------------------------------------------------------
+// TMSServer::DTMFInitCompleted
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::DTMFInitCompleted(gint /*status*/)
+    {
+    TRACE_PRN_FN_ENT;
+    // TODO: process error
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::DTMFToneFinished
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::DTMFToneFinished(gint status)
+    {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_IF_ERR(status);
+    TmsMsgBufPckg dtmfpckg;
+
+    // KErrUnderflow indicates end of DTMF playback.
+    if (status == KErrUnderflow /*|| status == KErrInUse*/)
+        {
+        status = TMS_RESULT_SUCCESS;
+        }
+    dtmfpckg().iStatus = TMSRESULT(status);
+    dtmfpckg().iRequest = ECmdDTMFTonePlayFinished;
+    if (iDTMFNotifier)
+        {
+        iDTMFNotifier->SetDtmf(dtmfpckg);
+        }
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::FindActiveCallType
+//
+// -----------------------------------------------------------------------------
+//
+gint TMSServer::FindActiveCallType()
+    {
+    TInt status(TMS_RESULT_INVALID_STATE);
+    iActiveCallType = -1;
+    TInt i = 0;
+    while (i < iTMSCallServList.Count())
+        {
+        TMSStartAndMonitorTMSCallThread* callThread = iTMSCallServList[i];
+        if (callThread)
+            {
+            TmsCallMsgBufPckg pckg;
+            TIpcArgs args(&pckg);
+            status = callThread->iTMSCallProxyLocal.ReceiveFromCallServer(
+                    TMS_GET_ACTIVE_CALL_PARAMS, args);
+            if (pckg().iBool || status != TMS_RESULT_SUCCESS)
+                {
+                iActiveCallType = static_cast<TMSCallType> (pckg().iInt);
+                break;
+                }
+            }
+        i++;
+        }
+    return status;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSServer::HandleDTMFEvent
+//
+// -----------------------------------------------------------------------------
+//
+void TMSServer::HandleDTMFEvent(const TMSDTMFObserver::TCCPDtmfEvent event,
+        const gint status, const TChar /*tone*/)
+    {
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_IF_ERR(status);
+    TmsMsgBufPckg dtmfpckg;
+    dtmfpckg().iStatus = TMSUtility::EtelToTMSResult(status);
+
+    switch (event)
+        {
+        case ECCPDtmfUnknown:               //Unknown
+            break;
+        case ECCPDtmfManualStart:           //DTMF sending started manually
+        case ECCPDtmfSequenceStart:         //Automatic DTMF sending initialized
+            dtmfpckg().iRequest = ECmdDTMFToneUplPlayStarted;
+            break;
+        case ECCPDtmfManualStop:            //DTMF sending stopped manually
+        case ECCPDtmfManualAbort:           //DTMF sending aborted manually
+        case ECCPDtmfSequenceStop:          //Automatic DTMF sending stopped
+        case ECCPDtmfSequenceAbort:         //Automatic DTMF sending aborted
+        case ECCPDtmfStopInDtmfString:      //There was stop mark in DTMF string
+        case ECCPDtmfStringSendingCompleted://DTMF sending success
+            dtmfpckg().iRequest = ECmdDTMFTonePlayFinished;
+            break;
+        default:
+            break;
+        }
+
+    if (iDTMFNotifier)
+        {
+        iDTMFNotifier->SetDtmf(dtmfpckg);
+        }
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -1575,4 +1765,3 @@ TInt E32Main()
     return r;
     }
 
-// End of file

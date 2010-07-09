@@ -1,7 +1,0 @@
-EXPORTS
-	??1CPdProperties@@UAE@XZ @ 1 NONAME ; CPdProperties::~CPdProperties(void)
-	?NewL@CPdProperties@@SAPAV1@XZ @ 2 NONAME ; class CPdProperties * CPdProperties::NewL(void)
-	?NewLC@CPdProperties@@SAPAV1@XZ @ 3 NONAME ; class CPdProperties * CPdProperties::NewLC(void)
-	?OpenL@CPdProperties@@QAEPAVCAudioPdPlayUtility@@ABVRFile@@AAVMAudioPdPlayUtilityCallback@@@Z @ 4 NONAME ; class CAudioPdPlayUtility * CPdProperties::OpenL(class RFile const &, class MAudioPdPlayUtilityCallback &)
-	?OpenL@CPdProperties@@QAEPAVCAudioPdPlayUtility@@ABVTDesC16@@AAVMAudioPdPlayUtilityCallback@@@Z @ 5 NONAME ; class CAudioPdPlayUtility * CPdProperties::OpenL(class TDesC16 const &, class MAudioPdPlayUtilityCallback &)
-

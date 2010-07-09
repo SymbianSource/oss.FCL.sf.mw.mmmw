@@ -239,6 +239,9 @@ void TMSServerSession::DispatchMessageL(const RMessage2& aMessage)
             iServer.CancelDTMFNotifier();
             aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
+        case ETMSInitDTMF:
+            iServer.InitDTMF(aMessage);
+            break;
         case ETMSStartDTMF:
             iServer.StartDTMF(aMessage);
             break;
@@ -522,4 +525,3 @@ void TMSServerSession::NotifyClient(const TInt aCommand, const TInt aStatus)
         }
     }
 
-// End of file

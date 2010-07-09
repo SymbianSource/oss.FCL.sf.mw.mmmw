@@ -36,10 +36,9 @@ TMSCallImpl::~TMSCallImpl()
 
 gint TMSCallImpl::PostConstruct(TMSCallType ctype, guint /*ctxid*/)
     {
+    TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
     TMSCallBody* tmscallimplbody(NULL);
-
-    TRACE_PRN_FN_ENT;
 
     switch (ctype)
         {
@@ -65,10 +64,10 @@ gint TMSCallImpl::PostConstruct(TMSCallType ctype, guint /*ctxid*/)
 EXPORT_C gint TMSCallImpl::Create(TMSCallType ctype, TMSCall*& tmscall,
         guint ctxid)
     {
+    TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
     TMSCallImpl *self = new TMSCallImpl();
 
-    TRACE_PRN_FN_ENT;
     if (self)
         {
         ret = self->PostConstruct(ctype, ctxid);

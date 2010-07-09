@@ -26,7 +26,7 @@ const TInt KDefaultVolume = 4;
 const TInt KDefaultMaxVolume = 10;
 const TInt KDefaultGain = 1;
 
-#ifndef __WINS__
+#ifndef __WINSCW__
 const TInt KDefaultMaxGain = 1;
 #else
 const TInt KDefaultMaxGain = 64;
@@ -176,4 +176,3 @@ TInt TMSGlobalEffectsSettings::MaxGain() const
     return iMaxGain;
     }
 
-//  End of File

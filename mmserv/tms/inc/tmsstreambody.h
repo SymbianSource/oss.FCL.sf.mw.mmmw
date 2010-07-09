@@ -55,10 +55,9 @@ public:
     virtual gint Start(gint retrytime) = 0;
     virtual gint Stop() = 0;
     virtual void Deinit() = 0;
-
-private:
     };
 
 } //namespace TMS
 
 #endif //TMS_STREAM_BODY_H
+

@@ -20,7 +20,6 @@
 #include <assert.h>
 #include "xadynamicsourceitf.h"
 
-#include "xadynamicsourceitfadaptation.h"
 #include "xadynamicsourceitfadaptationmmf.h"
 
 /*****************************************************************************
@@ -39,13 +38,16 @@ XAresult XADynamicSourceItfImpl_SetSource(XADynamicSourceItf self,
     /* check casting */
     if (!impl || impl != impl->self || !pDataSource)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XADynamicSourceItfImpl_SetSource");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XADynamicSourceItfImpl_SetSource");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
     if (!impl->adaptCtx)
         {
-        DEBUG_ERR("Adaptation not ready!!");DEBUG_ERR("XA_RESULT_INTERNAL_ERROR");DEBUG_API("<-XADynamicSourceItfImpl_SetSource");
+        DEBUG_ERR("Adaptation not ready!!");
+        DEBUG_ERR("XA_RESULT_INTERNAL_ERROR");
+        DEBUG_API("<-XADynamicSourceItfImpl_SetSource");
         res = XA_RESULT_INTERNAL_ERROR;
         }
     else
@@ -53,12 +55,7 @@ XAresult XADynamicSourceItfImpl_SetSource(XADynamicSourceItf self,
         res = XACommon_CheckDataSource(pDataSource, NULL);
         if (res == XA_RESULT_SUCCESS)
             {
-            if (impl->adaptCtx->fwtype == FWMgrFWGST)
-                {
-                res = XADynamicSourceItfAdapt_SetSource(
-                        (XAAdaptationGstCtx*) impl->adaptCtx, pDataSource);
-                }
-            else
+            if (impl->adaptCtx->fwtype == FWMgrFWMMF)
                 {
                 res = XADynamicSourceItfAdaptMMF_SetSource(
                         (XAAdaptationMMFCtx*) impl->adaptCtx, pDataSource);
@@ -91,7 +88,8 @@ XADynamicSourceItfImpl* XADynamicSourceItfImpl_Create(
         /* init variables */
         self->adaptCtx = adaptCtx;
         self->self = self;
-        }DEBUG_API("<-XADynamicSourceItfImpl_Create");
+        }
+    DEBUG_API("<-XADynamicSourceItfImpl_Create");
     return self;
     }
 

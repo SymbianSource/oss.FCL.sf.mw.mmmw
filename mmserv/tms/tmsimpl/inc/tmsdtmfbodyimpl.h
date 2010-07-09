@@ -33,10 +33,11 @@ class TMSProxy;
 class TMSDTMFBodyImpl : public TMSDTMFBody
     {
 public:
-    static gint Create(TMSStreamType streamtype, TMSDTMFBody*& bodyimpl);
+    static gint Create(TMSStreamType streamtype, TMSDTMF& parent,
+            TMSDTMFBody*& bodyimpl);
     virtual ~TMSDTMFBodyImpl();
 
-    // From TMSDTMFBody begins
+    // From TMSDTMFBody
     virtual gint AddObserver(TMSDTMFObserver& obsrvr, gpointer user_data);
     virtual gint RemoveObserver(TMSDTMFObserver& obsrvr);
     virtual gint Start();
@@ -44,11 +45,9 @@ public:
     virtual gint SetTone(GString* string);
     virtual gint ContinueDTMFStringSending(gboolean sending);
 
-    void SetParent(TMSDTMF*& parent);
-
 private:
     TMSDTMFBodyImpl();
-    gint PostConstruct();
+    gint PostConstruct(TMSStreamType stype, TMSDTMF& parent);
 
 private:
     TMSDTMFObserver* iObserver;

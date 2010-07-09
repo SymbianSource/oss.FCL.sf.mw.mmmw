@@ -227,6 +227,36 @@ TInt COpenMAXALTestModule::al_radioitf_GetFrequency( CStifItemParser& aItem)
         }    
     return status;
     }
+    
+TInt COpenMAXALTestModule::al_radioitf_GetFrequencyDefault( CStifItemParser& aItem)
+    {
+    TInt status(KErrCompletion);
+    XAuint32 freq;
+                 
+    if (m_RadioItf)
+        {
+        status = (*m_RadioItf)->GetFrequency(
+                m_RadioItf, &freq); 
+        }    
+    return status;
+    }    
+    
+TInt COpenMAXALTestModule::al_radioitf_GetFreqRangeDefault( CStifItemParser& aItem )
+    {
+    TInt status(KErrCompletion);
+    XAuint8 freqRange;
+    
+    if (m_RadioItf)
+        {
+        status = (*m_RadioItf)->GetFreqRange(
+                m_RadioItf, &freqRange);              
+        }
+    else
+        {
+        status = KErrNotFound;
+        }    
+    return status;
+    }    
 
 TInt COpenMAXALTestModule::al_radioitf_RegisterRadioCallback( CStifItemParser& /*aItem*/ )
     {

@@ -87,10 +87,7 @@ private:
     void HandleRoutingGetOutputL(const RMessage2& aMessage);
     void HandleRoutingGetPreviousOutputL(const RMessage2& aMessage);
     void HandleRoutingGetAvailableOutputsL(const RMessage2& aMessage);
-
-    void HandleDTMFStart(const RMessage2& aMessage);
-    void HandleDTMFStop(const RMessage2& aMessage);
-    void HandleDTMFContinue(const RMessage2& aMessage);
+    void HandleGetActiveCallL(const RMessage2& aMessage);
 
 private:
     TMSCallServer& iTMSCallServer;

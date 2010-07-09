@@ -20,21 +20,9 @@
 #include <gst/gst.h>
 #include <gst/gstbuffer.h>
 #include "xaobjectitf.h"
-#include "xacameradevice.h"
 #include "xaradiodevice.h"
-#include "xaoutputmix.h"
-#include "xamediaplayeradaptctx.h"
-#include "xacameraadaptctx.h"
 #include <stdlib.h>
-
-#ifdef OMAX_CAMERABIN
-extern XAboolean cameraRealized;
-
-extern XACameraAdaptationCtx_* cameraCtx;
-#else
-XAboolean cameraRealized = XA_BOOLEAN_FALSE;
-XACameraAdaptationCtx_* cameraCtx = NULL;
-#endif
+#include "xaadaptationgst.h"
 /*
  * XAAdaptationGstCtx* XAAdaptationGst_Create()
  * 1st phase initialization function for Adaptation Base context structure.
@@ -55,6 +43,7 @@ XAresult XAAdaptationGst_Init(XAAdaptationGstCtx* pSelf, XAuint32 ctxId)
             }
         else
             {
+            GError* gerror = 0;
             /*         Add default handler for Gst-bus messages */
             pSelf->busCb = XAAdaptationGst_GstBusCb;
 
@@ -63,6 +52,12 @@ XAresult XAAdaptationGst_Init(XAAdaptationGstCtx* pSelf, XAuint32 ctxId)
             // VASU MOD ENDS
 
             sem_init(&(pSelf->semAsyncWait), 0, 0);
+//cross check
+            if ( !gst_init_check( NULL, NULL, &gerror ) )
+                {
+                    DEBUG_ERR("Gst Initalization failure.");
+                    return XA_RESULT_INTERNAL_ERROR;
+                }
             }
         }
     else
@@ -220,7 +215,8 @@ gboolean XAAdaptationGst_GstBusCb(GstBus *bus, GstMessage *message,
             DEBUG_INFO("Unhandled Gst-Bus message")
             ;
             break;
-        }DEBUG_API("<-XAAdaptationGst_GstBusCb");
+        }
+    DEBUG_API("<-XAAdaptationGst_GstBusCb");
     return TRUE;
     }
 
@@ -252,7 +248,8 @@ XAresult XAAdaptationGst_InitGstListener(XAAdaptationGstCtx* ctx)
         {
         DEBUG_ERR_A1("could not create thread!! (%d)",ret)
         return XA_RESULT_INTERNAL_ERROR;
-        }DEBUG_API("<-XAAdaptationGst_InitGstListener");
+        }
+    DEBUG_API("<-XAAdaptationGst_InitGstListener");
     return XA_RESULT_SUCCESS;
     }
 
@@ -298,7 +295,8 @@ void XAAdaptationGst_StopGstListener(XAAdaptationGstCtx* ctx)
         {
         gst_object_unref(ctx->bus);
         ctx->bus = NULL;
-        }DEBUG_API("<-XAAdaptationGst_StopGstListener");
+        }
+    DEBUG_API("<-XAAdaptationGst_StopGstListener");
     }
 
 /*
@@ -363,7 +361,8 @@ gboolean XAAdaptationGst_CancelAsyncWait(gpointer ctx)
                 GST_STATE(bCtx->bin), GST_STATE_TARGET(bCtx->bin), bCtx->binWantedState);
         bCtx->waitingasyncop = XA_BOOLEAN_FALSE;
         sem_post(&(bCtx->semAsyncWait));
-        }DEBUG_API("<-XAAdaptationGst_CancelAsyncWait");
+        }
+    DEBUG_API("<-XAAdaptationGst_CancelAsyncWait");
     /* return false to remove timer */
     return FALSE;
     }
@@ -385,7 +384,8 @@ void XAAdaptationGst_CompleteAsyncWait(XAAdaptationGstCtx* ctx)
             { /* should not be, reset semaphore */
             sem_init(&(ctx->semAsyncWait), 0, 0);
             }
-        }DEBUG_API("<-XAAdaptationGst_CompleteAsyncWait");
+        }
+    DEBUG_API("<-XAAdaptationGst_CompleteAsyncWait");
     }
 
 /**
@@ -699,43 +699,8 @@ GstElement* XAAdaptationGst_CreateGstSink(XADataSink* xaSnk,
                         NULL);
                 break;
             case XA_DATALOCATOR_OUTPUTMIX:
-                DEBUG_INFO("Sink locator type - XA_DATALOCATOR_OUTPUTMIX")
-                ;
+                DEBUG_INFO("Sink locator type - XA_DATALOCATOR_OUTPUTMIX");
                     {
-                    /* Get OutputMix adaptation from data locator */
-                    XADataLocator_OutputMix* omix =
-                            (XADataLocator_OutputMix*) (xaSnk->pLocator);
-                    if (omix->outputMix)
-                        {
-                        XAOMixImpl* omixDevice =
-                                (XAOMixImpl*) (*omix->outputMix);
-
-                        if (omixDevice)
-                            {
-                            /*TODO we had to remove this line below since adaptationCtx
-                             * was  not a member of structure*/
-
-                            /*gstSnk = XAOutputMixAdapt_GetSink(omixDevice->adaptationCtx);*/
-                            if (!gstSnk)
-                                {
-                                DEBUG_ERR("Cannot create sink!");
-                                return NULL;
-                                }
-                            *isobj = XA_BOOLEAN_TRUE;
-                            }
-                        else
-                            {
-                            DEBUG_ERR("Warning - NULL outputmix object - default audio output used");
-                            gstSnk = gst_element_factory_make("alsasink",
-                                    name);
-                            }
-                        }
-                    else
-                        {
-                        DEBUG_ERR("Warning - NULL outputmix object - default audio output used");
-                        gstSnk = gst_element_factory_make("alsasink", name);
-                        }
-
                     }
                 break;
 
@@ -761,7 +726,8 @@ GstElement* XAAdaptationGst_CreateGstSink(XADataSink* xaSnk,
     if (gstSnk)
         {
         DEBUG_INFO_A1("Created gstreamer sink element at %x", gstSnk);
-        }DEBUG_API("<-XAAdaptationGst_CreateGstSink");
+        }
+    DEBUG_API("<-XAAdaptationGst_CreateGstSink");
     return gstSnk;
     }
 
@@ -947,7 +913,8 @@ GstElement* XAAdaptationGst_CreateVideoPP()
             gst_object_unref(vpp);
             vpp = NULL;
             }
-        }DEBUG_API("<-XAAdaptationGst_CreateVideoPP");
+        }
+    DEBUG_API("<-XAAdaptationGst_CreateVideoPP");
     return vpp;
     }
 
@@ -1095,7 +1062,8 @@ GstElement* XAAdaptationGst_CreateFixedSizeVideoPP()
             gst_object_unref(vpp);
             vpp = NULL;
             }
-        }DEBUG_API("<-XAAdaptationGst_CreateFixedSizeVideoPP");
+        }
+    DEBUG_API("<-XAAdaptationGst_CreateFixedSizeVideoPP");
     return vpp;
     }
 
@@ -1148,7 +1116,8 @@ GstElement* XAAdaptationGst_CreateVideoPPBlackScr()
             gst_object_unref(vppBScr);
             vppBScr = NULL;
             }
-        }DEBUG_API("<-XAAdaptationGst_CreateVideoPPBlackScr");
+        }
+    DEBUG_API("<-XAAdaptationGst_CreateVideoPPBlackScr");
     return vppBScr;
     }
 
@@ -1166,7 +1135,8 @@ GstElement* XAAdaptationGst_CreateInputSelector()
     if (inputSelector)
         {
         g_object_set(G_OBJECT(inputSelector), "select-all", TRUE, NULL);
-        }DEBUG_API("<-XAAdaptationGst_CreateInputSelector");
+        }
+    DEBUG_API("<-XAAdaptationGst_CreateInputSelector");
     return inputSelector;
     }
 

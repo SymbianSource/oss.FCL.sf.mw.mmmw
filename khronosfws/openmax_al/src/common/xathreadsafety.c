@@ -44,7 +44,8 @@ XAresult XAThreadSafety_Init(XAboolean tsEnable)
                 sizeof(XAThreadSafetyImpl));
         if (!threadSafety)
             {
-            DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");DEBUG_API("<-XAThreadSafety_Init");
+            DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+            DEBUG_API("<-XAThreadSafety_Init");
             /* memory allocation failed */
             return XA_RESULT_MEMORY_FAILURE;
             }
@@ -59,7 +60,8 @@ XAresult XAThreadSafety_Init(XAboolean tsEnable)
                 if (ret != XA_RESULT_SUCCESS)
                     {
                     break;
-                    }DEBUG_INFO_A2("Created %s:%x",MEDIAOBJECTNAME(i), threadSafety->mutexTable[i] );
+                    }
+                DEBUG_INFO_A2("Created %s:%x",MEDIAOBJECTNAME(i), threadSafety->mutexTable[i] );
                 }
             }
         else
@@ -129,7 +131,8 @@ XAresult XAThreadSafety_Unlock(XAThreadSafetyMediaObjects mediaObject)
     else
         {
         DEBUG_INFO("Thread safety: disabled.");
-        }DEBUG_API("<-XAThreadSafety_Unlock");
+        }
+    DEBUG_API("<-XAThreadSafety_Unlock");
     return ret;
     }
 /*

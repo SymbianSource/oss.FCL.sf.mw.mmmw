@@ -22,10 +22,8 @@
 #include "xadynamicsourceitf.h"
 #include "xadynintmgmtitf.h"
 #include "xametadataextractionitf.h"
-#include "xametadatatraversalitf.h"
 #include "xaconfigextensionsitf.h"
 
-#include "xametadataadaptctx.h"
 #include "xacapabilitiesmgr.h"
 #include "xathreadsafety.h"
 
@@ -35,12 +33,11 @@
 /* Static mapping of enumeration XAMetadataInterfaces to interface iids */
 static const XAInterfaceID* xaMetadataExtractorItfIIDs[MDE_ITFCOUNT] =
     {
-            &XA_IID_OBJECT,
-            &XA_IID_DYNAMICINTERFACEMANAGEMENT,
-            &XA_IID_METADATAEXTRACTION,
-            &XA_IID_METADATATRAVERSAL,
-            &XA_IID_CONFIGEXTENSION,
-            &XA_IID_DYNAMICSOURCE
+    &XA_IID_OBJECT,
+    &XA_IID_DYNAMICINTERFACEMANAGEMENT,
+    &XA_IID_METADATAEXTRACTION,
+    &XA_IID_CONFIGEXTENSION,
+    &XA_IID_DYNAMICSOURCE
     };
 
 /*****************************************************************************
@@ -106,8 +103,6 @@ XAresult XAMetadataExtractorImpl_Create(FrameworkMap* mapper,
     /* Mark interfaces that need to be exposed */
     /* Implicit and mandated interfaces */
     pBaseObj->interfaceMap[MDE_METADATAEXTRACTIONITF].required
-            = XA_BOOLEAN_TRUE;
-    pBaseObj->interfaceMap[MDE_METADATATRAVERSALITF].required
             = XA_BOOLEAN_TRUE;
     pBaseObj->interfaceMap[MDE_DYNAMICSOURCEITF].required = XA_BOOLEAN_TRUE;
     pBaseObj->interfaceMap[MDE_DIMITF].required = XA_BOOLEAN_TRUE;
@@ -180,15 +175,7 @@ XAresult XAMetadataExtractorImpl_Create(FrameworkMap* mapper,
     if (fwType == FWMgrFWMMF)
         {
         pImpl->adaptationCtxMMF = XAMetadataAdaptCtxMMF_Create(pDataSource);
-
         pImpl->curAdaptCtx = pImpl->adaptationCtxMMF;
-        }
-    else
-        {
-        // Create metadata adaptation context 
-        pImpl->adaptationCtxGst = XAMetadataAdaptCtx_Create(pDataSource);
-
-        pImpl->curAdaptCtx = pImpl->adaptationCtxGst;
         }
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
@@ -213,7 +200,8 @@ XAresult XAMetadataExtractorImpl_QueryNumSupportedInterfaces(
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         res = XA_RESULT_PARAMETER_INVALID;
-        }DEBUG_API_A1("<-XAMetadataExtractorImpl_QueryNumSupportedInterfaces (%d)", (int)res);
+        }
+    DEBUG_API_A1("<-XAMetadataExtractorImpl_QueryNumSupportedInterfaces (%d)", (int)res);
     return res;
     }
 /* XAResult XAMetadataExtractorImpl_QuerySupportedInterfaces
@@ -234,7 +222,8 @@ XAresult XAMetadataExtractorImpl_QuerySupportedInterfaces(XAuint32 index,
         {
         *pInterfaceId = *(xaMetadataExtractorItfIIDs[index]);
         res = XA_RESULT_SUCCESS;
-        }DEBUG_API_A1("<-XAMetadataExtractorImpl_QuerySupportedInterfaces (%d)", (int)res);
+        }
+    DEBUG_API_A1("<-XAMetadataExtractorImpl_QuerySupportedInterfaces (%d)", (int)res);
     return res;
     }
 
@@ -291,10 +280,6 @@ XAresult XAMetadataExtractorImpl_DoRealize(XAObjectItf self)
                     pItf = XAMetadataExtractionItfImpl_Create(
                             pObjImpl->curAdaptCtx);
                     break;
-                case MDE_METADATATRAVERSALITF:
-                    pItf = XAMetadataTraversalItfImpl_Create(
-                            pObjImpl->curAdaptCtx);
-                    break;
                 case MDE_CONFIGEXTENSIONITF:
                     pItf = XAConfigExtensionsItfImpl_Create();
                     XAConfigExtensionsItfImpl_SetContext(pItf,
@@ -329,11 +314,6 @@ XAresult XAMetadataExtractorImpl_DoRealize(XAObjectItf self)
         {
         ret = XAMetadataAdaptCtxMMF_PostInit(
                 (XAAdaptationMMFCtx*) pObjImpl->adaptationCtxMMF);
-        }
-    else
-        {
-        ret = XAMetadataAdaptCtx_PostInit(
-                (XAAdaptationGstCtx*) pObjImpl->adaptationCtxGst);
         }
 
     if (ret != XA_RESULT_SUCCESS)
@@ -385,9 +365,6 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
                 case MDE_METADATAEXTRACTIONITF:
                     XAMetadataExtractionItfImpl_Free(pItf);
                     break;
-                case MDE_METADATATRAVERSALITF:
-                    XAMetadataTraversalItfImpl_Free(pItf);
-                    break;
                 case MDE_DYNAMICSOURCEITF:
                     XADynamicSourceItfImpl_Free(pItf);
                     break;
@@ -409,12 +386,6 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
             XAMetadataAdaptCtxMMF_Destroy(
                     (XAAdaptationMMFCtx*) pImpl->adaptationCtxMMF);
             pImpl->adaptationCtxMMF = NULL;
-            }
-        else
-            {
-            XAMetadataAdaptCtx_Destroy(
-                    (XAAdaptationGstCtx*) pImpl->adaptationCtxGst);
-            pImpl->adaptationCtxGst = NULL;
             }
         }
 
@@ -454,8 +425,7 @@ XAresult XAMetadataExtractorImpl_DoAddItf(XAObjectItf self,
 
                 break;
             default:
-                DEBUG_ERR("XAMetadataExtractorImpl_DoAddItf unknown id")
-                ;
+                DEBUG_ERR("XAMetadataExtractorImpl_DoAddItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
                 break;
             }
@@ -505,8 +475,7 @@ XAresult XAMetadataExtractorImpl_DoRemoveItf(XAObjectItf self,
                 XAConfigExtensionsItfImpl_Free(mapEntry->pItf);
                 break;
             default:
-                DEBUG_ERR("XAMetadataExtractorImpl_DoRemoveItf unknown id")
-                ;
+                DEBUG_ERR("XAMetadataExtractorImpl_DoRemoveItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
                 break;
             }

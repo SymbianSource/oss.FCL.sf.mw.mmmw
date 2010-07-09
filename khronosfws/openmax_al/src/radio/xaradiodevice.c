@@ -22,7 +22,6 @@
 #include "xaradioitf.h"
 #include "xaconfigextensionsitf.h"
 #include "xadynintmgmtitf.h"
-#include "xardsitf.h"
 #include "xathreadsafety.h"
 #include "xaradioadaptctx.h"
 /* Static mapping of enumeration XARadioDeviceInterfaces to interface iids */
@@ -31,8 +30,7 @@ static const XAInterfaceID* XARadioDeviceItfIIDs[RADIO_ITFCOUNT]=
     &XA_IID_OBJECT,
     &XA_IID_RADIO,
     &XA_IID_CONFIGEXTENSION,
-    &XA_IID_DYNAMICINTERFACEMANAGEMENT,
-    &XA_IID_RDS
+    &XA_IID_DYNAMICINTERFACEMANAGEMENT
 };
 
 /*****************************************************************************
@@ -233,11 +231,6 @@ XAresult XARadioDeviceImpl_DoRealize( XAObjectItf self )
                 case RADIO_DIMITF:
                     pItf = XADIMItfImpl_Create();
                     break;
-                case RADIO_RDSITF:
-
-                   pItf = XARDSItfImpl_Create( pObjImpl->adaptationCtx );
-
-                   break;
                 default:
                     break;
             }
@@ -304,9 +297,6 @@ void XARadioDeviceImpl_FreeResources(XAObjectItf self)
                     break;
                 case RADIO_DIMITF:
                     XADIMItfImpl_Free( pItf );
-                    break;
-                case RADIO_RDSITF:
-                    XARDSItfImpl_Free( pItf );
                     break;
                 default:
                     break;

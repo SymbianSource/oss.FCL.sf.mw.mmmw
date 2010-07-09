@@ -21,7 +21,6 @@
 
 #include "xavolumeitf.h"
 
-#include "xavolumeitfadaptation.h"
 #include "xanokiavolumeextitfadaptationmmf.h"
 /**
  * XAVolumeItfImpl* GetImpl(XAVolumeItf self)
@@ -80,15 +79,6 @@ XAresult XAVolumeItfImpl_SetVolumeLevel(XAVolumeItf self, XAmillibel level)
         {
         DEBUG_API("<-XAVolumeItfImpl_SetVolumeLevel");
         return ret;
-        }
-    if (impl->adapCtx->fwtype == FWMgrFWGST)
-        {
-        ret = XAVolumeItfAdapt_SetVolumeLevel(
-                (XAAdaptationGstCtx*) impl->adapCtx, level);
-        }
-    else
-        {
-        impl->volumeLevel = level;
         }
 
     if (ret == XA_RESULT_SUCCESS)
@@ -152,15 +142,7 @@ XAresult XAVolumeItfImpl_GetMaxVolumeLevel(XAVolumeItf self,
         DEBUG_API("<-XAVolumeItfImpl_GetMaxVolumeLevel");
         return ret;
         }
-    if (impl->adapCtx->fwtype == FWMgrFWGST)
-        {
-        ret = XAVolumeItfAdapt_GetMaxVolumeLevel(
-                (XAAdaptationGstCtx*) impl->adapCtx, pMaxLevel);
-        }
-    else
-        {
-        *pMaxLevel = MAX_SUPPORT_VOLUME_LEVEL;
-        }
+    *pMaxLevel = MAX_SUPPORT_VOLUME_LEVEL;
 
     XAAdaptationBase_ThreadExit(impl->adapCtx);
 
@@ -200,11 +182,6 @@ XAresult XAVolumeItfImpl_SetMute(XAVolumeItf self, XAboolean mute)
             {
             ret = XANokiaVolumeExtItfAdapt_SetMute(
                     (XAAdaptationMMFCtx*) impl->adapCtx, mute);
-            }
-        else
-            {
-            ret = XAVolumeItfAdapt_SetMute(
-                    (XAAdaptationGstCtx*) impl->adapCtx, mute);
             }
 
         if (ret == XA_RESULT_SUCCESS)
@@ -272,12 +249,7 @@ XAresult XAVolumeItfImpl_EnableStereoPosition(XAVolumeItf self,
     /* Check is stereo position state changed */
     if (enable != impl->enableStereoPos)
         {
-        if (impl->adapCtx->fwtype == FWMgrFWGST)
-            {
-            ret = XAVolumeItfAdapt_EnableStereoPosition(
-                    (XAAdaptationGstCtx*) impl->adapCtx, enable);
-            }
-        else
+        if (impl->adapCtx->fwtype == FWMgrFWMMF)
             {
             ret = XANokiaVolumeExtItfAdapt_EnableStereoPosition(
                     (XAAdaptationMMFCtx*) impl->adapCtx, enable);
@@ -353,12 +325,7 @@ XAresult XAVolumeItfImpl_SetStereoPosition(XAVolumeItf self,
     /* check is stereo position effect enabled if is then handle effect */
     if (impl->enableStereoPos)
         {
-        if (impl->adapCtx->fwtype == FWMgrFWGST)
-            {
-            ret = XAVolumeItfAdapt_SetStereoPosition(
-                    (XAAdaptationGstCtx*) impl->adapCtx, stereoPosition);
-            }
-        else
+        if (impl->adapCtx->fwtype == FWMgrFWMMF)
             {
             ret = XANokiaVolumeExtItfAdapt_SetStereoPosition(
                     (XAAdaptationMMFCtx*) impl->adapCtx, stereoPosition);

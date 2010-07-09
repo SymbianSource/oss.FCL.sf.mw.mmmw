@@ -66,7 +66,6 @@ gint TMSCSCallBodyImpl::PostConstruct()
     {
     gint ret(TMS_RESULT_SUCCESS);
     TRACE_PRN_FN_ENT;
-
     iSession = new TMSCallProxy();
 
     TRACE_PRN_FN_ENT;
@@ -106,9 +105,7 @@ TMSCallType TMSCSCallBodyImpl::GetCallType()
 gint TMSCSCallBodyImpl::GetCallContextId(guint& ctxid)
     {
     gint ret(TMS_RESULT_FEATURE_NOT_SUPPORTED);
-    TRACE_PRN_FN_ENT;
     ctxid = 0;
-    TRACE_PRN_FN_EXT;
     return ret;
     }
 
@@ -138,13 +135,17 @@ gint TMSCSCallBodyImpl::CreateStream(TMSStreamType type, TMSStream*& strm)
                 }
             else
                 {
-                //TODO: delete call only if no active sessions left
                 if (iSession)
                     {
+                    //TODO: delete call only if no active sessions left
                     iSession->DeleteCall();
                     iSession->Close();
                     delete iSession;
                     iSession = NULL;
+                    }
+                else
+                    {
+                    ret = TMS_RESULT_UNINITIALIZED_OBJECT;
                     }
                 }
             break;

@@ -183,6 +183,7 @@ void TMSCSDevSound::InitializeComplete(TInt aError)
         CancelTimer();
         NotifyEvent(aError);
         }
+    TRACE_PRN_IF_ERR(aError);
     TRACE_PRN_FN_EXT;
     }
 

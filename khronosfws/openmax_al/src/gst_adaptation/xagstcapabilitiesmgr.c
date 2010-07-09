@@ -364,7 +364,8 @@ XAresult XAGSTCapabilitiesMgr_UpdateCapabilitieList(
     if (!(*ppListHead))
         {
         *ppListHead = firstNode;
-        }DEBUG_API("<-XAGSTCapabilitiesMgr_UpdateCapabilitieList");
+        }
+    DEBUG_API("<-XAGSTCapabilitiesMgr_UpdateCapabilitieList");
     return res;
     }
 

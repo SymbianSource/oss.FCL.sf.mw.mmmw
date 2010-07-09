@@ -115,7 +115,8 @@ XAresult XANokiaVolumeExtItfAdapt_EnableStereoPosition(
     if (!ctx || (ctx->baseObj.ctxId != XAMediaPlayerAdaptation
             && ctx->baseObj.ctxId != XAMediaRecorderAdaptation))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfAdapt_EnableStereoPosition");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfAdapt_EnableStereoPosition");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -152,7 +153,8 @@ XAresult XANokiaVolumeExtItfAdapt_SetStereoPosition(XAAdaptationMMFCtx *ctx,
     if (!ctx || (ctx->baseObj.ctxId != XAMediaPlayerAdaptation
             && ctx->baseObj.ctxId != XAMediaRecorderAdaptation))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaVolumeExtItfAdapt_SetStereoPosition");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaVolumeExtItfAdapt_SetStereoPosition");
         return XA_RESULT_PARAMETER_INVALID;
         }
 

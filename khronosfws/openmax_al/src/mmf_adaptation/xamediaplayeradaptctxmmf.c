@@ -169,7 +169,8 @@ XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_CreateRadio(
         free(pSelf);
         pSelf = NULL;
         return NULL;
-        }DEBUG_API("<-XAMediaPlayerAdaptMMF_Create");
+        }
+    DEBUG_API("<-XAMediaPlayerAdaptMMF_Create");
     return (XAAdaptationBaseCtx*) (&pSelf->baseObj.baseObj);
     }
 

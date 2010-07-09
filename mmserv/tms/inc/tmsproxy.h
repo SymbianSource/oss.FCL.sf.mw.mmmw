@@ -93,6 +93,7 @@ public:
     IMPORT_C gint MuteRT();
 
     // TMSDTMF
+    IMPORT_C gint InitDTMFPlayer(TMSStreamType streamtype);
     IMPORT_C gint StartDTMF(TMSStreamType streamtype, GString* tone);
     IMPORT_C gint StopDTMF(TMSStreamType streamtype);
     IMPORT_C gint ContinueDTMFStringSending(TBool continuesending);

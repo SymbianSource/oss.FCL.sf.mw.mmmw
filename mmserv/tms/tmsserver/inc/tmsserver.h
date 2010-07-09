@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __TMSSERVER_H
-#define __TMSSERVER_H
+#ifndef TMSSERVER_H
+#define TMSSERVER_H
 
 #include <e32base.h>
 #include <mmcccodecinformation.h>
@@ -25,6 +25,8 @@
 #include "tmsclientserver.h"
 #include "tmsrtplayerobsrv.h"
 #include "tmsrtplayer.h"
+#include "tmsdtmfobserver.h"
+#include "tmsdtmftoneplayerobserver.h"
 
 namespace TMS {
 
@@ -37,13 +39,18 @@ class TMSTarEventHandler;
 class TMSCSPCenRepListener;
 class TMSCenRepAudioHandler;
 class TMSDtmfEventHandler;
+class TMSAudioDtmfTonePlayer;
+class TMSDTMFProvider;
+class TMSDtmfNotifier;
 
 // -----------------------------------------------------------------------------
 // TMSServer class
 // -----------------------------------------------------------------------------
 //
 class TMSServer : public CServer2,
-                  private TMSRtPlayerObsrv
+                  private TMSRtPlayerObsrv,
+                  private TMSDTMFObserver,
+                  private TMSDTMFTonePlayerObserver
     {
 public:
     static void RunServerL();
@@ -52,12 +59,6 @@ public:
     void AddSession();
     void DropSession();
     TInt SessionCount() const;
-
-    void SetDnLinkSession(const TBool aSession);
-    void SetUpLinkSession(const TBool aSession);
-
-    TBool HasDnLinkSession() const;
-    TBool HasUpLinkSession() const;
 
     void GetNewTMSCallSessionHandleL(RHandleBase& aHandle);
     TInt SetOutput(CSession2* sid, TInt output);
@@ -75,12 +76,15 @@ public:
     TInt GetSupportedCodecs(const TMSStreamType strmType,
             RArray<TFourCC>*& aCodecs);
 
-    TInt NotifyTarClients(TRoutingMsgBufPckg routingpckg);
+    // for DTMF player
+    TInt InitDTMF(const RMessage2& aMessage);
     TInt StartDTMF(const RMessage2& aMessage);
     TInt StopDTMF(const RMessage2& aMessage);
     TInt ContinueSendingDTMF(const RMessage2& aMessage);
     TInt NotifyDtmfClients(TmsMsgBufPckg dtmfpckg);
+    gint FindActiveCallType();
 
+    TInt NotifyTarClients(TRoutingMsgBufPckg routingpckg);
     void StartDTMFNotifierL();
     void CancelDTMFNotifier();
     void StartRoutingNotifierL();
@@ -106,6 +110,14 @@ public:
     // from TMSRtPlayerObsrv
     void RtPlayerEvent(TInt aEventType, TInt aError);
 
+    //From TMSDTMFTonePlayerObserver
+    void DTMFInitCompleted(gint status);
+    void DTMFToneFinished(gint status);
+
+    //From TMSDTMFObserver
+    void HandleDTMFEvent(const TMSDTMFObserver::TCCPDtmfEvent event,
+            const gint status, const TChar tone);
+
 private:
     static TMSServer* NewLC();
     TMSServer();
@@ -122,9 +134,6 @@ private:
     TInt iSession;
     TMSServerShutDown *iShutdownTimer;
 
-    TBool iDnlinkSession;
-    TBool iUplinkSession;
-
     mutable RPointerArray<TMSStartAndMonitorTMSCallThread> iTMSCallServList;
     TMSGlobalEffectsSettings* iEffectSettings;
     TMSTarEventHandler* iTarHandler;
@@ -134,12 +143,19 @@ private:
     TInt iTarHandlerCount;
     TInt iAudioCenRepHandlerCount;
     TInt iDTMFHandlerCount;
+    TMSCallType iActiveCallType;
 
     // for RT
     TMSRingTonePlayer* iTMSRtPlayer;
     HBufC* iRtFile;
     HBufC8* iRtSequence;
     HBufC* iTtsText;
+
+    // for DTMF
+    TMSAudioDtmfTonePlayer* iDTMFDnlinkPlayer;
+    TMSDtmfNotifier* iDTMFNotifier;
+    TMSAudioDtmfTonePlayer* iDTMFUplinkPlayer;
+    TMSDTMFProvider* iDTMFUplinkPlayerEtel;
 
     // for codecs count
     RArray<TFourCC> iDnlCodecs;
@@ -191,6 +207,5 @@ private:
 
 } //namespace TMS
 
-#endif //__TMSSERVER_H
+#endif //TMSSERVER_H
 
-// End of file

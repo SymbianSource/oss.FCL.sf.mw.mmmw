@@ -94,7 +94,8 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoders(
 
         /* return number of encoders */
         *pNumEncoders = impl->numCodecs;
-        }DEBUG_API("<-XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoders");
+        }
+    DEBUG_API("<-XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoders");
     return res;
     }
 
@@ -205,7 +206,8 @@ XAAudioEncoderCapabilitiesItfImpl* XAAudioEncoderCapabilitiesItfImpl_Create(
         self->numCodecs = 3;
         self->self = self;
 
-        }DEBUG_API("<-XAAudioEncoderCapabilitiesItfImpl_Create");
+        }
+    DEBUG_API("<-XAAudioEncoderCapabilitiesItfImpl_Create");
     return self;
     }
 

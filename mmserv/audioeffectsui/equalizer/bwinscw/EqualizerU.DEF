@@ -1,5 +1,0 @@
-EXPORTS
-	?ExecuteLD@CEqualizerPresetsDialog@@QAEHXZ @ 1 NONAME ; int CEqualizerPresetsDialog::ExecuteLD(void)
-	?NewL@CEqualizerPresetsDialog@@SAPAV1@PAVCAudioEqualizerUtility@@HAAVMEqualizerPresetActivationObserver@@@Z @ 2 NONAME ; class CEqualizerPresetsDialog * CEqualizerPresetsDialog::NewL(class CAudioEqualizerUtility *, int, class MEqualizerPresetActivationObserver &)
-	?SetAudioEqualizerL@CEqualizerPresetsDialog@@QAEXPAVCAudioEqualizerUtility@@@Z @ 3 NONAME ; void CEqualizerPresetsDialog::SetAudioEqualizerL(class CAudioEqualizerUtility *)
-

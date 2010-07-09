@@ -225,14 +225,8 @@ void TMSCallSession::HandleMessageL(const RMessage2& aMessage)
         case TMS_ROUTING_AVAILABLE_OUTPUT_GET:
             HandleRoutingGetAvailableOutputsL(aMessage);
             break;
-        case TMS_DTMF_START:
-            HandleDTMFStart(aMessage);
-            break;
-        case TMS_DTMF_STOP:
-            HandleDTMFStop(aMessage);
-            break;
-        case TMS_DTMF_CONTINUE:
-            HandleDTMFContinue(aMessage);
+        case TMS_GET_ACTIVE_CALL_PARAMS:
+            HandleGetActiveCallL(aMessage);
             break;
         default:
             User::Leave(TMS_RESULT_ILLEGAL_OPERATION);
@@ -1113,68 +1107,24 @@ void TMSCallSession::HandleRoutingGetAvailableOutputsL(
         CleanupStack::PopAndDestroy(outputbuf);
         }
     aMessage.Complete(status);
-    }
-
-void TMSCallSession::HandleDTMFStart(const RMessage2& aMessage)
-    {
-    TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_DOES_NOT_EXIST);
-
-    if (iCallAdpt)
-        {
-        TMSStreamType strmtype;
-        gint len = 0;
-        strmtype = (TMSStreamType) aMessage.Int0();
-        len = aMessage.GetDesLength(1);
-        HBufC* tone(NULL);
-        if (len > 0)
-            {
-            TRAP(status,tone = HBufC::NewL(len));
-            if (status == KErrNone)
-                {
-                TPtr ptr = tone->Des();
-                status = aMessage.Read(1, ptr);
-                TRACE_PRN_N(ptr);
-                if (status == KErrNone)
-                    {
-                    status = iCallAdpt->StartDTMF(strmtype, ptr);
-                    }
-                }
-            delete tone;
-            tone = NULL;
-            }
-        }
-
-    aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
     }
 
-void TMSCallSession::HandleDTMFStop(const RMessage2& aMessage)
+void TMSCallSession::HandleGetActiveCallL(const RMessage2& aMessage)
     {
-    TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
+    TMSCallType callType;
+    gboolean active(FALSE);
     if (iCallAdpt)
         {
-        TMSStreamType streamtype;
-        streamtype = (TMSStreamType) aMessage.Int0();
-        status = iCallAdpt->StopDTMF(streamtype);
+        iCallAdpt->GetCallType(callType);
+        active = iCallAdpt->IsUplActivated();
+        TmsCallMsgBufPckg p;
+        p().iInt = (gint) callType;
+        p().iBool = active;
+        aMessage.WriteL(0, p);
+        status = TMS_RESULT_SUCCESS;
         }
     aMessage.Complete(status);
-    TRACE_PRN_FN_EXT;
     }
 
-void TMSCallSession::HandleDTMFContinue(const RMessage2& aMessage)
-    {
-    TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
-        {
-        TBool continuesending;
-        continuesending = (TBool) aMessage.Int0();
-        status = iCallAdpt->ContinueDTMF(continuesending);
-        }
-    aMessage.Complete(status);
-    TRACE_PRN_FN_EXT;
-    }
-
-// End of file

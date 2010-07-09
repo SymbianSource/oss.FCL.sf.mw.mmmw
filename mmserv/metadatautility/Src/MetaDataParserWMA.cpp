@@ -11,8 +11,7 @@
 *
 * Contributors:
 *
-* Description:  This class implements an ID3v1 and v1.1 parser as specified in
-*                www.id3.org.
+* Description:  This class implements a wma parser 
 *
 */
 
@@ -42,9 +41,12 @@
  *  Preroll,            QWORD,  64
  *  Flags,              DWORD,  32 
  */
-const TInt KDurationOffset  = 64;       // duration offset from File Property object
-const TInt KPrerollOffset   = 80;       // preRoll offset from File Property object
-const TInt KFlagsOffset     = 88;       // flags offset from File Property object
+const TInt KDurationOffset  = 64;       // duration offset in File Property object
+const TInt KPrerollOffset   = 80;       // preRoll offset in File Property object
+const TInt KFlagsOffset     = 88;       // flags offset in File Property object
+const TInt KSampleRateOffset = 82;      // sample rate offset in stream properties object
+const TInt KBitRateOffset   = 86;       // bit rate offset in stream properties object
+
 
 // ASF Header Object GUIDs 
   
@@ -70,6 +72,7 @@ _LIT(KWMDate, "WM/OriginalReleaseTime\0");
 #ifdef __WINDOWS_MEDIA
 _LIT(KWMProvider, "WM/Provider\0");
 #endif
+_LIT8 (KASFStreamPropertiesObject, "B7DC0791A9B711CF8EE600C00C205365");
 
 
 // ============================ MEMBER FUNCTIONS ===============================
@@ -125,10 +128,10 @@ CMetaDataParserWMA* CMetaDataParserWMA::NewL(
 
 // Destructor
 CMetaDataParserWMA::~CMetaDataParserWMA()
-	{
-		delete iHeaderData;
-		delete iCharacterSet;
-		iFs.Close();
+    {
+    delete iHeaderData;
+    delete iCharacterSet;
+    iFs.Close();
 	}
 
 // -----------------------------------------------------------------------------
@@ -183,6 +186,8 @@ void CMetaDataParserWMA::ParseL(
 	#ifdef __WINDOWS_MEDIA
 		TRAP(err, GetExtContDesEntryL(EMetaDataVendor, iProviderOffset));
 	#endif
+		TRAP(err, GetSampleRateL());
+		TRAP(err, GetBitRateL());
 		}
 	else
 		{
@@ -244,6 +249,12 @@ void CMetaDataParserWMA::ParseL(
 				case EMetaDataVendor:
 					TRAP(err, GetExtContDesEntryL(EMetaDataVendor, iProviderOffset));
 			#endif
+				case EMetaDataSampleRate:
+					TRAP(err, GetSampleRateL());
+					break;
+				case EMetaDataBitRate:
+					TRAP(err, GetBitRateL());
+					break;
 				default:
 					break;
 				}
@@ -336,6 +347,12 @@ TBool CMetaDataParserWMA::ValidateL()
 			iHeaderExtensionObjectExists = ETrue;
 			iHeaderExtensionOffset = objOffset;
 			}	
+		if(!iStreamPropertiesObjectExists && objGUID == 
+			KASFStreamPropertiesObject)
+			{
+			iStreamPropertiesObjectExists = ETrue;
+			iStreamPropertiesOffset = objOffset;
+			}	
 		TBuf8<8> size = iHeaderData->Mid(objOffset + 16, 8); 
 		TInt objSize = ConvertToInt64(size); // upper 32 bits?
 		if(0 > objSize)
@@ -345,7 +362,8 @@ TBool CMetaDataParserWMA::ValidateL()
 		objOffset += objSize;
 		if(objOffset >= headerSize - 30 || 
 			(iContentDescriptionObjectExists && iFilePropertiesObjectExists 
-			&& iExtendedContentDescriptionObjectExists && iHeaderExtensionObjectExists) )
+			&& iExtendedContentDescriptionObjectExists && iHeaderExtensionObjectExists 
+			&& iStreamPropertiesObjectExists) )
 			{
 			loop = EFalse;
 			}
@@ -374,7 +392,7 @@ TBool CMetaDataParserWMA::ValidateL()
 // -----------------------------------------------------------------------------
 //
 void CMetaDataParserWMA::FormatGUID(TDes8 &aGUID)
-{
+    {
 	TBuf8<16> copyGUID(aGUID);
 	TInt i;
 	for(i = 0; i < 4; i++)
@@ -396,16 +414,16 @@ void CMetaDataParserWMA::FormatGUID(TDes8 &aGUID)
 	aGUID.Delete(0, 32);
 	for(i = 0; i <16; i++)
 		{
-			aGUID.AppendNumFixedWidthUC(copyGUID[i], EHex, 2);
+        aGUID.AppendNumFixedWidthUC(copyGUID[i], EHex, 2);
 		}
-}
+    }
 
 // -----------------------------------------------------------------------------
 // CMetaDataParserWMA::ConvertToInt64
 // -----------------------------------------------------------------------------
 //
 TInt64 CMetaDataParserWMA::ConvertToInt64(TDesC8& aDes)
-{
+    {
 	TInt64 num = 0;
 	TInt i;
 	for(i = 7 ; i >= 0; i--)
@@ -414,14 +432,14 @@ TInt64 CMetaDataParserWMA::ConvertToInt64(TDesC8& aDes)
 		num |= aDes[i];
 		}
 	return num;
-}
+    }
 
 // -----------------------------------------------------------------------------
 // CMetaDataParserWMA::ConvertToInt32
 // -----------------------------------------------------------------------------
 //
 TInt CMetaDataParserWMA::ConvertToInt32(TDesC8& aDes)
-{
+    {
 	TInt num = 0;
 	for(TInt i = 3 ; i >= 0; i--)
 		{	
@@ -429,7 +447,7 @@ TInt CMetaDataParserWMA::ConvertToInt32(TDesC8& aDes)
 		num |= aDes[i];
 		}
 	return num;
-}
+    }
 
 
 // -----------------------------------------------------------------------------
@@ -437,7 +455,7 @@ TInt CMetaDataParserWMA::ConvertToInt32(TDesC8& aDes)
 // -----------------------------------------------------------------------------
 //
 TInt CMetaDataParserWMA::ConvertToInt16(TDesC8& aDes)
-{
+    {
 	TInt num = 0;
 	for(TInt i = 1 ; i >= 0; i--)
 		{	
@@ -445,7 +463,7 @@ TInt CMetaDataParserWMA::ConvertToInt16(TDesC8& aDes)
 		num |= aDes[i];
 		}
 	return num;
-}
+    }
 
 // -----------------------------------------------------------------------------
 // CMetaDataParserWMA::ConvertDes8toDes16
@@ -573,15 +591,15 @@ void CMetaDataParserWMA::GetCommentL()
 // -----------------------------------------------------------------------------
 //
 void CMetaDataParserWMA::GetJpegL()
-{
+    {
 	if (iPictureOffset <= 0)
-	{
-		return;
-	}
+	    {
+        return;
+        }
 	
 	TInt offset = iPictureOffset;
 	if(!iMetadatLibraryObjectJpegExists)
-		{
+	    {
 		TPtrC8 dataType = iHeaderData->Mid(offset, 2);
 		offset += 2;
 		TInt dataTypeInt = ConvertToInt16(dataType);
@@ -603,28 +621,28 @@ void CMetaDataParserWMA::GetJpegL()
 	TInt picType = 0;
 	picType |= picData[0];
 	if(picType != 3)
-	{
+	    {
 		return; // only Front Album Cover supported
-	}
+        }
 	
 	TPtrC8 picLengthData = iHeaderData->Mid(offset, 4);
 	offset += 4;
 	TInt picLength = ConvertToInt32(picLengthData);
 	if(picLength <= 0)
-	{
+	    {
 		return;
-	}
+        }
 	
 	_LIT8(KNULL, "\0\0");
 	TPtrC8 data = iHeaderData->Mid(offset, picLength);
 	TInt pos = data.Find(KNULL);
 	if(pos != 0)
-	{
+	    {
 		pos++; // for unicode coding for strings. 
-	}
+        }
 	// check mime type
 	if(pos != KErrNotFound)
-	{
+	    {
 		HBufC8 *mimeType = iHeaderData->Mid(offset, pos + 2).AllocLC();
 		offset += pos + 2;
 		HBufC* name16 = HBufC::NewLC( (pos+2)/2);
@@ -633,26 +651,26 @@ void CMetaDataParserWMA::GetJpegL()
 		_LIT(KJPEG, "image/jpeg\0");
 		_LIT(KJPG, "image/jpg\0");
 		if(mimeType16.Compare(KJPEG) != 0 && mimeType16.Compare(KJPG) != 0)
-		{
+		    {
 			CleanupStack::PopAndDestroy(2, mimeType);
 			return; // only JPEG & JPG supported
-		}
+		    }
 		CleanupStack::PopAndDestroy(2); // mimeType16, mimeType
-	}
+        }
 		
 	// skip the picture description
 	TPtrC8 picDesc = iHeaderData->Mid(offset, picLength);
 	pos = picDesc.Find(KNULL);
 	if(pos != 0)
-	{
+	    {
 		pos++; // for unicode coding for strings. 
-	}
+        }
 	offset += pos + 2;
 	
 	// picture data 
 	TPtrC8 pic8 = iHeaderData->Mid(offset, picLength);	
 	iContainer->AppendL( EMetaDataJpeg, pic8 );
-}
+    }
 
 
 // -----------------------------------------------------------------------------
@@ -660,7 +678,7 @@ void CMetaDataParserWMA::GetJpegL()
 // -----------------------------------------------------------------------------
 //
 TBool CMetaDataParserWMA::GetExtContDesEntryL(TMetaDataFieldId aFieldId, TInt aOffset)
-{
+    {
 	TBool ret = EFalse;
 	if(iExtendedContentDescriptionCount == 0)
 		{
@@ -705,7 +723,7 @@ TBool CMetaDataParserWMA::GetExtContDesEntryL(TMetaDataFieldId aFieldId, TInt aO
 		ret = ETrue;
 		}
 	return ret;
-}
+    }
 
 // -----------------------------------------------------------------------------
 // CMetaDataParserWMA::GetDurationL
@@ -757,7 +775,7 @@ TInt CMetaDataParserWMA::ConvertToUnicodeL(
 	TDes16& aUnicode )
 	{
 	TPtrC8 unicodeData;
-  TUint characterSetId = 0;
+	TUint characterSetId = 0;
 	CCnvCharacterSetConverter* charSetConv = CCnvCharacterSetConverter::NewLC();
 	TInt state = CCnvCharacterSetConverter::KStateDefault;
 
@@ -784,17 +802,17 @@ TInt CMetaDataParserWMA::ConvertToUnicodeL(
 //
 void CMetaDataParserWMA::ParseContentDescriptionObject()
 	{
-		TBuf8<2> data = iHeaderData->Mid(iContentDescriptionOffset + 24, 2);
-		iTitleLength = ConvertToInt16(data); 
-		data = iHeaderData->Mid(iContentDescriptionOffset + 26, 2);
-		iAuthorLength = ConvertToInt16(data); 
-		data = iHeaderData->Mid(iContentDescriptionOffset + 28, 2);
-		iCopyrightLength = ConvertToInt16(data); 
-		data = iHeaderData->Mid(iContentDescriptionOffset + 30, 2);
-		iDescriptionLength = ConvertToInt16(data); 
-		data = iHeaderData->Mid(iContentDescriptionOffset + 32, 2);
-		iRatingLength = ConvertToInt16(data);
-		return;
+	TBuf8<2> data = iHeaderData->Mid(iContentDescriptionOffset + 24, 2);
+	iTitleLength = ConvertToInt16(data); 
+	data = iHeaderData->Mid(iContentDescriptionOffset + 26, 2);
+	iAuthorLength = ConvertToInt16(data); 
+	data = iHeaderData->Mid(iContentDescriptionOffset + 28, 2);
+	iCopyrightLength = ConvertToInt16(data); 
+	data = iHeaderData->Mid(iContentDescriptionOffset + 30, 2);
+	iDescriptionLength = ConvertToInt16(data); 
+	data = iHeaderData->Mid(iContentDescriptionOffset + 32, 2);
+	iRatingLength = ConvertToInt16(data);
+	return;
 	}
 
 
@@ -1005,5 +1023,66 @@ void CMetaDataParserWMA::ParseHeaderExtensionObjectL()
 			}
 		}
 	}	
+
+// -----------------------------------------------------------------------------
+// CMetaDataParserWMA::GetSampleRateL
+// -----------------------------------------------------------------------------
+//
+void CMetaDataParserWMA::GetSampleRateL()
+    {
+#ifdef _DEBUG
+    RDebug::Print(_L("CMetaDataParserWMA::GetSampleRateL"));
+#endif    
+    if(!iStreamPropertiesObjectExists)
+        {
+        return;
+        }
+    TInt offset = iStreamPropertiesOffset + KSampleRateOffset;
+    TPtrC8 sampleRate = iHeaderData->Mid(offset, 4);
+    if(offset+4 > iHeaderData->Length())        //Header Size is too small
+        {
+        return ;
+        } 
+    
+    TInt sampleRateValue = ConvertToInt32(sampleRate); 
+    TBuf16<20> des16;   
+    des16.Num(sampleRateValue);                 // convert to string
+    
+    iContainer->AppendL( EMetaDataSampleRate, des16 );
+    
+#ifdef _DEBUG
+    RDebug::Print(_L("CMetaDataParserWMA::GetSampleRateL(), SampleRate=%S"), &des16);
+#endif      
+    }
+	
+// -----------------------------------------------------------------------------
+// CMetaDataParserWMA::GetBitRateL
+// -----------------------------------------------------------------------------
+//
+void CMetaDataParserWMA::GetBitRateL()
+    {
+#ifdef _DEBUG
+    RDebug::Print(_L("CMetaDataParserWMA::GetBitRateL"));
+#endif    
+    if(!iStreamPropertiesObjectExists)
+	    {
+        return;
+	    }
+    TInt offset = iStreamPropertiesOffset + KBitRateOffset;
+    if(offset+4 > iHeaderData->Length()) //Header Size is too small
+        {
+        return ;
+        } 
+    TPtrC8 byteRate = iHeaderData->Mid(offset, 4);      // byte rate
+
+    TInt bitRateValue = ConvertToInt32(byteRate) * 8;  // multiply by 8 to get bit rate
+    TBuf16<20> des16;   
+    des16.Num(bitRateValue);                           // convert to string
+    
+    iContainer->AppendL( EMetaDataBitRate, des16 );
+#ifdef _DEBUG
+    RDebug::Print(_L("CMetaDataParserWMA::GetBitRateL(), bitRate=%S"), &des16);
+#endif    
+    }
 
 //  End of File

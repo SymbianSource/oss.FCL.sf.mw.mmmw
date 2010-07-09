@@ -68,37 +68,38 @@ gint TMSIPCallBodyImpl::PostConstruct()
     TRACE_PRN_FN_ENT;
     iSession = new TMSCallProxy();
 
-    if (iSession)
+    TRACE_PRN_FN_ENT;
+    if (!iSession)
         {
-        if (iSession->Connect() != TMS_RESULT_SUCCESS)
+        ret = TMS_RESULT_INSUFFICIENT_MEMORY;
+        }
+    RET_REASON_IF_ERR(ret);
+
+    if (iSession->Connect() != TMS_RESULT_SUCCESS)
+        {
+        delete iSession;
+        iSession = NULL;
+        ret = TMS_RESULT_FATAL_ERROR;
+        }
+    else
+        {
+        ret = iSession->CreateCall(TMS_CALL_IP);
+        if (ret != TMS_RESULT_SUCCESS && ret != TMS_RESULT_ALREADY_EXIST)
             {
+            iSession->Close();
             delete iSession;
             iSession = NULL;
             ret = TMS_RESULT_FATAL_ERROR;
             }
-        else
-            {
-            ret = iSession->CreateCall(TMS_CALL_IP);
-            if (ret != TMS_RESULT_SUCCESS && ret != TMS_RESULT_ALREADY_EXIST)
-                {
-                iSession->Close();
-                delete iSession;
-                ret = TMS_RESULT_FATAL_ERROR;
-                }
-            }
         }
-    else
-        {
-        ret = TMS_RESULT_INSUFFICIENT_MEMORY;
-        }
+    RET_REASON_IF_ERR(ret);
     TRACE_PRN_FN_EXT;
     return ret;
     }
 
 TMSCallType TMSIPCallBodyImpl::GetCallType()
     {
-    TMSCallType ctype(TMS_CALL_IP);
-    return ctype;
+    return TMS_CALL_IP;
     }
 
 gint TMSIPCallBodyImpl::GetCallContextId(guint& ctxid)
@@ -127,7 +128,7 @@ gint TMSIPCallBodyImpl::CreateStream(TMSStreamType type, TMSStream*& strm)
                 ret = AddStreamToList(strm);
                 }
             //TODO:Need longer term fix to not destory everything
-            //if more the one stream is trying to be created.
+            //if more than one stream is trying to be created.
             else if (ret == TMS_RESULT_ALREADY_EXIST)
                 {
                 break;
@@ -193,9 +194,10 @@ gint TMSIPCallBodyImpl::RemStreamFromList(TMSStream*& strm)
 
     if (itStrm)
         {
+        // Remove stream object from the vector. After removing, the iterator
+        // will point to the next item (if available); so, do NOT attempt
+        // deleting itStrm here! (Will result in KERN-EXEC)
         iStreamsVector.erase(itStrm); // Remove from array
-        // Don't delete itStrm as the iterator advanced to the next
-        // item on the list
         ret = TMSStreamImpl::Delete(strm);
         }
     TRACE_PRN_FN_EXT;

@@ -53,6 +53,7 @@ enum TMSCallClientServerRequest
     TMS_ROUTING_OUTPUT_GET,
     TMS_ROUTING_PREVIOUSOUTPUT_GET,
     TMS_ROUTING_AVAILABLE_OUTPUT_GET,
+    TMS_GET_ACTIVE_CALL_PARAMS,
 
     //For TMS Format
     TMS_FORMAT_SETCODECMODE,
@@ -69,10 +70,7 @@ enum TMSCallClientServerRequest
     TMS_FORMAT_SETCNG,
     TMS_FORMAT_GETCNG,
     TMS_FORMAT_SETPLC,
-    TMS_FORMAT_GETPLC,
-    TMS_DTMF_START,
-    TMS_DTMF_STOP,
-    TMS_DTMF_CONTINUE
+    TMS_FORMAT_GETPLC
     };
 
 struct TMSCliSrvStreamCreateDataStruct
@@ -123,6 +121,15 @@ struct TMSCliSrvDataXferChunkHndlDataStruct
     };
 typedef TPckgBuf<TMSCliSrvDataXferChunkHndlDataStruct>
         TMSCliSrvDataXferChunkHndlDataStructBufPckg;
+
+struct TmsCallMsgBuf
+    {
+    gint iRequest;
+    gint iStatus;
+    gboolean iBool;
+    gint iInt;
+    };
+typedef TPckgBuf<TmsCallMsgBuf> TmsCallMsgBufPckg;
 
 } //namespace TMS
 

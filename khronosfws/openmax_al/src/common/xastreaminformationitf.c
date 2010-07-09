@@ -18,7 +18,7 @@
 #include <assert.h>
 
 #include "xastreaminformationitf.h"
-#include "xastreaminformationitfadaptation.h"
+
 #include "xastreaminformationitfadaptationmmf.h"
 
 /* XAStreamInformationItfImpl* GetImpl
@@ -56,20 +56,7 @@ XAresult XAStreamInformationItfImpl_QueryMediaContainerInformation(
         return XA_RESULT_PARAMETER_INVALID;
         }
 
-    if (impl->adapCtx->fwtype == FWMgrFWGST)
-        {
-        ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
-        if (ret == XA_RESULT_PARAMETER_INVALID)
-            {
-            DEBUG_API("<-XAStreamInformationItfImpl_QueryMediaContainerInformation");
-            return ret;
-            }
-        ret = XAStreamInformationItfAdapt_QueryMediaContainerInformation(
-                impl->adapCtx, &(info->containerType),
-                &(info->mediaDuration), &(info->numStreams));
-        XAAdaptationBase_ThreadExit(impl->adapCtx);
-        }
-    else
+    if (impl->adapCtx->fwtype == FWMgrFWMMF)
         {
         ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
         if (ret == XA_RESULT_PARAMETER_INVALID)
@@ -81,7 +68,6 @@ XAresult XAStreamInformationItfImpl_QueryMediaContainerInformation(
                 impl->adapCtx, &(info->containerType),
                 &(info->mediaDuration), &(info->numStreams));
         XAAdaptationBase_ThreadExit(impl->adapCtx);
-        ;
         }
 
     DEBUG_API("-<XAStreamInformationItfImpl_QueryMediaContainerInformation");
@@ -101,21 +87,7 @@ XAresult XAStreamInformationItfImpl_QueryStreamType(
         DEBUG_API("-<XAStreamInformationItfImpl_QueryStreamType");
         return XA_RESULT_PARAMETER_INVALID;
         }
-    if (impl->adapCtx->fwtype == FWMgrFWGST)
-        {
-        ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
-        if (ret == XA_RESULT_PARAMETER_INVALID)
-            {
-            DEBUG_API("<-XAStreamInformationItfImpl_QueryStreamType");
-            return ret;
-            }
-
-        ret = XAStreamInformationItfAdapt_QueryStreamType(impl->adapCtx,
-                streamIndex, domain);
-
-        XAAdaptationBase_ThreadExit(impl->adapCtx);
-        }
-    else
+    if (impl->adapCtx->fwtype == FWMgrFWMMF)
         {
         ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
         if (ret == XA_RESULT_PARAMETER_INVALID)
@@ -128,8 +100,8 @@ XAresult XAStreamInformationItfImpl_QueryStreamType(
                 streamIndex, domain);
 
         XAAdaptationBase_ThreadExit(impl->adapCtx);
-        ;
-        }DEBUG_API("-<XAStreamInformationItfImpl_QueryStreamType");
+        }
+    DEBUG_API("-<XAStreamInformationItfImpl_QueryStreamType");
     return ret;
     }
 
@@ -147,21 +119,7 @@ XAresult XAStreamInformationItfImpl_QueryStreamInformation(
         return XA_RESULT_PARAMETER_INVALID;
         }
 
-    if (impl->adapCtx->fwtype == FWMgrFWGST)
-        {
-        ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
-        if (ret == XA_RESULT_PARAMETER_INVALID)
-            {
-            DEBUG_API("<-XAStreamInformationItfImpl_QueryStreamInformation");
-            return ret;
-            }
-
-        ret = XAStreamInformationItfAdapt_QueryStreamInformation(
-                impl->adapCtx, streamIndex, info);
-
-        XAAdaptationBase_ThreadExit(impl->adapCtx);
-        }
-    else
+    if (impl->adapCtx->fwtype == FWMgrFWMMF)
         {
         ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
         if (ret == XA_RESULT_PARAMETER_INVALID)
@@ -174,7 +132,6 @@ XAresult XAStreamInformationItfImpl_QueryStreamInformation(
                 impl->adapCtx, streamIndex, info);
 
         XAAdaptationBase_ThreadExit(impl->adapCtx);
-        ;
         }
 
     DEBUG_API("-<XAStreamInformationItfImpl_QueryStreamInformation");
@@ -196,21 +153,7 @@ XAresult XAStreamInformationItfImpl_QueryStreamName(
         return XA_RESULT_PARAMETER_INVALID;
         }
 
-    if (impl->adapCtx->fwtype == FWMgrFWGST)
-        {
-        ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
-        if (ret == XA_RESULT_PARAMETER_INVALID)
-            {
-            DEBUG_API("<-XAStreamInformationItfImpl_QueryStreamName");
-            return ret;
-            }
-
-        ret = XAStreamInformationItfAdapt_QueryStreamName(impl->adapCtx,
-                streamIndex, pNameSize, pName);
-
-        XAAdaptationBase_ThreadExit(impl->adapCtx);
-        }
-    else
+    if (impl->adapCtx->fwtype == FWMgrFWMMF)
         {
         ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
         if (ret == XA_RESULT_PARAMETER_INVALID)
@@ -223,8 +166,8 @@ XAresult XAStreamInformationItfImpl_QueryStreamName(
                 streamIndex, pNameSize, pName);
 
         XAAdaptationBase_ThreadExit(impl->adapCtx);
-        ;
-        }DEBUG_API("-<XAStreamInformationItfImpl_QueryStreamName");
+        }
+    DEBUG_API("-<XAStreamInformationItfImpl_QueryStreamName");
     return ret;
     }
 
@@ -276,25 +219,10 @@ XAresult XAStreamInformationItfImpl_QueryActiveStreams(
             return ret;
             }
 
-        ret = XAStreamInformationItfAdapt_QueryActiveStreams(impl->adapCtx,
-                numStreams, activeStreams);
-
-        XAAdaptationBase_ThreadExit(impl->adapCtx);
-        }
-    else
-        {
-        ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
-        if (ret == XA_RESULT_PARAMETER_INVALID)
-            {
-            DEBUG_API("<-XAStreamInformationItfImpl_QueryActiveStreams");
-            return ret;
-            }
-
         ret = XAStreamInformationItfAdaptMMF_QueryActiveStreams(
                 impl->adapCtx, numStreams, activeStreams);
 
         XAAdaptationBase_ThreadExit(impl->adapCtx);
-        ;
         }
 
     DEBUG_API("-<XAStreamInformationItfImpl_QueryActiveStreams");
@@ -316,21 +244,7 @@ XAresult XAStreamInformationItfImpl_SetActiveStream(
         return XA_RESULT_PARAMETER_INVALID;
         }
 
-    if (impl->adapCtx->fwtype == FWMgrFWGST)
-        {
-        ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
-        if (ret == XA_RESULT_PARAMETER_INVALID)
-            {
-            DEBUG_API("<-XAStreamInformationItfImpl_SetActiveStream");
-            return ret;
-            }
-
-        ret = XAStreamInformationItfAdapt_SetActiveStream(impl->adapCtx,
-                streamNum, active, commitNow);
-
-        XAAdaptationBase_ThreadExit(impl->adapCtx);
-        }
-    else
+    if (impl->adapCtx->fwtype == FWMgrFWMMF)
         {
         ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
         if (ret == XA_RESULT_PARAMETER_INVALID)
@@ -343,7 +257,6 @@ XAresult XAStreamInformationItfImpl_SetActiveStream(
                 streamNum, active, commitNow);
 
         XAAdaptationBase_ThreadExit(impl->adapCtx);
-        ;
         }
 
     DEBUG_API("-<XAStreamInformationItfImpl_SetActiveStream");

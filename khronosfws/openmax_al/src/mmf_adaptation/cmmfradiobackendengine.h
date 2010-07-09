@@ -227,6 +227,7 @@ private:
     CMMFRadioBackendEngine();
     void ConstructL();
 	XAresult TranslateError(TInt error);    
+	XAresult SetForceMonoFlag();		 
 
 private:      
     CRadioUtility* 				iRadioUtility; 
@@ -235,6 +236,10 @@ private:
     TBool						iForceStereo;
     void* 						iRadioAdaptContext;
     void* 						iPlayerAdaptContext;    
+    TFmRadioFrequencyRange 		iDefaultFreqRange;
+    XAuint32 					iDefaultFrequency; 
+    TInt 						iDefaultMinFreq;
+    TInt 						iDefaultMaxFreq; 
        
     };
     
@@ -258,6 +263,7 @@ extern XAresult  	mmf_set_player_adapt_context(void * context, void * adaptconte
 extern void         stop_radio(void * context);
 extern void         play_radio(void* context);
 extern XAresult     set_volume(void* context, XAuint32 vol);
+extern XAresult     get_volume(void* context, XAuint32* vol);
 extern XAresult     mmf_set_player_adapt_context(void * context, void * adaptcontext);
 extern XAresult     set_mute(void* context, XAboolean mute);
 #endif /* __cplusplus */

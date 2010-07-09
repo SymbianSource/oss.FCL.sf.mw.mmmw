@@ -48,7 +48,7 @@ const TInt Kkilo = 1024;
 
 _LIT(KTMSTtsHeader, "(tts)");
 
-#ifdef __WINS__
+#ifdef __WINSCW__
 //_LIT(KTMSDefaultSoundFile, "z:\\data\\sounds\\digital\\Nokia_tune.aac");
 _LIT(KTMSDefaultSoundFile, "Z:\\Data\\Sounds\\Digital\\Nokia tune.aac");
 //_LIT(KTMSDefaultSoundFile, "c:\\data\\sounds\\digital\\test_8khz.wav");
@@ -67,7 +67,7 @@ _LIT8(KTMSNoSoundSequence, "\x00\x11\x0A\x05\xFC\x0A\x08\x40\x32\x0A\xF7\
 \x40\x64\x06\x0B");
 _LIT8(KTMSUnsecureVoIPCall, "\x00\x11\x0B\x67\x04\x40\x04\x67\x04\x40\x04\
 \x6C\x04\x40\x04\x6D\x04\x0B");
-#endif // __WINS__
+#endif // __WINSCW__
 
 // -----------------------------------------------------------------------------
 // TMSRingTonePlayer::NewL
@@ -371,7 +371,7 @@ void TMSRingTonePlayer::CreateBeepOncePlayerL()
     delete iBeepOncePlayer;
     iBeepOncePlayer = NULL;
 
-#ifdef __WINS__
+#ifdef __WINSCW__
     TParse* fp = new (ELeave) TParse();
     fp->Set(KTMSBeepSequence, NULL, NULL);
     TFileName fileName(fp->FullName());
@@ -381,7 +381,7 @@ void TMSRingTonePlayer::CreateBeepOncePlayerL()
 #else
     iBeepOncePlayer = TMSRtAudioHdlr::NewSeqL(KTMSBeepSequence(),
             iRtParam.iPriority, iRtParam.iPreference, *this, EPlayerBeepOnce);
-#endif // __WINS__
+#endif // __WINSCW__
 
     iRtParam.iType = EPlayerBeepOnce;
     TRACE_PRN_FN_EXT;
@@ -399,7 +399,7 @@ void TMSRingTonePlayer::CreateSilentPlayerL()
     delete iSilentPlayer;
     iSilentPlayer = NULL;
 
-#ifdef __WINS__
+#ifdef __WINSCW__
     TParse* fp = new (ELeave) TParse();
     fp->Set(KTMSNoSoundSequence, NULL, NULL);
     TFileName fileName(fp->FullName());
@@ -409,7 +409,7 @@ void TMSRingTonePlayer::CreateSilentPlayerL()
 #else
     iSilentPlayer = TMSRtAudioHdlr::NewSeqL(KTMSNoSoundSequence(),
             iRtParam.iPriority, iRtParam.iPreference, *this, EPlayerSilent);
-#endif // __WINS__
+#endif // __WINSCW__
 
     iRtParam.iType = EPlayerSilent;
     TRACE_PRN_FN_EXT;
@@ -426,7 +426,7 @@ void TMSRingTonePlayer::CreateUnsecureVoipPlayerL()
     delete iUnsecureVoIPTonePlayer;
     iUnsecureVoIPTonePlayer = NULL;
 
-#ifdef __WINS__
+#ifdef __WINSCW__
     TParse* fp = new (ELeave) TParse();
     fp->Set(KTMSUnsecureVoIPCall, NULL, NULL);
     TFileName fileName(fp->FullName());
@@ -438,7 +438,7 @@ void TMSRingTonePlayer::CreateUnsecureVoipPlayerL()
     iUnsecureVoIPTonePlayer = TMSRtAudioHdlr::NewSeqL(KTMSUnsecureVoIPCall(),
             iRtParam.iPriority, iRtParam.iPreference, *this,
             EPlayerUnsecureVoIP);
-#endif // __WINS__
+#endif // __WINSCW__
 
     iRtParam.iType = EPlayerUnsecureVoIP;
     TRACE_PRN_FN_EXT;
@@ -449,7 +449,7 @@ void TMSRingTonePlayer::CreateUnsecureVoipPlayerL()
 // -----------------------------------------------------------------------------
 //
 void TMSRingTonePlayer::CreateCustomSequencePlayerL(const TDesC8&
-#ifdef __WINS__
+#ifdef __WINSCW__
         /*aSequence*/)
 #else
         aSequence)
@@ -460,7 +460,7 @@ void TMSRingTonePlayer::CreateCustomSequencePlayerL(const TDesC8&
     delete iSequencePlayer;
     iSequencePlayer = NULL;
 
-#ifdef __WINS__
+#ifdef __WINSCW__
     TParse* fp = new (ELeave) TParse();
     fp->Set(KTMSBeepSequence, NULL, NULL);
     TFileName fileName(fp->FullName());
@@ -470,7 +470,7 @@ void TMSRingTonePlayer::CreateCustomSequencePlayerL(const TDesC8&
 #else
     iSequencePlayer = TMSRtAudioHdlr::NewSeqL(aSequence, iRtParam.iPriority,
             iRtParam.iPreference, *this, EPlayerSequence);
-#endif // __WINS__
+#endif // __WINSCW__
 
     iRtParam.iType = EPlayerSequence;
     TRACE_PRN_FN_EXT;
@@ -1378,12 +1378,12 @@ void TMSRingTonePlayer::DoHandlePlayerError(TBool aDelete, TBool aSync)
                 iAudioPlayer = NULL;
                 }
 
-#ifdef __WINS__
+#ifdef __WINSCW__
             TRAP_IGNORE(PlayAudioRingToneL());
             iTonePlayingStatus = EDefaultTonePlaying;
 #else
             TRAP_IGNORE(PlayDefaultToneL());
-#endif
+#endif //__WINSCW__
             break;
             }
         case EDefaultTonePlaying:
@@ -1710,4 +1710,3 @@ TMSRtAudioHdlr* TMSRingTonePlayer::ActiveAudioPlayer()
     return audioHdlr;
     }
 
-//  End of File

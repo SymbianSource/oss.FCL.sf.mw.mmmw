@@ -22,18 +22,10 @@
 #include "xaaudioencoderitf.h"
 #include "xaconfigextensionsitf.h"
 #include "xadynintmgmtitf.h"
-#include "xaequalizeritf.h"
-#include "xaimagecontrolsitf.h"
-#include "xaimageeffectsitf.h"
-#include "xaimageencoderitf.h"
 #include "xametadatainsertionitf.h"
 #include "xarecorditf.h"
-#include "xasnapshotitf.h"
-#include "xavideoencoderitf.h"
-#include "xavideopostprocessingitf.h"
 #include "xavolumeitf.h"
 #include "xametadataextractionitf.h"
-#include "xametadatatraversalitf.h"
 #include "xathreadsafety.h"
 #include <string.h>
 #include "xacapabilitiesmgr.h"
@@ -42,22 +34,14 @@
 /* Static mapping of enumeration XAMediaRecorderInterfaces to interface iids */
 static const XAInterfaceID* xaMediaRecorderItfIIDs[MR_ITFCOUNT] =
     {
-            &XA_IID_OBJECT,
-            &XA_IID_AUDIOENCODER,
-            &XA_IID_CONFIGEXTENSION,
-            &XA_IID_DYNAMICINTERFACEMANAGEMENT,
-            &XA_IID_EQUALIZER,
-            &XA_IID_IMAGECONTROLS,
-            &XA_IID_IMAGEEFFECTS,
-            &XA_IID_IMAGEENCODER,
-            &XA_IID_METADATAINSERTION,
-            &XA_IID_RECORD,
-            &XA_IID_SNAPSHOT,
-            &XA_IID_VIDEOENCODER,
-            &XA_IID_VIDEOPOSTPROCESSING,
-            &XA_IID_VOLUME,
-            &XA_IID_METADATAEXTRACTION,
-            &XA_IID_METADATATRAVERSAL
+    &XA_IID_OBJECT,
+    &XA_IID_AUDIOENCODER,
+    &XA_IID_CONFIGEXTENSION,
+    &XA_IID_DYNAMICINTERFACEMANAGEMENT,
+    &XA_IID_METADATAINSERTION,
+    &XA_IID_RECORD,
+    &XA_IID_VOLUME,
+    &XA_IID_METADATAEXTRACTION
     };
 
 /* Global methods */
@@ -128,12 +112,7 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
         {
         pBaseObj->interfaceMap[MR_AUDIOENCODERITF].required = XA_BOOLEAN_TRUE;
         }
-    if (pImageVideoSrc && mediaType != XA_MEDIATYPE_AUDIO)
-        {
-        pBaseObj->interfaceMap[MR_VIDEOENCODER].required = XA_BOOLEAN_TRUE;
-        pBaseObj->interfaceMap[MR_IMAGEENCODERITF].required = XA_BOOLEAN_TRUE;
-        pBaseObj->interfaceMap[MR_SNAPSHOTITF].required = XA_BOOLEAN_TRUE;
-        }
+
     pBaseObj->interfaceMap[MR_DIMITF].required = XA_BOOLEAN_TRUE;
 
     /* Explicit interfaces */
@@ -163,17 +142,8 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
                 }
             else
                 { /* weed out unsupported content-aware itf's */
-                if (((mediaType == XA_MEDIATYPE_IMAGE || !pAudioSrc)
-                        && (entry->mapIdx == MR_EQUALIZERITF || entry->mapIdx
-                                == MR_VOLUMEITF || entry->mapIdx
-                                == MR_AUDIOENCODERITF)) || ((mediaType
-                        == XA_MEDIATYPE_AUDIO || !pImageVideoSrc)
-                        && (entry->mapIdx == MR_IMAGECONTROLSITF
-                                || entry->mapIdx == MR_IMAGEEFFECTSITF
-                                || entry->mapIdx == MR_VIDEOPOSTPROCESSINGITF
-                                || entry->mapIdx == MR_VIDEOENCODER
-                                || entry->mapIdx == MR_IMAGEENCODERITF
-                                || entry->mapIdx == MR_SNAPSHOTITF)))
+                if ((mediaType == XA_MEDIATYPE_IMAGE || !pAudioSrc)
+                        && (entry->mapIdx == MR_VOLUMEITF || entry->mapIdx == MR_AUDIOENCODERITF))
                     {
                     entry->required = XA_BOOLEAN_FALSE;
                     if (pInterfaceRequired[itfIdx])
@@ -188,11 +158,6 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
                     entry->required = XA_BOOLEAN_TRUE;
                     }
 
-                if (entry->mapIdx == MR_SNAPSHOTITF)
-                    {
-                    DEBUG_ERR("SnapshotItf requested - support still mode");
-                    pImpl->recModes |= XA_RECMODE_STILL;
-                    }
                 if (entry->mapIdx == MR_RECORDITF)
                     {
                     DEBUG_ERR("RecordItf requested - support stream mode");
@@ -235,8 +200,6 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
     /* Mandated dynamic itfs */
     pBaseObj->interfaceMap[MR_METADATAINSERTIONITF].isDynamic
             = XA_BOOLEAN_TRUE;
-    pBaseObj->interfaceMap[MR_EQUALIZERITF].isDynamic = XA_BOOLEAN_TRUE;
-    pBaseObj->interfaceMap[MR_IMAGEEFFECTSITF].isDynamic = XA_BOOLEAN_TRUE;
 
     /* Initialize XAMediaRecorderImpl variables */
     pImpl->audioSrc = pAudioSrc;
@@ -412,17 +375,6 @@ XAresult XAMediaRecorderImpl_DoRealize(XAObjectItf self)
                 case MR_AUDIOENCODERITF:
                     pItf = XAAudioEncoderItfImpl_Create(pObjImpl);
                     break;
-#ifdef OMAX_CAMERABIN
-                    case MR_SNAPSHOTITF:
-                    pItf = XASnapshotItfImpl_Create(pObjImpl);
-                    break;
-                    case MR_VIDEOENCODER:
-                    pItf = XAVideoEncoderItfImpl_Create(pObjImpl);
-                    break;
-                    case MR_IMAGEENCODERITF:
-                    pItf = XAImageEncoderItfImpl_Create(pObjImpl);
-                    break;
-#endif
                 case MR_METADATAINSERTIONITF:
                     pItf = XAMetadataInsertionItfImpl_Create(pObjImpl);
                     break;
@@ -432,20 +384,6 @@ XAresult XAMediaRecorderImpl_DoRealize(XAObjectItf self)
                     XAConfigExtensionsItfImpl_SetContext(pItf,
                             pObjImpl->adaptationCtx);
                     break;
-                case MR_EQUALIZERITF:
-                    pItf = XAEqualizerItfImpl_Create(pObjImpl->adaptationCtx);
-                    break;
-#ifdef OMAX_CAMERABIN
-                    case MR_IMAGECONTROLSITF:
-                    pItf = XAImageControlsItfImpl_Create( pObjImpl->adaptationCtx );
-                    break;
-                    case MR_IMAGEEFFECTSITF:
-                    pItf = XAImageEffectsItfImpl_Create( pObjImpl->adaptationCtx );
-                    break;
-                    case MR_VIDEOPOSTPROCESSINGITF:
-                    pItf = XAVideoPostProcessingItfImpl_Create( pObjImpl->adaptationCtx );
-                    break;
-#endif
                 case MR_VOLUMEITF:
                     pItf = XAVolumeItfImpl_Create(pObjImpl->adaptationCtx);
                     break;
@@ -453,11 +391,6 @@ XAresult XAMediaRecorderImpl_DoRealize(XAObjectItf self)
                     pItf = XAMetadataExtractionItfImpl_Create(
                             pObjImpl->adaptationCtx);
                     break;
-                case MR_METADATATRAVERSALITF:
-                    pItf = XAMetadataTraversalItfImpl_Create(
-                            pObjImpl->adaptationCtx);
-                    break;
-
                 default:
                     break;
                 }
@@ -522,45 +455,17 @@ void XAMediaRecorderImpl_FreeResources(XAObjectItf self)
                 case MR_DIMITF:
                     XADIMItfImpl_Free(pItf);
                     break;
-                case MR_EQUALIZERITF:
-                    XAEqualizerItfImpl_Free(pItf);
-                    break;
-#ifdef OMAX_CAMERABIN
-                    case MR_IMAGECONTROLSITF:
-                    XAImageControlsItfImpl_Free(pItf);
-                    break;
-                    case MR_IMAGEEFFECTSITF:
-                    XAImageEffectsItfImpl_Free(pItf);
-                    break;
-                    case MR_IMAGEENCODERITF:
-                    XAImageEncoderItfImpl_Free(pItf);
-                    break;
-#endif
                 case MR_METADATAINSERTIONITF:
                     XAMetadataInsertionItfImpl_Free(pItf);
                     break;
                 case MR_RECORDITF:
                     XARecordItfImpl_Free(pItf);
                     break;
-#ifdef OMAX_CAMERABIN
-                    case MR_SNAPSHOTITF:
-                    XASnapshotItfImpl_Free(pItf);
-                    break;
-                    case MR_VIDEOENCODER:
-                    XAVideoEncoderItfImpl_Free(pItf);
-                    break;
-                    case MR_VIDEOPOSTPROCESSINGITF:
-                    XAVideoPostProcessingItfImpl_Free(pItf);
-                    break;
-#endif
                 case MR_VOLUMEITF:
                     XAVolumeItfImpl_Free(pItf);
                     break;
                 case MR_METADATAEXTRACTIONITF:
                     XAMetadataExtractionItfImpl_Free(pItf);
-                    break;
-                case MR_METADATATRAVERSALITF:
-                    XAMetadataTraversalItfImpl_Free(pItf);
                     break;
                 default:
                     break;
@@ -618,18 +523,8 @@ XAresult XAMediaRecorderImpl_DoAddItf(XAObjectItf self,
             case MR_METADATAINSERTIONITF:
                 mapEntry->pItf = XAMetadataInsertionItfImpl_Create(pImpl);
                 break;
-            case MR_EQUALIZERITF:
-                mapEntry->pItf = XAEqualizerItfImpl_Create(
-                        pImpl->adaptationCtx);
-                break;
-#ifdef OMAX_CAMERABIN
-                case MR_IMAGEEFFECTSITF:
-                mapEntry->pItf = XAImageEffectsItfImpl_Create( pImpl->adaptationCtx );
-                break;
-#endif
             default:
-                DEBUG_ERR("XAMediaRecorderImpl_DoAddItf unknown id")
-                ;
+                DEBUG_ERR("XAMediaRecorderImpl_DoAddItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
                 break;
             }
@@ -682,17 +577,8 @@ XAresult XAMediaRecorderImpl_DoRemoveItf(XAObjectItf self,
             case MR_METADATAINSERTIONITF:
                 XAMetadataInsertionItfImpl_Free(mapEntry->pItf);
                 break;
-            case MR_EQUALIZERITF:
-                XAEqualizerItfImpl_Free(mapEntry->pItf);
-                break;
-#ifdef OMAX_CAMERABIN
-                case MR_IMAGEEFFECTSITF:
-                XAImageEffectsItfImpl_Free( mapEntry->pItf );
-                break;
-#endif
             default:
-                DEBUG_ERR("XAMediaRecorderImpl_DoRemoveItf unknown id")
-                ;
+                DEBUG_ERR("XAMediaRecorderImpl_DoRemoveItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
                 break;
             }

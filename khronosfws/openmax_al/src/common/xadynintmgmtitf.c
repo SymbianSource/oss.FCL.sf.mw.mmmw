@@ -53,7 +53,8 @@ XAresult XADIMItfImpl_AddInterface(XADynamicInterfaceManagementItf self,
     DEBUG_API("->XADIMItfImpl_AddInterface");
     if (!impl)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XADIMItfImpl_AddInterface");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XADIMItfImpl_AddInterface");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -154,7 +155,8 @@ XAresult XADIMItfImpl_ResumeInterface(XADynamicInterfaceManagementItf self,
 
     if (!impl)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XADIMItfImpl_ResumeInterface");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XADIMItfImpl_ResumeInterface");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -201,7 +203,8 @@ XAresult XADIMItfImpl_RegisterCallback(XADynamicInterfaceManagementItf self,
 
     if (!impl)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XADIMItfImpl_RegisterCallback");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XADIMItfImpl_RegisterCallback");
         return XA_RESULT_PARAMETER_INVALID;
         }
     impl->dimCb = callback;
@@ -242,7 +245,8 @@ XADIMItfImpl* XADIMItfImpl_Create()
             free(self);
             self = NULL;
             }
-        }DEBUG_API("<-XADIMItfImpl_Create");
+        }
+    DEBUG_API("<-XADIMItfImpl_Create");
     return self;
     }
 
@@ -288,7 +292,8 @@ void XADIMItfImpl_SendCbEvent(XADIMItfImpl* self, XAuint32 event,
         {
         self->dimCb((XADynamicInterfaceManagementItf) (self),
                 self->dimCbContext, event, result, iid);
-        }DEBUG_API("<-XADIMItfImpl_SendCbEvent");
+        }
+    DEBUG_API("<-XADIMItfImpl_SendCbEvent");
     }
 
 /* void* XADIMItfImpl_AsyncAddItf

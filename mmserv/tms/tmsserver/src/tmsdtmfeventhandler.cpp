@@ -96,15 +96,12 @@ void TMSDtmfEventHandler::RunL()
     TRACE_PRN_FN_ENT;
 // Subscribe immediately before analyzing the notification to ensure that we
 // don't miss further updates.
-//if (iStatus.Int() == KErrNone)
-//    {
     iStatus = KRequestPending;
     iProperty.Subscribe(iStatus);
     SetActive();
     TmsMsgBufPckg dtmfpckg;
     iProperty.Get(dtmfpckg);
     iTMSSer->NotifyDtmfClients(dtmfpckg);
-//    }
     TRACE_PRN_FN_EXT;
     }
 
@@ -116,6 +113,4 @@ TInt TMSDtmfEventHandler::RunError(TInt aError)
     {
     return aError;
     }
-
-//  End of File
 

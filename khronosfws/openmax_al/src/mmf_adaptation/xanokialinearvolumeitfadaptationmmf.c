@@ -47,6 +47,12 @@ XAresult XANokiaLinearVolumeItfAdapt_GetVolumeLevel(XAAdaptationMMFCtx *ctx, XAu
         *percentage = (vol * MAX_PERCENTAGE_VOLUME)/maxvol;
         
         }
+    else if (ctx->baseObj.ctxId == XARadioAdaptation)
+        {
+        mmf_set_player_adapt_context(cmmfradiobackendengine_init(), ctx);
+        res = get_volume(cmmfradiobackendengine_init(), &vol);
+        *percentage = vol;
+        }      
 
     DEBUG_API_A1("<-XANokiaLinearVolumeItfAdapt_GetVolumeLevel %d", percentage);
     return res;
@@ -70,7 +76,8 @@ XAresult XANokiaLinearVolumeItfAdapt_SetVolumeLevel(XAAdaptationMMFCtx *ctx,
             && ctx->baseObj.ctxId != XAMediaRecorderAdaptation
             && ctx->baseObj.ctxId != XARadioAdaptation))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaLinearVolumeItfAdapt_SetVolumeLevel");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaLinearVolumeItfAdapt_SetVolumeLevel");
         /* invalid parameter */
         res = XA_RESULT_PARAMETER_INVALID;
         return res;
@@ -93,7 +100,8 @@ XAresult XANokiaLinearVolumeItfAdapt_SetVolumeLevel(XAAdaptationMMFCtx *ctx,
         {
         mmf_set_player_adapt_context(cmmfradiobackendengine_init(), ctx);
         res = set_volume(cmmfradiobackendengine_init(), percentage);
-        }DEBUG_API("<-XANokiaLinearVolumeItfAdapt_SetVolumeLevel");
+        }
+    DEBUG_API("<-XANokiaLinearVolumeItfAdapt_SetVolumeLevel");
     return res;
     }
 
@@ -106,7 +114,8 @@ XAresult XANokiaLinearVolumeItfAdapt_GetStepCount(XAAdaptationMMFCtx *ctx,
             && ctx->baseObj.ctxId != XAMediaRecorderAdaptation
             && ctx->baseObj.ctxId != XARadioAdaptation))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaLinearVolumeItfAdapt_SetVolumeLevel");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaLinearVolumeItfAdapt_SetVolumeLevel");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }

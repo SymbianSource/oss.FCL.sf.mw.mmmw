@@ -18,8 +18,7 @@
 #include <string.h>
 #include <gst/gst.h>
 #include "xaadaptationgst.h"
-#include "xametadataadaptctx.h"
-#include "xamediaplayeradaptctx.h"
+
 #include "xamediarecorderadaptctx.h"
 #include "xametadataadaptation.h"
 
@@ -111,16 +110,8 @@ XAresult XAMetadataAdapt_PreInit(XAAdaptationGstCtx *bCtx)
     XAresult ret = XA_RESULT_SUCCESS;
     XAMetadataAdaptVars* mdv;
     DEBUG_API("->XAMetadataAdapt_PreInit");
-    if( bCtx->baseObj.ctxId == XAMDAdaptation ||
-        bCtx->baseObj.ctxId == XAMediaPlayerAdaptation )
-    {
-        mdv = (XAMetadataAdaptVars*) calloc(1, sizeof(XAMetadataAdaptVars));
-        mdv->currentchild = &(mdv->generaltags);
-        mdv->traversemode=XA_METADATATRAVERSALMODE_NODE;
-        ((XAMediaPlayerAdaptationCtx*)bCtx)->metadatavars = mdv;
-
-    }
-    else if ( bCtx->baseObj.ctxId == XAMediaRecorderAdaptation )
+    
+    if ( bCtx->baseObj.ctxId == XAMediaRecorderAdaptation )
     {
         mdv = (XAMetadataAdaptVars*) calloc(1, sizeof(XAMetadataAdaptVars));
         mdv->currentchild = &(mdv->generaltags);
@@ -155,97 +146,7 @@ XAresult XAMetadataAdapt_PreInit(XAAdaptationGstCtx *bCtx)
 XAresult XAMetadataAdapt_PostInit(XAAdaptationGstCtx *bCtx)
 {
     XAresult ret = XA_RESULT_SUCCESS;
-    XAMetadataAdaptVars* mdv=NULL;
-    XAMediaPlayerAdaptationCtx* mCtx=NULL;
-    GstPad* tmppad=NULL;
-    GstCaps* tmpcaps=NULL;
-    GstElement* tmpelement=NULL;
-    XAAdaptEvent event = {XA_METADATAEVENTS, XA_ADAPT_MDE_TAGS_AVAILABLE, 0, NULL };
-
     DEBUG_API("->XAMetadataAdapt_PostInit");
-    if( bCtx->baseObj.ctxId == XAMDAdaptation ||
-        bCtx->baseObj.ctxId == XAMediaPlayerAdaptation )
-    {
-        mdv = XAMetadataAdapt_GetMetadataVars(bCtx);
-        if( mdv )
-        {
-            mdv->childcount = 0;
-            /* try to dig out audio and video pads from decodebin for stream info tags */
-            /* NOTE: currently no good deterministic way to dig out undecoded pads
-             * from decodebin's internal demuxer, this is just ugly way to try to cope
-             * with most demuxers.
-             */
-            mCtx = ((XAMediaPlayerAdaptationCtx*)bCtx);
-            if(GST_IS_BIN(mCtx->codecbin))
-            {
-                tmpelement=gst_bin_get_by_name(GST_BIN(mCtx->codecbin),"typefind");
-                if(tmpelement)
-                {
-                    tmppad = gst_element_get_static_pad(GST_ELEMENT(tmpelement),"src");
-                    tmpelement=NULL;
-                    if(tmppad)
-                    {
-                        tmppad = gst_pad_get_peer(tmppad);
-                        if(tmppad)
-                        {
-                            tmpelement = gst_pad_get_parent_element(tmppad);
-                        }
-                    }
-                    /* now we have demuxer, if existing */
-                    if(tmpelement)
-                    {
-                        tmppad = gst_element_get_pad( tmpelement, "audio_00");
-                        if(tmppad)
-                        {
-                            tmpcaps = gst_pad_get_negotiated_caps( GST_PAD(tmppad) );
-                            if(tmpcaps==NULL || gst_caps_is_any(tmpcaps) || gst_caps_is_empty(tmpcaps))
-                            {
-                                mdv->audiotags = NULL;
-                                DEBUG_INFO("no usable audio properties found from pad !");
-                            }
-                            else
-                            {
-                                mdv->audiotags = gst_caps_get_structure(tmpcaps,0);
-                                mdv->childcount++;
-                                DEBUG_INFO_A1("found audio node: %s",gst_caps_to_string(tmpcaps));
-                            }
-                        }
-                        tmppad = gst_element_get_pad( tmpelement, "video_00");
-                        if(tmppad)
-                        {
-                            tmpcaps = gst_pad_get_negotiated_caps( GST_PAD(tmppad) );
-                            if(tmpcaps==NULL || gst_caps_is_any(tmpcaps) || gst_caps_is_empty(tmpcaps))
-                            {
-                                mdv->videotags = NULL;
-                                DEBUG_INFO("no usable video properties found from pad !");
-                            }
-                            else
-                            {
-                                mdv->videotags = gst_caps_get_structure(tmpcaps,0);
-                                mdv->childcount++;
-                                DEBUG_INFO_A1("found video node: %s",gst_caps_to_string(tmpcaps));
-                            }
-                        }
-                    }
-                }
-            }
-            XAAdaptationBase_SendAdaptEvents(&bCtx->baseObj, &event );
-        }
-    }
-
-    if ( tmpelement )
-    {
-    	gst_object_unref( tmpelement );
-    }
-    if ( tmppad )
-    {
-    	gst_object_unref( tmppad );
-    }
-    if ( tmpcaps )
-    {
-    	gst_object_unref( tmpcaps );
-    }
-
     DEBUG_API_A1("<-XAMetadataAdapt_PostInit (%d)", (int)ret);
     return ret;
 }
@@ -621,7 +522,8 @@ XAresult XAMetadataInsertionItfAdapt_CreateChildNode(XAAdaptationGstCtx *bCtx,
                 DEBUG_ERR("Nodetype not supported!");
                 ret = XA_RESULT_CONTENT_UNSUPPORTED;
                 DEBUG_API_A1("<-XAMetadataInsertionItfAdapt_CreateChildNode (%d)", (int)ret);
-                return ret;            }
+                return ret;            
+            }
 
             mdv = mCtx->metadatavars;
             if(!mdv)
@@ -956,12 +858,8 @@ GstStructure* XAMetadataAdapt_GetChildStructure(XAMetadataAdaptVars* mdv, XAuint
  */
 XAMetadataAdaptVars* XAMetadataAdapt_GetMetadataVars(XAAdaptationGstCtx *bCtx)
 {
-    if( bCtx->baseObj.ctxId == XAMDAdaptation ||
-        bCtx->baseObj.ctxId == XAMediaPlayerAdaptation )
-    {
-        return ((XAMediaPlayerAdaptationCtx*)bCtx)->metadatavars;
-    }
-    else if( bCtx->baseObj.ctxId == XAMediaRecorderAdaptation )
+    
+    if( bCtx->baseObj.ctxId == XAMediaRecorderAdaptation )
     {
         return ((XAMediaRecorderAdaptationCtx*)bCtx)->metadatavars;
     }
@@ -1087,13 +985,8 @@ gboolean XAMetadataAdapt_GstTagCb( GstBus *bus, GstMessage *message, gpointer da
                         GST_MESSAGE_TYPE_NAME(message), GST_OBJECT_NAME(GST_MESSAGE_SRC(message)));
         gst_message_parse_tag (message, &new_tags);
         /* NOTE: only general tags received this way (not child nodes)*/
-        if( bCtx->baseObj.ctxId == XAMDAdaptation ||
-            bCtx->baseObj.ctxId == XAMediaPlayerAdaptation )
-        {
-            old_tags = &((XAMediaPlayerAdaptationCtx*)bCtx)->metadatavars->generaltags;
-            mode = GST_TAG_MERGE_REPLACE;
-        }
-        else if( bCtx->baseObj.ctxId == XAMediaRecorderAdaptation )
+        
+        if( bCtx->baseObj.ctxId == XAMediaRecorderAdaptation )
         {
             old_tags = &((XAMediaRecorderAdaptationCtx*)bCtx)->metadatavars->generaltags;
             /* keep user's tags */

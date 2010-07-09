@@ -60,6 +60,7 @@ enum TMSClientServerRequest
     ETMSRingToneMute,
     ETMSStartDTMFNotifier,
     ETMSCancelDTMFNotifier,
+    ETMSInitDTMF,
     ETMSStartDTMF,
     ETMSStopDTMF,
     ETMSContinueDTMF,

@@ -11,8 +11,7 @@
 *
 * Contributors:
 *
-* Description:  This class implements an ID3v1 and v1.1 parser as specified in
-*                www.id3.org.
+* Description:  This class implements a wma parser 
 *
 */
 
@@ -119,6 +118,18 @@ class CMetaDataParserWMA : public CMetaDataParser
         * @return void
 		*/
 		void GetDurationL();
+		
+		/**
+        * Append sample rate to the container, if found.
+        * @return void
+		*/
+		void GetSampleRateL();
+		
+		/**
+        * Append bit rate to the container, if found.
+        * @return void
+		*/
+		void GetBitRateL();
 
 		/**
         * Parses all entries in Content Description Object
@@ -240,6 +251,9 @@ class CMetaDataParserWMA : public CMetaDataParser
 		TBool iHeaderExtensionObjectExists;
 		TBool iMetadataLibraryObjectExists;
 		TBool iMetadatLibraryObjectJpegExists;
+		TBool iStreamPropertiesObjectExists;
+		
+		TInt iStreamPropertiesOffset;
     };
 
 #endif      // CMetaDataParserWMA_H

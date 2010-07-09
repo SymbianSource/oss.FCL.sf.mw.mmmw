@@ -26,12 +26,7 @@
 #include "xadynintmgmtitf.h"
 #include "xavolumeitf.h"
 #include "xametadataextractionitf.h"
-#include "xametadatatraversalitf.h"
 #include "xaplaybackrateitf.h"
-#include "xaequalizeritf.h"
-#include "xaimagecontrolsitf.h"
-#include "xaimageeffectsitf.h"
-#include "xavideopostprocessingitf.h"
 #include "xaconfigextensionsitf.h"
 #include "xathreadsafety.h"
 #include "xametadataadaptation.h"
@@ -46,24 +41,19 @@ extern void* vfHandle;
 /* Static mapping of enumeration XAMediaPlayerInterfaces to interface iids */
 static const XAInterfaceID* xaMediaPlayerItfIIDs[MP_ITFCOUNT] =
     {
-            &XA_IID_OBJECT,
-            &XA_IID_DYNAMICINTERFACEMANAGEMENT,
-            &XA_IID_PLAY,
-            &XA_IID_SEEK,
-            &XA_IID_VOLUME,
-            &XA_IID_PREFETCHSTATUS,
-            &XA_IID_CONFIGEXTENSION,
-            &XA_IID_DYNAMICSOURCE,
-            &XA_IID_EQUALIZER,
-            &XA_IID_IMAGECONTROLS,
-            &XA_IID_IMAGEEFFECTS,
-            &XA_IID_METADATAEXTRACTION,
-            &XA_IID_METADATATRAVERSAL,
-            &XA_IID_PLAYBACKRATE,
-            &XA_IID_VIDEOPOSTPROCESSING,
-            &XA_IID_NOKIAVOLUMEEXT,
-            &XA_IID_NOKIALINEARVOLUME,
-            &XA_IID_STREAMINFORMATION
+    &XA_IID_OBJECT,
+    &XA_IID_DYNAMICINTERFACEMANAGEMENT,
+    &XA_IID_PLAY,
+    &XA_IID_SEEK,
+    &XA_IID_VOLUME,
+    &XA_IID_PREFETCHSTATUS,
+    &XA_IID_CONFIGEXTENSION,
+    &XA_IID_DYNAMICSOURCE,
+    &XA_IID_METADATAEXTRACTION,
+    &XA_IID_PLAYBACKRATE,
+    &XA_IID_NOKIAVOLUMEEXT,
+    &XA_IID_NOKIALINEARVOLUME,
+    &XA_IID_STREAMINFORMATION
     };
 
 /* Global methods */
@@ -164,13 +154,8 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
                 }
             else
                 { /* weed out unsupported content-aware itf's */
-                if ((mediaType == XA_MEDIATYPE_IMAGE && (entry->mapIdx
-                        == MP_SEEKITF || entry->mapIdx == MP_EQUALIZERITF
-                        || entry->mapIdx == MP_VOLUMEITF)) || (mediaType
-                        == XA_MEDIATYPE_AUDIO && (entry->mapIdx
-                        == MP_IMAGECONTROLSITF || entry->mapIdx
-                        == MP_IMAGEEFFECTSITF || entry->mapIdx
-                        == MP_VIDEOPOSTPROCESSINGITF)))
+                if ((mediaType == XA_MEDIATYPE_IMAGE && (entry->mapIdx == MP_SEEKITF 
+                        || entry->mapIdx == MP_VOLUMEITF)))
                     {
                     entry->required = XA_BOOLEAN_FALSE;
                     if (pInterfaceRequired[itfIdx])
@@ -196,11 +181,7 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
 
     /* Mark interfaces that can be handled dynamically */
     /* Mandated dynamic itfs */
-    pBaseObj->interfaceMap[MP_EQUALIZERITF].isDynamic = XA_BOOLEAN_TRUE;
-    pBaseObj->interfaceMap[MP_IMAGEEFFECTSITF].isDynamic = XA_BOOLEAN_TRUE;
     pBaseObj->interfaceMap[MP_METADATAEXTRACTIONITF].isDynamic
-            = XA_BOOLEAN_TRUE;
-    pBaseObj->interfaceMap[MP_METADATATRAVERSALITF].isDynamic
             = XA_BOOLEAN_TRUE;
     pBaseObj->interfaceMap[MP_PLAYBACKRATEITF].isDynamic = XA_BOOLEAN_TRUE;
 
@@ -257,15 +238,6 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
                 pPlayerImpl->vibra, pPlayerImpl->LEDArray);
 
         pPlayerImpl->curAdaptCtx = pPlayerImpl->adaptationCtxMMF;
-        }
-    else
-        {
-        pPlayerImpl->adaptationCtxGst = XAMediaPlayerAdapt_Create(
-                pPlayerImpl->dataSrc, pPlayerImpl->bankSrc,
-                pPlayerImpl->audioSnk, pPlayerImpl->imageVideoSnk,
-                pPlayerImpl->vibra, pPlayerImpl->LEDArray);
-
-        pPlayerImpl->curAdaptCtx = pPlayerImpl->adaptationCtxGst;
         }
 
     pPlayerImpl->curAdaptCtx->capslist = capabilities;
@@ -401,10 +373,6 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                     pItf = XAMetadataExtractionItfImpl_Create(
                             pImpl->curAdaptCtx);
                     break;
-                case MP_METADATATRAVERSALITF:
-                    pItf = XAMetadataTraversalItfImpl_Create(
-                            pImpl->curAdaptCtx);
-                    break;
                 case MP_PLAYBACKRATEITF:
                     pItf = XAPlaybackRateItfImpl_Create(pImpl);
                     break;
@@ -416,20 +384,6 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                 case MP_DYNAMICSOURCEITF:
                     pItf = XADynamicSourceItfImpl_Create(pImpl->curAdaptCtx);
                     break;
-                case MP_EQUALIZERITF:
-                    pItf = XAEqualizerItfImpl_Create(pImpl->curAdaptCtx);
-                    break;
-#ifdef OMAX_CAMERABIN
-                    case MP_IMAGECONTROLSITF:
-                    pItf = XAImageControlsItfImpl_Create(pImpl->curAdaptCtx);
-                    break;
-                    case MP_IMAGEEFFECTSITF:
-                    pItf = XAImageEffectsItfImpl_Create(pImpl->curAdaptCtx);
-                    break;
-                    case MP_VIDEOPOSTPROCESSINGITF:
-                    pItf = XAVideoPostProcessingItfImpl_Create(pImpl->curAdaptCtx);
-                    break;
-#endif
                 case MP_NOKIAVOLUMEEXT:
                     pItf = XANokiaVolumeExtItfImpl_Create(pImpl->curAdaptCtx);
                     break;
@@ -464,11 +418,7 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
         ret = XAMediaPlayerAdaptMMF_PostInit(
                 (XAAdaptationMMFCtx*) pImpl->adaptationCtxMMF);
         }
-    else
-        {
-        ret = XAMediaPlayerAdapt_PostInit(
-                (XAAdaptationGstCtx*) pImpl->adaptationCtxGst);
-        }
+
     if (ret != XA_RESULT_SUCCESS)
         {
         XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
@@ -533,9 +483,6 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
                 case MP_METADATAEXTRACTIONITF:
                     XAMetadataExtractionItfImpl_Free(pItf);
                     break;
-                case MP_METADATATRAVERSALITF:
-                    XAMetadataTraversalItfImpl_Free(pItf);
-                    break;
                 case MP_PLAYBACKRATEITF:
                     XAPlaybackRateItfImpl_Free(pItf);
                     break;
@@ -545,20 +492,6 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
                 case MP_DYNAMICSOURCEITF:
                     XADynamicSourceItfImpl_Free(pItf);
                     break;
-                case MP_EQUALIZERITF:
-                    XAEqualizerItfImpl_Free(pItf);
-                    break;
-#ifdef OMAX_CAMERABIN
-                    case MP_IMAGECONTROLSITF:
-                    XAImageControlsItfImpl_Free(pItf);
-                    break;
-                    case MP_IMAGEEFFECTSITF:
-                    XAImageEffectsItfImpl_Free(pItf);
-                    break;
-                    case MP_VIDEOPOSTPROCESSINGITF:
-                    XAVideoPostProcessingItfImpl_Free(pItf);
-                    break;
-#endif
                 case MP_NOKIAVOLUMEEXT:
                     XANokiaVolumeExtItfImpl_Free(pItf);
                     break;
@@ -580,11 +513,6 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
             {
             XAMediaPlayerAdaptMMF_Destroy(
                     (XAAdaptationMMFCtx*) pImpl->adaptationCtxMMF);
-            }
-        else
-            {
-            XAMediaPlayerAdapt_Destroy(
-                    (XAAdaptationGstCtx*) pImpl->adaptationCtxGst);
             }
         }
 
@@ -615,22 +543,9 @@ XAresult XAMediaPlayerImpl_DoAddItf(XAObjectItf self,
                 mapEntry->pItf = XAMetadataExtractionItfImpl_Create(
                         pImpl->curAdaptCtx);
                 break;
-            case MP_METADATATRAVERSALITF:
-                mapEntry->pItf = XAMetadataTraversalItfImpl_Create(
-                        pImpl->curAdaptCtx);
-                break;
             case MP_PLAYBACKRATEITF:
                 mapEntry->pItf = XAPlaybackRateItfImpl_Create(pImpl);
                 break;
-            case MP_EQUALIZERITF:
-                mapEntry->pItf
-                        = XAEqualizerItfImpl_Create(pImpl->curAdaptCtx);
-                break;
-#ifdef OMAX_CAMERABIN
-                case MP_IMAGEEFFECTSITF:
-                mapEntry->pItf = XAImageEffectsItfImpl_Create( pImpl->curAdaptCtx );
-                break;
-#endif
             default:
                 DEBUG_ERR("XAMediaPlayerImpl_DoAddItf unknown id")
                 ;
@@ -683,20 +598,9 @@ XAresult XAMediaPlayerImpl_DoRemoveItf(XAObjectItf self,
             case MP_METADATAEXTRACTIONITF:
                 XAMetadataExtractionItfImpl_Free(mapEntry->pItf);
                 break;
-            case MP_METADATATRAVERSALITF:
-                XAMetadataTraversalItfImpl_Free(mapEntry->pItf);
-                break;
             case MP_PLAYBACKRATEITF:
                 XAPlaybackRateItfImpl_Free(mapEntry->pItf);
                 break;
-            case MP_EQUALIZERITF:
-                XAEqualizerItfImpl_Free(mapEntry->pItf);
-                break;
-#ifdef OMAX_CAMERABIN				
-                case MP_IMAGEEFFECTSITF:
-                XAImageEffectsItfImpl_Free(mapEntry->pItf);
-                break;
-#endif
             default:
                 DEBUG_ERR("XAMediaPlayerImpl_DoRemoveItf unknown id")
                 ;

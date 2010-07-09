@@ -52,31 +52,30 @@ TMSDTMFBodyImpl::~TMSDTMFBodyImpl()
     TRACE_PRN_FN_EXT;
     }
 
-gint TMSDTMFBodyImpl::Create(TMSStreamType streamtype, TMSDTMFBody*& bodyimpl)
+gint TMSDTMFBodyImpl::Create(TMSStreamType streamtype, TMSDTMF& parent,
+        TMSDTMFBody*& bodyimpl)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
     TMSDTMFBodyImpl* self = new TMSDTMFBodyImpl();
     if (self)
         {
-        ret = self->PostConstruct();
+        ret = self->PostConstruct(streamtype, parent);
         if (ret != TMS_RESULT_SUCCESS)
             {
             delete self;
             self = NULL;
-            }
-        else
-            {
-            self->iStreamType = streamtype;
             }
         }
     bodyimpl = self;
     return ret;
     }
 
-gint TMSDTMFBodyImpl::PostConstruct()
+gint TMSDTMFBodyImpl::PostConstruct(TMSStreamType streamtype, TMSDTMF& parent)
     {
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
+    iParent = &parent;
+    iStreamType = streamtype;
     iProxy = new TMSProxy();
     if (!iProxy)
         {
@@ -109,6 +108,7 @@ gint TMSDTMFBodyImpl::AddObserver(TMSDTMFObserver& obsrvr, gpointer user_data)
             if (ret == TMS_RESULT_SUCCESS)
                 {
                 ret = iProxy->StartDTMFNotifier();
+                ret |= iProxy->InitDTMFPlayer(iStreamType);
                 }
             }
         else
@@ -179,7 +179,6 @@ gint TMSDTMFBodyImpl::SetTone(GString* string)
     __ASSERT_ALWAYS(string, PANIC(TMS_RESULT_NULL_ARGUMENT));
 
     gint ret(TMS_RESULT_SUCCESS);
-
     if (iString)
         {
         if (iString->len)
@@ -204,10 +203,5 @@ gint TMSDTMFBodyImpl::ContinueDTMFStringSending(gboolean sending)
         ret = TMS_RESULT_DOES_NOT_EXIST;
         }
     return ret;
-    }
-
-void TMSDTMFBodyImpl::SetParent(TMSDTMF*& parent)
-    {
-    iParent = parent;
     }
 
