@@ -20,11 +20,17 @@
 #include "tmsclientserver.h"
 
 using namespace TMS;
+
 // CONSTANTS
 const TInt KDefaultVolume = 4;
 const TInt KDefaultMaxVolume = 10;
 const TInt KDefaultGain = 1;
+
+#ifndef __WINS__
+const TInt KDefaultMaxGain = 1;
+#else
 const TInt KDefaultMaxGain = 64;
+#endif
 
 TUid KCRUidTmseffects = {0x10207C80};
 const TUint32 KTmsEarPieceVolume = 0x00000001;
@@ -41,7 +47,8 @@ TMSGlobalEffectsSettings::TMSGlobalEffectsSettings() :
     iMaxVolume(KDefaultMaxVolume),
     iMaxGain(KDefaultMaxGain),
     iEarVolume(KDefaultVolume),
-    iLoudSpkrVolume(KDefaultVolume)
+    iLoudSpkrVolume(KDefaultVolume),
+    iRepository(NULL)
     {
     }
 

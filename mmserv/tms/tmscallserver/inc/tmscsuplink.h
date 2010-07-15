@@ -24,14 +24,14 @@
 namespace TMS {
 
 /**
- *  Provides uplink functionality.
+ *  Provides Uplink stream functionality.
  *
  */
-NONSHARABLE_CLASS(TMSCSUplink) : public TMSCSPDevSound
+NONSHARABLE_CLASS(TMSCSUplink) : public TMSCSDevSound
     {
 public:
 
-    static TMSCSUplink* NewL(TMSCSPDevSoundObserver& aObserver);
+    static TMSCSUplink* NewL(TMSCSDevSoundObserver& observer);
 
     virtual ~TMSCSUplink();
 
@@ -40,22 +40,12 @@ public:
      *
      * @return ETrue - mic is muted, EFalse - mic is not muted.
      */
-    TBool IsMuted();
-
-    /**
-     * Set mic muted.
-     */
-    void SetMuted();
-
-    /**
-     * Set mic unmuted.
-     */
-    void SetUnmuted();
+    gboolean IsMuted();
 
     /**
      * Set mic gain.
      */
-    void SetGain(gint aGain);
+    void SetGain(gint gain);
 
     /**
      * Get mic muted.
@@ -70,32 +60,29 @@ public:
     // from base class MDevSoundObserver
 
     /**
-     * From MDevSoundObserver
-     * Notification from Devsound that stream (mic) is
-     * activated successfully.
+     * From MDevSoundObserver.
+     * Indication from the devsound that Uplink has been activated
+     * successfully.
      */
     void BufferToBeEmptied(CMMFBuffer* aBuffer);
 
     /**
      * From MDevSoundObserver
-     * Notification from devsound that downstream(mic) activation
-     * feiled.
+     * Indication from devsound that Uplink activation has failed.
      */
     void RecordError(TInt aError);
 
 private:
 
-    // from base class MCSPDevSound
-
     /**
-     * From MCSPDevSound.
+     * From TMSCSDevSound.
      * Tries to activate the mic stream.
      */
     void DoActivateL();
 
 protected:
 
-    TMSCSUplink(TMSCSPDevSoundObserver& aObserver);
+    TMSCSUplink(TMSCSDevSoundObserver& aObserver);
     void ConstructL();
     };
 

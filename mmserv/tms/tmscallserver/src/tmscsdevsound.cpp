@@ -16,8 +16,8 @@
  */
 
 #include <AudioPreference.h>
-#include <glib.h>
 #include <S60FourCC.h>
+#include "tmsutility.h"
 #include "tmscsdevsound.h"
 #include "tmscsdevsoundobserver.h"
 
@@ -27,8 +27,8 @@ using namespace TMS;
 // TMSCSPDevSound
 // -----------------------------------------------------------------------------
 //
-TMSCSPDevSound::TMSCSPDevSound(TMSCSPDevSoundObserver& aObserver) :
-    iObserver(aObserver)
+TMSCSDevSound::TMSCSDevSound(TMSCSDevSoundObserver& observer) :
+    iObserver(observer)
     {
     }
 
@@ -36,26 +36,55 @@ TMSCSPDevSound::TMSCSPDevSound(TMSCSPDevSoundObserver& aObserver) :
 // ConstructL
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::ConstructL(TMMFState aMode, gint aAudioPreference,
-        gint aAudioPriority)
+void TMSCSDevSound::ConstructL(const TMSStreamType strmtype)
     {
+    TRACE_PRN_FN_ENT;
+    iStreamType = strmtype;
+
+    if (strmtype == TMS_STREAM_UPLINK)
+        {
+        iMode = EMMFStateRecording;
+        iPriority = KAudioPriorityCSCallUplink;
+        iPreference = KAudioPrefCSCallUplink;
+        }
+    else if (strmtype == TMS_STREAM_DOWNLINK)
+        {
+        iMode = EMMFStatePlaying;
+        iPriority = KAudioPriorityCSCallDownlink;
+        iPreference = KAudioPrefCSCallDownlink;
+        }
+    InitializeL();
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// InitializeL
+// -----------------------------------------------------------------------------
+//
+void TMSCSDevSound::InitializeL()
+    {
+    TRACE_PRN_FN_ENT;
     TMMFPrioritySettings audioPriority;
     TFourCC modemFourCC;
     modemFourCC.Set(KS60FourCCCodeModem);
+
+    delete iDevSound;
+    iDevSound = NULL;
     iDevSound = CMMFDevSound::NewL();
     if (iDevSound)
         {
 #ifndef __WINSCW__
-        iDevSound->InitializeL(*this, modemFourCC, aMode);
-#else //For testing TMS in WINSCW
-        iDevSound->InitializeL(*this, KMMFFourCCCodePCM16, aMode);
+        iDevSound->InitializeL(*this, modemFourCC, iMode);
+#else
+        //For testing TMS in WINSCW
+        iDevSound->InitializeL(*this, KMMFFourCCCodePCM16, iMode);
 #endif
-        iStreamType = aAudioPreference;
-        audioPriority.iPriority = aAudioPriority;
-        audioPriority.iPref = aAudioPreference;
-        audioPriority.iState = aMode;
+        audioPriority.iPriority = iPriority;
+        audioPriority.iPref = iPreference;
+        audioPriority.iState = iMode;
         iDevSound->SetPrioritySettings(audioPriority);
         }
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -63,18 +92,18 @@ void TMSCSPDevSound::ConstructL(TMMFState aMode, gint aAudioPreference,
 // Not implemented
 // -----------------------------------------------------------------------------
 //
-TMSCSPDevSound::~TMSCSPDevSound()
+TMSCSDevSound::~TMSCSDevSound()
     {
     delete iDevSound;
     }
 
 // -----------------------------------------------------------------------------
-// Tries to activate the audio stream if not active or activating
+// Tries to activate the audio stream if not already active or activating
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::Activate()
+void TMSCSDevSound::Activate()
     {
-    if (!IsActive() && !IsActivationOngoing())
+    if (!iActive && !iActivationOngoing)
         {
         iActivationOngoing = ETrue;
         TRAP_IGNORE(DoActivateL());
@@ -85,9 +114,9 @@ void TMSCSPDevSound::Activate()
 // Deactivates the audio device.
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::Deactivate()
+void TMSCSDevSound::Deactivate()
     {
-    if (iDevSound && (IsActive() || IsActivationOngoing()))
+    if (iDevSound && (iActive || iActivationOngoing))
         {
         iDevSound->Stop();
         iActive = EFalse;
@@ -96,111 +125,42 @@ void TMSCSPDevSound::Deactivate()
     }
 
 // -----------------------------------------------------------------------------
-// ActivationOngoing
-// -----------------------------------------------------------------------------
-//
-TBool TMSCSPDevSound::IsActivationOngoing() const
-    {
-    return iActivationOngoing;
-    }
-
-// -----------------------------------------------------------------------------
-// IsActive
-// -----------------------------------------------------------------------------
-//
-TBool TMSCSPDevSound::IsActive() const
-    {
-    return iActive;
-    }
-
-// -----------------------------------------------------------------------------
 // DevSound
 // -----------------------------------------------------------------------------
 //
-CMMFDevSound& TMSCSPDevSound::DevSound()
+CMMFDevSound& TMSCSDevSound::DevSound()
     {
     return *iDevSound;
     }
 
 // -----------------------------------------------------------------------------
 // From class MDevSoundObserver
-// Not implemented
 // -----------------------------------------------------------------------------
 //
-void TMSCSPDevSound::InitializeComplete(TInt aError)
+void TMSCSDevSound::InitializeComplete(TInt aError)
     {
-    if (iStreamType == KAudioPrefCSCallDownlink)
+    TRACE_PRN_FN_ENT;
+    if (aError == TMS_RESULT_SUCCESS)
         {
-        iObserver.DownlinkInitCompleted(aError);
+        NotifyEvent(aError);
         }
-    else
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSCSDevSound::NotifyEvent
+// -----------------------------------------------------------------------------
+//
+void TMSCSDevSound::NotifyEvent(gint error)
+    {
+    if (iStreamType == TMS_STREAM_DOWNLINK)
         {
-        iObserver.UplinkInitCompleted(aError);
+        iObserver.DownlinkInitCompleted(error);
         }
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::PlayError(TInt /*aError*/)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::ToneFinished(TInt /*aError*/)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::BufferToBeEmptied(CMMFBuffer* /*aBuffer*/)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::RecordError(TInt /*aError*/)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::ConvertError(TInt /*aError*/)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// From class MDevSoundObserver
-// Not implemented
-// -----------------------------------------------------------------------------
-//
-void TMSCSPDevSound::DeviceMessage(TUid /*aMessageType*/,
-        const TDesC8& /*aMsg*/)
-    {
+    else if (iStreamType == TMS_STREAM_UPLINK)
+        {
+        iObserver.UplinkInitCompleted(error);
+        }
     }
 
 //  End of File

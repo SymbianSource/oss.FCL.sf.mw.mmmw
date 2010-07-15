@@ -240,7 +240,7 @@ void CVoIPAudioServerSession::DispatchMessageL(const RMessage2& aMessage)
             GetMaxVolumeL(aMessage);
             break;
         case EVoIPGetVolume:
-            GetVolume(aMessage);
+            GetVolumeL(aMessage);
             break;
         case EVoIPSetVolume:
             SetVolume(aMessage);
@@ -249,7 +249,7 @@ void CVoIPAudioServerSession::DispatchMessageL(const RMessage2& aMessage)
             GetMaxGainL(aMessage);
             break;
         case EVoIPGetGain:
-            GetGain(aMessage);
+            GetGainL(aMessage);
             break;
         case EVoIPSetGain:
             SetGain(aMessage);
@@ -258,7 +258,7 @@ void CVoIPAudioServerSession::DispatchMessageL(const RMessage2& aMessage)
             SetAudioDeviceL(aMessage);
             break;
         case EVoIPGetAudioDevice:
-            GetAudioDevice(aMessage);
+            GetAudioDeviceL(aMessage);
             break;
         case EVoIPBufferFilled:
             BufferFilledL(aMessage);
@@ -270,16 +270,16 @@ void CVoIPAudioServerSession::DispatchMessageL(const RMessage2& aMessage)
             SetIlbcCodecModeL(aMessage);
             break;
         case EVoIPGetIlbcCodecMode:
-            GetIlbcCodecMode(aMessage);
+            GetIlbcCodecModeL(aMessage);
             break;
         case EVoIPSetG711CodecMode:
             SetG711CodecModeL(aMessage);
             break;
         case EVoIPGetG711CodecMode:
-            GetG711CodecMode(aMessage);
+            GetG711CodecModeL(aMessage);
             break;
         case EVoIPGetSupportedBitratesCount:
-            GetSupportedBitratesCount(aMessage);
+            GetSupportedBitratesCountL(aMessage);
             break;
         case EVoIPGetSupportedBitrates:
             GetSupportedBitratesL(aMessage);
@@ -288,16 +288,16 @@ void CVoIPAudioServerSession::DispatchMessageL(const RMessage2& aMessage)
             SetBitrate(aMessage);
             break;
         case EVoIPGetBitrate:
-            GetBitrate(aMessage);
+            GetBitrateL(aMessage);
             break;
         case EVoIPFrameModeRqrdForEC:
-            FrameModeRqrdForEC(aMessage);
+            FrameModeRqrdForEcL(aMessage);
             break;
         case EVoIPSetFrameMode:
             SetFrameMode(aMessage);
             break;
         case EVoIPGetFrameMode:
-            GetFrameMode(aMessage);
+            GetFrameModeL(aMessage);
             break;
         case EVoIPConcealErrForNextBuf:
             ConcealErrorForNextBuffer();
@@ -306,19 +306,19 @@ void CVoIPAudioServerSession::DispatchMessageL(const RMessage2& aMessage)
             SetVad(aMessage);
             break;
         case EVoIPGetVad:
-            GetVad(aMessage);
+            GetVadL(aMessage);
             break;
         case EVoIPSetCng:
             SetCng(aMessage);
             break;
         case EVoIPGetCng:
-            GetCng(aMessage);
+            GetCngL(aMessage);
             break;
         case EVoIPSetPlc:
             SetPlc(aMessage);
             break;
         case EVoIPGetPlc:
-            GetPlc(aMessage);
+            GetPlcL(aMessage);
             break;
         case EVoIPBadLsfNextBuffer:
             BadLsfNextBuffer();
@@ -439,29 +439,11 @@ void CVoIPAudioServerSession::GetCodecsCountL(const RMessage2& aMessage)
             iCodecsUp.Reset();
             iCodecsCountUp = 0;
             iDevSound->GetSupportedInputDataTypesL(iCodecsUp, iPriority);
-/*
-#ifdef __WINSCW__
-            // Support for adaptation stubs
-            iCodecsUp.Append(KMccFourCCIdG711);
-            iCodecsUp.Append(KMccFourCCIdG729);
-            iCodecsUp.Append(KMccFourCCIdILBC);
-            iCodecsUp.Append(KMccFourCCIdAMRNB);
-#endif
-*/
             iCodecsCountUp = iCodecsUp.Count();
 
             iCodecsDn.Reset();
             iCodecsCountDn = 0;
             iDevSound->GetSupportedOutputDataTypesL(iCodecsDn, iPriority);
-/*
-#ifdef __WINSCW__
-            // Support for adaptation stubs
-            iCodecsDn.Append(KMccFourCCIdG711);
-            iCodecsDn.Append(KMccFourCCIdG729);
-            iCodecsDn.Append(KMccFourCCIdILBC);
-            iCodecsDn.Append(KMccFourCCIdAMRNB);
-#endif
-*/
             iCodecsCountDn = iCodecsDn.Count();
             }
         }
@@ -737,23 +719,37 @@ void CVoIPAudioServerSession::CloseUplink()
 //
 void CVoIPAudioServerSession::GetMaxVolumeL(const RMessage2& aMessage)
     {
-    TPckgBuf<TInt> p(iMaxVolume);
-    aMessage.WriteL(0, p);
+    if (iThread.Handle() > 0 && iMaxVolume > 0)
+        {
+        TPckgBuf<TInt> p(iMaxVolume);
+        aMessage.WriteL(0, p);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
 
     TRACE_PRN_N1(_L("VoIP->SRV-SESSION: GetMaxVolumeL->MaxVolume [%d]"),
             iMaxVolume);
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetVolume
+// CVoIPAudioServerSession::GetVolumeL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetVolume(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetVolumeL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetVolume);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetVolume);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -776,22 +772,35 @@ void CVoIPAudioServerSession::SetVolume(const RMessage2& aMessage)
 //
 void CVoIPAudioServerSession::GetMaxGainL(const RMessage2& aMessage)
     {
-    TPckgBuf<TInt> p(iMaxGain);
-    aMessage.WriteL(0, p);
-
+    if (iThread.Handle() > 0 && iMaxGain > 0)
+        {
+        TPckgBuf<TInt> p(iMaxGain);
+        aMessage.WriteL(0, p);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     TRACE_PRN_N1(_L("VoIP->SRV-SESSION: GetMaxGainL->MaxGain [%d]"), iMaxGain);
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetGain
+// CVoIPAudioServerSession::GetGainL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetGain(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetGainL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetGain);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetGain);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -829,15 +838,22 @@ void CVoIPAudioServerSession::SetAudioDeviceL(const RMessage2& aMessage)
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetAudioDevice
+// CVoIPAudioServerSession::GetAudioDeviceL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetAudioDevice(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetAudioDeviceL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetAudioDevice);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetAudioDevice);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -847,8 +863,6 @@ void CVoIPAudioServerSession::GetAudioDevice(const RMessage2& aMessage)
 //
 void CVoIPAudioServerSession::BufferFilledL(const RMessage2& aMessage)
     {
-    //    TRACE_PRN_FN_ENT;
-
     TVoIPMsgBufPckg pckg;
     aMessage.ReadL(0, pckg);
     iShared.iMutex.Wait();
@@ -856,8 +870,6 @@ void CVoIPAudioServerSession::BufferFilledL(const RMessage2& aMessage)
     iShared.iSequenceNum = pckg().iUint;
     iShared.iMutex.Signal();
     SendCmdToThread(ECmdBufferFilled);
-
-    //    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -867,9 +879,7 @@ void CVoIPAudioServerSession::BufferFilledL(const RMessage2& aMessage)
 //
 void CVoIPAudioServerSession::BufferEmptiedL(const RMessage2& /*aMessage*/)
     {
-    //    TRACE_PRN_FN_ENT;
     SendCmdToThread(ECmdBufferEmptied);
-    //    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -888,15 +898,22 @@ void CVoIPAudioServerSession::SetIlbcCodecModeL(const RMessage2& aMessage)
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetIlbcCodecMode
+// CVoIPAudioServerSession::GetIlbcCodecModeL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetIlbcCodecMode(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetIlbcCodecModeL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetIlbcCodecMode);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetIlbcCodecMode);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -915,28 +932,42 @@ void CVoIPAudioServerSession::SetG711CodecModeL(const RMessage2& aMessage)
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetG711CodecMode
+// CVoIPAudioServerSession::GetG711CodecModeL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetG711CodecMode(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetG711CodecModeL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetG711CodecMode);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetG711CodecMode);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetSupportedBitratesCount
+// CVoIPAudioServerSession::GetSupportedBitratesCountL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetSupportedBitratesCount(
+void CVoIPAudioServerSession::GetSupportedBitratesCountL(
         const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetSupportedBitrates);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetSupportedBitrates);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -992,27 +1023,41 @@ void CVoIPAudioServerSession::SetBitrate(const RMessage2& aMessage)
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetBitrate
+// CVoIPAudioServerSession::GetBitrateL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetBitrate(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetBitrateL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetBitrate);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetBitrate);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::FrameModeRequiredForEC
+// CVoIPAudioServerSession::FrameModeRequiredForEcL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::FrameModeRqrdForEC(const RMessage2& aMessage)
+void CVoIPAudioServerSession::FrameModeRqrdForEcL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdFrameModeRqrdForEC);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdFrameModeRqrdForEC);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -1029,15 +1074,22 @@ void CVoIPAudioServerSession::SetFrameMode(const RMessage2& aMessage)
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetFrameMode
+// CVoIPAudioServerSession::GetFrameModeL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetFrameMode(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetFrameModeL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetFrameMode);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetFrameMode);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -1063,15 +1115,22 @@ void CVoIPAudioServerSession::SetVad(const RMessage2& aMessage)
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetVad
+// CVoIPAudioServerSession::GetVadL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetVad(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetVadL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetVad);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetVad);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -1088,15 +1147,22 @@ void CVoIPAudioServerSession::SetCng(const RMessage2& aMessage)
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetCng
+// CVoIPAudioServerSession::GetCngL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetCng(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetCngL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetCng);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetCng);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -1113,15 +1179,22 @@ void CVoIPAudioServerSession::SetPlc(const RMessage2& aMessage)
     }
 
 // -----------------------------------------------------------------------------
-// CVoIPAudioServerSession::GetPlc
+// CVoIPAudioServerSession::GetPlcL
 //
 // -----------------------------------------------------------------------------
 //
-void CVoIPAudioServerSession::GetPlc(const RMessage2& aMessage)
+void CVoIPAudioServerSession::GetPlcL(const RMessage2& aMessage)
     {
-    iMessage = aMessage;
-    iMsgQueued = ETrue;
-    SendCmdToThread(ECmdGetPlc);
+    if (iThread.Handle() > 0)
+        {
+        iMessage = aMessage;
+        iMsgQueued = ETrue;
+        SendCmdToThread(ECmdGetPlc);
+        }
+    else
+        {
+        User::Leave(KErrBadHandle);
+        }
     }
 
 // -----------------------------------------------------------------------------
@@ -1202,7 +1275,8 @@ void CVoIPAudioServerSession::OpenDTMFTonePlayerL()
         if (iDTMFTonePlayer)
             {
             iDTMFTonePlayerInitRequest = ETrue;
-            TRAPD(err, iDTMFTonePlayer->InitializeL(*this, EMMFStateTonePlaying));
+            TRAPD(err, iDTMFTonePlayer->InitializeL(*this,
+                    EMMFStateTonePlaying));
             if (err != KErrNone)
                 {
                 delete iDTMFTonePlayer;
@@ -1857,14 +1931,6 @@ void CVoIPAudioServerSession::SendCmdToThread(const TInt aCommand,
         iMsgBuffer.iStatus = aStatus;
         iITCMsgComQueue.Send(iMsgBuffer);
         }
-    else
-        {
-        if (iMsgQueued)
-            {
-            iMessage.Complete(KErrCancel);
-            iMsgQueued = EFalse;
-            }
-        }
     }
 
 // -----------------------------------------------------------------------------
@@ -2091,22 +2157,21 @@ void CVoIPAudioServerSession::MapcPlayComplete(TInt aError)
 // -----------------------------------------------------------------------------
 //
 void CVoIPAudioServerSession::DoHandleError(TInt /*aError*/)
-    {
-    /*    DEBPRN1(_L("VoIP->CVoIPAudioServerSession[0x%x]::DoHandleError [%d] :>"), aError);
-     iShared.iMutex.Wait();
-     TUserCommand cmd = iShared.iCmd;
-     iShared.iMutex.Signal();
+    {/*
+    DEBPRN1(_L("VoIP->CVoIPAudioServerSession[0x%x]::DoHandleError [%d] :>"), aError);
+    iShared.iMutex.Wait();
+    TUserCommand cmd = iShared.iCmd;
+    iShared.iMutex.Signal();
 
-     if (iMsgQueued)
-     {
-     iMessage.Complete(aError);
-     iMsgQueued = EFalse;
-     }
-     else
-     {
-     NotifyClient(cmd, aError);
-     }
-     */
+    if (iMsgQueued)
+        {
+        iMessage.Complete(aError);
+        iMsgQueued = EFalse;
+        }
+    else
+        {
+        NotifyClient(cmd, aError);
+        }*/
     }
 
 // -----------------------------------------------------------------------------

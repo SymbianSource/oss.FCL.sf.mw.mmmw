@@ -32,7 +32,8 @@ using namespace TMS;
 // Standard Constructor
 // -----------------------------------------------------------------------------
 //
-TMSIPDownlink::TMSIPDownlink()
+TMSIPDownlink::TMSIPDownlink(TMSIPDevSoundObserver& observer) :
+    TMSIPCallStreamBase(observer)
     {
     }
 
@@ -61,10 +62,10 @@ TMSIPDownlink::~TMSIPDownlink()
 // Symbian two-phase constructor
 // -----------------------------------------------------------------------------
 //
-TMSIPDownlink* TMSIPDownlink::NewL(const guint32 codecID,
-        const TMMFPrioritySettings priority)
+TMSIPDownlink* TMSIPDownlink::NewL(TMSIPDevSoundObserver& observer,
+        const guint32 codecID, const TMMFPrioritySettings priority)
     {
-    TMSIPDownlink* self = new (ELeave) TMSIPDownlink();
+    TMSIPDownlink* self = new (ELeave) TMSIPDownlink(observer);
     CleanupStack::PushL(self);
     self->ConstructL(codecID, priority);
     CleanupStack::Pop(self);
@@ -80,14 +81,12 @@ void TMSIPDownlink::ConstructL(const guint32 codecID,
         const TMMFPrioritySettings priority)
     {
     TRACE_PRN_FN_ENT;
-
     iCodecID = codecID;
     iPriority = priority;
 
     // Client must set these before querying!
     iG711DecodeMode = TMS_G711_CODEC_MODE_ALAW;
     iILBCDecodeMode = TMS_ILBC_CODEC_MODE_20MS_FRAME;
-
     TRAPD(err, InitDevSoundL(EMMFStatePlaying, priority));
     if (err != TMS_RESULT_SUCCESS)
         {
@@ -95,7 +94,6 @@ void TMSIPDownlink::ConstructL(const guint32 codecID,
         }
 
     iMaxBufLen = ConfigureMedia(iCodecID);
-
     TRACE_PRN_FN_EXT;
     }
 
@@ -107,23 +105,18 @@ void TMSIPDownlink::ConstructL(const guint32 codecID,
 void TMSIPDownlink::Start()
     {
     TRACE_PRN_FN_ENT;
-
     gint err = TMS_RESULT_ILLEGAL_OPERATION;
 
     if (iStatus == EReady && iDevSound)
         {
         TRAP(err, iDevSound->PlayInitL());
         TRACE_PRN_IF_ERR(err);
-
-#ifdef _DEBUG
-        iSamplesPlayedCount = 0;
-#endif
         if (err != TMS_RESULT_SUCCESS)
             {
             iStatus = EReady;
+            iObserver.DownlinkStarted(err);
             }
         }
-
     TRACE_PRN_FN_EXT;
     }
 
@@ -141,7 +134,6 @@ void TMSIPDownlink::Stop()
         iDevSound->Stop();
         iStatus = EReady;
         }
-
     TRACE_PRN_FN_EXT;
     }
 
@@ -156,18 +148,19 @@ void TMSIPDownlink::Stop()
 void TMSIPDownlink::BufferToBeFilled(CMMFBuffer* aBuffer)
     {
     // Store pointer to the received buffer
-    iDevSoundBufPtr = static_cast<CMMFDataBuffer*>(aBuffer);
+    iDevSoundBufPtr = static_cast<CMMFDataBuffer*> (aBuffer);
     iBufLen = iDevSoundBufPtr->RequestSize();
     TRACE_PRN_N1(_L("TMS->DNL->BTBF: LEN[%d]"), iBufLen);
 
 #ifndef __WINSCW__
-    //TODO: revisit this!
+    //TODO: Is this still true?
     // The first AMR buffer returns 1 for no data frame.
     /*if (iCodecID == KMccFourCCIdAMRNB)
      {
      iBufLen = iMaxBufLen;
      }*/
 #endif //__WINSCW__
+
     // Create or adjust the chunk
     gint err = DoChunk(iBufLen, iMsgBuffer);
 
@@ -182,6 +175,7 @@ void TMSIPDownlink::BufferToBeFilled(CMMFBuffer* aBuffer)
         iMsgBuffer.iStatus = err;
         iMsgBuffer.iInt = iBufLen;
         iStatus = EStreaming;
+
         // If chunk is opened, we will expect a call from the client to
         // get chunk handle. When we get a call to copy chunk handle,
         // check these variables and see if they match. This is not
@@ -195,7 +189,6 @@ void TMSIPDownlink::BufferToBeFilled(CMMFBuffer* aBuffer)
 
     iMsgBuffer.iRequest = ECmdFillBuffer;
     err = iMsgQueue.Send(iMsgBuffer);
-
     TRACE_PRN_IF_ERR(err);
     }
 
@@ -210,7 +203,7 @@ void TMSIPDownlink::BufferFilled(const guint buflen)
 
     // Copy data over from chunk
     TPtr8 dataPtr(iChunk.Base(), buflen, iMaxBufLen);
-    //    RDebug::RawPrint(dataPtr);
+    //RDebug::RawPrint(dataPtr);
 
     if (iStatus == EStreaming && iDevSound && iDevSoundBufPtr)
         {
@@ -362,7 +355,6 @@ gint TMSIPDownlink::GetDataXferChunkHndl(const TUint32 key, RChunk& chunk)
             status = TMS_RESULT_ILLEGAL_OPERATION;
             }
         }
-
     TRACE_PRN_IF_ERR(status);
     return status;
     }
@@ -396,7 +388,6 @@ gint TMSIPDownlink::SetIlbcCodecMode(gint mode)
                 }
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -443,7 +434,6 @@ gint TMSIPDownlink::SetG711CodecMode(gint mode)
                 }
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -478,7 +468,6 @@ gint TMSIPDownlink::FrameModeRqrdForEC(gboolean& frmodereq)
             TRACE_PRN_N1(_L("TMS->DNL: FrameModeRqrdForEC [%d]"), frmodereq);
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -502,7 +491,6 @@ gint TMSIPDownlink::SetFrameMode(const gboolean frmode)
             TRACE_PRN_N1(_L("TMS->DNL: SetFrameMode [%d]"), frmode);
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -523,7 +511,6 @@ gint TMSIPDownlink::GetFrameMode(gboolean& frmode)
         TRACE_PRN_N1(_L("TMS->DNL: GetFrameMode [%d]"), frmode);
         err = TMS_RESULT_SUCCESS;
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -542,7 +529,6 @@ gint TMSIPDownlink::ConcealErrorForNextBuffer()
         err = iErrConcealmentIntfc->ConcealErrorForNextBuffer();
         TRACE_PRN_N(_L("TMS->DNL: ConcealErrorForNextBuffer"));
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -569,7 +555,6 @@ gint TMSIPDownlink::SetCng(const TMSFormatType fmttype, const gboolean cng)
             TRACE_PRN_N1(_L("TMS->DNL: SetCng [%d]"), cng);
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -596,7 +581,6 @@ gint TMSIPDownlink::GetCng(const TMSFormatType fmttype, gboolean& cng)
             TRACE_PRN_N1(_L("TMS->DNL: GetCng [%d]"), cng);
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -619,7 +603,6 @@ gint TMSIPDownlink::SetPlc(const TMSFormatType fmttype, const gboolean plc)
             TRACE_PRN_N1(_L("TMS->DNL: SetPlc [%d]"), plc);
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -640,7 +623,6 @@ gint TMSIPDownlink::GetPlc(const TMSFormatType fmttype, gboolean& plc)
         err = TMS_RESULT_SUCCESS;
         TRACE_PRN_N1(_L("TMS->DNL: GetPlc [%d]"), plc);
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -662,7 +644,6 @@ gint TMSIPDownlink::BadLsfNextBuffer()
             TRACE_PRN_N(_L("TMS->DNL: BadLsfNextBuffer"));
             }
         }
-
     TRACE_PRN_IF_ERR(err);
     return err;
     }
@@ -759,37 +740,30 @@ void TMSIPDownlink::GetAudioDeviceL(TMSAudioOutput& output)
 void TMSIPDownlink::InitializeComplete(TInt aError)
     {
     TRACE_PRN_FN_ENT;
+    gint status = aError;
 
-    gint err = aError;
-
-    if (err == TMS_RESULT_SUCCESS && iDevSound)
+    if (status == TMS_RESULT_SUCCESS && iDevSound)
         {
         TMMFCapabilities conf;
         conf = iDevSound->Config();
         conf.iRate = EMMFSampleRate8000Hz;
         conf.iChannels = EMMFMono;
-        TRAP(err, iDevSound->SetConfigL(conf));
-        if (err == TMS_RESULT_SUCCESS)
+        TRAP(status, iDevSound->SetConfigL(conf));
+        if (status == TMS_RESULT_SUCCESS)
             {
             // We are ready to stream even in case of later CI setting failure
             iStatus = EReady;
             iMaxVolume = iDevSound->MaxVolume();
             }
 
-        // Init Custom Interface API to the decoder
-        err = SetCodecCi();
-        if (err != TMS_RESULT_SUCCESS)
-            {
-            // DEBUG only
-            // Can ignore error - although decoder is not fully configured but
-            // it can still run in the default mode.
-            TRACE_PRN_IF_ERR(err);
-            }
+        // Init Custom Interface API to the Decoder. Any return error can
+        // be ignored as codec can still run in the default mode even if not
+        // fully configured.
+        SetCodecCi();
         }
 
-    // TODO: Notify client
-
-    TRACE_PRN_IF_ERR(err);
+    iObserver.DownlinkInitCompleted(status);
+    TRACE_PRN_IF_ERR(status);
     TRACE_PRN_FN_EXT;
     }
 
@@ -800,16 +774,11 @@ void TMSIPDownlink::InitializeComplete(TInt aError)
 // The state of recorder is rolled back to EReady.
 // -----------------------------------------------------------------------------
 //
-void TMSIPDownlink::PlayError(TInt /*aError*/)
+void TMSIPDownlink::PlayError(TInt aError)
     {
-    //TRACE_PRN_IF_ERR(aError);
-
-#ifdef _DEBUG
-    iSamplesPlayedCount = 0;
-#endif
     iStatus = EReady;
-
-    // TODO: Notify client
+    iObserver.DownlinkStarted(aError);
+    TRACE_PRN_IF_ERR(aError);
     }
 
 // End of file

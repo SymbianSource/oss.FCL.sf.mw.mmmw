@@ -697,6 +697,7 @@ TInt TMSServer::SetGain(CSession2* /*sid*/, TInt level)
     TInt status = SendMessageToCallServ(TMS_EFFECT_GLOBAL_GAIN_SET, level);
     if (status == TMS_RESULT_SUCCESS)
         {
+        iAudioCenRepHandler->SetMuteState(level);
         iEffectSettings->SetGain(level);
         iSessionIter.SetToFirst();
 

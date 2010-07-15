@@ -1114,11 +1114,11 @@ TInt CProgDLMultimediaSource::Stop()
             {
             TInt pos = 0;
             CancelRequests();
+			// we should not delete the iFile, it causes the CAF to delete the rights if they are expired.
+
             // Since the requests will not be deleted if it is still inside RunL() (iState is EProcessing), 
             // iReadRequestPending should not be initialized to 0 always
             iReadRequestPending = iRequests.Count();
-            delete iFile;
-            iFile = NULL;
             //iDLFileSize = -1;
             iSnkBytes=pos;
             iBufferedDataSize = 0;
@@ -1623,7 +1623,8 @@ TInt CProgDLMultimediaSource::ReadRequestStatus(CReadWriteRequest* aRequest, TRe
     if(aStatus != KErrNone)
         {
         TMMFEvent event(KMMFErrorCategoryControllerGeneralError, aStatus.Int());
-        iEventHandler->SendEventToClient(event);
+        //TODO: Need to send this error back to client. Currently removing this as iEventHandler is never set.
+        //iEventHandler->SendEventToClient(event);
         return KErrNone;
         }
     else

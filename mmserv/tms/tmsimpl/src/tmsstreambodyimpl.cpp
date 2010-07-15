@@ -373,7 +373,7 @@ gint TMSStreamBodyImpl::Init()
             switch (effecttype)
                 {
                 case TMS_EFFECT_GAIN:
-                    static_cast<TMSGainEffectImpl*>(iEffectsList[i])->SetProxy(
+                    static_cast<TMSGainEffectImpl*> (iEffectsList[i])->SetProxy(
                             iContext.CallProxy, iMsgQHandler);
                     break;
                 case TMS_EFFECT_VOLUME:
@@ -395,23 +395,23 @@ gint TMSStreamBodyImpl::Init()
         switch (fmttype)
             {
             case TMS_FORMAT_PCM:
-                static_cast<TMSPCMFormatImpl*>(iFormat)->SetProxy(&iContext,
+                static_cast<TMSPCMFormatImpl*> (iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             case TMS_FORMAT_AMR:
-                static_cast<TMSAMRFormatImpl*>(iFormat)->SetProxy(&iContext,
+                static_cast<TMSAMRFormatImpl*> (iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             case TMS_FORMAT_G711:
-                static_cast<TMSG711FormatImpl*>(iFormat)->SetProxy(&iContext,
+                static_cast<TMSG711FormatImpl*> (iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             case TMS_FORMAT_G729:
-                static_cast<TMSG729FormatImpl*>(iFormat)->SetProxy(&iContext,
+                static_cast<TMSG729FormatImpl*> (iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             case TMS_FORMAT_ILBC:
-                static_cast<TMSILBCFormatImpl*>(iFormat)->SetProxy(&iContext,
+                static_cast<TMSILBCFormatImpl*> (iFormat)->SetProxy(&iContext,
                         iMsgQHandler);
                 break;
             default:
@@ -429,8 +429,8 @@ gint TMSStreamBodyImpl::Init()
             switch (sinkType)
                 {
                 case TMS_SINK_CLIENT:
-                    static_cast<TMSClientSinkImpl*>(iSink)->SetProxy(
-                            iContext.CallProxy, iMsgQHandler);
+                    static_cast<TMSClientSinkImpl*> (iSink)->SetProxy(&iContext,
+                            iMsgQHandler);
                     break;
                 case TMS_SINK_MODEM:
                 case TMS_SINK_SPEAKER:
@@ -454,9 +454,8 @@ gint TMSStreamBodyImpl::Init()
             switch (sourceType)
                 {
                 case TMS_SOURCE_CLIENT:
-                    static_cast<TMSClientSourceImpl*>(iSource)->SetProxy(
-                            iContext.CallProxy, iContext.StreamId,
-                            iMsgQHandler);
+                    static_cast<TMSClientSourceImpl*> (iSource)->SetProxy(
+                            &iContext, iMsgQHandler);
                     break;
                 case TMS_SOURCE_MODEM:
                 case TMS_SOURCE_MIC:

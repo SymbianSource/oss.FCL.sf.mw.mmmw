@@ -31,24 +31,26 @@ public:
     virtual ~TMSCallAdpt();
 
     // From TMSStream
-    virtual gint CreateStream(TMSCallType callType,
-            TMSStreamType strmType, gint& outStrmId) = 0;
-    virtual gint InitStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId, TMSFormatType frmtType, const RMessage2& aMessage) = 0;
-    virtual gint StartStream(TMSCallType callType,
-            TMSStreamType strmType, gint strmId) = 0;
-    virtual gint PauseStream(TMSCallType callType,
-            TMSStreamType strmType, gint strmId) = 0;
-    virtual gint StopStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId) = 0;
-    virtual gint DeinitStream(TMSCallType callType,
-            TMSStreamType strmType, gint strmId) = 0;
-    virtual gint DeleteStream(TMSCallType callType,
-            TMSStreamType strmType, gint strmId) = 0;
-    virtual gint DataXferBufferEmptied(TMSCallType callType,
-            TMSStreamType strmType, gint strmId) = 0;
-    virtual gint DataXferBufferFilled(TMSCallType callType,
-            TMSStreamType strmType, gint strmId, guint datasize) = 0;
+    virtual gint CreateStream(const TMSCallType callType,
+            const TMSStreamType strmType, gint& outStrmId) = 0;
+    virtual gint InitStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId,
+            const TMSFormatType frmtType, const RMessage2& aMessage) = 0;
+    virtual gint StartStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId) = 0;
+    virtual gint PauseStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId) = 0;
+    virtual gint StopStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId) = 0;
+    virtual gint DeinitStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId) = 0;
+    virtual gint DeleteStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId) = 0;
+    virtual gint DataXferBufferEmptied(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId) = 0;
+    virtual gint DataXferBufferFilled(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId,
+            const guint datasize) = 0;
     virtual gint GetDataXferBufferHndl(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId,
             const guint32 key, RChunk& chunk) = 0;
@@ -84,15 +86,14 @@ public:
     virtual gint SetPlc(const TMSFormatType fmttype, const gboolean plc) = 0;
 
     // From TMS routing
-    virtual gint SetOutput(TMSAudioOutput output) = 0;
+    virtual gint SetOutput(const TMSAudioOutput output) = 0;
     virtual gint GetOutput(TMSAudioOutput& output) = 0;
     virtual gint GetPreviousOutput(TMSAudioOutput& output) = 0;
-    virtual gint GetAvailableOutputsL(gint& count,
-            CBufFlat*& outputsbuffer) = 0;
+    virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuf) = 0;
 
 protected:
     TMSCallAdpt();
-    virtual gint PostConstruct();
+    virtual gint PostConstruct() = 0;
 
 protected:
     gint iGlobalVol;

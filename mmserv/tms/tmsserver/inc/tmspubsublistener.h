@@ -77,6 +77,13 @@ public:
      */
     TInt Get(TDes16& aVal);
 
+    /**
+     * Sets integer value for P & S.
+     * @param aVal a value in return
+     * @return error code
+     */
+    TInt Set(TInt aVal);
+
 private:
     // New functions.
 

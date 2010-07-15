@@ -27,6 +27,7 @@ namespace TMS {
 // FORWARD DECLARATIONS
 class TMSClientSinkObserver;
 class TMSBuffer;
+class TMSGlobalContext;
 class TMSCallProxy;
 
 // TMSClientSinkBodyImpl class
@@ -35,7 +36,6 @@ class TMSClientSinkBodyImpl : public TMSClientSinkBody,
     {
 public:
     static gint Create(TMSClientSinkBody*& bodyimpl);
-    // From TMSClientSinkBody begins
 
     virtual ~TMSClientSinkBodyImpl();
 
@@ -49,13 +49,10 @@ public:
 
     virtual gint GetType(TMSSinkType& sinktype);
 
-    // From TMSClientSinkBody ends
-
     // From MQueueHandlerObserver starts
     virtual void QueueEvent(TInt aEventType, TInt aError, void* user_data);
-    // From MQueueHandlerObserver ends
 
-    void SetProxy(TMSCallProxy* aProxy, gpointer queuehandler);
+    void SetProxy(TMSGlobalContext* context, gpointer queuehandler);
 
 private:
     TMSClientSinkBodyImpl();
@@ -64,6 +61,7 @@ private:
 private:
     TMSClientSinkObserver* iObserver;
     gpointer iUserData;
+    TMSGlobalContext* iContext;
     TMSCallProxy* iProxy;
     };
 

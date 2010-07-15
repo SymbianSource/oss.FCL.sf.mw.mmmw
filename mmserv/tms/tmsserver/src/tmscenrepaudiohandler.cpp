@@ -33,7 +33,11 @@ const TUint32 KTelIncallLoudspeakerVolume = 0x00000002;
 #include "tmspubsublistener.h"
 #include "tmsutility.h"
 
+#ifndef __WINS__
+const TInt KDefaultMaxGain = 1;
+#else
 const TInt KDefaultMaxGain = 64;
+#endif
 
 using namespace TMS;
 
@@ -65,6 +69,10 @@ TMSCenRepAudioHandler::~TMSCenRepAudioHandler()
     TRACE_PRN_FN_EXT;
     }
 
+// ---------------------------------------------------------------------------
+// TMSCenRepAudioHandler::HandleNotifyPSL
+// ---------------------------------------------------------------------------
+//
 void TMSCenRepAudioHandler::HandleNotifyPSL(const TUid /*aUid*/,
         const TInt& /*aKey*/, const TRequestStatus& /*aStatus*/)
     {
@@ -93,6 +101,25 @@ void TMSCenRepAudioHandler::HandleNotifyPSL(const TUid /*aUid*/,
             iTMSSer->SetGain(NULL, KDefaultMaxGain);
             }
 #endif //__WINSCW__
+        }
+    }
+
+// ---------------------------------------------------------------------------
+// TMSCenRepAudioHandler::SetMuteState
+// ---------------------------------------------------------------------------
+//
+void TMSCenRepAudioHandler::SetMuteState(TInt level)
+    {
+    if (iMuteListener)
+        {
+        if (level == 0)
+            {
+            iMuteListener->Set(EPSTelMicMuteOn);
+            }
+        else
+            {
+            iMuteListener->Set(EPSTelMicMuteOff);
+            }
         }
     }
 

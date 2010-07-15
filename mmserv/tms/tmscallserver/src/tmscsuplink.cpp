@@ -21,16 +21,31 @@
 
 using namespace TMS;
 
-// Mute value
-const gint KSetMuteToDevSound = 0;
-
 // -----------------------------------------------------------------------------
-// Static constructor.
+// Constructor
 // -----------------------------------------------------------------------------
 //
-TMSCSUplink* TMSCSUplink::NewL(TMSCSPDevSoundObserver& aObserver)
+TMSCSUplink::TMSCSUplink(TMSCSDevSoundObserver& observer) :
+    TMSCSDevSound(observer)
     {
-    TMSCSUplink* self = new (ELeave) TMSCSUplink(aObserver);
+    }
+
+// -----------------------------------------------------------------------------
+// Second phase constructor
+// -----------------------------------------------------------------------------
+//
+void TMSCSUplink::ConstructL()
+    {
+    TMSCSDevSound::ConstructL(TMS_STREAM_UPLINK);
+    }
+
+// -----------------------------------------------------------------------------
+// Static constructor
+// -----------------------------------------------------------------------------
+//
+TMSCSUplink* TMSCSUplink::NewL(TMSCSDevSoundObserver& observer)
+    {
+    TMSCSUplink* self = new (ELeave) TMSCSUplink(observer);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -49,61 +64,31 @@ TMSCSUplink::~TMSCSUplink()
 // Gives mic mute state
 // -----------------------------------------------------------------------------
 //
-TBool TMSCSUplink::IsMuted()
+gboolean TMSCSUplink::IsMuted()
     {
-    TBool isMuted = EFalse;
-    gint gain = 0;
+    gint gain(0);
+
     if (iDevSound)
         {
         gain = iDevSound->Gain();
         }
-    if (!gain)
-        {
-        // Mute is on
-        isMuted = ETrue;
-        }
-    //   CSPLOGSTRING( CSPINT, "TMSCSUplink::IsMuted" );
-    return isMuted;
+    return ((!gain)? TRUE : FALSE);
     }
 
 // -----------------------------------------------------------------------------
-// Set mic muted.
+// Sets mic gain
 // -----------------------------------------------------------------------------
 //
-void TMSCSUplink::SetMuted()
+void TMSCSUplink::SetGain(gint gain)
     {
     if (iDevSound)
         {
-        iDevSound->SetGain(KSetMuteToDevSound);
+        iDevSound->SetGain(gain);
         }
     }
 
 // -----------------------------------------------------------------------------
-// Set mic unmuted
-// -----------------------------------------------------------------------------
-//
-void TMSCSUplink::SetUnmuted()
-    {
-    if (iDevSound)
-        {
-        iDevSound->SetGain(iDevSound->MaxGain());
-        }
-    }
-
-// -----------------------------------------------------------------------------
-// Sets gain
-// -----------------------------------------------------------------------------
-//
-void TMSCSUplink::SetGain(gint aGain)
-    {
-    if (iDevSound)
-        {
-        iDevSound->SetGain(aGain);
-        }
-    }
-
-// -----------------------------------------------------------------------------
-// Gives volume
+// Returns mic gain
 // -----------------------------------------------------------------------------
 //
 gint TMSCSUplink::Gain()
@@ -117,7 +102,7 @@ gint TMSCSUplink::Gain()
     }
 
 // -----------------------------------------------------------------------------
-// Gives max gain
+// Returns max mic gain
 // -----------------------------------------------------------------------------
 //
 gint TMSCSUplink::MaxGain()
@@ -132,46 +117,42 @@ gint TMSCSUplink::MaxGain()
 
 // -----------------------------------------------------------------------------
 // From class MDevSoundObserver
-// Activation was successfull.
+// Uplink stream has been activated successfully.
 // -----------------------------------------------------------------------------
 //
 void TMSCSUplink::BufferToBeEmptied(CMMFBuffer* /*aBuffer*/)
     {
-    //  CSPLOGSTRING( CSPINT, "TMSCSUplink::BufferToBeEmptied" );
+    //TRACE_PRN_N(_L("TMSCSUplink::BufferToBeEmptied"));
 
     // We dont react to devsound messages unless we are activating.
-    if (IsActivationOngoing())
+    if (iActivationOngoing)
         {
         iActive = ETrue;
         iActivationOngoing = EFalse;
-        iObserver.UplinkActivatedSuccessfully();
+        iObserver.UplinkActivationCompleted(KErrNone);
         }
     }
 
 // -----------------------------------------------------------------------------
 // From class MDevSoundObserver
-// Activation feiled
+// Uplink stream activation failed
 // -----------------------------------------------------------------------------
 //
 void TMSCSUplink::RecordError(TInt aError)
     {
-    //  CSPLOGSTRING( CSPINT, "TMSCSUplink::RecordError" );
+    //TRACE_PRN_N1(_L("TMSCSUplink::RecordError[%d]"), aError);
 
     // We dont react to devsound messages unless we are activating.
-    if (IsActivationOngoing())
+    if (iActivationOngoing && aError == KErrAccessDenied)
         {
-        if (aError == KErrAccessDenied)
-            {
-            iActivationOngoing = EFalse;
-            iObserver.UplinkActivationFailed();
-            }
+        iActivationOngoing = EFalse;
+        iObserver.UplinkActivationCompleted(aError);
         }
     }
 
 // -----------------------------------------------------------------------------
-// From class TMSCSPDevSound
-// Tries to activate mic stream. Stream becomes active when BufferToBeFilled
-// gets called.
+// From class TMSCSDevSound
+// Activates Uplink stream.
 // -----------------------------------------------------------------------------
 //
 void TMSCSUplink::DoActivateL()
@@ -180,25 +161,6 @@ void TMSCSUplink::DoActivateL()
         {
         iDevSound->RecordInitL();
         }
-    }
-
-// -----------------------------------------------------------------------------
-// Constructor
-// -----------------------------------------------------------------------------
-//
-TMSCSUplink::TMSCSUplink(TMSCSPDevSoundObserver& aObserver) :
-    TMSCSPDevSound(aObserver)
-    {
-    }
-
-// -----------------------------------------------------------------------------
-// Second phase constructor
-// -----------------------------------------------------------------------------
-//
-void TMSCSUplink::ConstructL()
-    {
-    TMSCSPDevSound::ConstructL(EMMFStateRecording, KAudioPrefCSCallUplink,
-            KAudioPriorityCSCallUplink);
     }
 
 //  End of File

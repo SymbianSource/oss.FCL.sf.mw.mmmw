@@ -73,7 +73,7 @@ gint TMSCallAdpt::CreateCallL(gint callType, TMSCallAdpt*& callAdpt)
 
         case TMS_CALL_CS:
             retVal = TMS_RESULT_INSUFFICIENT_MEMORY;
-            self = new TMSCallCSAdpt();
+            self = TMSCallCSAdpt::NewL();
             if (self)
                 {
                 retVal = self->PostConstruct();
@@ -91,16 +91,6 @@ gint TMSCallAdpt::CreateCallL(gint callType, TMSCallAdpt*& callAdpt)
     callAdpt = self;
     TRACE_PRN_FN_EXT;
     return retVal;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallAdpt::PostConstruct
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallAdpt::PostConstruct()
-    {
-    return TMS_RESULT_SUCCESS;
     }
 
 // End of file

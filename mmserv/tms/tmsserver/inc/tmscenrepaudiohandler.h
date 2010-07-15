@@ -53,6 +53,7 @@ public:
 
     void SetLoudSpeakerVol(TInt vol);
     void SetEarPieceVol(TInt vol);
+    void SetMuteState(TInt mutestate);
 
     // from base class TMSPubSubObserver
     /**

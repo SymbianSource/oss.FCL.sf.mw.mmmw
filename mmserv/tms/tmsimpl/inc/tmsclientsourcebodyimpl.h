@@ -27,6 +27,7 @@ namespace TMS {
 // FORWARD DECLARATIONS
 class TMSClientSourceObserver;
 class TMSBuffer;
+class TMSGlobalContext;
 class TMSCallProxy;
 
 // TMSClientSourceBodyImpl class
@@ -35,13 +36,11 @@ class TMSClientSourceBodyImpl : public TMSClientSourceBody,
     {
 public:
     static gint Create(TMSClientSourceBody*& bodyimpl);
-    // From TMSClientSourceBody begins
 
     virtual ~TMSClientSourceBodyImpl();
 
     virtual gint AddObserver(TMSClientSourceObserver& obsrvr,
             gpointer user_data);
-
     virtual gint RemoveObserver(TMSClientSourceObserver& obsrvr);
 
     // In pull mode, client calls this.??? How to identify last buffer.
@@ -60,13 +59,10 @@ public:
 
     virtual gint GetType(TMSSourceType& sourcetype);
 
-    // From TMSClientSourceBody ends
-
-    // From MQueueHandlerObserver starts
+    // From MQueueHandlerObserver
     virtual void QueueEvent(TInt aEventType, TInt aError, void* user_data);
-    // From MQueueHandlerObserver ends
 
-    void SetProxy(TMSCallProxy* aProxy, gint strmid, gpointer queuehandler);
+    void SetProxy(TMSGlobalContext* context, gpointer queuehandler);
 
 private:
     TMSClientSourceBodyImpl();
@@ -75,9 +71,9 @@ private:
 private:
     TMSClientSourceObserver* iObserver;
     gpointer iUserData;
+    TMSGlobalContext* iContext;
     TMSCallProxy* iProxy;
     gboolean iQueueMode;
-    gint iStreamId;
     };
 
 } //namespace TMS

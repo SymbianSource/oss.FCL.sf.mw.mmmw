@@ -21,39 +21,16 @@
 namespace TMS {
 
 /**
- *  Observer interface for knowing when audio streams have been
- *  successfully ramped up.
- *
+ *  TMSCSDevSoundObserver
+  * An observer interface providing TMSCSDevSound event notifications.
  */
-class TMSCSPDevSoundObserver
+class TMSCSDevSoundObserver
     {
 public:
-    virtual void DownlinkInitCompleted(TInt status) = 0;
-    virtual void UplinkInitCompleted(TInt status) = 0;
-
-    /**
-     * Notification that Mic has been activated successfully
-     *
-     */
-    virtual void UplinkActivatedSuccessfully() = 0;
-
-    /**
-     * Notification that speaker has been activated successfully
-     *
-     */
-    virtual void DownlinkActivatedSuccessfully() = 0;
-
-    /**
-     * Notification that Mic initialisation failed.
-     *
-     */
-    virtual void UplinkActivationFailed() = 0;
-
-    /**
-     * Notification that Speaker activation failed.
-     *
-     */
-    virtual void DownlinkActivationFailed() = 0;
+    virtual void DownlinkInitCompleted(gint status) = 0;
+    virtual void UplinkInitCompleted(gint status) = 0;
+    virtual void UplinkActivationCompleted(gint status) = 0;
+    virtual void DownlinkActivationCompleted(gint status) = 0;
     };
 
 } //namespace TMS

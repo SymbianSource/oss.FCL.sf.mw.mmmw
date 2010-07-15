@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<api id="fab871be362a466ed241e6168fa181ac" dataversion="2.0">
-  <name>EMC Audio Effects API</name>
-  <description>This API defines an how to use S60 effects from EMC</description>
+<api id="2e973d1422b06fd4fc780bc219404dca" dataversion="2.0">
+  <name>EMC Balance Effect API</name>
+  <description>This API defines an how to control audio balance from EMC</description>
   <type>c++</type>
   <collection>mmfenh</collection>
   <libs>

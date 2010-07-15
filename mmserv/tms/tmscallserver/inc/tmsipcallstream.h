@@ -56,6 +56,19 @@ class CIlbcEncoderIntfc;
 
 namespace TMS {
 
+/**
+ *  TMSIPDevSoundObserver
+  * An observer interface providing TMSIPCallStreamBase event notifications.
+ */
+class TMSIPDevSoundObserver
+    {
+public:
+    virtual void DownlinkInitCompleted(gint status) = 0;
+    virtual void UplinkInitCompleted(gint status) = 0;
+    virtual void UplinkStarted(gint status) = 0;
+    virtual void DownlinkStarted(gint status) = 0;
+    };
+
 // -----------------------------------------------------------------------------
 //  Class Name:  TMSIPCallStreamBase
 //
@@ -91,6 +104,8 @@ public:
     gint ConfigureMedia(const guint32 aCodecID);
 
 protected:
+    TMSIPCallStreamBase(TMSIPDevSoundObserver& observer);
+
 #ifndef __USE_GSTREAMER__
     // From MDevSoundObserver
     virtual void InitializeComplete(TInt aError) = 0;
@@ -105,7 +120,7 @@ protected:
 #endif //__USE_GSTREAMER__
 
 protected:
-
+    TMSIPDevSoundObserver& iObserver;
     CActiveScheduler* iActiveScheduler;
     TStreamState iStatus;
 
@@ -145,11 +160,9 @@ public:
     static void cb_raw_playback_handoff(GstElement* appsrc, guint size);
     static gboolean bus_call(GstBus* bus, GstMessage* msg, gpointer data);
 #endif //__USE_GSTREAMER__
-    static TMSIPDownlink* NewL(const guint32 codecID,
-            const TMMFPrioritySettings priority);
-    TMSIPDownlink();
-    void ConstructL(const guint32 codecID,
-            const TMMFPrioritySettings priority);
+
+    static TMSIPDownlink* NewL(TMSIPDevSoundObserver& observer,
+            const guint32 codecID, const TMMFPrioritySettings priority);
 
     gint SetCodecCi();
     void Start();
@@ -177,6 +190,11 @@ public:
 
     void SetAudioDeviceL(TMSAudioOutput output);
     void GetAudioDeviceL(TMSAudioOutput& output);
+
+protected:
+    TMSIPDownlink(TMSIPDevSoundObserver& observer);
+    void ConstructL(const guint32 codecID,
+            const TMMFPrioritySettings priority);
 
 private:
     void SetCodecCiL();
@@ -214,9 +232,6 @@ private:
     GstElement* iSink;
     GstBus* iBusPlay;
 #endif //__USE_GSTREAMER__
-#ifdef _DEBUG
-    gint iSamplesPlayedCount;
-#endif
 
 #ifdef __PLAY_WAV_FROM_FILE__
     RFile iFile;
@@ -242,11 +257,9 @@ public:
     static void cb_record_raw_handoff(GstElement *sink);
     static gboolean bus_call(GstBus* bus, GstMessage* msg, gpointer data);
 #endif //__USE_GSTREAMER__
-    static TMSIPUplink* NewL(const guint32 codecID,
-            const TMMFPrioritySettings priority);
-    TMSIPUplink();
-    void ConstructL(const guint32 codecID,
-            const TMMFPrioritySettings priority);
+
+    static TMSIPUplink* NewL(TMSIPDevSoundObserver& observer,
+            const guint32 codecID, const TMMFPrioritySettings priority);
 
     gint SetCodecCi();
     void Start();
@@ -267,6 +280,11 @@ public:
     gint GetBitrate(guint& bitrate);
     gint SetVad(const TMSFormatType fmttype, const gboolean vad);
     gint GetVad(const TMSFormatType fmttype, gboolean& vad);
+
+protected:
+    TMSIPUplink(TMSIPDevSoundObserver& observer);
+    void ConstructL(const guint32 codecID,
+            const TMMFPrioritySettings priority);
 
 private:
     void SetCodecCiL();
@@ -300,9 +318,6 @@ private:
     GstElement* iAppSink;
     GstBus* iBusRec;
 #endif //__USE_GSTREAMER__
-#ifdef _DEBUG
-    gint iSamplesRecCount;
-#endif
     };
 
 } //namespace TMS

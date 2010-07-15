@@ -18,6 +18,7 @@
 #ifndef CALLCSADPT_H
 #define CALLCSADPT_H
 
+// INCLUDES
 #include <TelephonyAudioRouting.h>
 #include <MTelephonyAudioRoutingObserver.h>
 #include <e32msgqueue.h>
@@ -33,35 +34,38 @@ class TMSCSDownlink;
 class TMSTarSettings;
 
 /*
- * CallCSAdapt class
+ * TMSCallCSAdpt class
  */
 class TMSCallCSAdpt : public TMSCallAdpt,
-                      public TMSCSPDevSoundObserver,
+                      public TMSCSDevSoundObserver,
                       public MTelephonyAudioRoutingObserver
     {
 public:
-    TMSCallCSAdpt();
+	static TMSCallCSAdpt* NewL();
     virtual ~TMSCallCSAdpt();
     virtual gint PostConstruct();
 
-    virtual gint CreateStream(TMSCallType callType, TMSStreamType strmType,
-            gint& outStrmId);
-    virtual gint InitStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId, TMSFormatType frmtType, const RMessage2& message);
-    virtual gint StartStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint PauseStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint StopStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint DeinitStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint DeleteStream(TMSCallType callType, TMSStreamType strmType,
-            gint strmId);
-    virtual gint DataXferBufferEmptied(TMSCallType callType,
-            TMSStreamType strmType, gint strmId);
-    virtual gint DataXferBufferFilled(TMSCallType callType,
-            TMSStreamType strmType, gint strmId, guint datasize);
+    // From TMSStream
+    virtual gint CreateStream(const TMSCallType callType,
+            const TMSStreamType strmType, gint& outStrmId);
+    virtual gint InitStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId,
+            const TMSFormatType frmtType, const RMessage2& message);
+    virtual gint StartStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint PauseStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint StopStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint DeinitStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint DeleteStream(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint DataXferBufferEmptied(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId);
+    virtual gint DataXferBufferFilled(const TMSCallType callType,
+            const TMSStreamType strmType, const gint strmId,
+            const guint datasize);
     virtual gint GetDataXferBufferHndl(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId,
             const guint32 key, RChunk& chunk);
@@ -97,38 +101,40 @@ public:
     virtual gint SetPlc(const TMSFormatType fmttype, const gboolean plc);
 
     // From TMS audio routing
-    virtual gint SetOutput(TMSAudioOutput output);
+    virtual gint SetOutput(const TMSAudioOutput output);
     virtual gint GetOutput(TMSAudioOutput& output);
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
-    virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuffer);
+    virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuf);
 
-    //From TMSCSPDevSoundObserver
-    void DownlinkInitCompleted(TInt status);
-    void UplinkInitCompleted(TInt status);
-    void UplinkActivatedSuccessfully();
-    void DownlinkActivatedSuccessfully();
-    void UplinkActivationFailed();
-    void DownlinkActivationFailed();
+    //From TMSCSDevSoundObserver
+    void DownlinkInitCompleted(gint status);
+    void UplinkInitCompleted(gint status);
+    void DownlinkActivationCompleted(gint status);
+    void UplinkActivationCompleted(gint status);
 
 private:
+    TMSCallCSAdpt();
+    void ConstructL();
+
+    gint InitUplink();
+    gint InitDownlink();
     void AvailableOutputsChanged(
             CTelephonyAudioRouting& aTelephonyAudioRouting);
     void OutputChanged(CTelephonyAudioRouting& aTelephonyAudioRouting);
     void SetOutputComplete(CTelephonyAudioRouting& aTelephonyAudioRouting,
-            gint aError);
+            gint status);
     void GetSupportedBitRatesL(CBufFlat*& brbuffer);
     void NotifyClient(const gint strmId, const gint command,
             const gint status = KErrNone, const gint64 int64 = TInt64(0));
 
 private:
     gint iNextStreamId;
-
     TMSCSUplink* iCSUplink;
     TMSCSDownlink* iCSDownlink;
     CTelephonyAudioRouting* iRouting;
     TMSTarSettings* iTarSettings;
-    TMSStreamType iStrmtype;
 
+    // Message queues for communication and data transfer back to the client
     RMsgQueue<TmsMsgBuf> iMsgQueueUp;
     RMsgQueue<TmsMsgBuf> iMsgQueueDn;
     TmsMsgBuf iMsgBuffer;
