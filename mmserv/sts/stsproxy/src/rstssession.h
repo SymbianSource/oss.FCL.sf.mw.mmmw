@@ -39,6 +39,9 @@ public:
             unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 
     void SendStopAlarm(unsigned int aAlarmContext);
+    
+    void SendPlayToneForStop(CSystemToneService::TToneType aTone,
+    	      unsigned int& aAlarmContext,  MStsPlayAlarmObserver& aObserver);
 
 private:
 

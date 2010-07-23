@@ -38,6 +38,7 @@ enum TStsServerCommandType
     StsMsg_StopAlarm,
     StsMsg_PlayTone,
     StsMsg_PlayAlarm,
+    StsMsg_PlayToneStop,
     StsMsg_ENDMARKER
     };
 

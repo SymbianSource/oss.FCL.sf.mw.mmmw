@@ -41,6 +41,8 @@ public:
     void PlayAlarm(CSystemToneService::TAlarmType aAlarm,
             unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
     void StopAlarm(unsigned int aAlarmContext);
+    void PlayToneStop(CSystemToneService::TToneType aTone,
+    	      unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 
 protected:
     CSts();

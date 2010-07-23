@@ -26,6 +26,7 @@
 #include "tmsshared.h"
 #include "tmsclientserver.h"
 #include "tmstarsettings.h"
+#include "tmssyncvol.h"
 
 using namespace TMS;
 
@@ -55,6 +56,7 @@ void TMSCallCSAdpt::ConstructL()
     iCSUplink = NULL;
     iRouting = NULL;
     iTarSettings = NULL;
+    iResetVolNotifier = NULL;
     TRACE_PRN_FN_EXT;
     }
 
@@ -80,6 +82,7 @@ TMSCallCSAdpt::~TMSCallCSAdpt()
     delete iTarSettings;
     delete iCSUplink;
     delete iCSDownlink;
+    delete iResetVolNotifier;
 
     if (iMsgQueueUp.Handle() > 0)
         {
@@ -282,6 +285,14 @@ gint TMSCallCSAdpt::StartStream(const TMSCallType /*callType*/,
             }
         case TMS_STREAM_DOWNLINK:
             {
+            if(!iResetVolNotifier)
+                {
+                TRAP(status, iResetVolNotifier = TMSSyncVol::NewL());
+                }
+            if(iResetVolNotifier)
+                {
+                iResetVolNotifier->SetSyncVol();
+                }
             if (iCSDownlink && strmId == iDnlinkStreamId &&
                     iDnlState == EInitialized)
                 {
@@ -329,8 +340,7 @@ gint TMSCallCSAdpt::StopStream(const TMSCallType /*callType*/,
         {
         case TMS_STREAM_UPLINK:
             {
-            if (iCSUplink && strmId == iUplinkStreamId &&
-                    iUplState == EActivated)
+            if (iCSUplink && strmId == iUplinkStreamId)
                 {
                 iCSUplink->Deactivate();
                 iUplState = EInitialized;
@@ -341,8 +351,7 @@ gint TMSCallCSAdpt::StopStream(const TMSCallType /*callType*/,
             }
         case TMS_STREAM_DOWNLINK:
             {
-            if (iCSDownlink && strmId == iDnlinkStreamId &&
-                    iDnlState == EActivated)
+            if (iCSDownlink && strmId == iDnlinkStreamId)
                 {
                 iCSDownlink->Deactivate();
                 iDnlState = EInitialized;
@@ -376,7 +385,7 @@ gint TMSCallCSAdpt::DeinitStream(const TMSCallType /*callType*/,
         {
         case TMS_STREAM_UPLINK:
             {
-            if (iCSUplink && strmId == iUplinkStreamId && iUplState != EIdle)
+            if (iCSUplink && strmId == iUplinkStreamId)
                 {
                 iCSUplink->Deactivate();
                 iUplState = EIdle;
@@ -387,7 +396,7 @@ gint TMSCallCSAdpt::DeinitStream(const TMSCallType /*callType*/,
             }
         case TMS_STREAM_DOWNLINK:
             {
-            if (iCSDownlink && strmId == iDnlinkStreamId && iDnlState != EIdle)
+            if (iCSDownlink && strmId == iDnlinkStreamId)
                 {
                 iCSDownlink->Deactivate();
                 iDnlState = EIdle;

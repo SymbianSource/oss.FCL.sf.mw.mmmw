@@ -18,6 +18,7 @@
 // INCLUDE FILES
 #include "tmsglobaleffectssettings.h"
 #include "tmsclientserver.h"
+#include "tmsutility.h"
 
 using namespace TMS;
 
@@ -59,13 +60,17 @@ TMSGlobalEffectsSettings::TMSGlobalEffectsSettings() :
 //
 void TMSGlobalEffectsSettings::ConstructL()
     {
+    TRACE_PRN_FN_ENT;
     // Create repository instance
     iRepository = CRepository::NewL(KCRUidTmseffects);
     if (iRepository)
         {
         iRepository->Get(KTmsLoudSpkrVolume, iLoudSpkrVolume);
         iRepository->Get(KTmsEarPieceVolume, iEarVolume);
+        TRACE_PRN_N1(_L("loud spkr vol %d"),iLoudSpkrVolume);
+        TRACE_PRN_N1(_L("ear piece vol %d"),iEarVolume);
         }
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -94,15 +99,27 @@ TMSGlobalEffectsSettings::~TMSGlobalEffectsSettings()
 //
 void TMSGlobalEffectsSettings::SetLoudSpkrVolume(TInt aVolume)
     {
+    TRACE_PRN_FN_ENT;
     TInt status(KErrNone);
     if (iRepository)
         {
-        status = iRepository->Set(KTmsLoudSpkrVolume, aVolume);
+        if (aVolume > 0)
+            {
+            status = iRepository->Set(KTmsLoudSpkrVolume, aVolume);
+            TRACE_PRN_N2(_L("status %d loud spkr vol %d"),status,aVolume);
+            }
+        else
+            {
+            status = iRepository->Set(KTmsLoudSpkrVolume, KDefaultVolume);
+            TRACE_PRN_N(_L("loud spkr level 0 store default"));
+            }
         if (status == KErrNone)
             {
             iLoudSpkrVolume = aVolume;
+            TRACE_PRN_N1(_L("cached loud spkr vol %d"),iLoudSpkrVolume);
             }
         }
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -111,15 +128,27 @@ void TMSGlobalEffectsSettings::SetLoudSpkrVolume(TInt aVolume)
 //
 void TMSGlobalEffectsSettings::SetEarPieceVolume(TInt aVolume)
     {
+    TRACE_PRN_FN_ENT;
     TInt status(KErrNone);
     if (iRepository)
         {
-        status = iRepository->Set(KTmsEarPieceVolume, aVolume);
+        if (aVolume > 0)
+            {
+            status = iRepository->Set(KTmsEarPieceVolume, aVolume);
+            TRACE_PRN_N2(_L("status %d ear vol %d"),status,aVolume);
+            }
+        else
+            {
+            status = iRepository->Set(KTmsEarPieceVolume, KDefaultVolume);
+            TRACE_PRN_N(_L("ear piece vol level 0 store default"));
+            }
         if (status == KErrNone)
             {
             iEarVolume = aVolume;
+            TRACE_PRN_N1(_L("cached ear piece vol %d"),iEarVolume);
             }
         }
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -129,6 +158,7 @@ void TMSGlobalEffectsSettings::SetEarPieceVolume(TInt aVolume)
 void TMSGlobalEffectsSettings::GetLoudSpkrVolume(TInt& aVolume)
     {
     aVolume = iLoudSpkrVolume;
+    TRACE_PRN_N1(_L("TMSGlobalEffectsSettings GetLoudSpkrVolume %d"),aVolume);
     }
 
 // -----------------------------------------------------------------------------
@@ -138,6 +168,7 @@ void TMSGlobalEffectsSettings::GetLoudSpkrVolume(TInt& aVolume)
 void TMSGlobalEffectsSettings::GetEarPieceVolume(TInt& aVolume)
     {
     aVolume = iEarVolume;
+    TRACE_PRN_N1(_L("TMSGlobalEffectsSettings GetEarPieceVolume  %d"),aVolume);
     }
 
 // -----------------------------------------------------------------------------
@@ -174,5 +205,23 @@ TInt TMSGlobalEffectsSettings::Gain() const
 TInt TMSGlobalEffectsSettings::MaxGain() const
     {
     return iMaxGain;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSGlobalEffectsSettings::ResetDefaultVolume
+// -----------------------------------------------------------------------------
+//
+void TMSGlobalEffectsSettings::ResetDefaultVolume()
+    {
+    if (iLoudSpkrVolume == 0)
+        {
+        iRepository->Get(KTmsLoudSpkrVolume, iLoudSpkrVolume);
+        TRACE_PRN_N1(_L("Needed to reset default loudspkr vol %d"),iLoudSpkrVolume);
+        }
+    if (iEarVolume == 0)
+        {
+        iRepository->Get(KTmsEarPieceVolume, iEarVolume);
+        TRACE_PRN_N1(_L("Needed to reset default ear vol %d"),iEarVolume);
+        }
     }
 

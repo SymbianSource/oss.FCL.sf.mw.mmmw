@@ -82,13 +82,11 @@ FrameworkMap* XAFrameworkMgr_CreateFrameworkMap()
     FrameworkMap *curNode = NULL;
     FWMgrBool newNode;
     FrameworkMap *frameworkMap = NULL;
-    FILE* fp = fopen(configFileLocationZ, "r");
 
+    FILE* fp = fopen(configFileLocationC, "r");
     if (fp == NULL)
         {
-        createDefaultRules(configFileLocationC);
-
-        fp = fopen(configFileLocationC, "r");
+        fp = fopen(configFileLocationZ, "r");
         }
 
     if (fp != NULL)
@@ -553,70 +551,4 @@ FWMgrBool tokenizeTag(FWMgrTagType tagType, const char* buffer,
         }
     return FWMgrTrue;
     }
-
-int createDefaultRules(const char * filename)
-    {
-    FILE* fp = fopen(filename, "w");
-    if (fp == NULL)
-        return /*KErrAccessDenied*/-21;
-    fputs("#/*\r\n", fp);
-    fputs(
-            "#* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).\r\n",
-            fp);
-    fputs("#* All rights reserved.\r\n", fp);
-    fputs(
-            "#* This component and the accompanying materials are made available\r\n",
-            fp);
-    fputs("#* under the terms of \"Eclipse Public License v1.0\"\r\n", fp);
-    fputs("#* which accompanies this distribution, and is available\r\n", fp);
-    fputs("#* at the URL \"http://www.eclipse.org/legal/epl-v10.html\".\r\n",
-            fp);
-    fputs("#*\r\n", fp);
-    fputs("#* Initial Contributors:\r\n", fp);
-    fputs("#* Nokia Corporation - initial contribution.\r\n", fp);
-    fputs("#*\r\n", fp);
-    fputs("#* Contributors:\r\n", fp);
-    fputs("#*\r\n", fp);
-    fputs("#* Description:\r\n", fp);
-    fputs("#*\r\n", fp);
-    fputs("#*/\r\n", fp);
-    fputs(
-            "#============================================================================>|\r\n",
-            fp);
-    fputs(
-            "# Must not exceed 80 chars each line=========================================>|\r\n",
-            fp);
-    fputs(
-            "#============================================================================>|\r\n",
-            fp);
-    fputs("<mediaplayer>\r\n", fp);
-    fputs("<mmf>\r\n", fp);
-    fputs("<urischeme>\r\n", fp);
-    fputs(
-            "# Num of entries followed by actual entries all ending with a comma\r\n",
-            fp);
-    fputs("6,file,http,rtsp,rtspu,rtspt,mms,\r\n", fp);
-    fputs("</urischeme>\r\n", fp);
-    fputs("<fileext>\r\n", fp);
-    fputs(
-            "15,3gp,wma,wmv,wav,amr,mp3,mp4,rm,ra,avi,mkv,aac,mid,awb,3g2,\r\n",
-            fp);
-    fputs("</fileext>\r\n", fp);
-    fputs("</mmf>\r\n", fp);
-    fputs("</mediaplayer>\r\n", fp);
-    fputs("<mediarecorder>\r\n", fp);
-    fputs("<gst>\r\n", fp);
-    fputs("<urischeme>\r\n", fp);
-    fputs(
-            "# Num of entries followed by actual entries all ending with a comma\r\n",
-            fp);
-    fputs("1,file,\r\n", fp);
-    fputs("</urischeme>\r\n", fp);
-    fputs("<fileext>\r\n", fp);
-    fputs("3,wav,amr,mp4,\r\n", fp);
-    fputs("</fileext>\r\n", fp);
-    fputs("</gst>\r\n", fp);
-    fputs("</mediarecorder>\r\n", fp);
-    fclose(fp);
-    return 0;
-    }
+	

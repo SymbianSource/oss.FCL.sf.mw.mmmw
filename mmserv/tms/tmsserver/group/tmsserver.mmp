@@ -37,7 +37,6 @@ SOURCE          tmsglobaleffectssettings.cpp
 SOURCE          tmstareventhandler.cpp
 SOURCE          tmscenreplistener.cpp
 SOURCE          tmscenrepaudiohandler.cpp
-SOURCE          tmsdtmfeventhandler.cpp
 SOURCE          tmsaudiotoneutilityimpl.cpp
 SOURCE          tmsaudioinbandtoneplayer.cpp
 SOURCE          tmspubsublistener.cpp
@@ -49,7 +48,6 @@ SOURCE          tmsdtmftoneplayer.cpp
 SOURCE          tmsdtmfprovider.cpp
 SOURCE          tmseteldtmfmonitor.cpp
 SOURCE          tmseteldtmfstopmonitor.cpp
-SOURCE          tmsdtmfnotifier.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../inc

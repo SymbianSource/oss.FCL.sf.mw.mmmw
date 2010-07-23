@@ -47,6 +47,7 @@ private:
     void DoPlayToneL(const RMessage2& aMessage);
     void DoPlayAlarmL(const RMessage2& aMessage);
     void DoStopAlarmL(const RMessage2& aMessage);
+    void DoPlayToneStopL(const RMessage2& aMessage);
 
     void CleanUpObservers();
     

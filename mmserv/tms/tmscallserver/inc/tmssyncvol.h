@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
  * All rights reserved.
  * This component and the accompanying materials are made available
  * under the terms of "Eclipse Public License v1.0"
@@ -15,10 +15,11 @@
  *
  */
 
-#ifndef DTMFNOTIFIER_H
-#define DTMFNOTIFIER_H
+#ifndef TMSSYNCVOL_H
+#define TMSSYNCVOL_H
 
 //  INCLUDES
+#include <e32base.h>
 #include <e32property.h>
 #include <sounddevice.h>
 #include "tmsclientserver.h"
@@ -26,7 +27,7 @@
 namespace TMS {
 
 // CLASS DECLARATION
-class TMSDtmfNotifier
+class TMSSyncVol
     {
 public:
     // Constructors and destructor
@@ -34,24 +35,24 @@ public:
     /**
      * Two-phased constructor.
      */
-    static TMSDtmfNotifier* NewL();
+    static TMSSyncVol* NewL();
 
     /**
      * Destructor.
      */
-    virtual ~TMSDtmfNotifier();
+    virtual ~TMSSyncVol();
 
 public:
     // New functions
 
-    void SetDtmf(TmsMsgBufPckg dtmfpckg, gboolean publish = TRUE);
+    void SetSyncVol(TBool syncvol = ETrue);
 
 private:
 
     /**
      * C++ default constructor.
      */
-    TMSDtmfNotifier();
+    TMSSyncVol();
 
     /**
      * By default Symbian 2nd phase constructor is private.
@@ -59,11 +60,11 @@ private:
     void ConstructL();
 
 private:
-    gint iVolume;
+    gint iVolume; //Volume
     };
 
 } //namespace TMS
 
-#endif // DTMFNOTIFIER_H
+#endif // TMSSYNCVOL_H
 
 // End of File

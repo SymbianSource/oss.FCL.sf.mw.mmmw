@@ -52,6 +52,7 @@ SOURCE          tmscsdevsound.cpp
 SOURCE          tmscsdownlink.cpp
 SOURCE          tmscsuplink.cpp
 SOURCE          tmstarsettings.cpp
+SOURCE          tmsyncvol.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../inc

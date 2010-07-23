@@ -103,8 +103,6 @@ public:
     IMPORT_C gint StopInbandTone();
 
     // Global notifiers
-    IMPORT_C gint StartDTMFNotifier();
-    IMPORT_C gint CancelDTMFNotifier();
     IMPORT_C gint StartGlobalEffectNotifier();
     IMPORT_C gint CancelGlobalEffectNotifier();
     IMPORT_C gint StartRoutingNotifier();

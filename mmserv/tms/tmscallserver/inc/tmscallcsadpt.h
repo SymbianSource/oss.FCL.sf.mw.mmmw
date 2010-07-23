@@ -34,9 +34,7 @@ namespace TMS {
 class TMSCSUplink;
 class TMSCSDownlink;
 class TMSTarSettings;
-class TMSAudioDtmfTonePlayer;
-class TMSDTMFProvider;
-class TMSDtmfNotifier;
+class TMSSyncVol;
 
 /*
  * TMSCallCSAdpt class
@@ -148,6 +146,7 @@ private:
 
     gint iUplinkStreamId;
     gint iDnlinkStreamId;
+    TMSSyncVol* iResetVolNotifier;
     };
 
 } //namespace TMS

@@ -609,20 +609,6 @@ EXPORT_C gint TMSProxy::StopInbandTone()
     return TMSRESULT(status);
     }
 
-EXPORT_C gint TMSProxy::StartDTMFNotifier()
-    {
-    gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSStartDTMFNotifier); //DTMFHandler
-    return TMSRESULT(status);
-    }
-
-EXPORT_C gint TMSProxy::CancelDTMFNotifier()
-    {
-    gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSCancelDTMFNotifier); //DTMFHandler
-    return TMSRESULT(status);
-    }
-
 EXPORT_C gint TMSProxy::StartGlobalEffectNotifier()
     {
     gint status(TMS_RESULT_SUCCESS);

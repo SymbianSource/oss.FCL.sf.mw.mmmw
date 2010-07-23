@@ -1040,7 +1040,7 @@ gint TMSCallIPAdpt::OpenUplink(const RMessage2& message, const gint retrytime)
      * 2) KAudioPrefVoipAudioUplink             -NOK native VoIP?
      *    KAudioPriorityVoipAudioUplink         -NOK native VoIP?
      */
-    iPriority.iPref = KAudioPrefVoipAudioUplink;
+    iPriority.iPref = KAudioPrefVoipAudioUplinkNonSignal;
     iPriority.iPriority = KAudioPriorityVoipAudioUplink;
 
     delete iIPUplink;

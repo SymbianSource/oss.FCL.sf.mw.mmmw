@@ -27,6 +27,7 @@
 #include "tmsrtplayer.h"
 #include "tmsdtmfobserver.h"
 #include "tmsdtmftoneplayerobserver.h"
+#include "tmspubsubobserver.h"
 
 namespace TMS {
 
@@ -38,10 +39,9 @@ class TMSGlobalEffectsSettings;
 class TMSTarEventHandler;
 class TMSCSPCenRepListener;
 class TMSCenRepAudioHandler;
-class TMSDtmfEventHandler;
 class TMSAudioDtmfTonePlayer;
 class TMSDTMFProvider;
-class TMSDtmfNotifier;
+class TMSPubSubListener;
 
 // -----------------------------------------------------------------------------
 // TMSServer class
@@ -50,7 +50,8 @@ class TMSDtmfNotifier;
 class TMSServer : public CServer2,
                   private TMSRtPlayerObsrv,
                   private TMSDTMFObserver,
-                  private TMSDTMFTonePlayerObserver
+                  private TMSDTMFTonePlayerObserver,
+                  public TMSPubSubObserver
     {
 public:
     static void RunServerL();
@@ -81,12 +82,10 @@ public:
     TInt StartDTMF(const RMessage2& aMessage);
     TInt StopDTMF(const RMessage2& aMessage);
     TInt ContinueSendingDTMF(const RMessage2& aMessage);
-    TInt NotifyDtmfClients(TmsMsgBufPckg dtmfpckg);
+    TInt NotifyDtmfClients(gint aEventType, gint aError);
     gint FindActiveCallType();
 
     TInt NotifyTarClients(TRoutingMsgBufPckg routingpckg);
-    void StartDTMFNotifierL();
-    void CancelDTMFNotifier();
     void StartRoutingNotifierL();
     void CancelRoutingNotifier();
     void StartCenRepHandlerL();
@@ -110,13 +109,17 @@ public:
     // from TMSRtPlayerObsrv
     void RtPlayerEvent(TInt aEventType, TInt aError);
 
-    //From TMSDTMFTonePlayerObserver
+    // from TMSDTMFTonePlayerObserver
     void DTMFInitCompleted(gint status);
     void DTMFToneFinished(gint status);
 
-    //From TMSDTMFObserver
+    // from TMSDTMFObserver
     void HandleDTMFEvent(const TMSDTMFObserver::TCCPDtmfEvent event,
             const gint status, const TChar tone);
+
+    // from TMSPubSubObserver
+    void HandleNotifyPSL(const TUid aUid, const TInt& aKey,
+                const TRequestStatus& aStatus);
 
 private:
     static TMSServer* NewLC();
@@ -139,7 +142,6 @@ private:
     TMSTarEventHandler* iTarHandler;
     TMSCenRepAudioHandler* iAudioCenRepHandler;
     TMSAudioOutput iCurrentRouting;
-    TMSDtmfEventHandler* iDTMFHandler;
     TInt iTarHandlerCount;
     TInt iAudioCenRepHandlerCount;
     TInt iDTMFHandlerCount;
@@ -153,13 +155,13 @@ private:
 
     // for DTMF
     TMSAudioDtmfTonePlayer* iDTMFDnlinkPlayer;
-    TMSDtmfNotifier* iDTMFNotifier;
     TMSAudioDtmfTonePlayer* iDTMFUplinkPlayer;
     TMSDTMFProvider* iDTMFUplinkPlayerEtel;
 
     // for codecs count
     RArray<TFourCC> iDnlCodecs;
     RArray<TFourCC> iUplCodecs;
+    TMSPubSubListener* iSyncVol;
     };
 
 // -----------------------------------------------------------------------------

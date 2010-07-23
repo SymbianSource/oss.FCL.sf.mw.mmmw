@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
  * All rights reserved.
  * This component and the accompanying materials are made available
  * under the terms of "Eclipse Public License v1.0"
@@ -16,7 +16,7 @@
  */
 
 // INCLUDE FILES
-#include "tmsdtmfnotifier.h"
+#include "tmssyncvol.h"
 #include "tmsclientserver.h"
 #include "tmsutility.h"
 
@@ -27,26 +27,26 @@ _LIT_SECURITY_POLICY_PASS(KTMSServerReadPolicy);
 _LIT_SECURITY_POLICY_C1(KTMSServerWritePolicy, ECapabilityWriteUserData);
 
 // -----------------------------------------------------------------------------
-// TMSDtmfNotifier::TMSDtmfNotifier
+// TMSSyncVol::TMSSyncVol
 // C++ default constructor can NOT contain any code, that
 // might leave.
 // -----------------------------------------------------------------------------
 //
-TMSDtmfNotifier::TMSDtmfNotifier()
+TMSSyncVol::TMSSyncVol()
     {
     }
 
 // -----------------------------------------------------------------------------
-// TMSDtmfNotifier::ConstructL
+// TMSSyncVol::ConstructL
 // Symbian 2nd phase constructor can leave.
 // -----------------------------------------------------------------------------
 //
-void TMSDtmfNotifier::ConstructL()
+void TMSSyncVol::ConstructL()
     {
     TRACE_PRN_FN_ENT;
-    gint err = RProperty::Define(EDtmfPs, RProperty::EByteArray,
+    TInt err = RProperty::Define(ESyncVolume, RProperty::EInt,
             KTMSServerReadPolicy, KTMSServerWritePolicy);
-    TRACE_PRN_N1(_L("DtmfSetting::ConstructL err:%d"), err);
+    TRACE_PRN_N1(_L("TMSSyncVol::ConstructL err:%d"),err);
 
     if (err != KErrAlreadyExists)
         {
@@ -56,13 +56,13 @@ void TMSDtmfNotifier::ConstructL()
     }
 
 // -----------------------------------------------------------------------------
-// TMSDtmfNotifier::NewL
+// TMSSyncVol::NewL
 // Two-phased constructor.
 // -----------------------------------------------------------------------------
 //
-TMSDtmfNotifier* TMSDtmfNotifier::NewL()
+TMSSyncVol* TMSSyncVol::NewL()
     {
-    TMSDtmfNotifier* self = new (ELeave) TMSDtmfNotifier();
+    TMSSyncVol* self = new (ELeave) TMSSyncVol();
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -70,26 +70,28 @@ TMSDtmfNotifier* TMSDtmfNotifier::NewL()
     }
 
 // Destructor
-TMSDtmfNotifier::~TMSDtmfNotifier()
+TMSSyncVol::~TMSSyncVol()
     {
     TRACE_PRN_FN_ENT;
-    gint err = RProperty::Delete(KTMSPropertyCategory, EDtmfPs);
-    TRACE_PRN_N1(_L("DtmfSetting::~TMSDtmfNotifier err:%d"), err);
+    TInt err = RProperty::Delete(KTMSPropertyCategory, ESyncVolume);
+    TRACE_PRN_N1(_L("TMSSyncVol::~TMSSyncVol err:%d"),err);
     TRACE_PRN_FN_ENT;
     }
 
 // -----------------------------------------------------------------------------
-// TMSDtmfNotifier::SetDtmf
+// TMSSyncVol::SetSyncVol
 // -----------------------------------------------------------------------------
 //
-void TMSDtmfNotifier::SetDtmf(TmsMsgBufPckg dtmfpckg, gboolean publish)
+void TMSSyncVol::SetSyncVol(TBool syncvol)
     {
     TRACE_PRN_FN_ENT;
-    if (publish)
+    //    TInt err(KErrNone);
+    if (syncvol)
         {
-        gint err = RProperty::Set(KTMSPropertyCategory, EDtmfPs, dtmfpckg);
-        TRACE_PRN_N1(_L("DtmfSetting::SetDtmf err:%d"), err);
+        /*err =*/RProperty::Set(KTMSPropertyCategory, ESyncVolume, syncvol);
         }
+
+    //TRACE_PRN_N1(_L("TMSSyncVol::SetSyncVol err:%d"),err);
     TRACE_PRN_FN_EXT;
     }
 

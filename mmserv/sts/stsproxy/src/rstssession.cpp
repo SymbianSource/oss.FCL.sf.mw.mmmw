@@ -295,6 +295,26 @@ void RStsSession::SendStopAlarm(unsigned int aAlarmContext)
         }
     }
 
+void RStsSession::SendPlayToneForStop(CSystemToneService::TToneType aTone,
+        unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
+    {
+    TPckg<unsigned int> alarmContextPckg(aAlarmContext);
+    TInt err = SendReceive(StsMsg_PlayTone, TIpcArgs(aTone,
+            &alarmContextPckg, &aObserver));
+    if (err != KErrNone)
+        {
+        //TODO: Log a message
+        aObserver.PlayAlarmComplete(aAlarmContext);
+        }
+    else
+        {
+        iObserverMutex.Wait();
+        iObserverMap[aAlarmContext] = &aObserver;
+        iObserverMutex.Signal();
+        }
+   }   
+    
+
 void RStsSession::CleanUpObservers()
     {
     iObserverMutex.Wait();

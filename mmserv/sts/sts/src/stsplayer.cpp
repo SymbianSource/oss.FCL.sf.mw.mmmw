@@ -28,7 +28,8 @@
     {
     CStsPlayer* self = 0;
     
-    
+   
+
     self = new CStsPlayer(aObserver, aFileName, 0, aContext, aVolume, aAudioPreference, aAudioPriority);
     
            	        
@@ -51,6 +52,7 @@
        	TUint aAudioPreference, TUint  aAudioPriority)
     {
     CStsPlayer* self = 0;
+   
    	
    	self = new CStsPlayer(aObserver, aFileName, 10, aContext, aVolume, aAudioPreference, aAudioPriority);
    	

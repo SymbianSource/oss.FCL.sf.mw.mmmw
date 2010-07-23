@@ -308,6 +308,95 @@ void CSts::StopAlarm(unsigned int aAlarmContext)
         }
     }
 
+
+void CSts::PlayToneStop(CSystemToneService::TToneType aTone,
+        unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
+    {
+    
+    if(iProfile)
+    
+    {
+    	MProEngTones&         tones = iProfile->ProfileTones();
+		
+			switch (aTone)
+				{
+				case CSystemToneService::EEmailAlert:
+					{
+				    	iFileName.Set(tones.EmailAlertTone());
+				    	iAudioPreference = KAudioPrefNewSMS;
+				    	iAudioPriority = KAudioPriorityRecvMsg ;
+				    	break;
+				    }
+				case CSystemToneService::ESmsAlert:
+					{
+				    	iFileName.Set(tones.MessageAlertTone());
+				    	iAudioPreference = KAudioPrefNewSMS;
+				    	iAudioPriority = KAudioPriorityRecvMsg;
+				    	break; 
+				    }
+				case CSystemToneService::EMmsAlert:
+					{
+				    	iFileName.Set(tones.MessageAlertTone());
+				    	iAudioPreference = KAudioPrefNewSMS;
+				    	iAudioPriority = KAudioPriorityRecvMsg;
+				    	break;
+				  	}
+				case CSystemToneService::EChatAlert:
+					{
+				    	iFileName.Set(tones.MessageAlertTone());
+				    	iAudioPreference = KAudioPrefNewSMS ;
+				    	iAudioPriority = KAudioPriorityRecvMsg;
+				    	break;
+				    } 
+				case CSystemToneService::EWarningBeep:
+				    {
+				    	iAudioPreference = KAudioPrefWarning;
+				    	iAudioPriority =  KAudioPriorityWarningTone ;
+				    	if (iWarningToneEnabled)
+				      	  iFileName.Set(KDefaultFile);
+				    	else
+				      	  iVolume = 0;
+				    
+				    	break;
+				    }
+				default:
+					{
+					  	iFileName.Set(KDefaultFile);
+					  	iAudioPreference = KAudioPrefDefaultTone;
+				        iAudioPriority = KAudioPriorityWarningTone ;
+				      break;
+				    }
+				}
+			}
+			
+		else
+		{			 
+				 iFileName.Set(KDefaultFile);
+				 iAudioPreference = KAudioPrefDefaultTone;
+				 iAudioPriority = KAudioPriorityWarningTone ;
+		}
+    	
+    CStsPlayer* player = CStsPlayer::CreateTonePlayer(*this, aTone,
+             iNextContext, iFileName, iVolume, 
+             iAudioPreference, iAudioPriority);
+    if (player != 0)
+        {
+        iPlayerMap[iNextContext] = new CPlayerNode(player, aObserver);
+        aAlarmContext = iNextContext;
+        iNextContext++;
+        if (iNextContext == 0)
+            iNextContext++;
+        player->Play();
+        }
+    else
+        {
+        //TODO: Add trace here
+        aAlarmContext = 0;
+        }
+    }
+
+
+
 void CSts::CleanUpPlayers()
     {
         while (!iPlayerMap.empty())

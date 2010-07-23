@@ -83,7 +83,11 @@ gint TMSDTMFBodyImpl::PostConstruct(TMSStreamType streamtype, TMSDTMF& parent)
         }
     else
         {
-        if (iProxy->Connect() != TMS_RESULT_SUCCESS)
+        if (iProxy->Connect() == TMS_RESULT_SUCCESS)
+            {
+            ret = iProxy->InitDTMFPlayer(iStreamType);
+            }
+        else
             {
             delete iProxy;
             iProxy = NULL;
@@ -105,11 +109,6 @@ gint TMSDTMFBodyImpl::AddObserver(TMSDTMFObserver& obsrvr, gpointer user_data)
             {
             ret = iProxy->SetMsgQueueNotifier(EMsgQueueDTMFType, iObserver,
                     iParent, iClientId);
-            if (ret == TMS_RESULT_SUCCESS)
-                {
-                ret = iProxy->StartDTMFNotifier();
-                ret |= iProxy->InitDTMFPlayer(iStreamType);
-                }
             }
         else
             {
@@ -130,7 +129,6 @@ gint TMSDTMFBodyImpl::RemoveObserver(TMSDTMFObserver& obsrvr)
         {
         ret = iProxy->RemoveMsgQueueNotifier(EMsgQueueDTMFType, iObserver);
         iObserver = NULL;
-        iProxy->CancelDTMFNotifier();
         }
     else
         {

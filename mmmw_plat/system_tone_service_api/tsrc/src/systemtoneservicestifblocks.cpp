@@ -37,6 +37,7 @@ TInt CSystemToneServiceStif::RunMethodL(CStifItemParser& aItem )
         ENTRY( "PlayTone", CSystemToneServiceStif::PlayTone ),
         ENTRY( "PlayAlarm", CSystemToneServiceStif::PlayAlarm ),
         ENTRY( "StopAlarm", CSystemToneServiceStif::StopAlarm ),
+        ENTRY( "PlayToneWithStop", CSystemToneServiceStif::PlayToneWithStop ),	
         
 
 
@@ -214,6 +215,40 @@ TInt  CSystemToneServiceStif::StopAlarm(CStifItemParser& aItem  )
     
     return error;
 }
+
+
+TInt CSystemToneServiceStif::PlayToneWithStop( CStifItemParser& aItem )
+    {
+        // Print to UI
+            _LIT( Ksystemtoneservicestif, "systemtoneservicestif" );
+            _LIT( KPrint, "In PlaySystemToneServiceWithContext" );
+            TestModuleIf().Printf( 0, Ksystemtoneservicestif, KPrint );
+            // Print to log file
+            iLog->Log( KPrint );
+            
+               TInt lRetVal = KErrNone;
+               TInt alarmType = 0;
+
+               lRetVal = aItem.GetNextInt(alarmType);
+
+               if ( lRetVal != KErrNone )
+                {
+                   iLog->Log(_L("CSystemToneServiceStif::PlaySystemToneService tone type missing in config file "));
+                   iLog->Log(_L("Playing Default Tone"));
+                   
+            iSts->PlayAlarm(CSystemToneService::EClockAlarm, iCurrentContext, *this);
+        }
+			  else
+        {
+            //iSts->PlayTone(CSystemToneService::EClockAlarm, iCurrentContext);
+            iSts->PlayAlarm(CSystemToneService::TToneType(alarmType), iCurrentContext, *this);
+            iLog->Log(_L("CSystemToneService::TAlarmType(alarmType) %d"),CSystemToneService::TAlarmType(alarmType) );
+        }
+        
+        return lRetVal;       
+            
+        }
+
 
 
 void CSystemToneServiceStif::HandleEvent()

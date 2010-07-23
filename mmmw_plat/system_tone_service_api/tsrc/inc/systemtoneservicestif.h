@@ -136,6 +136,8 @@ NONSHARABLE_CLASS(CSystemToneServiceStif) : public CScriptBase, MStsPlayAlarmObs
         virtual TInt  PlayAlarm( CStifItemParser& aItem );
         
         virtual TInt  StopAlarm( CStifItemParser& aItem );
+        
+        virtual TInt  PlayToneWithStop( CStifItemParser& aItem);
 
 
 
