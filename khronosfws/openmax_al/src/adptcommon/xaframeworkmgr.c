@@ -62,9 +62,6 @@ static FWMgrBool processTagType(const char* buffer,
 static FWMgrBool tokenizeTag(FWMgrTagType tagType, const char* buffer,
         FrameworkMap **node);
 
-/* Crates a default rules config file */
-static int createDefaultRules(const char * filename);
-
 /* Global functions from header file */
 
 /* FrameworkMap* XAFrameworkMgr_CreateFrameworkMap

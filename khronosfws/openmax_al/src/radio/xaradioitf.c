@@ -95,7 +95,6 @@ XAresult XARadioItfImpl_GetFreqRange(XARadioItf self, XAuint8 * pRange)
     XAresult ret = XA_RESULT_SUCCESS;
     XARadioItfImpl* impl = GetImpl(self);
     DEBUG_API("->XARadioItfImpl_GetFreqRange");
-    XA_IMPL_THREAD_SAFETY_ENTRY(XATSRadio);
 
     if(!impl || !pRange)
     {
@@ -108,7 +107,6 @@ XAresult XARadioItfImpl_GetFreqRange(XARadioItf self, XAuint8 * pRange)
 
     ret = XARadioItfAdapt_GetFreqRange(pRange);
 
-    XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_GetFreqRange");
     return ret;
 }
@@ -147,7 +145,7 @@ XAresult XARadioItfImpl_IsFreqRangeSupported(XARadioItf self,
 
 /**
  * XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
- *                                                XAuint8 range,
+ *                                                XAuint8  range,
  *                                                XAuint32 * pMinFreq,
  *                                                XAuint32 * pMaxFreq,
  *                                                XAuint32 * pFreqInterval)
@@ -155,7 +153,7 @@ XAresult XARadioItfImpl_IsFreqRangeSupported(XARadioItf self,
  *              modulation of the given frequency range.
  **/
 XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
-                                               XAuint8 range,
+                                               XAuint8  range,
                                                XAuint32 * pMinFreq,
                                                XAuint32 * pMaxFreq,
                                                XAuint32 * pFreqInterval)
@@ -167,21 +165,9 @@ XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
    *pFreqInterval = FREQINTERVAL;   
 		    
     DEBUG_API("->XARadioItfImpl_GetFreqRangeProperties");
-    XA_IMPL_THREAD_SAFETY_ENTRY(XATSRadio);
 
     if(!impl || !pMinFreq || !pMaxFreq || !pFreqInterval)
     {
-        XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
-        /* invalid parameter */
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("<-XARadioItfImpl_GetFreqRangeProperties");
-        return XA_RESULT_PARAMETER_INVALID;
-    }
-    ret = XARadioItfAdapt_IsFreqRangeSupported( range, &isSupported );
-
-    if (isSupported != XA_BOOLEAN_TRUE || ret != XA_RESULT_SUCCESS)
-    {
-        XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
         /* invalid parameter */
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XARadioItfImpl_GetFreqRangeProperties");
@@ -191,7 +177,6 @@ XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
     ret = XARadioItfAdapt_GetFreqRangeProperties( (XAAdaptationMMFCtx*)impl->adapCtx,
             range, pMinFreq, pMaxFreq );
 
-    XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_GetFreqRangeProperties");
     return ret;
 }
@@ -207,6 +192,10 @@ XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
 XAresult XARadioItfImpl_SetFrequency(XARadioItf self, XAuint32 freq)
 {
     XAresult ret = XA_RESULT_SUCCESS;
+    XAuint8 range = 1; // Default to EuroAmerica
+    XAuint32 minFreq;
+    XAuint32 maxFreq;
+   	XAuint32 freqInterval;
         
     XARadioItfImpl* impl = GetImpl(self);
     DEBUG_API("->XARadioItfImpl_SetFrequency");
@@ -220,9 +209,23 @@ XAresult XARadioItfImpl_SetFrequency(XARadioItf self, XAuint32 freq)
         return XA_RESULT_PARAMETER_INVALID;
     }
     
- 
-
-    ret = XARadioItfAdapt_SetFrequency( (XAAdaptationMMFCtx*)impl->adapCtx, freq );
+    // Check for valid entries: 
+ 		ret = XARadioItfImpl_GetFreqRangeProperties(self, range, &minFreq, &maxFreq, &freqInterval);   
+    if (ret != XA_RESULT_SUCCESS)
+    {
+    	XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
+    	DEBUG_API("<-XARadioItfImpl_SetFrequency");    	
+    	return ret;
+    }		
+    
+    if ( (freq < minFreq) || (freq > maxFreq) )
+    {
+    	XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
+    	DEBUG_API("<-XARadioItfImpl_SetFrequency");    	
+    	return XA_RESULT_PARAMETER_INVALID;
+    }	  
+           
+   	ret = XARadioItfAdapt_SetFrequency( (XAAdaptationMMFCtx*)impl->adapCtx, freq );
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_SetFrequency");

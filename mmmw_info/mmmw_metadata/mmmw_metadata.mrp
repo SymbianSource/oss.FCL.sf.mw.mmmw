@@ -1,6 +1,0 @@
-component           mmmw_metadata
-source   \sf\mw\mmmw\mmmw_info\mmmw_metadata 
-source   \sf\mw\mmmw\package_definition.xml
-source   \sf\mw\mmmw\distribution.policy.s60
-notes_source      \component_defs\release.src
-ipr T 

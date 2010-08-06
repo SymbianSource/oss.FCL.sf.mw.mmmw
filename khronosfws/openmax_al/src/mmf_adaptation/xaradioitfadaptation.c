@@ -70,7 +70,7 @@ XAresult XARadioItfAdapt_IsFreqRangeSupported(XAuint8 range,
 
 /*
  * XAresult XARadioItfAdapt_GetFreqRangeProperties(XAAdaptationMMFCtx *bCtx,
- *                                                 XAuint8 * pRange,
+ *                                                 XAuint8 range,
  *                                                 XAuint32 * pMinFreq,
  *                                                 XAuint32 * pMaxFreq)
  */

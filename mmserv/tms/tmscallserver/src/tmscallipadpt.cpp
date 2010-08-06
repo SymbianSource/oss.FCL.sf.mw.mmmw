@@ -259,6 +259,7 @@ gint TMSCallIPAdpt::PauseStream(const TMSCallType /*callType*/,
             if (strmId == iUplinkStreamId && iIPUplink)
                 {
                 iIPUplink->Stop();
+                iUplState = EInitialized;
                 status = TMS_RESULT_SUCCESS;
                 NotifyClient(iUplinkStreamId, ECmdUplinkPaused, status);
                 }
@@ -269,6 +270,7 @@ gint TMSCallIPAdpt::PauseStream(const TMSCallType /*callType*/,
             if (strmId == iDnlinkStreamId && iIPDownlink)
                 {
                 iIPDownlink->Stop();
+                iDnlState = EInitialized;
                 status = TMS_RESULT_SUCCESS;
                 NotifyClient(iDnlinkStreamId, ECmdDownlinkPaused, status);
                 }

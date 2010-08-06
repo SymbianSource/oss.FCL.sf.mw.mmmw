@@ -83,6 +83,17 @@ TInt COpenMAXALTestModule::al_radioitf_SetFreqRange( CStifItemParser& aItem )
     status = aItem.GetNextInt(freqRange);
     RET_ERR_IF_ERR(status);
 
+		if (m_PlayItf)
+        {
+        status = (*m_PlayItf)->SetPlayState(
+                m_PlayItf, XA_PLAYSTATE_PLAYING);              
+        }
+    else
+        {
+        status = KErrNotFound;
+        return status;
+        } 			
+			
     if(m_RadioItf)
         {
         status = (*m_RadioItf)->SetFreqRange(
@@ -185,12 +196,39 @@ TInt COpenMAXALTestModule::al_radioitf_SetFrequency( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     TInt freq;
+    XAuint32 currentFreq;    
     status = aItem.GetNextInt(freq); 
-    RET_ERR_IF_ERR(status);             
+    RET_ERR_IF_ERR(status);   
+    
+		if (m_PlayItf)
+        {
+        status = (*m_PlayItf)->SetPlayState(
+                m_PlayItf, XA_PLAYSTATE_PLAYING);              
+        }
+    else
+        {
+        status = KErrNotFound;
+        return status;
+        } 
+        
     if (m_RadioItf)
         {
-        status = (*m_RadioItf)->SetFrequency(
-                m_RadioItf, freq); 
+        	status = (*m_RadioItf)->GetFrequency(m_RadioItf, &currentFreq); 
+       		if (status != KErrNone)
+       		{	
+       			status = KErrCompletion;  
+       			return status;
+       		}             
+        }
+    else
+        {
+        status = KErrNotFound;
+        return status;
+        }          
+                      
+    if (m_RadioItf)
+        {
+        status = (*m_RadioItf)->SetFrequency(m_RadioItf, freq); 
        	if (status != KErrNone)
        		status = KErrCompletion;               
         }
@@ -444,10 +482,10 @@ void COpenMAXALTestModule::HandleRadioItfCallback(
         XARadioItf 	caller,
         XAuint32   	event
 )
-{
-   
+{  		
+    
     switch (event)
-        {
+        {                   	
         case XA_RADIO_EVENT_ANTENNA_STATUS_CHANGED:
             {
             TEventIf antennaStatusEvent( TEventIf::ESetEvent, _L("Event_XA_RADIO_EVENT_ANTENNA_STATUS_CHANGED:") );

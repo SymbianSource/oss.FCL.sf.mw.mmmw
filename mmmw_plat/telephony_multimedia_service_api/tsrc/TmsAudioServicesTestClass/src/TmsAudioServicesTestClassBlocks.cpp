@@ -1272,7 +1272,7 @@ TInt CTmsAudioServicesTestClass::OpenDownlink(CStifItemParser& /*aItem */)
             {
             iLog->Log(_L("CTmsAudioServicesTestClass::OpenDownlink - init Downlink"));
             iTmsDnlink->AddObserver(*this, NULL);
-            error = iTmsDnlink->Init();
+            error = iTmsDnlink->Init(4);
             }
 
         if (error != KErrNone)
@@ -1358,7 +1358,7 @@ TInt CTmsAudioServicesTestClass::OpenUplink(CStifItemParser& /*aItem */)
             {
             iLog->Log(_L("CTmsAudioServicesTestClass::OpenDownlink - init Uplink"));
             iTmsUplink->AddObserver(*this, NULL);
-            error = iTmsUplink->Init();
+            error = iTmsUplink->Init(4);
             }
 
         if (error != KErrNone)
@@ -1460,7 +1460,7 @@ TInt CTmsAudioServicesTestClass::Start(CStifItemParser& aItem)
             {
             if ((iUpLinkStatus == INITIALIZED) || (iUpLinkStatus == PAUSED))
                 {
-                iTmsUplink->Start();
+                iTmsUplink->Start(2);
 
                 if (iUpLinkStatus == INITIALIZED)
                     {
@@ -1483,7 +1483,7 @@ TInt CTmsAudioServicesTestClass::Start(CStifItemParser& aItem)
             {
             if ((iDnLinkStatus == INITIALIZED) || (iDnLinkStatus == PAUSED))
                 {
-                iTmsDnlink->Start();
+                iTmsDnlink->Start(2);
                 if (iDnLinkStatus == INITIALIZED)
                     {
                     AddExpectedEvent(EFillBuffer, KMediumTimeout);

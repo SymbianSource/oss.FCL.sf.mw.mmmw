@@ -115,7 +115,7 @@ void TMSRingTonePlayer::ConstructL()
 
     iEngine =  ProEngFactory::NewEngineL();
 
-    InitRtParamsL(EPlayerBackup);
+    InitRtParams(EPlayerBackup);
     //CreateDefaultRingToneL();
     CreateBkpRtPlayerL();
     //GetMaxToneFileSizeL(iToneFileSizeLimitKB);
@@ -152,10 +152,10 @@ TMSRingTonePlayer::~TMSRingTonePlayer()
     }
 
 // -----------------------------------------------------------------------------
-// TMSRingTonePlayer::InitRtParamsL
+// TMSRingTonePlayer::InitRtParams
 // -----------------------------------------------------------------------------
 //
-void TMSRingTonePlayer::InitRtParamsL(TRtPlayerType aPlayerType)
+void TMSRingTonePlayer::InitRtParams(TRtPlayerType aPlayerType)
     {
     TRACE_PRN_FN_ENT;
 
@@ -183,7 +183,7 @@ void TMSRingTonePlayer::CreateDefaultRingToneL()
     {
     TRACE_PRN_FN_ENT;
 
-    InitRtParamsL(EPlayerDefault);
+    InitRtParams(EPlayerDefault);
     LoadProfileRingToneL();
 
     TRACE_PRN_FN_EXT;

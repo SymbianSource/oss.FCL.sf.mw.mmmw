@@ -32,7 +32,7 @@
 "/epoc32/release/armv5/urel/TmsAudioServicesTestClass.dll" - "c:/Sys/Bin/TmsAudioServicesTestClass.dll"
 ; If installation process fails, exclude testframework.ini from the sis file and
 ; copy manually.
-"../../init/TestFramework.ini"-"c:/Testframework/TestFramework.ini"
+;"../../init/TestFramework.ini"-"c:/Testframework/TestFramework.ini"
 "../../init/TmsAudioServicesTestClass.ini"-"c:/Testframework/TmsAudioServicesTestClass.ini"
 "../../Conf/TMSAudioServicesTestClass.cfg"-"c:/Testframework/TMSAudioServicesTestClass.cfg"
 

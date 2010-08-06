@@ -147,6 +147,7 @@ NONSHARABLE_CLASS(CSystemToneServiceStif) : public CScriptBase, MStsPlayAlarmObs
        virtual void HandleEvent();
     	
     	
+    	
     	  
     	  // Data
         TPlayState            iPlayState;

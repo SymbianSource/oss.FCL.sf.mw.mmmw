@@ -142,6 +142,7 @@ void TMSServer::ConstructL()
     iDTMFDnlinkPlayer = NULL;
     iDTMFUplinkPlayer = NULL;
     iDTMFUplinkPlayerEtel = NULL;
+    iActiveCallType = -1;
     iSyncVol = TMSPubSubListener::NewL(KTMSPropertyCategory,ESyncVolume, this);
 
     //TODO: EUnit fails to initialize ProfileEngine in RT in eshell mode
@@ -858,12 +859,7 @@ TInt TMSServer::InitDTMF(const RMessage2& aMessage)
             }
         if (!iDTMFUplinkPlayer) //IP call
             {
-            // TODO: Ongoing work with Audio Policy team...
             TRAP(status, iDTMFUplinkPlayer = TMSAudioDtmfTonePlayer::NewL(*this,
-//                    KAudioPrefVoipAudioUplinkNonSignal,
-//                    KAudioPrefVoipAudioUplink,
-//                    KAudioPrefUnknownVoipAudioUplink
-//                    KAudioPriorityDTMFString));
                     KAudioDTMFString, KAudioPriorityDTMFString));
             }
         }
@@ -988,6 +984,7 @@ TInt TMSServer::StopDTMF(const RMessage2& aMessage)
             status = TMS_RESULT_SUCCESS;
             }
         }
+    iActiveCallType = -1;
     NotifyDtmfClients(ECmdDTMFTonePlayFinished, status);
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -1002,16 +999,13 @@ TInt TMSServer::StopDTMF(const RMessage2& aMessage)
 TInt TMSServer::ContinueSendingDTMF(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
-
     TInt status(TMS_RESULT_INVALID_STATE);
-    TBool continuesnd;
-    continuesnd = (TBool) aMessage.Int0();
-     if (iActiveCallType == TMS_CALL_CS && iDTMFUplinkPlayerEtel)
+    if (iActiveCallType == TMS_CALL_CS && iDTMFUplinkPlayerEtel)
         {
+        TBool continuesnd = (TBool) aMessage.Int0();
         status = iDTMFUplinkPlayerEtel->ContinueDtmfStringSending(continuesnd);
         status = TMSUtility::EtelToTMSResult(status);
         }
-
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
     return status;

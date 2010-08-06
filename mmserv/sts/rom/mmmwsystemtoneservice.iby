@@ -14,10 +14,6 @@
 * Description: STS IBY file
 *
 */
-/*
- * sts.iby
- *
- */
 
 #ifndef MMMWSYSTEMTONESERVICE_IBY
 #define MMMWSYSTEMTONESERVICE_IBY

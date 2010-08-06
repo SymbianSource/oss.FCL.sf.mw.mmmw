@@ -722,7 +722,7 @@ void TMSStreamBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         void* user_data)
     {
     TMSSignalEvent event = {}; //all elements initialized to zeros
-    event.reason = aError;
+    event.reason = TMSRESULT(aError);
     event.user_data = user_data;
     iStreamState = aEventType;
 
