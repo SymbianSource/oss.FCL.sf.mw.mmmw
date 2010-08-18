@@ -21,8 +21,6 @@
 
 #include "xaplayitf.h"
 
-#include "xaplayitfadaptation.h"
-
 #include "xaplayitfadaptationmmf.h"
 #include "xathreadsafety.h"
 #include <string.h>
@@ -73,31 +71,6 @@ XAresult XAPlayItfImpl_SetPlayState(XAPlayItf self, XAuint32 state)
         {
         ret = XAPlayItfAdaptMMF_SetPlayState(impl->pObjImpl->curAdaptCtx,
                 state);
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
-        DEBUG_API("<-XAPlayItfImpl_SetPlayState");
-        return ret;
-        }
-
-    /* check is play state changed, if not do nothing */
-    if (state != impl->playbackState)
-        {
-        if (state == XA_PLAYSTATE_PLAYING)
-            {
-            XAPlayItfAdaptGST_GetPosition(
-                    (XAAdaptationGstCtx*) impl->adapCtx,
-                    &(impl->lastPosition));
-            }
-        ret = XAPlayItfAdaptGST_SetPlayState(impl->adapCtx, state);
-
-        if (ret == XA_RESULT_SUCCESS)
-            {
-            impl->playbackState = state;
-            if (state == XA_PLAYSTATE_STOPPED || state == XA_PLAYSTATE_PAUSED)
-                {
-                impl->isMarkerPosCbSend = XA_BOOLEAN_FALSE;
-                impl->lastPosition = 0;
-                }
-            }
         }
 
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
@@ -131,10 +104,6 @@ XAresult XAPlayItfImpl_GetPlayState(XAPlayItf self, XAuint32 *pState)
         ret = XAPlayItfAdaptMMF_GetPlayState(impl->pObjImpl->curAdaptCtx,
                 pState);
         }
-    else
-        {
-        *pState = impl->playbackState;
-        }
 
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
 
@@ -166,11 +135,6 @@ XAresult XAPlayItfImpl_GetDuration(XAPlayItf self, XAmillisecond *pMsec)
         {
         ret = XAPlayItfAdaptMMF_GetDuration(impl->pObjImpl->curAdaptCtx,
                 pMsec);
-        }
-    else
-        {
-        ret = XAPlayItfAdaptGST_GetDuration(
-                (XAAdaptationGstCtx*) impl->adapCtx, pMsec);
         }
 
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
@@ -205,19 +169,6 @@ XAresult XAPlayItfImpl_GetPosition(XAPlayItf self, XAmillisecond *pMsec)
         {
         ret = XAPlayItfAdaptMMF_GetPosition(impl->pObjImpl->curAdaptCtx,
                 pMsec);
-        }
-    else
-        {
-
-        if (impl->playbackState == XA_PLAYSTATE_STOPPED)
-            {
-            *pMsec = 0;
-            DEBUG_API("<-XAPlayItfImpl_GetPosition");
-            XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
-            return XA_RESULT_SUCCESS;
-            }
-        ret = XAPlayItfAdaptGST_GetPosition(
-                (XAAdaptationGstCtx*) impl->adapCtx, pMsec);
         }
 
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
@@ -289,7 +240,8 @@ XAresult XAPlayItfImpl_SetCallbackEventsMask(XAPlayItf self,
             | XA_PLAYEVENT_HEADMOVING | XA_PLAYEVENT_HEADSTALLED)))
         {
         /* invalid parameter */
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAPlayItfImpl_SetCallbackEventsMask");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAPlayItfImpl_SetCallbackEventsMask");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -305,29 +257,6 @@ XAresult XAPlayItfImpl_SetCallbackEventsMask(XAPlayItf self,
         XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
         DEBUG_API("<-XAPlayItfImpl_SetCallbackEventsMask");
         return ret;
-        }
-
-    /* enable position tracking if client wants so */
-    if ((eventFlags & (XA_PLAYEVENT_HEADATMARKER | XA_PLAYEVENT_HEADATNEWPOS))
-            && impl->adapCtx && !impl->positionupdateOn)
-        {
-        ret = XAPlayItfAdapt_EnablePositionTracking(
-                (XAAdaptationGstCtx*) impl->adapCtx, XA_BOOLEAN_TRUE);
-        if (ret == XA_RESULT_SUCCESS)
-            {
-            impl->positionupdateOn = XA_BOOLEAN_TRUE;
-            }
-        }
-    else if (!(eventFlags & (XA_PLAYEVENT_HEADATMARKER
-            | XA_PLAYEVENT_HEADATNEWPOS)) && impl->adapCtx
-            && impl->positionupdateOn)
-        {
-        ret = XAPlayItfAdapt_EnablePositionTracking(
-                (XAAdaptationGstCtx*) impl->adapCtx, XA_BOOLEAN_FALSE);
-        if (ret == XA_RESULT_SUCCESS)
-            {
-            impl->positionupdateOn = XA_BOOLEAN_FALSE;
-            }
         }
 
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
@@ -608,7 +537,6 @@ void XAPlayItfImpl_Free(XAPlayItfImpl* self)
 void XAPlayItfImpl_AdaptCb(void *pHandlerCtx, XAAdaptEvent *event)
     {
     XAPlayItfImpl* impl = (XAPlayItfImpl*) pHandlerCtx;
-    XAuint32 newpos = 0;
 
     DEBUG_API("->XAPlayItfImpl_AdaptCb");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
@@ -627,101 +555,6 @@ void XAPlayItfImpl_AdaptCb(void *pHandlerCtx, XAAdaptEvent *event)
         DEBUG_API("<-XAPlayItfImpl_AdaptCb");
         XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
         return;
-        }
-
-    /* check position update events */
-    if (event->eventid == XA_ADAPT_POSITION_UPDATE_EVT)
-        {
-        assert(event->data);
-        newpos = *((XAuint32*) (event->data));
-        DEBUG_API_A1("Position update from adaptation: new position %lu ms",newpos);
-
-        /* Check is looping start file playing before marker position */
-        if (newpos < impl->markerPosition || impl->lastPosition > newpos)
-            {
-            DEBUG_INFO("Restart looping, clear marker position callback flag.");
-            impl->isMarkerPosCbSend = XA_BOOLEAN_FALSE;
-            }
-
-        /* check if marker passed and callback needed */
-        if ((impl->markerPosition != NO_POSITION) && (impl->eventFlags
-                & XA_PLAYEVENT_HEADATMARKER))
-            {
-            if (impl->callback && (((impl->lastPosition
-                    < impl->markerPosition)
-                    && (newpos > impl->markerPosition)) || (newpos
-                    == impl->markerPosition)))
-                {
-                /* Check is callback already send */
-                if (impl->isMarkerPosCbSend != XA_BOOLEAN_TRUE)
-                    {
-                    impl->callback(impl->cbPtrToSelf, impl->cbcontext,
-                            XA_PLAYEVENT_HEADATMARKER);
-                    impl->isMarkerPosCbSend = XA_BOOLEAN_TRUE;
-                    }
-                }
-            }
-        /* check if update period passed and callback needed */
-        if ((impl->positionUpdatePeriod > 0) && (impl->eventFlags
-                & XA_PLAYEVENT_HEADATNEWPOS) && impl->callback)
-            {
-            if ((XAuint32) ((impl->lastPosition)
-                    / (impl->positionUpdatePeriod)) < (XAuint32) (newpos
-                    / (impl->positionUpdatePeriod)))
-                {
-                impl->callback(impl->cbPtrToSelf, impl->cbcontext,
-                        XA_PLAYEVENT_HEADATNEWPOS);
-                }
-            }
-        /* store position */
-        impl->lastPosition = newpos;
-        }
-
-    /* check other events */
-    else if (event->eventid == XA_PLAYEVENT_HEADATEND)
-        {
-        impl->playbackState = XA_PLAYSTATE_STOPPED;
-        impl->lastPosition = 0;
-        /* send callback if needed */
-        if ((XA_PLAYEVENT_HEADATEND & impl->eventFlags) && impl->callback)
-            {
-            impl->callback(impl->cbPtrToSelf, impl->cbcontext,
-                    XA_PLAYEVENT_HEADATEND);
-            }
-        }
-    else if (event->eventid == XA_PLAYEVENT_HEADSTALLED)
-        {
-        impl->playbackState = XA_PLAYSTATE_PAUSED;
-        if (impl->adapCtx->fwtype == FWMgrFWMMF)
-            {
-            //XAPlayItfAdaptMMF_GetPosition((XAAdaptationGstCtx*)impl->adapCtx, &(impl->lastPosition));
-            }
-        else
-            {
-            XAPlayItfAdaptGST_GetPosition(
-                    (XAAdaptationGstCtx*) impl->adapCtx,
-                    &(impl->lastPosition));
-            }
-        /* send callback if needed */
-        if ((XA_PLAYEVENT_HEADSTALLED & impl->eventFlags) && impl->callback)
-            {
-            impl->callback(impl->cbPtrToSelf, impl->cbcontext,
-                    XA_PLAYEVENT_HEADSTALLED);
-            }
-        }
-    else if (event->eventid == XA_PLAYEVENT_HEADMOVING)
-        {
-        impl->playbackState = XA_PLAYSTATE_PLAYING;
-        /* send callback if needed */
-        if ((XA_PLAYEVENT_HEADMOVING & impl->eventFlags) && impl->callback)
-            {
-            impl->callback(impl->cbPtrToSelf, impl->cbcontext,
-                    XA_PLAYEVENT_HEADMOVING);
-            }
-        }
-    else
-        {
-        /* do nothing */
         }
 
     DEBUG_API("<-XAPlayItfImpl_AdaptCb");

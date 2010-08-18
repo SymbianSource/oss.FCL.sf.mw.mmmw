@@ -21,7 +21,6 @@
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
 #include "xaobjectitf.h"
-#include "xamediaplayeradaptctx.h"
 #include "xamediaplayeradaptctxmmf.h"
 #include "xacapabilitiesmgr.h"
 /** MACROS **/
@@ -40,13 +39,8 @@ typedef enum
     MP_PREFETCHSTATUSITF,
     MP_CONFIGEXTENSIONITF,
     MP_DYNAMICSOURCEITF,
-    MP_EQUALIZERITF,
-    MP_IMAGECONTROLSITF,
-    MP_IMAGEEFFECTSITF,
     MP_METADATAEXTRACTIONITF,
-    MP_METADATATRAVERSALITF,
     MP_PLAYBACKRATEITF,
-    MP_VIDEOPOSTPROCESSINGITF,
     MP_NOKIAVOLUMEEXT,
     MP_NOKIALINEARVOLUME,
     MP_STREAMINFORMATIONITF,

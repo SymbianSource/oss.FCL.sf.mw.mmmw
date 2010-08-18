@@ -145,7 +145,8 @@ void TMSCSUplink::RecordError(TInt aError)
     TRACE_PRN_N1(_L("TMSCSUplink::RecordError[%d]"), aError);
 
     // We dont react to devsound messages unless we are activating.
-    if (iActivationOngoing && aError == KErrAccessDenied)
+    if (iActivationOngoing && (aError == KErrAccessDenied ||
+            aError == KErrInUse))
         {
         if (iStartRetryTime != 0)
             {

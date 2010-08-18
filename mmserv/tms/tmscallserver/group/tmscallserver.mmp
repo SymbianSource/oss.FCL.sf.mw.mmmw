@@ -52,11 +52,7 @@ SOURCE          tmscsdevsound.cpp
 SOURCE          tmscsdownlink.cpp
 SOURCE          tmscsuplink.cpp
 SOURCE          tmstarsettings.cpp
-SOURCE          tmsdtmftoneplayer.cpp
-SOURCE          tmsdtmfprovider.cpp
-SOURCE          tmseteldtmfmonitor.cpp
-SOURCE          tmseteldtmfstopmonitor.cpp
-SOURCE          tmsdtmfnotifier.cpp
+SOURCE          tmsyncvol.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../inc
@@ -99,10 +95,6 @@ LIBRARY         mediaclientaudio.lib
 LIBRARY         profileengine.lib
 LIBRARY         telephonyaudiorouting.lib
 LIBRARY         tmsutility.lib
-// Libraries for ETel
-LIBRARY         etelmm.lib
-LIBRARY         etel.lib
-LIBRARY         customapi.lib
 
 DEFFILE         tmscallserver.def
 NOSTRICTDEF

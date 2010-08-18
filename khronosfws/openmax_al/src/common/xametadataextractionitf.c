@@ -150,7 +150,8 @@ XAresult XAMetadataExtractionItfImpl_GetKeySize(XAMetadataExtractionItf self,
     impl = GetImpl(self);
     if (!impl || !pKeySize)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAMetadataExtractionItfImpl_GetKeySize");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAMetadataExtractionItfImpl_GetKeySize");
         return XA_RESULT_PARAMETER_INVALID;
         }
     *pKeySize = 0;
@@ -173,7 +174,8 @@ XAresult XAMetadataExtractionItfImpl_GetKeySize(XAMetadataExtractionItf self,
         /* check index and return unfiltered index */
         if (CheckAndUnfilterIndex(impl, index, &newidx) != XA_RESULT_SUCCESS)
             {
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAMetadataExtractionItfImpl_GetKeySize");
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XAMetadataExtractionItfImpl_GetKeySize");
             return XA_RESULT_PARAMETER_INVALID;
             }
 
@@ -210,7 +212,8 @@ XAresult XAMetadataExtractionItfImpl_GetKey(XAMetadataExtractionItf self,
     impl = GetImpl(self);
     if (!impl || !pKey)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAMetadataExtractionItfImpl_GetKey");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAMetadataExtractionItfImpl_GetKey");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -235,7 +238,8 @@ XAresult XAMetadataExtractionItfImpl_GetKey(XAMetadataExtractionItf self,
         /* check index and return unfiltered index */
         if (CheckAndUnfilterIndex(impl, index, &newidx) != XA_RESULT_SUCCESS)
             {
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAMetadataExtractionItfImpl_GetKey");
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XAMetadataExtractionItfImpl_GetKey");
             return XA_RESULT_PARAMETER_INVALID;
             }
 
@@ -284,7 +288,8 @@ XAresult XAMetadataExtractionItfImpl_GetValueSize(
     impl = GetImpl(self);
     if (!impl || !pValueSize)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAMetadataExtractionItfImpl_GetValueSize");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAMetadataExtractionItfImpl_GetValueSize");
         return XA_RESULT_PARAMETER_INVALID;
         }
     *pValueSize = 0;
@@ -307,7 +312,8 @@ XAresult XAMetadataExtractionItfImpl_GetValueSize(
         /* check index and return unfiltered index */
         if (CheckAndUnfilterIndex(impl, index, &newidx) != XA_RESULT_SUCCESS)
             {
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAMetadataExtractionItfImpl_GetValueSize");
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XAMetadataExtractionItfImpl_GetValueSize");
             return XA_RESULT_PARAMETER_INVALID;
             }
 
@@ -344,7 +350,8 @@ XAresult XAMetadataExtractionItfImpl_GetValue(XAMetadataExtractionItf self,
     impl = GetImpl(self);
     if (!impl || !pValue)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAMetadataExtractionItfImpl_GetValue");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAMetadataExtractionItfImpl_GetValue");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -368,7 +375,8 @@ XAresult XAMetadataExtractionItfImpl_GetValue(XAMetadataExtractionItf self,
         /* check index and return unfiltered index */
         if (CheckAndUnfilterIndex(impl, index, &newidx) != XA_RESULT_SUCCESS)
             {
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAMetadataExtractionItfImpl_GetValue");
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-XAMetadataExtractionItfImpl_GetValue");
             return XA_RESULT_PARAMETER_INVALID;
             }
 
@@ -433,7 +441,8 @@ XAresult XAMetadataExtractionItfImpl_AddKeyFilter(
 
     if (!impl)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAMetadataExtractionItfImpl_AddKeyFilter");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAMetadataExtractionItfImpl_AddKeyFilter");
         return XA_RESULT_PARAMETER_INVALID;
         }
     else
@@ -495,7 +504,8 @@ XAresult XAMetadataExtractionItfImpl_AddKeyFilter(
                 matchMask = 0;
                 }
             }
-        }DEBUG_API_A1("<-XAMetadataExtractionItfImpl_AddKeyFilter (%d)", (int)res);
+        }
+    DEBUG_API_A1("<-XAMetadataExtractionItfImpl_AddKeyFilter (%d)", (int)res);
     return res;
     }
 
@@ -627,7 +637,8 @@ void XAMetadataExtractionItfImp_AdaptCb(void *pHandlerCtx,
     impl = (XAMetadataExtractionItfImpl*) pHandlerCtx;
     if (!impl)
         {
-        DEBUG_ERR("XAMetadataExtractionItfImp_AdaptCb, invalid context pointer!");DEBUG_API("<-XAMetadataExtractionItfImp_AdaptCb");
+        DEBUG_ERR("XAMetadataExtractionItfImp_AdaptCb, invalid context pointer!");
+        DEBUG_API("<-XAMetadataExtractionItfImp_AdaptCb");
         return;
         }
     if (event && event->eventid == XA_ADAPT_MDE_TAGS_AVAILABLE)
@@ -646,7 +657,8 @@ void XAMetadataExtractionItfImp_AdaptCb(void *pHandlerCtx,
     else
         {
         DEBUG_INFO("unhandled");
-        }DEBUG_API("<-XAMetadataExtractionItfImp_AdaptCb");
+        }
+    DEBUG_API("<-XAMetadataExtractionItfImp_AdaptCb");
     }
 
 /* For given index over filtered array, return index over whole array
@@ -661,7 +673,8 @@ XAresult CheckAndUnfilterIndex(XAMetadataExtractionItfImpl *impl,
         XAint16 i = -1;
         if (oldidx >= impl->filteredcount)
             {
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-CheckAndUnfilterIndex");
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-CheckAndUnfilterIndex");
             return XA_RESULT_PARAMETER_INVALID;
             }
         *newidx = 0;
@@ -678,7 +691,8 @@ XAresult CheckAndUnfilterIndex(XAMetadataExtractionItfImpl *impl,
             {
             /* should not end up here */
             *newidx = 0;
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-CheckAndUnfilterIndex");
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-CheckAndUnfilterIndex");
             return XA_RESULT_PARAMETER_INVALID;
             }
         }
@@ -686,7 +700,8 @@ XAresult CheckAndUnfilterIndex(XAMetadataExtractionItfImpl *impl,
         {
         if (oldidx >= impl->currentTags.itemcount)
             {
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-CheckAndUnfilterIndex");
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            DEBUG_API("<-CheckAndUnfilterIndex");
             return XA_RESULT_PARAMETER_INVALID;
             }
         *newidx = oldidx;

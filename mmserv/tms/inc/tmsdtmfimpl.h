@@ -32,14 +32,11 @@ public:
     IMPORT_C static gint Delete(TMSDTMF*& dtmf);
 
 private:
-    TMSDTMFImpl(TMSStreamType streamtype);
-    gint PostConstruct();
-    gint SetParent(TMSDTMF*& parent);
-
-private:
-    TMSStreamType iStreamType;
+    TMSDTMFImpl();
+    gint PostConstruct(TMSStreamType streamtype);
     };
 
 } //namespace TMS
 
 #endif //TMS_DTMF_IMPL_H
+

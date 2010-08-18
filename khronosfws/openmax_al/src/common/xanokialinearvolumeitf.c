@@ -126,7 +126,8 @@ XAresult XANokiaLinearVolumeItfImpl_GetVolumeLevel(
 
     if (!impl || !percentage)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaLinearVolumeItfImpl_GetVolumeLevel");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaLinearVolumeItfImpl_GetVolumeLevel");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -163,7 +164,8 @@ XAresult XANokiaLinearVolumeItfImpl_GetStepCount(XANokiaLinearVolumeItf self,
 
     if (!impl || !pStepCount)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XANokiaLinearVolumeItfImpl_GetMaxVolumeLevel");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XANokiaLinearVolumeItfImpl_GetMaxVolumeLevel");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -294,7 +296,8 @@ void XANokiaLinearVolumeItfImpl_AdaptCb(void *pHandlerCtx,
 
     if (!impl && !event)
         {
-        DEBUG_ERR("XANokiaLinearVolumeItfImpl_AdaptCb, invalid context pointer!");DEBUG_API("<-XANokiaLinearVolumeItfImpl_AdaptCb");
+        DEBUG_ERR("XANokiaLinearVolumeItfImpl_AdaptCb, invalid context pointer!");
+        DEBUG_API("<-XANokiaLinearVolumeItfImpl_AdaptCb");
         return;
         }
     
@@ -312,5 +315,6 @@ void XANokiaLinearVolumeItfImpl_AdaptCb(void *pHandlerCtx,
     else
         {
         /* do nothing */
-        }DEBUG_API("<-XANokiaLinearVolumeItfimpl_AdaptCb");
+        }
+    DEBUG_API("<-XANokiaLinearVolumeItfimpl_AdaptCb");
     }

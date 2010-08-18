@@ -38,7 +38,8 @@ XAresult XAStreamInformationItfAdaptMMF_QueryMediaContainerInformation(
     /* Both Media Player and Metadata Extractor objec uses the same ctxId */
     if (!adaptCtx || (adaptCtx->ctxId != XAMediaPlayerAdaptation))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryMediaContainerInformation");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryMediaContainerInformation");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -100,14 +101,16 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamType(
             &numStreams);
     if (ret != XA_RESULT_SUCCESS)
         {
-        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamType");
+        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamType");
         return ret;
         }
 
     /* validate stream index */
     if (streamIndex > numStreams)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamType");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamType");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -291,7 +294,8 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamName(
     if (!adaptCtx || !pNameSize || (adaptCtx->ctxId
             != XAMediaPlayerAdaptation))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -301,14 +305,16 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamName(
             &numStreams);
     if (ret != XA_RESULT_SUCCESS)
         {
-        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
+        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
         return ret;
         }
 
     /* validate stream index */
     if (streamIndex > numStreams)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -344,13 +350,15 @@ XAresult XAStreamInformationItfAdaptMMF_QueryActiveStreams(
     if (!adaptCtx  || !numStreams || (adaptCtx->ctxId
             != XAMediaPlayerAdaptation))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
     if (adaptCtx->ctxId == XAMDAdaptation)
         {
-        DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+        DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
         return XA_RESULT_PRECONDITIONS_VIOLATED;
         }
 
@@ -360,7 +368,8 @@ XAresult XAStreamInformationItfAdaptMMF_QueryActiveStreams(
             &inputNumStreams);
     if (ret != XA_RESULT_SUCCESS)
         {
-        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
         return ret;
         }
 
@@ -369,7 +378,8 @@ XAresult XAStreamInformationItfAdaptMMF_QueryActiveStreams(
         XAuint32 loopIndex;
         if (*numStreams < inputNumStreams)
             {
-            DEBUG_INFO("numStreams param value is smaller than number of streams");DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+            DEBUG_INFO("numStreams param value is smaller than number of streams");
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
             return XA_RESULT_PARAMETER_INVALID;
             }
         for (loopIndex = 0; loopIndex < inputNumStreams; loopIndex++)
@@ -400,13 +410,15 @@ XAresult XAStreamInformationItfAdaptMMF_SetActiveStream(
     /* Both Media Player and Metadata Extractor objec uses the same ctxId */
     if (!adaptCtx || (adaptCtx->ctxId != XAMediaPlayerAdaptation))
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_SetActiveStream");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_SetActiveStream");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
     if (adaptCtx->ctxId == XAMDAdaptation)
         {
-        DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");DEBUG_API("-<XAStreamInformationItfAdaptMMF_SetActiveStream");
+        DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_SetActiveStream");
         return XA_RESULT_PRECONDITIONS_VIOLATED;
         }
 
@@ -416,14 +428,16 @@ XAresult XAStreamInformationItfAdaptMMF_SetActiveStream(
             &numStreams);
     if (ret != XA_RESULT_SUCCESS)
         {
-        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
         return ret;
         }
 
     /* validate stream index */
     if (streamNum > numStreams)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_SetActiveStream");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("-<XAStreamInformationItfAdaptMMF_SetActiveStream");
         return XA_RESULT_PARAMETER_INVALID;
         }
 

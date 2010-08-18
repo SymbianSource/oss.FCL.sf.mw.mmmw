@@ -53,8 +53,9 @@ TMSCallAdpt::~TMSCallAdpt()
 gint TMSCallAdpt::CreateCallL(gint callType, TMSCallAdpt*& callAdpt)
     {
     TRACE_PRN_FN_ENT;
-    TMSCallAdpt* self(NULL);
     gint retVal(TMS_RESULT_SUCCESS);
+    TMSCallAdpt* self(NULL);
+
     switch (callType)
         {
         case TMS_CALL_IP:
@@ -63,6 +64,7 @@ gint TMSCallAdpt::CreateCallL(gint callType, TMSCallAdpt*& callAdpt)
             if (self)
                 {
                 retVal = self->PostConstruct();
+                self->iCallType = callType;
                 if (retVal != TMS_RESULT_SUCCESS)
                     {
                     delete self;
@@ -77,6 +79,7 @@ gint TMSCallAdpt::CreateCallL(gint callType, TMSCallAdpt*& callAdpt)
             if (self)
                 {
                 retVal = self->PostConstruct();
+                self->iCallType = callType;
                 if (retVal != TMS_RESULT_SUCCESS)
                     {
                     delete self;
@@ -93,4 +96,23 @@ gint TMSCallAdpt::CreateCallL(gint callType, TMSCallAdpt*& callAdpt)
     return retVal;
     }
 
-// End of file
+// -----------------------------------------------------------------------------
+// TMSCallAdpt::GetCallType
+//
+// -----------------------------------------------------------------------------
+//
+void TMSCallAdpt::GetCallType(TMSCallType& callType)
+    {
+    callType = iCallType;
+    }
+
+// -----------------------------------------------------------------------------
+// TMSCallAdpt::IsUplActivated
+//
+// -----------------------------------------------------------------------------
+//
+gboolean TMSCallAdpt::IsUplActivated()
+    {
+    return (iUplState == EActivated)? TRUE : FALSE;
+    }
+

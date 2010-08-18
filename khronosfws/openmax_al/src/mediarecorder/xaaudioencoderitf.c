@@ -258,7 +258,8 @@ XAresult XAAudioEncoderItfImpl_GetEncoderSettings(XAAudioEncoderItf self,
         {
         ret = XAAudioEncoderItfAdapt_GetEncoderSettings(impl->adapCtx,
                 pSettings);
-        }DEBUG_API("<-XAAudioEncoderItfImpl_GetEncoderSettings");
+        }
+    DEBUG_API("<-XAAudioEncoderItfImpl_GetEncoderSettings");
     return ret;
     }
 
@@ -292,7 +293,8 @@ XAAudioEncoderItfImpl* XAAudioEncoderItfImpl_Create(XAMediaRecorderImpl* impl)
         self->adapCtx = impl->adaptationCtx;
 
         self->self = self;
-        }DEBUG_API("<-XAAudioEncoderItfImpl_Create");
+        }
+    DEBUG_API("<-XAAudioEncoderItfImpl_Create");
     return self;
     }
 

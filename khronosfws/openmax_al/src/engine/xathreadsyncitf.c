@@ -53,7 +53,8 @@ XAresult XAThreadSyncItfImpl_EnterCriticalSection(XAThreadSyncItf self)
             {
             impl->engInCritical = XA_BOOLEAN_TRUE;
             }
-        }DEBUG_API("<-XAThreadSyncItfImpl_EnterCriticalSection");
+        }
+    DEBUG_API("<-XAThreadSyncItfImpl_EnterCriticalSection");
     return ret;
     }
 
@@ -85,7 +86,8 @@ XAresult XAThreadSyncItfImpl_ExitCriticalSection(XAThreadSyncItf self)
         /* The engine must be in critical section state */
         DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");
         ret = XA_RESULT_PRECONDITIONS_VIOLATED;
-        }DEBUG_API("<-XAThreadSyncItfImpl_ExitCriticalSection");
+        }
+    DEBUG_API("<-XAThreadSyncItfImpl_ExitCriticalSection");
     return ret;
     }
 

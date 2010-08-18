@@ -223,6 +223,8 @@ public:
      * @param[in] aAlarmContext The context to the specific alarm that is to be stopped.
      */
     IMPORT_C void StopAlarm(unsigned int aAlarmContext);
+    
+    IMPORT_C void PlayAlarm(TToneType aTone, unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 
 protected:
     // Protected constructors and destructors

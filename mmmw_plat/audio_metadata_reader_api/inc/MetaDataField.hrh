@@ -44,7 +44,9 @@ enum TMetaDataFieldId		// Possible metadata fields
     EMetaDataDuration,
     EMetaDataDate,
     EMetaDataUnsyncLyrics,
-    EMetaDataProtected        // get the Protected info, "0"=non protected, "1"=protected
+    EMetaDataProtected,   // get the Protected info, "0"=non protected, "1"=protected
+    EMetaDataSampleRate,  // Hz
+    EMetaDataBitRate      // Bps		
 	
     // More later...
     };

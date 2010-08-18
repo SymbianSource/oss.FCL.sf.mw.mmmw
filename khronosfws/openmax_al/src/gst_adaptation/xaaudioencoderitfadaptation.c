@@ -52,7 +52,8 @@ XAresult XAAudioEncoderItfAdapt_SetEncoderSettings(XAAdaptationBaseCtx *ctx,
         mCtx->encodingchanged = XA_BOOLEAN_TRUE;
         memcpy(&mCtx->audioEncSettings, pSettings,
                 sizeof(XAAudioEncoderSettings));
-        }DEBUG_API("<-XAAudioEncoderItfAdapt_SetEncoderSettings");
+        }
+    DEBUG_API("<-XAAudioEncoderItfAdapt_SetEncoderSettings");
     return ret;
     }
 

@@ -80,7 +80,8 @@ XAresult XAObjectItfImpl_Realize(XAObjectItf self, XAboolean async)
             {
             retval = pObjImp->DoRealizeImpl(self);
             }
-        }DEBUG_API("<-XAObjectItfImpl_Realize");
+        }
+    DEBUG_API("<-XAObjectItfImpl_Realize");
     return retval;
     }
 
@@ -132,7 +133,8 @@ XAresult XAObjectItfImpl_Resume(XAObjectItf self, XAboolean async)
             {
             retval = pObjImp->DoResumeImpl(self);
             }
-        }DEBUG_API("<-XAObjectItfImpl_Resume");
+        }
+    DEBUG_API("<-XAObjectItfImpl_Resume");
     return retval;
     }
 

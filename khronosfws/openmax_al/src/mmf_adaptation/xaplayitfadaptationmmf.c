@@ -23,8 +23,6 @@
 #include "cmmfradiobackendengine.h"
 #include <glib.h>
 
-extern XAboolean cameraRealized;
-
 /*forward declaration of position updater callback*/
 gboolean XAPlayItfAdapt_PositionUpdate(gpointer ctx);
 

@@ -94,7 +94,8 @@ void XAMetadataAdaptCtxMMF_Destroy(XAAdaptationMMFCtx* bCtx)
     DEBUG_API("->XAMetadataAdaptCtxMMF_Destroy");
     if (bCtx == NULL)
         {
-        DEBUG_ERR("Invalid parameter!!");DEBUG_API("<-XAMetadataAdaptCtxMMF_Destroy");
+        DEBUG_ERR("Invalid parameter!!");
+        DEBUG_API("<-XAMetadataAdaptCtxMMF_Destroy");
         return;
         }
 

@@ -263,7 +263,7 @@ void TMSAudioInbandTonePlayer::PlayCurrentTone()
                 default:
                     break;
                 }
-#ifndef __WINS__
+#ifndef __WINSCW__
             //Play the tone
             iPlayer->Play();
 #endif
@@ -282,22 +282,6 @@ void TMSAudioInbandTonePlayer::SetToneAttributes(const guint pref,
     {
     iPlayer->SetRepeats(repeatTimes, TTimeIntervalMicroSeconds(trailSilence));
     iPlayer->SetPriority(priority, static_cast<TMdaPriorityPreference> (pref));
-    }
-
-// -----------------------------------------------------------------------------
-// TMSAudioInbandTonePlayer::MatoPrepareComplete
-// Updates flag values and plays current inbandtone.
-// (other items were commented in a header).
-// -----------------------------------------------------------------------------
-//
-void TMSAudioInbandTonePlayer::MatoPrepareComplete(TInt aError)
-    {
-    TRACE_PRN_FN_ENT;
-    if (aError == KErrNone)
-        {
-        PlayCurrentTone();
-        }
-    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -322,15 +306,40 @@ void TMSAudioInbandTonePlayer::SetVolume(gint volume)
     }
 
 // -----------------------------------------------------------------------------
+// TMSAudioInbandTonePlayer::MatoPrepareComplete
+// Updates flag values and plays current inbandtone.
+// (other items were commented in a header).
+// -----------------------------------------------------------------------------
+//
+void TMSAudioInbandTonePlayer::MatoPrepareComplete(TInt aError)
+    {
+    TRACE_PRN_FN_ENT;
+    if (aError == KErrNone)
+        {
+        PlayCurrentTone();
+        }
+    TRACE_PRN_IF_ERR(aError);
+    TRACE_PRN_FN_EXT;
+    }
+
+// -----------------------------------------------------------------------------
 // TMSAudioInbandTonePlayer::MatoPlayComplete
 // -
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void TMSAudioInbandTonePlayer::MatoPlayComplete(TInt /*aError*/)
+void TMSAudioInbandTonePlayer::MatoPlayComplete(
+#ifdef _DEBUG
+        TInt aError)
+#else
+        TInt /*aError*/)
+#endif
     {
     TRACE_PRN_FN_ENT;
     // TODO: process error?
+#ifdef _DEBUG
+    TRACE_PRN_IF_ERR(aError);
+#endif
     TRACE_PRN_FN_EXT;
     }
 
@@ -360,4 +369,3 @@ void TMSAudioInbandTonePlayer::UpdateTonePlayerVolume()
     TRACE_PRN_FN_EXT;
     }
 
-// End of File

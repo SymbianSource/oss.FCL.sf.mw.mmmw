@@ -16,16 +16,14 @@
 *               to DEF files.
 *
 */
-#ifndef _OPENMAXAL_WRAPPER_H_
-#define _OPENMAXAL_WRAPPER_H_
+#ifndef OPENMAXAL_WRAPPER_H_
+#define OPENMAXAL_WRAPPER_H_
 
-#include <OpenMAXAL_Platform.h>
-#undef XA_API
-
-#define XA_API __declspec(dllexport)
- 
+#include <e32def.h>
 #include <OpenMAXAL.h>
 #include <xanokiavolumeextitf.h>
 #include <xanokialinearvolumeitf.h>
+#include <xaradioitfext.h>
 
-#endif
+#endif //ends OPENMAXAL_WRAPPER_H_
+

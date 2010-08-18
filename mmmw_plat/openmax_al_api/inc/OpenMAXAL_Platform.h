@@ -48,8 +48,8 @@ typedef unsigned long long          xa_uint64_t;
 /** The XA_API is platform specific definition used
  *  to declare OMX function prototypes.  They are modified to meet the
  *  requirements for a particular platform */
-#ifdef __SYMBIAN32__   
-#   define XA_API __declspec(dllimport) 
+#ifndef XA_API
+    #define XA_API __declspec(dllimport)
 #endif
 
 #endif /* _OPENMAXAL_PLATFORM_H_ */

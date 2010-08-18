@@ -112,12 +112,7 @@ void TMSIPUplink::Start(const gint /*retrytime*/)
         {
         TRAP(err, iDevSound->RecordInitL());
         TRACE_PRN_IF_ERR(err);
-
-        if (err != TMS_RESULT_SUCCESS)
-            {
-            iStatus = EReady;
-            iObserver.UplinkStarted(err);
-            }
+        iObserver.UplinkStarted(err);
         }
     TRACE_PRN_FN_EXT;
     }

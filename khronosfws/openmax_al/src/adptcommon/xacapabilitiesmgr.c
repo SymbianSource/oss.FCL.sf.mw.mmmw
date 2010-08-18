@@ -99,7 +99,8 @@ XAresult XACapabilitiesMgr_UpdateAudioIOCapabilitieList(
     if (!(*ppListHead))
         {
         *ppListHead = firstNode;
-        }DEBUG_API("<-XACapabilitiesMgr_UpdateAudioIOCapabilitieList");
+        }
+    DEBUG_API("<-XACapabilitiesMgr_UpdateAudioIOCapabilitieList");
     return res;
     }
 

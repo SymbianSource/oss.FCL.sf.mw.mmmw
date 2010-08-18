@@ -25,16 +25,12 @@
 #ifdef _DEBUG
 /*parse media object names for debug prints*/
 
-static const char* mediaobjectnames[9] =
+static const char* mediaobjectnames[5] =
     {
             "XATSMediaPlayer",
             "XATSMediaRecorder",
             "XATSEngine",
             "XATSRadio",
-            "XATSCamera",
-            "XATSOutputMix",
-            "XATSVibra",
-            "XATSLEDArray",
             "XATSMetaDataExtractor"
     };
 #define MEDIAOBJECTNAME(i) ((i<XATSCount)?mediaobjectnames[i]:"INVALID")
@@ -144,10 +140,6 @@ typedef enum
     XATSMediaRecorder,
     XATSEngine,
     XATSRadio,
-    XATSCamera,
-    XATSOutputMix,
-    XATSVibra,
-    XATSLEDArray,
     XATSMetaDataExtractor,
     XATSCount
     } XAThreadSafetyMediaObjects;

@@ -161,7 +161,8 @@ XAresult XAAdaptationBase_ThreadEntry(XAAdaptationBaseCtx *adaptCtx)
     DEBUG_API("->XAAdaptationBase_ThreadEntry");
     if (!adaptCtx)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAAdaptationBase_ThreadEntry");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAAdaptationBase_ThreadEntry");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -169,44 +170,22 @@ XAresult XAAdaptationBase_ThreadEntry(XAAdaptationBaseCtx *adaptCtx)
     switch (adaptCtx->ctxId)
         {
         case XAMediaPlayerAdaptation:
-            XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaPlayer)
-            ;
+            XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaPlayer);
             break;
         case XAMediaRecorderAdaptation:
-            XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaRecorder)
-            ;
+            XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaRecorder);
             break;
         case XARadioAdaptation:
-            XA_IMPL_THREAD_SAFETY_ENTRY(XATSRadio)
-            ;
-            break;
-        case XACameraAdaptation:
-            XA_IMPL_THREAD_SAFETY_ENTRY(XATSCamera)
-            ;
-            break;
-        case XAOutputMixAdaptation:
-            XA_IMPL_THREAD_SAFETY_ENTRY(XATSOutputMix)
-            ;
-            break;
-        case XAVibraAdaptation:
-            XA_IMPL_THREAD_SAFETY_ENTRY(XATSVibra)
-            ;
-            break;
-        case XALedArrayAdaptation:
-            XA_IMPL_THREAD_SAFETY_ENTRY(XATSLEDArray)
-            ;
+            XA_IMPL_THREAD_SAFETY_ENTRY(XATSRadio);
             break;
         case XAMDAdaptation:
-            XA_IMPL_THREAD_SAFETY_ENTRY(XATSMetaDataExtractor)
-            ;
+            XA_IMPL_THREAD_SAFETY_ENTRY(XATSMetaDataExtractor);
             break;
         case XAEngineAdaptation:
-            XA_IMPL_THREAD_SAFETY_ENTRY(XATSEngine)
-            ;
+            XA_IMPL_THREAD_SAFETY_ENTRY(XATSEngine);
             break;
         default:
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID")
-            ;
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
             /* invalid parameter */
             res = XA_RESULT_PARAMETER_INVALID;
             break;
@@ -225,7 +204,8 @@ XAresult XAAdaptationBase_ThreadExit(XAAdaptationBaseCtx *adaptCtx)
     DEBUG_API("->XAAdaptationBase_ThreadExit");
     if (!adaptCtx)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAAdaptationBase_ThreadExit");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAAdaptationBase_ThreadExit");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -233,44 +213,22 @@ XAresult XAAdaptationBase_ThreadExit(XAAdaptationBaseCtx *adaptCtx)
     switch (adaptCtx->ctxId)
         {
         case XAMediaPlayerAdaptation:
-            XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer)
-            ;
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
             break;
         case XAMediaRecorderAdaptation:
-            XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder)
-            ;
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
             break;
         case XARadioAdaptation:
-            XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio)
-            ;
-            break;
-        case XACameraAdaptation:
-            XA_IMPL_THREAD_SAFETY_EXIT(XATSCamera)
-            ;
-            break;
-        case XAOutputMixAdaptation:
-            XA_IMPL_THREAD_SAFETY_EXIT(XATSOutputMix)
-            ;
-            break;
-        case XAVibraAdaptation:
-            XA_IMPL_THREAD_SAFETY_EXIT(XATSVibra)
-            ;
-            break;
-        case XALedArrayAdaptation:
-            XA_IMPL_THREAD_SAFETY_EXIT(XATSLEDArray)
-            ;
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
             break;
         case XAMDAdaptation:
-            XA_IMPL_THREAD_SAFETY_EXIT(XATSMetaDataExtractor)
-            ;
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSMetaDataExtractor);
             break;
         case XAEngineAdaptation:
-            XA_IMPL_THREAD_SAFETY_EXIT(XATSEngine)
-            ;
+            XA_IMPL_THREAD_SAFETY_EXIT(XATSEngine);
             break;
         default:
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID")
-            ;
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
             /* invalid parameter */
             res = XA_RESULT_PARAMETER_INVALID;
             break;

@@ -201,7 +201,7 @@ private:
     /**
      * Initializes ring tone configuration parameters.
      */
-    void InitRtParamsL(TRtPlayerType aPlayerType);
+    void InitRtParams(TRtPlayerType aPlayerType);
 
     /*
      * from TMSRtAudioHdlrObsrv

@@ -136,6 +136,8 @@ NONSHARABLE_CLASS(CSystemToneServiceStif) : public CScriptBase, MStsPlayAlarmObs
         virtual TInt  PlayAlarm( CStifItemParser& aItem );
         
         virtual TInt  StopAlarm( CStifItemParser& aItem );
+        
+        virtual TInt  PlayToneWithStop( CStifItemParser& aItem);
 
 
 
@@ -143,6 +145,7 @@ NONSHARABLE_CLASS(CSystemToneServiceStif) : public CScriptBase, MStsPlayAlarmObs
     	 // inherited from MPlayAlarmObserver
        virtual void PlayAlarmComplete(unsigned int aAlarmContext);
        virtual void HandleEvent();
+    	
     	
     	
     	  

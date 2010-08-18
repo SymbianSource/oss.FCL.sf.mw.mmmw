@@ -118,4 +118,3 @@ private:
 
 #endif // TMS_STREAM_BODY_IMPL_H
 
-// End of file

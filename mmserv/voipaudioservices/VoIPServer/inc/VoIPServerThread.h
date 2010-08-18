@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef __VOIPAUDIOSERVERTHREAD_H
-#define __VOIPAUDIOSERVERTHREAD_H
+#ifndef VOIPAUDIOSERVERTHREAD_H
+#define VOIPAUDIOSERVERTHREAD_H
 
 #include <e32msgqueue.h>
 #include <sounddevice.h>
@@ -281,6 +281,6 @@ private:
 
     };
 
-#endif  // __VOIPAUDIOSERVERTHREAD_H
+#endif  // VOIPAUDIOSERVERTHREAD_H
 
 // End of file

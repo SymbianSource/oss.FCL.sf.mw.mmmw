@@ -25,8 +25,6 @@
 #include "tmsshared.h"
 #include "tmscalladpt.h"
 #include "tmsipcallstream.h"
-#include "tmsdtmftoneplayer.h"
-#include "tmsdtmfnotifier.h"
 
 namespace TMS {
 
@@ -38,8 +36,7 @@ class TMSIPUplink;
  * TMSCallIPAdpt class
  */
 class TMSCallIPAdpt : public TMSCallAdpt,
-                      public TMSIPDevSoundObserver,
-                      public TMSDTMFTonePlayerObserver
+                      public TMSIPDevSoundObserver
     {
 public:
     static TMSCallIPAdpt* NewL();
@@ -109,11 +106,6 @@ public:
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
     virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuf);
 
-	// From TMSDTMF
-    virtual gint StartDTMF(const TMSStreamType streamtype, TDes& dtmfstr);
-    virtual gint StopDTMF(const TMSStreamType streamtype);
-    virtual gint ContinueDTMF(const gboolean sending);
-
     // From TMS codec formats
     gint SetIlbcCodecMode(const gint mode, const TMSStreamType strmtype);
     gint GetIlbcCodecMode(gint& mode, const TMSStreamType strmtype);
@@ -138,10 +130,6 @@ public:
     void DownlinkStarted(gint status);
     void UplinkStarted(gint status);
 
-    //From TMSDTMFTonePlayerObserver
-    void DTMFInitCompleted(gint status);
-    void DTMFToneFinished(gint status);
-
 private:
     TMSCallIPAdpt();
     void ConstructL();
@@ -149,7 +137,6 @@ private:
     gint OpenDownlink(const RMessage2& message, const gint retrytime);
     gint OpenUplink(const RMessage2& message, const gint retrytime);
 
-    gint InitDTMF(TMSStreamType strmtype);
     void GetSupportedBitRatesL(CBufFlat*& brbuffer);
     void NotifyClient(const gint strmId, const gint command,
             const gint status = KErrNone, const gint64 int64 = TInt64(0));
@@ -158,17 +145,13 @@ private:
     gint iNextStreamId;
     TMSIPUplink* iIPUplink;
     TMSIPDownlink* iIPDownlink;
-    TMSAudioDtmfTonePlayer* iDTMFDnlinkPlayer;
-    TMSDtmfNotifier* iDTMFNotifier;
-    TMSAudioDtmfTonePlayer* iDTMFUplinkPlayer;
+
     // Message queues for communication and data transfer back to the client
     RMsgQueue<TmsMsgBuf> iMsgQueueUp;
     RMsgQueue<TmsMsgBuf> iMsgQueueDn;
     TmsMsgBuf iMsgBuffer;
 
-    gboolean iUplinkInitialized;
     gint iUplinkStreamId;
-    gboolean iDnlinkInitialized;
     gint iDnlinkStreamId;
 
     TMMFPrioritySettings iPriority;

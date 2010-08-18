@@ -49,11 +49,13 @@ TMSStreamBodyImpl::TMSStreamBodyImpl() :
     iFormat(NULL),
     iStreamState(TMS_STREAM_UNINITIALIZED)
     {
-    //TMSStream::Construct(this);
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_FN_EXT;
     }
 
 TMSStreamBodyImpl::~TMSStreamBodyImpl()
     {
+    TRACE_PRN_FN_ENT;
     if (iMsgQHandler)
         {
         iMsgQHandler->Cancel();
@@ -71,6 +73,7 @@ TMSStreamBodyImpl::~TMSStreamBodyImpl()
         iContext.CallProxy->DeleteStream(iContext.CallType,
                 iContext.StreamType, iContext.StreamId);
         }
+    TRACE_PRN_FN_EXT;
     }
 
 gint TMSStreamBodyImpl::Create(TMSCallType callType, TMSStreamType stype,
@@ -719,7 +722,7 @@ void TMSStreamBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         void* user_data)
     {
     TMSSignalEvent event = {}; //all elements initialized to zeros
-    event.reason = aError;
+    event.reason = TMSRESULT(aError);
     event.user_data = user_data;
     iStreamState = aEventType;
 

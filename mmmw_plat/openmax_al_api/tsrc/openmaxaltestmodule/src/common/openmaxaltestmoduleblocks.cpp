@@ -248,11 +248,13 @@ TInt COpenMAXALTestModule::RunMethodL(
         /*RadioItf begins*/
         ENTRY( "al_radioitf_SetFreqRange", COpenMAXALTestModule::al_radioitf_SetFreqRange ),    
         ENTRY( "al_radioitf_GetFreqRange", COpenMAXALTestModule::al_radioitf_GetFreqRange ),    
+        ENTRY( "al_radioitf_GetFreqRangeDefault", COpenMAXALTestModule::al_radioitf_GetFreqRangeDefault ),            	 
         ENTRY( "al_radioitf_IsFreqRangeSupported", COpenMAXALTestModule::al_radioitf_IsFreqRangeSupported ),    
         ENTRY( "al_radioitf_GetFreqRangeProperties", COpenMAXALTestModule::al_radioitf_GetFreqRangeProperties ),    
         ENTRY( "al_radioitf_SetFrequency", COpenMAXALTestModule::al_radioitf_SetFrequency ),            	        	        	        	
         ENTRY( "al_radioitf_CancelSetFrequency", COpenMAXALTestModule::al_radioitf_CancelSetFrequency ),    
         ENTRY( "al_radioitf_GetFrequency", COpenMAXALTestModule::al_radioitf_GetFrequency ),    
+        ENTRY( "al_radioitf_GetFrequencyDefault", COpenMAXALTestModule::al_radioitf_GetFrequencyDefault ),            	
         ENTRY( "al_radioitf_SetSquelch", COpenMAXALTestModule::al_radioitf_SetSquelch ),    
         ENTRY( "al_radioitf_GetSquelch", COpenMAXALTestModule::al_radioitf_GetSquelch ),    
         ENTRY( "al_radioitf_SetStereoMode", COpenMAXALTestModule::al_radioitf_SetStereoMode ),    

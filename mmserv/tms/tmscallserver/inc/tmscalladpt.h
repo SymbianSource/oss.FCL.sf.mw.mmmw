@@ -26,6 +26,14 @@ namespace TMS {
 // TMSCallAdpt class
 class TMSCallAdpt
     {
+protected:
+    enum TMSStreamState
+        {
+        EIdle = 0,
+        EInitialized,
+        EActivated
+        };
+
 public:
     static gint CreateCallL(gint callType, TMSCallAdpt*& callAdpt);
     virtual ~TMSCallAdpt();
@@ -93,10 +101,8 @@ public:
     virtual gint GetPreviousOutput(TMSAudioOutput& output) = 0;
     virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuf) = 0;
 
-    // From TMSDTMF
-    virtual gint StartDTMF(const TMSStreamType streamtype, TDes& dtmfstr) = 0;
-    virtual gint StopDTMF(const TMSStreamType streamtype) = 0;
-    virtual gint ContinueDTMF(const gboolean sending) = 0;
+    void GetCallType(TMSCallType& callType);
+    gboolean IsUplActivated();
 
 protected:
     TMSCallAdpt();
@@ -105,10 +111,12 @@ protected:
 protected:
     gint iGlobalVol;
     gint iGlobalGain;
+    TMSStreamState iUplState;
+    TMSStreamState iDnlState;
+    gint iCallType;
     };
 
 } //namespace TMS
 
 #endif // CALLADPT_H
 
-// End of file

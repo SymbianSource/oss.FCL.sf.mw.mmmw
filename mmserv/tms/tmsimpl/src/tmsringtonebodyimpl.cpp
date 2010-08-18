@@ -81,18 +81,18 @@ gint TMSRingToneBodyImpl::PostConstruct()
     gint ret(TMS_RESULT_SUCCESS);
     iClientId = 1;
     iProxy = new TMSProxy();
-
     if (!iProxy)
         {
         ret = TMS_RESULT_INSUFFICIENT_MEMORY;
         }
-    RET_REASON_IF_ERR(ret);
-
-    if (iProxy->Connect() != TMS_RESULT_SUCCESS)
+    else
         {
-        delete iProxy;
-        iProxy = NULL;
-        ret = TMS_RESULT_FATAL_ERROR;
+        if (iProxy->Connect() != TMS_RESULT_SUCCESS)
+            {
+            delete iProxy;
+            iProxy = NULL;
+            ret = TMS_RESULT_FATAL_ERROR;
+            }
         }
     RET_REASON_IF_ERR(ret);
     return ret;
@@ -222,7 +222,6 @@ gint TMSRingToneBodyImpl::Mute()
         }
     return ret;
     }
-
 
 void TMSRingToneBodyImpl::SetParent(TMSRingTone*& parent)
     {

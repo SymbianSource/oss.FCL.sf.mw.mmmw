@@ -22,8 +22,6 @@
 #include "cmmfbackendengine.h"
 #include "xaadptbasectx.h"
 
-extern XAboolean cameraRealized;
-
 /*
  * XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create()
  * Allocates memory for Media Recorder Adaptation Context and makes 1st phase initialization
@@ -36,9 +34,7 @@ XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
         XADataSource* pImageVideoSrc, XADataSink* pDataSnk, XAuint8 recModes)
     {
     XAMediaRecorderAdaptationMMFCtx *pSelf = NULL;
-    XAuint32 locType = 0;
     XAresult res;
-    XADataLocator_IODevice *ioDevice;
     DEBUG_API("->XAMediaRecorderAdaptMMF_Create");
 
     pSelf = (XAMediaRecorderAdaptationMMFCtx*) calloc(1,
@@ -81,27 +77,6 @@ XAAdaptationBaseCtx* XAMediaRecorderAdaptMMF_Create(XADataSource* pAudioSrc,
             pSelf->audioEncSettings.bitRate = 128;
             pSelf->audioEncSettings.sampleRate = 44100;
             }
-
-        if (pImageVideoSrc)
-            {
-            locType = *((XAuint32*) (pImageVideoSrc->pLocator));
-            if (locType == XA_DATALOCATOR_IODEVICE)
-                {
-                ioDevice
-                        = (XADataLocator_IODevice*) (pImageVideoSrc->pLocator);
-                if (ioDevice->deviceType == XA_IODEVICE_CAMERA
-
-                && !cameraRealized
-
-                )
-                    {
-                    DEBUG_ERR("Preconditions violated - Camera object not realized");
-                    XAAdaptationBaseMMF_Free(&pSelf->baseObj);
-                    free(pSelf);
-                    pSelf = NULL;
-                    }
-                }
-            }
         }
     else
         {
@@ -138,7 +113,7 @@ XAresult XAMediaRecorderAdaptMMF_PostInit(XAAdaptationMMFCtx* bCtx)
     XADataFormat_MIME* tempFormat;
     XAMediaRecorderAdaptationMMFCtx *pSelf;
     DEBUG_API("->XAMediaRecorderAdapt_PostInit");
-    if(bCtx)
+    if(!bCtx)
         {
         ret = XA_RESULT_PARAMETER_INVALID;
         return ret;

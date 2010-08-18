@@ -41,7 +41,8 @@ XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationMMFCtx *bCtx,
     DEBUG_API_A1("->XARecordItfAdaptMMF_SetRecordState %s",RECORDSTATENAME(state));
     if (!bCtx)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XARecordItfAdaptMMF_SetRecordState");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XARecordItfAdaptMMF_SetRecordState");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -111,7 +112,8 @@ XAresult XARecordItfAdaptMMF_GetRecordState(XAAdaptationMMFCtx *bCtx,
 
     if (!bCtx)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XARecordItfAdaptMMF_GetRecordState");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XARecordItfAdaptMMF_GetRecordState");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -139,7 +141,8 @@ XAresult XARecordItfAdaptMMF_GetPosition(XAAdaptationMMFCtx *bCtx,
 
     if (!bCtx)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XARecordItfAdaptMMF_GetPosition");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XARecordItfAdaptMMF_GetPosition");
         /* invalid parameter */
         ret = XA_RESULT_PARAMETER_INVALID;
         return ret;
@@ -178,7 +181,8 @@ gboolean XARecordItfAdaptMMF_PositionUpdate(gpointer ctx, XAuint64 position)
             event.data = &posInMsec;
             DEBUG_API_A1("XARecordItfAdapt_PositionUpdate: pos %lu ms", posInMsec);
             XAAdaptationBase_SendAdaptEvents(&bCtx->baseObj, &event);
-            }DEBUG_API_A1("<-XARecordItfAdapt_PositionUpdate: %d", mCtx->runpositiontimer);
+            }
+            DEBUG_API_A1("<-XARecordItfAdapt_PositionUpdate: %d", mCtx->runpositiontimer);
         return (mCtx->runpositiontimer);
         }
     /* return false to stop timer */
@@ -198,7 +202,8 @@ XAresult XARecordItfAdaptMMF_EnablePositionTracking(XAAdaptationMMFCtx *bCtx,
 
     if (!bCtx || bCtx->baseObj.ctxId != XAMediaRecorderAdaptation)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XARecordItfAdapt_EnablePositionTracking");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XARecordItfAdapt_EnablePositionTracking");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
@@ -233,7 +238,8 @@ XAresult XARecordItfAdaptMMF_SetPositionUpdatePeriod(
 
     if (!bCtx || bCtx->baseObj.ctxId != XAMediaRecorderAdaptation)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XARecordItfAdapt_EnablePositionTracking");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XARecordItfAdapt_EnablePositionTracking");
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }

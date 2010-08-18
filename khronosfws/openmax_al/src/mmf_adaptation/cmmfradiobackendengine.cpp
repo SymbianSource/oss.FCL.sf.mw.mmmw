@@ -86,6 +86,12 @@ void CMMFRadioBackendEngine::ConstructL()
  		iRadioPlayerUtility = &iRadioUtility->RadioPlayerUtilityL( *this ); 
  	}   
  	 
+	SetForceMonoFlag();
+	iDefaultFrequency = RADIO_DEFAULT_FREQ;
+	iDefaultFreqRange = (TFmRadioFrequencyRange)RADIO_DEFAULT_FREQ_RANGE;  
+	iDefaultMinFreq = RADIO_DEFAULT_MIN_FREQ;
+	iDefaultMaxFreq = RADIO_DEFAULT_MAX_FREQ;
+	 	 
 }
 void CMMFRadioBackendEngine::StationSeek(XAboolean aUpwards)
 {
@@ -98,6 +104,7 @@ void CMMFRadioBackendEngine::StationSeek(XAboolean aUpwards)
 void CMMFRadioBackendEngine::SetFrequency(TInt aFreq)
 {
   DEBUG_API_A1("CMMFRadioBackendEngine::SetFrequency: %d", aFreq);	
+  
 	if (iFmTunerUtility)
  	{
   	iFmTunerUtility->SetFrequency(aFreq);
@@ -111,6 +118,11 @@ TInt CMMFRadioBackendEngine::GetFrequency(TInt& aFreq)
 	if (iFmTunerUtility)
 	{
   	ret = iFmTunerUtility->GetFrequency(aFreq);
+  	if (ret != KErrNone)
+  	{
+  		aFreq = iDefaultFrequency;
+  		ret = KErrNone;
+  	}
  	}	
   DEBUG_API_A1("CMMFRadioBackendEngine::GetFrequency RET: %d", ret);	 
 //  RDebug::Print(_L("CMMFRadioBackendEngine::GetFrequency RET: %d"), ret);	 
@@ -156,12 +168,19 @@ void CMMFRadioBackendEngine::SetFreqRange(TFmRadioFrequencyRange aRange)
 TInt CMMFRadioBackendEngine::GetFreqRange(TFmRadioFrequencyRange& aRange)
 {
 	TInt ret = KErrNotFound;
-	TInt minFreq = 0;
-	TInt maxFreq = 0;
+	TInt minFreq;
+	TInt maxFreq;
 		
  	if (iFmTunerUtility)
  	{
  		ret = iFmTunerUtility->GetFrequencyRange((TFmRadioFrequencyRange&)aRange, (TInt&)minFreq, (TInt&)maxFreq);
+ 		if (ret != KErrNone)
+ 		{
+ 			minFreq = iDefaultMinFreq;
+ 			maxFreq = iDefaultMaxFreq;
+ 			aRange = iDefaultFreqRange;
+ 			ret = KErrNone;
+ 		}
  	}	
   DEBUG_API_A1("CMMFRadioBackendEngine::GetFreqRange RET: %d", ret);	 
 //  RDebug::Print(_L("CMMFRadioBackendEngine::GetFreqRange RET: %d"), ret);	   	
@@ -174,7 +193,14 @@ TInt CMMFRadioBackendEngine::GetFreqRangeProperties(TFmRadioFrequencyRange& aRan
 		
 	if (iFmTunerUtility)
  	{
-  	ret = iFmTunerUtility->GetFrequencyRange((TFmRadioFrequencyRange&)aRange, (TInt&)aMinFreq, (TInt&)aMaxFreq);
+  		ret = iFmTunerUtility->GetFrequencyRange((TFmRadioFrequencyRange&)aRange, (TInt&)aMinFreq, (TInt&)aMaxFreq);
+  		if (ret != KErrNone)
+  		{
+  			aRange = iDefaultFreqRange;
+  			aMinFreq = iDefaultMinFreq;
+  			aMaxFreq = iDefaultMaxFreq;
+  			ret = KErrNone;
+  		}
  	}	
   DEBUG_API_A1("CMMFRadioBackendEngine::GetFreqRangeProperties RET: %d", ret);	 	
 //  RDebug::Print(_L("CMMFRadioBackendEngine::GetFreqRangeProperties RET: %d"), ret);	   
@@ -232,9 +258,14 @@ TInt CMMFRadioBackendEngine::GetForcedMonoReception(XAuint32& aForcedMono)
 	if (iFmTunerUtility)
 	{
 		ret = iFmTunerUtility->GetForcedMonoReception(forceMono);
+		if (ret == KErrNotReady)
+		{
+			aForcedMono = XA_STEREOMODE_AUTO; // Radio Utility Default value
+			return KErrNone;
+		}
 	}		 
 		
-//  RDebug::Print(_L("CMMFRadioBackendEngine::GetForcedMonoReception RET: %d, aForcedMono = %d"), ret, aForcedMono);	 		
+	
 	if (forceMono)
 	{
 		aForcedMono = XA_STEREOMODE_MONO;
@@ -268,9 +299,9 @@ void CMMFRadioBackendEngine::StopRadio()
 TInt CMMFRadioBackendEngine::ForceMonoReception(XAuint32 aForcedMono)
 {
 	TInt ret = KErrNotFound;
-	TBool currentMode;
+	XAuint32 currentMode;
 	
-	ret = GetForcedMonoReception((XAuint32&)currentMode);
+	ret = GetForcedMonoReception(currentMode);
 	if (ret != XA_RESULT_SUCCESS)
 		return ret;
 		
@@ -311,6 +342,33 @@ TInt CMMFRadioBackendEngine::ForceMonoReception(XAuint32 aForcedMono)
   return ret;
 }
 
+XAresult CMMFRadioBackendEngine::SetForceMonoFlag() 
+{
+	TInt ret = KErrNotFound;
+	TBool forceMono;
+
+	if (iFmTunerUtility)
+	{
+		ret = iFmTunerUtility->GetForcedMonoReception(forceMono);
+		if (ret == KErrNotReady)
+		{
+			// For Radio Utility Default value = XA_STEREOMODE_STEREO
+			iForceStereo = ETrue;
+			return KErrNone;
+		}
+				
+	}		 
+		
+	if (forceMono == XA_STEREOMODE_MONO)
+	{
+		iForceStereo = EFalse;
+	}
+	else
+	{
+		iForceStereo = ETrue;			
+	}
+  return ret;
+}
 XAresult CMMFRadioBackendEngine::SetRadioAdaptContext(void * adaptcontext)
 {
 	iRadioAdaptContext = adaptcontext;
@@ -649,9 +707,9 @@ extern "C" {
 		return ((CMMFRadioBackendEngine*)(context))->GetFreqRange((TFmRadioFrequencyRange&)*range); 			
 	}
     
-	XAresult  get_freq_range_properties(void* context, XAuint8 range, XAuint32* aMinFreq, XAuint32* aMaxFreq)
+	XAresult  get_freq_range_properties(void* context, XAuint8 aRange, XAuint32* aMinFreq, XAuint32* aMaxFreq)
 	{
-		return ((CMMFRadioBackendEngine*)(context))->GetFreqRangeProperties((TFmRadioFrequencyRange&)range, (TInt&) *aMinFreq, (TInt&) *aMaxFreq); 		
+		return ((CMMFRadioBackendEngine*)(context))->GetFreqRangeProperties((TFmRadioFrequencyRange&) aRange, (TInt&) *aMinFreq, (TInt&) *aMaxFreq); 		
 	}   
     
 	XAresult  get_max_volume(void* context, XAmillibel* maxVol)

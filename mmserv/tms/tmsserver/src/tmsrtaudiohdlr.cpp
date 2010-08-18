@@ -392,9 +392,8 @@ void TMSRtAudioHdlr::StopPlaying()
 void TMSRtAudioHdlr::MapcInitComplete(TInt aError,
         const TTimeIntervalMicroSeconds& /*aDuration*/)
     {
-    TRACE_PRN_N2(
-            _L("TMS->TMSRtAudioHdlr::MapcInitComplete: player[%d], err[%d]"),
-            iRtType, aError);
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_N2(_L("RT player type[%d], err[%d]"), iRtType, aError);
 
     __ASSERT_DEBUG((iFormat == EFormatSample) ||
             ((iFormat == EFormatTts) && (iPlayerStatus == EToneLoading)),
@@ -414,6 +413,7 @@ void TMSRtAudioHdlr::MapcInitComplete(TInt aError,
             }
         }
     iObserver.RtAudioHdlrEvent(ECmdRingToneOpenComplete, aError, iRtType);
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -422,9 +422,8 @@ void TMSRtAudioHdlr::MapcInitComplete(TInt aError,
 //
 void TMSRtAudioHdlr::MapcPlayComplete(TInt aError)
     {
-    TRACE_PRN_N2(
-            _L("TMS->TMSRtAudioHdlr::MapcPlayComplete: player[%d], err[%d]"),
-            iRtType, aError);
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_N2(_L("RT player type[%d], err[%d]"), iRtType, aError);
 
     iPlayerStatus = EToneReady;
 
@@ -437,6 +436,7 @@ void TMSRtAudioHdlr::MapcPlayComplete(TInt aError)
         i3DPlugin = NULL;
         }*/
     iObserver.RtAudioHdlrEvent(ECmdRingTonePlayComplete, aError, iRtType);
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -445,9 +445,8 @@ void TMSRtAudioHdlr::MapcPlayComplete(TInt aError)
 //
 void TMSRtAudioHdlr::MatoPrepareComplete(TInt aError)
     {
-    TRACE_PRN_N2(
-            _L("TMS->TMSRtAudioHdlr::MatoPrepareComplete: player[%d], err[%d]"),
-            iRtType, aError);
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_N2(_L("RT player type[%d], err[%d]"), iRtType, aError);
 
     __ASSERT_DEBUG(((iFormat == EFormatTone) &&
             (iPlayerStatus == EToneLoading)), PANIC(TMS_RESULT_INVALID_STATE));
@@ -466,6 +465,7 @@ void TMSRtAudioHdlr::MatoPrepareComplete(TInt aError)
             }
         }
     iObserver.RtAudioHdlrEvent(ECmdRingToneOpenComplete, aError, iRtType);
+    TRACE_PRN_FN_ENT;
     }
 
 // -----------------------------------------------------------------------------
@@ -474,12 +474,11 @@ void TMSRtAudioHdlr::MatoPrepareComplete(TInt aError)
 //
 void TMSRtAudioHdlr::MatoPlayComplete(TInt aError)
     {
-    TRACE_PRN_N2(
-            _L("TMS->TMSRtAudioHdlr::MatoPlayComplete: player[%d], err[%d]"),
-            iRtType, aError);
-
+    TRACE_PRN_FN_ENT;
+    TRACE_PRN_N2(_L("RT player type[%d], err[%d]"), iRtType, aError);
     iObserver.RtAudioHdlrEvent(ECmdRingTonePlayComplete, aError, iRtType);
-    }
+    TRACE_PRN_FN_EXT;
+   }
 
 // -----------------------------------------------------------------------------
 // TMSRtAudioHdlr::DoPlay
@@ -505,7 +504,7 @@ void TMSRtAudioHdlr::DoPlay()
         }
     else
         {
-#ifdef __WINS__
+#ifdef __WINSCW__
         iSamplePlayer->Play();
 #else
 /*
@@ -529,7 +528,7 @@ void TMSRtAudioHdlr::DoPlay()
                 }
             }*/
         iSamplePlayer->Play();
-#endif //__WINS__
+#endif //__WINSCW__
         }
 
     TRACE_PRN_FN_EXT;
@@ -830,4 +829,3 @@ void TMSRtAudioHdlr::MutePlaying()
         }
     }
 
-//  End of File

@@ -71,7 +71,7 @@ void CVoIPUtilityFactoryImpl::ConstructL()
     // deny access to audio resources.
     iPriorityDn.iPref = KAudioPrefVoipAudioDownlink;
     iPriorityDn.iPriority = KAudioPriorityVoipAudioDownlink;
-    iPriorityUp.iPref = KAudioPrefVoipAudioUplink;
+    iPriorityUp.iPref = KAudioPrefVoipAudioUplinkNonSignal; //for DTMF mixing
     iPriorityUp.iPriority = KAudioPriorityVoipAudioUplink;
     }
 

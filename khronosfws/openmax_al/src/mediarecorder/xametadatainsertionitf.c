@@ -64,7 +64,6 @@ XAresult XAMetadataInsertionItfImpl_CreateChildNode(
         }
     else
         {
-
         if (impl->adaptCtx && impl->adaptCtx->fwtype == FWMgrFWGST)
             {
             if (impl->adaptCtx)
@@ -85,7 +84,8 @@ XAresult XAMetadataInsertionItfImpl_CreateChildNode(
             DEBUG_API("<-XAMetadataInsertionItfImpl_CreateChildNode");
             return XA_RESULT_FEATURE_UNSUPPORTED;
             }
-        }DEBUG_API("<-XAMetadataInsertionItfImpl_CreateChildNode");
+        }
+    DEBUG_API("<-XAMetadataInsertionItfImpl_CreateChildNode");
     return ret;
     }
 
@@ -129,7 +129,8 @@ XAresult XAMetadataInsertionItfImpl_GetSupportedKeysCount(
             DEBUG_API("<-XAMetadataInsertionItfImpl_GetSupportedKeysCount");
             return XA_RESULT_PARAMETER_INVALID;
             }
-        }DEBUG_API("<-XAMetadataInsertionItfImpl_GetSupportedKeysCount");
+        }
+    DEBUG_API("<-XAMetadataInsertionItfImpl_GetSupportedKeysCount");
     return ret;
     }
 
@@ -173,7 +174,8 @@ XAresult XAMetadataInsertionItfImpl_GetKeySize(XAMetadataInsertionItf self,
             DEBUG_API("<-XAMetadataInsertionItfImpl_GetKeySize");
             return XA_RESULT_PARAMETER_INVALID;
             }
-        }DEBUG_API("<-XAMetadataInsertionItfImpl_GetKeySize");
+        }
+    DEBUG_API("<-XAMetadataInsertionItfImpl_GetKeySize");
     return ret;
     }
 
@@ -219,7 +221,8 @@ XAresult XAMetadataInsertionItfImpl_GetKey(XAMetadataInsertionItf self,
             return XA_RESULT_PARAMETER_INVALID;
             }
 
-        }DEBUG_API("<-XAMetadataInsertionItfImpl_GetKey");
+        }
+    DEBUG_API("<-XAMetadataInsertionItfImpl_GetKey");
     return ret;
     }
 
@@ -264,7 +267,8 @@ XAresult XAMetadataInsertionItfImpl_GetFreeKeysEncoding(
             DEBUG_API("<-XAMetadataInsertionItfImpl_GetFreeKeysEncoding");
             return XA_RESULT_PARAMETER_INVALID;
             }
-        }DEBUG_API("<-XAMetadataInsertionItfImpl_GetFreeKeysEncoding");
+        }
+    DEBUG_API("<-XAMetadataInsertionItfImpl_GetFreeKeysEncoding");
     return ret;
     }
 
@@ -312,7 +316,8 @@ XAresult XAMetadataInsertionItfImpl_InsertMetadataItem(
             DEBUG_API("<-XAMetadataInsertionItfImpl_GetFreeKeysEncoding");
             return XA_RESULT_FEATURE_UNSUPPORTED;
             }
-        }DEBUG_API("<-XAMetadataInsertionItfImpl_InsertMetadataItem");
+        }
+    DEBUG_API("<-XAMetadataInsertionItfImpl_InsertMetadataItem");
     return ret;
     }
 
@@ -399,7 +404,8 @@ XAMetadataInsertionItfImpl* XAMetadataInsertionItfImpl_Create(
                 sizeof(XAMetadataInfo*));
         self->self = self;
 
-        }DEBUG_API("<-XAMetadataInsertionItfImpl_Create");
+        }
+    DEBUG_API("<-XAMetadataInsertionItfImpl_Create");
     return self;
     }
 

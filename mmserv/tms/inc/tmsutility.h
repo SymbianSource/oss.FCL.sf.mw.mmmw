@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
  * All rights reserved.
  * This component and the accompanying materials are made available
  * under the terms of "Eclipse Public License v1.0"
@@ -11,7 +11,7 @@
  *
  * Contributors:
  *
- * Description: Telephony Multimedia Service
+ * Description:  Tracing and convertion utility.
  *
  */
 
@@ -60,6 +60,7 @@ namespace TMS {
 #define RET_REASON_IF_ERR(s) if(s!=0) return s
 
 #define TMSRESULT(result) TMSUtility::TMSResult(result)
+#define SYMBIANRESULT(result) TMSUtility::SymbianResult(result)
 #define TOTMSOUTPUT(output) TMSUtility::ToTMSOutput(output)
 #define TOTAROUTPUT(output) TMSUtility::ToTAROutput(output)
 #define TOFOURCC(format) TMSUtility::ToFourCC(format)
@@ -73,6 +74,7 @@ class TMSUtility
     {
 public:
     IMPORT_C static gint TMSResult(const gint error);
+    IMPORT_C static TInt SymbianResult(const gint error);
     IMPORT_C static gint EtelToTMSResult(const gint error);
     IMPORT_C static TMSAudioOutput ToTMSOutput(
             CTelephonyAudioRouting::TAudioOutput taroutput);

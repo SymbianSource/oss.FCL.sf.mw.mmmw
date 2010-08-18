@@ -112,11 +112,7 @@ void TMSIPDownlink::Start(const gint /*retrytime*/)
         {
         TRAP(err, iDevSound->PlayInitL());
         TRACE_PRN_IF_ERR(err);
-        if (err != TMS_RESULT_SUCCESS)
-            {
-            iStatus = EReady;
-            iObserver.DownlinkStarted(err);
-            }
+        iObserver.DownlinkStarted(err);
         }
     TRACE_PRN_FN_EXT;
     }

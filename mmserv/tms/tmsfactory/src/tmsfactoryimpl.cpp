@@ -25,7 +25,6 @@
 #include "tmsringtoneimpl.h"
 #include "tmsdtmfimpl.h"
 #include "tmsinbandtoneimpl.h"
-
 #include "tmsutility.h"
 #include "tmsproxy.h"
 #include "tmsfactoryimpl.h"

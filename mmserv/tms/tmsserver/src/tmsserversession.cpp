@@ -15,7 +15,6 @@
  *
  */
 
-#include <AudioPreference.h>
 #include "tmsutility.h"
 #include "tmsclientserver.h"
 #include "tmsshared.h"
@@ -231,13 +230,8 @@ void TMSServerSession::DispatchMessageL(const RMessage2& aMessage)
             iServer.MuteRingTone();
             aMessage.Complete(TMS_RESULT_SUCCESS);
             break;
-        case ETMSStartDTMFNotifier:
-            iServer.StartDTMFNotifierL();
-            aMessage.Complete(TMS_RESULT_SUCCESS);
-            break;
-        case ETMSCancelDTMFNotifier:
-            iServer.CancelDTMFNotifier();
-            aMessage.Complete(TMS_RESULT_SUCCESS);
+        case ETMSInitDTMF:
+            iServer.InitDTMF(aMessage);
             break;
         case ETMSStartDTMF:
             iServer.StartDTMF(aMessage);
@@ -522,4 +516,3 @@ void TMSServerSession::NotifyClient(const TInt aCommand, const TInt aStatus)
         }
     }
 
-// End of file

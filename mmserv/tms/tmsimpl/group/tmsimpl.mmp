@@ -96,6 +96,7 @@ LIBRARY         libglib.lib
 LIBRARY         tmsapi.lib
 LIBRARY         tmscallproxy.lib
 LIBRARY         tmsproxy.lib
+LIBRARY         tmsutility.lib
 LIBRARY         libc.lib
 
 DEFFILE         tmsimpl.def

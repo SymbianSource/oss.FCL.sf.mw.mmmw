@@ -21,10 +21,9 @@
 
 using namespace TMS;
 
-TMSDTMFImpl::TMSDTMFImpl(TMSStreamType streamtype)
+TMSDTMFImpl::TMSDTMFImpl()
     {
     TRACE_PRN_FN_ENT;
-    iStreamType = streamtype;
     TRACE_PRN_FN_EXT;
     }
 
@@ -34,12 +33,12 @@ TMSDTMFImpl::~TMSDTMFImpl()
     TRACE_PRN_FN_EXT;
     }
 
-gint TMSDTMFImpl::PostConstruct()
+gint TMSDTMFImpl::PostConstruct(TMSStreamType streamtype)
     {
+    TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
     TMSDTMFBody* bodyimpl(NULL);
-    TRACE_PRN_FN_ENT;
-    ret = TMSDTMFBodyImpl::Create(iStreamType, bodyimpl);
+    ret = TMSDTMFBodyImpl::Create(streamtype, *this, bodyimpl);
 
     if (ret == TMS_RESULT_SUCCESS)
         {
@@ -51,49 +50,32 @@ gint TMSDTMFImpl::PostConstruct()
 
 EXPORT_C gint TMSDTMFImpl::Create(TMSStreamType streamtype, TMSDTMF*& dtmf)
     {
-    gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSDTMFImpl *self = new TMSDTMFImpl(streamtype);
-
     TRACE_PRN_FN_ENT;
+    gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
+    TMSDTMFImpl *self = new TMSDTMFImpl();
+
     if (self)
         {
-        ret = self->PostConstruct();
+        ret = self->PostConstruct(streamtype);
         if (ret != TMS_RESULT_SUCCESS)
             {
             delete self;
             self = NULL;
             }
         }
-    if (self && ret == TMS_RESULT_SUCCESS)
-        {
-        dtmf = self;
-        ret = self->SetParent(dtmf);
-        }
+
+    dtmf = self;
     TRACE_PRN_FN_EXT;
     return ret;
     }
 
 EXPORT_C gint TMSDTMFImpl::Delete(TMSDTMF*& dtmf)
     {
-    gint ret(TMS_RESULT_SUCCESS);
     TRACE_PRN_FN_ENT;
-    delete (static_cast<TMSDTMFImpl*>(dtmf));
+    gint ret(TMS_RESULT_SUCCESS);
+    delete (static_cast<TMSDTMFImpl*> (dtmf));
     dtmf = NULL;
     TRACE_PRN_FN_EXT;
-    return ret;
-    }
-
-gint TMSDTMFImpl::SetParent(TMSDTMF*& parent)
-    {
-    gint ret(TMS_RESULT_SUCCESS);
-    if (this->iBody)
-        {
-        static_cast<TMSDTMFBodyImpl*>(this->iBody)->SetParent(parent);
-        }
-    else
-        {
-        ret = TMS_RESULT_UNINITIALIZED_OBJECT;
-        }
     return ret;
     }
 

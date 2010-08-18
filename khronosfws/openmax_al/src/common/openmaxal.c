@@ -23,6 +23,9 @@
 
 #include "openmaxalwrapper.h"
 #include "openmaxal_iid.c"
+#include "xanokialinearvolume_iid.c"
+#include "xanokiavolumeext_iid.c"
+
 #include "xaglobals.h"
 #include "xaobjects.h"
 

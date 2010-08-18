@@ -34,6 +34,9 @@ public:
     PlayAlarm(CSystemToneService::TAlarmType aAlarm,
             unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
     void StopAlarm(unsigned int aAlarmContext);
+    void
+    PlayAlarm(CSystemToneService::TToneType aTone,
+            unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 private:
     CStsImplementation();
     bool Init();

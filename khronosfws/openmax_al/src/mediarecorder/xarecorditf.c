@@ -521,7 +521,8 @@ XARecordItfImpl* XARecordItfImpl_Create(XAMediaRecorderImpl* impl)
         XAAdaptationBase_AddEventHandler(impl->adaptationCtx,
                 &XARecordItfImpl_AdaptCb, XA_RECORDITFEVENTS, self);
         self->self = self;
-        }DEBUG_API("<-XARecordItfImpl_Create");
+        }
+    DEBUG_API("<-XARecordItfImpl_Create");
     return self;
     }
 

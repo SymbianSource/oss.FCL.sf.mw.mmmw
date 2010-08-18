@@ -114,6 +114,27 @@ void CStsServerSession::DoStopAlarmL(const RMessage2& aMessage)
     iSts.StopAlarm(context);
     }
 
+void CStsServerSession::DoPlayToneStopL(const RMessage2& aMessage)
+    {
+    CSystemToneService::TToneType tone =
+            (CSystemToneService::TToneType) aMessage.Int0();
+    unsigned int context = 0;
+    //SR
+    //iSts.PlayTone(tone, context, *this);
+    iSts.PlayToneStop(tone, context, *this);
+    iObserverMap[context] = (MStsPlayAlarmObserver*) aMessage.Ptr2();
+    TPckg<unsigned int> contextPckg(context);
+    TRAPD(err,aMessage.WriteL(1,contextPckg));
+    aMessage.Complete(err);
+    // if the context is 0 there was a problem with the PlayAlarm,
+    // so trigger the PlayAlarmComplete callback.
+    if (context == 0)
+        {
+        PlayAlarmComplete(0);
+        }
+    }
+
+
 void CStsServerSession::CleanUpObservers()
     {
     while (!iObserverMap.empty())

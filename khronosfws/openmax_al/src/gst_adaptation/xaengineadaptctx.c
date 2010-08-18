@@ -169,8 +169,6 @@ void XAEngineAdapt_Destroy(XAAdaptationGstCtx* bCtx)
 
     XAAdaptationBase_Free(&(ctx->baseObj.baseObj));
 
-/*    gst_deinit(); */
-
     free(ctx);
     ctx = NULL;
 

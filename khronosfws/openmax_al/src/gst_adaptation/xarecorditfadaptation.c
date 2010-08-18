@@ -20,13 +20,10 @@
 #include "xamediarecorderadaptctx.h"
 #include "xarecorditfadaptation.h"
 #include "xaadaptationgst.h"
-#include "xacameraadaptctx.h"
+
 
 /*forward declaration of position updater callback*/
 gboolean XARecordItfAdapt_PositionUpdate(gpointer ctx);
-
-extern XAboolean cameraRealized;
-extern XACameraAdaptationCtx_* cameraCtx;
 
 /*
  * XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *ctx, XAuint32 state)
@@ -74,30 +71,6 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
                     }
                 }
 
-            if (cameraCtx && cameraRealized && mCtx->isobjvsrc
-                    && mCtx->videosource)
-                {
-                cameraCtx->recording = XA_BOOLEAN_FALSE;
-
-                if (!cameraCtx->playing && !cameraCtx->snapshotting)
-                    {
-                    /* Neither view finder or recorder is running -> pause camera */
-                    if (GST_STATE( GST_ELEMENT(mCtx->videosource))
-                            == GST_STATE_PLAYING)
-                        {
-                        GstStateChangeReturn gret;
-                        DEBUG_INFO("Stop camera source");
-                        gret = gst_element_set_state(
-                                GST_ELEMENT(mCtx->videosource),
-                                GST_STATE_PAUSED);
-                        if (gret == GST_STATE_CHANGE_SUCCESS)
-                            gret = gst_element_get_state(
-                                    GST_ELEMENT(mCtx->videosource), NULL,
-                                    NULL, XA_ADAPT_ASYNC_TIMEOUT_SHORT_NSEC);
-                        }
-                    }
-                }
-
             bCtx->binWantedState = GST_STATE_PAUSED;
             closeSink = XA_BOOLEAN_TRUE;
             if (mCtx->runpositiontimer > 0)
@@ -120,29 +93,6 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
             }
         case XA_RECORDSTATE_PAUSED:
             {
-            if (cameraCtx && cameraRealized && mCtx->isobjvsrc
-                    && mCtx->videosource)
-                {
-                cameraCtx->recording = XA_BOOLEAN_FALSE;
-                if (!cameraCtx->playing && !cameraCtx->snapshotting)
-                    {
-                    /* Neither view finder or recorder is running -> pause camera */
-                    if (GST_STATE( GST_ELEMENT(mCtx->videosource))
-                            == GST_STATE_PLAYING)
-                        {
-                        GstStateChangeReturn gret;
-                        DEBUG_INFO("Stop camera source");
-                        gret = gst_element_set_state(
-                                GST_ELEMENT(mCtx->videosource),
-                                GST_STATE_PAUSED);
-                        if (gret == GST_STATE_CHANGE_SUCCESS)
-                            gret = gst_element_get_state(
-                                    GST_ELEMENT(mCtx->videosource), NULL,
-                                    NULL, XA_ADAPT_ASYNC_TIMEOUT_SHORT_NSEC);
-                        }
-                    }
-                }
-
             if (mCtx->xaRecordState == XA_RECORDSTATE_STOPPED
                     && mCtx->encodingchanged)
                 {
@@ -163,11 +113,6 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
             }
         case XA_RECORDSTATE_RECORDING:
             {
-            if (cameraCtx && mCtx->isobjvsrc)
-                {
-                cameraCtx->recording = XA_BOOLEAN_TRUE;
-                }
-
             if (mCtx->xaRecordState == XA_RECORDSTATE_STOPPED
                     && (mCtx->encodingchanged))
                 {
@@ -288,7 +233,8 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
                 gret = gst_element_get_state(GST_ELEMENT(mCtx->videosource),
                         NULL, NULL, XA_ADAPT_ASYNC_TIMEOUT_SHORT_NSEC);
             }
-        }DEBUG_API("<-XARecordItfAdapt_SetRecordState");
+        }
+    DEBUG_API("<-XARecordItfAdapt_SetRecordState");
     return ret;
     }
 

@@ -21,11 +21,6 @@
 #include <gst/app/gstappsink.h>
 #include "xacapabilitiesmgr.h"
 #include "xamediarecorderadaptctx.h"
-#include "xacameraadaptctx.h"
-
-
-extern XAboolean cameraRealized;
-extern XACameraAdaptationCtx_* cameraCtx;
 
 /*forward declarations*/
 GstElement* XAMediaRecorderAdapt_CreateEncodeBin(
@@ -165,8 +160,6 @@ XAAdaptationBaseCtx* XAMediaRecorderAdapt_Create(XADataSource* pAudioSrc,
         XADataSource* pImageVideoSrc, XADataSink* pDataSnk, XAuint8 recModes)
     {
     XAMediaRecorderAdaptationCtx *pSelf = NULL;
-    XAuint32 locType = 0;
-    XADataLocator_IODevice *ioDevice;
     DEBUG_API("->XAMediaRecorderAdapt_Create");
 
     pSelf = (XAMediaRecorderAdaptationCtx*)calloc(1, sizeof(XAMediaRecorderAdaptationCtx));
@@ -219,26 +212,6 @@ XAAdaptationBaseCtx* XAMediaRecorderAdapt_Create(XADataSource* pAudioSrc,
             pSelf->audioEncSettings.encodeOptions = 0;
             pSelf->audioEncSettings.blockAlignment = 0;
             }
-
-        if (pImageVideoSrc)
-            {
-            locType = *((XAuint32*) (pImageVideoSrc->pLocator));
-            if (locType == XA_DATALOCATOR_IODEVICE)
-                {
-                ioDevice
-                        = (XADataLocator_IODevice*) (pImageVideoSrc->pLocator);
-                if (ioDevice->deviceType == XA_IODEVICE_CAMERA
-                        && !cameraRealized)
-                    {
-                    DEBUG_ERR("Preconditions violated - Camera object not realized");
-                    XAAdaptationBase_Free(&pSelf->baseObj.baseObj);
-                    free(pSelf);
-                    pSelf = NULL;
-                    DEBUG_API("<-XAMediaRecorderAdapt_Create");
-                    return NULL;
-                    }
-                }
-            }
         }
 
     DEBUG_API("<-XAMediaRecorderAdapt_Create");
@@ -260,7 +233,8 @@ XAresult XAMediaRecorderAdapt_PostInit(XAAdaptationGstCtx* bCtx)
     DEBUG_API("->XAMediaRecorderAdapt_PostInit");
     if (bCtx == NULL || bCtx->baseObj.ctxId != XAMediaRecorderAdaptation)
         {
-        DEBUG_ERR("Invalid parameter!!");DEBUG_API("<-XAMediaRecorderAdapt_PostInit");
+        DEBUG_ERR("Invalid parameter!!");
+        DEBUG_API("<-XAMediaRecorderAdapt_PostInit");
         return XA_RESULT_PARAMETER_INVALID;
         }
     ctx = (XAMediaRecorderAdaptationCtx*) bCtx;
@@ -354,7 +328,8 @@ void XAMediaRecorderAdapt_Destroy(XAAdaptationGstCtx* bCtx)
 
     if (bCtx == NULL || bCtx->baseObj.ctxId != XAMediaRecorderAdaptation)
         {
-        DEBUG_ERR("Invalid parameter!!");DEBUG_API("<-XAMediaRecorderAdapt_Destroy");
+        DEBUG_ERR("Invalid parameter!!");
+        DEBUG_API("<-XAMediaRecorderAdapt_Destroy");
         return;
         }
     ctx = (XAMediaRecorderAdaptationCtx*) bCtx;

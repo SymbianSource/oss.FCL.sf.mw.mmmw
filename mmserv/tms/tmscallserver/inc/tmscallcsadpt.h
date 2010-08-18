@@ -25,10 +25,8 @@
 #include <etelmm.h>
 #include <rmmcustomapi.h>
 #include "tmsclientserver.h"
-#include "tmsdtmftoneplayerobserver.h"
 #include "tmscalladpt.h"
 #include "tmscsdevsoundobserver.h"
-#include "tmsdtmfobserver.h"
 
 namespace TMS {
 
@@ -36,18 +34,14 @@ namespace TMS {
 class TMSCSUplink;
 class TMSCSDownlink;
 class TMSTarSettings;
-class TMSAudioDtmfTonePlayer;
-class TMSDTMFProvider;
-class TMSDtmfNotifier;
+class TMSSyncVol;
 
 /*
  * TMSCallCSAdpt class
  */
 class TMSCallCSAdpt : public TMSCallAdpt,
                       public TMSCSDevSoundObserver,
-                      public MTelephonyAudioRoutingObserver,
-                      public TMSDTMFTonePlayerObserver,
-                      public TMSDTMFObserver
+                      public MTelephonyAudioRoutingObserver
     {
 public:
 	static TMSCallCSAdpt* NewL();
@@ -117,24 +111,11 @@ public:
     virtual gint GetPreviousOutput(TMSAudioOutput& output);
     virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuf);
 
-	// From TMSDTMF
-    virtual gint StartDTMF(const TMSStreamType streamtype, TDes& dtmfstr);
-    virtual gint StopDTMF(const TMSStreamType streamtype);
-    virtual gint ContinueDTMF(const gboolean sending);
-
     //From TMSCSDevSoundObserver
     void DownlinkInitCompleted(gint status);
     void UplinkInitCompleted(gint status);
     void DownlinkActivationCompleted(gint status);
     void UplinkActivationCompleted(gint status);
-
-    //From TMSDTMFTonePlayerObserver
-    void DTMFInitCompleted(gint status);
-    void DTMFToneFinished(gint status);
-
-    //From TMSDTMFObserver
-    void HandleDTMFEvent(const TMSDTMFObserver::TCCPDtmfEvent event,
-            const gint status, const TChar tone);
 
 private:
     TMSCallCSAdpt();
@@ -157,23 +138,18 @@ private:
     TMSCSDownlink* iCSDownlink;
     CTelephonyAudioRouting* iRouting;
     TMSTarSettings* iTarSettings;
-    TMSAudioDtmfTonePlayer* iDTMFDnlinkPlayer;
-    TMSDtmfNotifier* iDTMFNotifier;
-    TMSDTMFProvider* iDTMFUplinkPlayer;
 
     // Message queues for communication and data transfer back to the client
     RMsgQueue<TmsMsgBuf> iMsgQueueUp;
     RMsgQueue<TmsMsgBuf> iMsgQueueDn;
     TmsMsgBuf iMsgBuffer;
 
-    gboolean iUplinkInitialized;
     gint iUplinkStreamId;
-    gboolean iDnlinkInitialized;
     gint iDnlinkStreamId;
+    TMSSyncVol* iResetVolNotifier;
     };
 
 } //namespace TMS
 
 #endif // CALLCSADPT_H
 
-// End of file

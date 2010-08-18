@@ -15,7 +15,6 @@
  *
  */
 
-#include <OpenMAXAL.h>
 #include <string.h>
 #include <ctype.h>
 #include <uri8.h>

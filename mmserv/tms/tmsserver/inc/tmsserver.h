@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __TMSSERVER_H
-#define __TMSSERVER_H
+#ifndef TMSSERVER_H
+#define TMSSERVER_H
 
 #include <e32base.h>
 #include <mmcccodecinformation.h>
@@ -25,6 +25,9 @@
 #include "tmsclientserver.h"
 #include "tmsrtplayerobsrv.h"
 #include "tmsrtplayer.h"
+#include "tmsdtmfobserver.h"
+#include "tmsdtmftoneplayerobserver.h"
+#include "tmspubsubobserver.h"
 
 namespace TMS {
 
@@ -36,14 +39,19 @@ class TMSGlobalEffectsSettings;
 class TMSTarEventHandler;
 class TMSCSPCenRepListener;
 class TMSCenRepAudioHandler;
-class TMSDtmfEventHandler;
+class TMSAudioDtmfTonePlayer;
+class TMSDTMFProvider;
+class TMSPubSubListener;
 
 // -----------------------------------------------------------------------------
 // TMSServer class
 // -----------------------------------------------------------------------------
 //
 class TMSServer : public CServer2,
-                  private TMSRtPlayerObsrv
+                  private TMSRtPlayerObsrv,
+                  private TMSDTMFObserver,
+                  private TMSDTMFTonePlayerObserver,
+                  public TMSPubSubObserver
     {
 public:
     static void RunServerL();
@@ -52,12 +60,6 @@ public:
     void AddSession();
     void DropSession();
     TInt SessionCount() const;
-
-    void SetDnLinkSession(const TBool aSession);
-    void SetUpLinkSession(const TBool aSession);
-
-    TBool HasDnLinkSession() const;
-    TBool HasUpLinkSession() const;
 
     void GetNewTMSCallSessionHandleL(RHandleBase& aHandle);
     TInt SetOutput(CSession2* sid, TInt output);
@@ -75,14 +77,15 @@ public:
     TInt GetSupportedCodecs(const TMSStreamType strmType,
             RArray<TFourCC>*& aCodecs);
 
-    TInt NotifyTarClients(TRoutingMsgBufPckg routingpckg);
+    // for DTMF player
+    TInt InitDTMF(const RMessage2& aMessage);
     TInt StartDTMF(const RMessage2& aMessage);
     TInt StopDTMF(const RMessage2& aMessage);
     TInt ContinueSendingDTMF(const RMessage2& aMessage);
-    TInt NotifyDtmfClients(TmsMsgBufPckg dtmfpckg);
+    TInt NotifyDtmfClients(gint aEventType, gint aError);
+    gint FindActiveCallType();
 
-    void StartDTMFNotifierL();
-    void CancelDTMFNotifier();
+    TInt NotifyTarClients(TRoutingMsgBufPckg routingpckg);
     void StartRoutingNotifierL();
     void CancelRoutingNotifier();
     void StartCenRepHandlerL();
@@ -106,6 +109,18 @@ public:
     // from TMSRtPlayerObsrv
     void RtPlayerEvent(TInt aEventType, TInt aError);
 
+    // from TMSDTMFTonePlayerObserver
+    void DTMFInitCompleted(gint status);
+    void DTMFToneFinished(gint status);
+
+    // from TMSDTMFObserver
+    void HandleDTMFEvent(const TMSDTMFObserver::TCCPDtmfEvent event,
+            const gint status, const TChar tone);
+
+    // from TMSPubSubObserver
+    void HandleNotifyPSL(const TUid aUid, const TInt& aKey,
+                const TRequestStatus& aStatus);
+
 private:
     static TMSServer* NewLC();
     TMSServer();
@@ -122,18 +137,15 @@ private:
     TInt iSession;
     TMSServerShutDown *iShutdownTimer;
 
-    TBool iDnlinkSession;
-    TBool iUplinkSession;
-
     mutable RPointerArray<TMSStartAndMonitorTMSCallThread> iTMSCallServList;
     TMSGlobalEffectsSettings* iEffectSettings;
     TMSTarEventHandler* iTarHandler;
     TMSCenRepAudioHandler* iAudioCenRepHandler;
     TMSAudioOutput iCurrentRouting;
-    TMSDtmfEventHandler* iDTMFHandler;
     TInt iTarHandlerCount;
     TInt iAudioCenRepHandlerCount;
     TInt iDTMFHandlerCount;
+    TMSCallType iActiveCallType;
 
     // for RT
     TMSRingTonePlayer* iTMSRtPlayer;
@@ -141,9 +153,15 @@ private:
     HBufC8* iRtSequence;
     HBufC* iTtsText;
 
+    // for DTMF
+    TMSAudioDtmfTonePlayer* iDTMFDnlinkPlayer;
+    TMSAudioDtmfTonePlayer* iDTMFUplinkPlayer;
+    TMSDTMFProvider* iDTMFUplinkPlayerEtel;
+
     // for codecs count
     RArray<TFourCC> iDnlCodecs;
     RArray<TFourCC> iUplCodecs;
+    TMSPubSubListener* iSyncVol;
     };
 
 // -----------------------------------------------------------------------------
@@ -191,6 +209,5 @@ private:
 
 } //namespace TMS
 
-#endif //__TMSSERVER_H
+#endif //TMSSERVER_H
 
-// End of file

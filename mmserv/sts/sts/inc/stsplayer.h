@@ -18,11 +18,10 @@
 #ifndef STSPLAYER_H_
 #define STSPLAYER_H_
 
-#include <mdaaudiosampleplayer.h>
-#include <systemtoneservice.h>
 
-class MProEngEngine;
-class MProEngProfile;
+#include <systemtoneservice.h>
+#include <mdaaudiosampleplayer.h>
+
 
 class MStsPlayerObserver
     {
@@ -35,26 +34,28 @@ class CStsPlayer : private MMdaAudioPlayerCallback
 public:
 
     static CStsPlayer* CreateTonePlayer(MStsPlayerObserver& aObserver,
-            CSystemToneService::TToneType aTone, unsigned int aContext);
+            CSystemToneService::TToneType aTone, unsigned int aContext, 
+           	const TDesC& aFileName, TInt aVolume, 
+           	TUint aAudioPreference, TUint  aAudioPriority);
     static CStsPlayer* CreateAlarmPlayer(MStsPlayerObserver& aObserver,
-            CSystemToneService::TAlarmType aAlarm, unsigned int aContext);
+            CSystemToneService::TAlarmType aAlarm, unsigned int aContext,
+            const TDesC& aFileName, TInt aVolume,
+    				TUint aAudioPreference, TUint  aAudioPriority);	
     virtual ~CStsPlayer();
     void Play();
     void Stop();
-
-
-protected:
     
-    void LoadActiveProfileSettingsL();
-    void SetToneSettings(CSystemToneService::TToneType aTone);
-    void SetAlarmSettings(CSystemToneService::TAlarmType aAlarm);
+    
+protected:
+        
     CStsPlayer(MStsPlayerObserver& aObserver, const TDesC& aFileName,
-    int aRepeatNumberOfTimes, unsigned int aContext);
+    int aRepeatNumberOfTimes, unsigned int aContext,
+    TInt aVolume, TUint aAudioPreference, TUint aAudioPriority);
     bool Init();
 
 private:
     void MapcInitComplete(TInt aError,
-            const TTimeIntervalMicroSeconds& aDuration);
+    const TTimeIntervalMicroSeconds& aDuration);
     void MapcPlayComplete(TInt aError);
 
     MStsPlayerObserver& iObserver;
@@ -63,14 +64,11 @@ private:
     int iRepeatNumberOfTimes;
     unsigned int iContext;
 
-    MProEngEngine* iEngine;
-    MProEngProfile* iProfile;
-
-    TInt iVolume;
+	TInt  iVolume;
     TBool iWarningToneEnabled;
     TUint iAudioPreference;
     TUint iAudioPriority;
-
+		
     };
 
 #endif // STSPLAYER_H_

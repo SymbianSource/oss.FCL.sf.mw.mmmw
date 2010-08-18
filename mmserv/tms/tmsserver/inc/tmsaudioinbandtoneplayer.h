@@ -19,6 +19,7 @@
 #define TMSAUDIOINBANDTONEPLAYER_H
 
 // INCLUDES
+#include <AudioPreference.h>
 #include <mdaaudiotoneplayer.h>
 #include <barsc.h>
 #include <barsread.h>

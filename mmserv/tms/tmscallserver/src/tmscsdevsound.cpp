@@ -68,11 +68,7 @@ void TMSCSDevSound::ConstructL(const TMSStreamType strmtype,
         iPreference = KAudioPrefCSCallDownlink;
         }
 
-    if (iInitRetryTime != 0)
-        {
-        iTimer = TMSTimer::NewL();
-        }
-
+    iTimer = TMSTimer::NewL();
     InitializeL();
     TRACE_PRN_FN_EXT;
     }
@@ -183,6 +179,7 @@ void TMSCSDevSound::InitializeComplete(TInt aError)
         CancelTimer();
         NotifyEvent(aError);
         }
+    TRACE_PRN_IF_ERR(aError);
     TRACE_PRN_FN_EXT;
     }
 

@@ -19,8 +19,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "xaengineitf.h"
-#include "xavibraitf.h"
-#include "xaledarrayitf.h"
 #include "xaobjects.h"
 #include "xacapabilitiesmgr.h"
 /*static XAchar implementationText[] = "Implementation does not conform to AL Spec";*/
@@ -73,9 +71,7 @@ XAresult XAEngineItfImpl_CreateLEDDevice(XAEngineItf self,
         const XAInterfaceID *pInterfaceIds,
         const XAboolean *pInterfaceRequired)
     {
-    return XALEDArrayDeviceImpl_CreateLEDArrayDevice(
-            ((XAEngineItfImpl*) self)->mapper, pDevice, deviceID,
-            numInterfaces, pInterfaceIds, pInterfaceRequired);
+    return XA_RESULT_FEATURE_UNSUPPORTED;
     }
 
 XAresult XAEngineItfImpl_CreateVibraDevice(XAEngineItf self,
@@ -83,9 +79,7 @@ XAresult XAEngineItfImpl_CreateVibraDevice(XAEngineItf self,
         const XAInterfaceID *pInterfaceIds,
         const XAboolean *pInterfaceRequired)
     {
-    return XAVibraDeviceImpl_CreateVibraDevice(
-            ((XAEngineItfImpl*) self)->mapper, pDevice, deviceID,
-            numInterfaces, pInterfaceIds, pInterfaceRequired);
+    return XA_RESULT_FEATURE_UNSUPPORTED;
     }
 
 XAresult XAEngineItfImpl_CreateMediaPlayer(XAEngineItf self,
@@ -118,9 +112,7 @@ XAresult XAEngineItfImpl_CreateOutputMix(XAEngineItf self, XAObjectItf *pMix,
         XAuint32 numInterfaces, const XAInterfaceID *pInterfaceIds,
         const XAboolean *pInterfaceRequired)
     {
-    XAEngineItfImpl* impl = GetImpl(self);
-    return XAOMixImpl_CreateOutputMix(impl->mapper, impl->capabilities, pMix,
-            numInterfaces, pInterfaceIds, pInterfaceRequired);
+    return XA_RESULT_FEATURE_UNSUPPORTED;
     }
 
 XAresult XAEngineItfImpl_CreateMetadataExtractor(XAEngineItf self,
@@ -153,7 +145,8 @@ XAresult XAEngineItfImpl_GetImplementationInfo(XAEngineItf self,
 
     if (!pMajor || !pMinor || !pStep)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAEngineItfImpl_GetImplementationInfo");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAEngineItfImpl_GetImplementationInfo");
         return XA_RESULT_PARAMETER_INVALID;
         }
     /* OpenMAX AL API ver 1.0.1 */
@@ -197,7 +190,8 @@ XAresult XAEngineItfImpl_QueryNumSupportedInterfaces(XAEngineItf self,
 
     if (!pNumSupportedInterfaces)
         {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAEngineItfImpl_QueryNumSupportedInterfaces");
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAEngineItfImpl_QueryNumSupportedInterfaces");
         return XA_RESULT_PARAMETER_INVALID;
         }
     *pNumSupportedInterfaces = 0;
@@ -215,26 +209,8 @@ XAresult XAEngineItfImpl_QueryNumSupportedInterfaces(XAEngineItf self,
             res = XAMediaRecorderImpl_QueryNumSupportedInterfaces(
                     pNumSupportedInterfaces);
             break;
-        case XA_OBJECTID_OUTPUTMIX:
-            res = XAOMixImpl_QueryNumSupportedInterfaces(
-                    pNumSupportedInterfaces);
-            break;
-#ifdef OMAX_CAMERABIN
-            case XA_OBJECTID_CAMERADEVICE:
-            res = XACameraDeviceImpl_QueryNumSupportedInterfaces(
-                    pNumSupportedInterfaces);
-            break;
-#endif
         case XA_OBJECTID_RADIODEVICE:
             res = XARadioDeviceImpl_QueryNumSupportedInterfaces(
-                    pNumSupportedInterfaces);
-            break;
-        case XA_OBJECTID_LEDDEVICE:
-            res = XALEDArrayDeviceImpl_QueryNumSupportedInterfaces(
-                    pNumSupportedInterfaces);
-            break;
-        case XA_OBJECTID_VIBRADEVICE:
-            res = XAVibraDeviceImpl_QueryNumSupportedInterfaces(
                     pNumSupportedInterfaces);
             break;
         case XA_OBJECTID_METADATAEXTRACTOR:
@@ -276,25 +252,8 @@ XAresult XAEngineItfImpl_QuerySupportedInterfaces(XAEngineItf self,
             res = XAMediaRecorderImpl_QuerySupportedInterfaces(index,
                     pInterfaceId);
             break;
-        case XA_OBJECTID_OUTPUTMIX:
-            res = XAOMixImpl_QuerySupportedInterfaces(index, pInterfaceId);
-            break;
-#ifdef OMAX_CAMERABIN
-            case XA_OBJECTID_CAMERADEVICE:
-            res = XACameraDeviceImpl_QuerySupportedInterfaces(
-                    index, pInterfaceId );
-            break;
-#endif
         case XA_OBJECTID_RADIODEVICE:
             res = XARadioDeviceImpl_QuerySupportedInterfaces(index,
-                    pInterfaceId);
-            break;
-        case XA_OBJECTID_LEDDEVICE:
-            res = XALEDArrayDeviceImpl_QuerySupportedInterfaces(index,
-                    pInterfaceId);
-            break;
-        case XA_OBJECTID_VIBRADEVICE:
-            res = XAVibraDeviceImpl_QuerySupportedInterfaces(index,
                     pInterfaceId);
             break;
         case XA_OBJECTID_METADATAEXTRACTOR:
@@ -313,9 +272,7 @@ XAresult XAEngineItfImpl_QueryLEDCapabilities(XAEngineItf self,
         XAuint32 *pIndex, XAuint32 *pLEDDeviceID,
         XALEDDescriptor *pDescriptor)
     {
-
-    XALEDDescriptor descriptor;
-
+    XAresult res = XA_RESULT_SUCCESS;
     DEBUG_API("->XAEngineItfImpl_QueryLEDCapabilities");
 
     if (!pDescriptor)
@@ -326,52 +283,26 @@ XAresult XAEngineItfImpl_QueryLEDCapabilities(XAEngineItf self,
             DEBUG_API("<-XAEngineItfImpl_QueryLEDCapabilities");
             return XA_RESULT_PARAMETER_INVALID;
             }
-        /* Number of devices */
-        *pIndex = 1;
+        else
+            {
+            /* Number of devices */
+            *pIndex = 0;
+            }
         }
     else
         {
-
-        /* query device capabilities */
-        if (pIndex)
-            {
-            if (*pIndex == 0)
-                {
-                if (!pLEDDeviceID)
-                    {
-                    DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-                    DEBUG_API("<-XAEngineItfImpl_QueryLEDCapabilities");
-                    return XA_RESULT_PARAMETER_INVALID;
-                    }
-                *pLEDDeviceID = XA_ADAPTID_LEDARRAY;
-                }
-            else
-                {
-                DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-                DEBUG_API("<-XAEngineItfImpl_QueryLEDCapabilities");
-                return XA_RESULT_PARAMETER_INVALID;
-                }
-            }
-
-        if (*pLEDDeviceID == XA_ADAPTID_LEDARRAY)
-            {
-            descriptor.colorMask = COLOR_MASK;
-            descriptor.ledCount = LED_COUNT;
-            descriptor.primaryLED = PRIMARY_LED;
-            *pDescriptor = descriptor;
-            }
-
-        }DEBUG_API("<-XAEngineItfImpl_QueryLEDCapabilities");
-    return XA_RESULT_SUCCESS;
+        // return NotSupported below
+        res = XA_RESULT_FEATURE_UNSUPPORTED;
+        }
+    DEBUG_API("<-XAEngineItfImpl_QueryLEDCapabilities");
+    return res;
     }
 
 XAresult XAEngineItfImpl_QueryVibraCapabilities(XAEngineItf self,
         XAuint32 *pIndex, XAuint32 *pVibraDeviceID,
         XAVibraDescriptor *pDescriptor)
     {
-
-    XAVibraDescriptor descriptor;
-
+    XAresult res = XA_RESULT_SUCCESS;
     DEBUG_API("->XAEngineItfImpl_QueryVibraCapabilities");
 
     if (!pDescriptor)
@@ -380,49 +311,22 @@ XAresult XAEngineItfImpl_QueryVibraCapabilities(XAEngineItf self,
             {
             DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
             DEBUG_API("<-XAEngineItfImpl_QueryVibraCapabilities");
-            return XA_RESULT_PARAMETER_INVALID;
+            res = XA_RESULT_PARAMETER_INVALID;
             }
-        /* Number of devices */
-        *pIndex = 1;
+        else
+            {
+            /* Number of devices */
+            *pIndex = 0;
+            }
         }
     else
         {
-
-        /* query device capabilities */
-        if (pIndex)
-            {
-            if (*pIndex == 0)
-                {
-                if (!pVibraDeviceID)
-                    {
-                    DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-                    DEBUG_API("<-XAEngineItfImpl_QueryVibraCapabilities");
-                    return XA_RESULT_PARAMETER_INVALID;
-                    }
-
-                *pVibraDeviceID = XA_ADAPTID_VIBRA;
-                }
-            else
-                {
-                DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-                DEBUG_API("<-XAEngineItfImpl_QueryVibraCapabilities");
-                return XA_RESULT_PARAMETER_INVALID;
-                }
-            }
-
-        if (*pVibraDeviceID == XA_ADAPTID_VIBRA)
-            {
-            descriptor.minFrequency = MIN_FREQUENCY;
-            descriptor.maxFrequency = MAX_FREQUENCY;
-            descriptor.supportsFrequency = XA_BOOLEAN_TRUE;
-            descriptor.supportsIntensity = XA_BOOLEAN_TRUE;
-            *pDescriptor = descriptor;
-            }
-
+        // return NotSupported below
+        res = XA_RESULT_FEATURE_UNSUPPORTED;
         }
 
     DEBUG_API("<-XAEngineItfImpl_QueryVibraCapabilities");
-    return XA_RESULT_SUCCESS;
+    return res;
     }
 
 XAresult XAEngineItfImpl_QueryNumSupportedExtensions(XAEngineItf self,
