@@ -300,7 +300,17 @@ class CFileAudioOutput : public CAdvancedAudioOutput,
         * @param   aError a system-wide error code.
         * @return  -
         */
+       
         virtual void IOError(TInt aError);
+        
+        /**
+        * From MAdvancedAudioDecoderObserver
+        * Callback function from CAdvancedAudioDecoder to return if source is position or time seekable
+        * 
+        * @param None
+        * @return TBool
+        */
+        virtual TBool IsTimePosSeekable();
 
     private:
 

@@ -61,7 +61,7 @@ C3GPExtParser::~C3GPExtParser()
 // 3GPExtParser::GetilstBoxesL
 // -----------------------------------------------------------------------------
 //
-EXPORT_C void C3GPExtParser::GetilstBoxesL(const TDesC8 &/*aBox*/, TMetaDataFieldId /*aFieldId*/, HBufC** /*aBuf*/)
+EXPORT_C void C3GPExtParser::GetilstBoxesL(TMetaDataFieldId /*aFieldId*/, HBufC** /*aBuf*/)
 {
     User::Leave(KErrNotSupported);    
 }
@@ -69,7 +69,7 @@ EXPORT_C void C3GPExtParser::GetilstBoxesL(const TDesC8 &/*aBox*/, TMetaDataFiel
 // 3GPExtParser::GetilstBoxesL for 8-bit descriptor fields 
 // -----------------------------------------------------------------------------
 //
-EXPORT_C void C3GPExtParser::GetilstBoxesL(const TDesC8 &/*aBox*/, TMetaDataFieldId /*aFieldId*/, HBufC8** /*aBuf*/)
+EXPORT_C void C3GPExtParser::GetilstBoxesL(TMetaDataFieldId /*aFieldId*/, HBufC8** /*aBuf*/)
 {
     User::Leave(KErrNotSupported);   
 }

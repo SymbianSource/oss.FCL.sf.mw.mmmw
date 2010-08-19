@@ -767,7 +767,7 @@ The intent to evaluate.
   @return An error code indicating if the function call was successful. KErrNone on success, otherwise
   another of the system-wide error codes.
 */
-TInt CProgDLMultimediaSource::EvaluateIntent(ContentAccess::TIntent aIntent) const
+TInt CProgDLMultimediaSource::EvaluateIntent(ContentAccess::TIntent aIntent)
     {
     if (!iFile)
         {
@@ -1114,8 +1114,8 @@ TInt CProgDLMultimediaSource::Stop()
             {
             TInt pos = 0;
             CancelRequests();
-			// we should not delete the iFile, it causes the CAF to delete the rights if they are expired.
-
+            if (iFile)
+                iFile->Seek(ESeekStart,0);
             // Since the requests will not be deleted if it is still inside RunL() (iState is EProcessing), 
             // iReadRequestPending should not be initialized to 0 always
             iReadRequestPending = iRequests.Count();
@@ -1225,6 +1225,20 @@ void CProgDLMultimediaSource::SourceCustomCommand(TMMFMessage& aMessage)
             if ( err == KErrNone )
                 {
                 iFullFileName = sizePckg();
+                if (iFile)
+                {
+                    delete iFile;
+                    iFile = NULL;
+                }
+                if (iFileHandle)
+                    {
+                    TRAPD(err,iFile = CContentFile::NewL(iHandle, UniqueId(), iCAFParameters->iEnableUI));
+                    }
+                else
+                    {
+                    // Open for read-only access
+                    TRAPD(err,iFile = CContentFile::NewL(iFsSession, iFullFileName, UniqueId(), EFileShareAny, iCAFParameters->iEnableUI));
+                    }
                 }
             aMessage.Complete(KErrNone);			            
             
@@ -1395,8 +1409,17 @@ void CProgDLMultimediaSource::SourceCustomCommand(TMMFMessage& aMessage)
             aMessage.WriteDataToClient(perBufPckg);
             aMessage.Complete(KErrNone);
             }
-            break;   
-                
+            break;
+        case ESetFileMoving:
+            {
+            if (iFile)
+                {
+                delete iFile;
+                iFile = NULL;
+                }
+            aMessage.Complete(KErrNone);
+            }
+            break;    
         default:
             err = KErrArgument;
             break;
@@ -1475,13 +1498,7 @@ TInt CProgDLMultimediaSource::ServiceFillBuffer()
             request->SetActive();
             
             //	iSnkBytes += requestSize;
-            
-            if ((iSnkBytes + request->Buffer()->RequestSize()) >= iDownloadSize && isDownloadComplete)
-                {
-    	              request->Buffer()->SetLastBuffer(ETrue);
-                      DEBPRN1(_L("CProgDLMultimediaSource::ServiceFillBuffer() LastBuffer$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"));
-                }
-            
+            request->Buffer()->SetLastBuffer(EFalse);
             iFile->Read(request->BufferDes(), requestSize, request->iStatus);
             
             }
@@ -1633,6 +1650,13 @@ TInt CProgDLMultimediaSource::ReadRequestStatus(CReadWriteRequest* aRequest, TRe
         DEBPRN4(_L("CProgDLMultimediaSource::ReadRequestStatus Buffer[%x] BufferSize[%d] RequestSize[%d]"),aRequest->Buffer(),aRequest->Buffer()->BufferSize(),aRequest->Buffer()->RequestSize());
         DEBPRN3(_L("CProgDLMultimediaSource::ReadRequestStatus Buffer[%x] LastBuffer[%d]"),aRequest->Buffer(),aRequest->Buffer()->LastBuffer());
         
+        //Moved from CProgDLMultimediaSource::ServiceFillBuffer to handle deadlock situations
+        if ((iSnkBytes + aRequest->Buffer()->RequestSize()) >= iDownloadSize && isDownloadComplete)
+            {
+	              aRequest->Buffer()->SetLastBuffer(ETrue);
+                DEBPRN1(_L("CProgDLMultimediaSource::ReadRequestStatus() LastBuffer$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"));
+            }
+
         TBool lastBuffer = aRequest->Buffer()->LastBuffer();
         
         if((aRequest->Buffer()->BufferSize() != aRequest->Buffer()->RequestSize()) && !lastBuffer)
@@ -1697,7 +1721,7 @@ TInt CProgDLMultimediaSource::ReadRequestStatus(CReadWriteRequest* aRequest, TRe
 TInt CProgDLMultimediaSource::ReOpenCAF()
     {
     TInt status(KErrNone);
-    DEBPRN2(_L("CProgDLMultimediaSource::StateChanged ReOpenCAF[%d]"),iSnkBytes);     
+    DEBPRN2(_L("CProgDLMultimediaSource::ReOpenCAF ReOpenCAF[%d]"),iSnkBytes);     
     delete iFile;
     iFile = NULL;
     
@@ -1741,7 +1765,7 @@ TInt CProgDLMultimediaSource::ReOpenCAF()
         }												
 
     iReOpenCAF = ETrue;
-    DEBPRN3(_L("CProgDLMultimediaSource::StateChanged Exit status[%d] iFileSize[%d]"),status,iFileSize);     
+    DEBPRN3(_L("CProgDLMultimediaSource::ReOpenCAF Exit status[%d] iFileSize[%d]"),status,iFileSize);     
     return status;    
     }
 

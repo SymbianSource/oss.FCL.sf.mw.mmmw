@@ -27,19 +27,6 @@
 #include "MetaDataFieldContainer.h"
 #include "MetaDataField.hrh"
 
-// CONSTANTS
-
-_LIT8 (K3GPExtMetaTitleFormat, "%cnam"); 
-_LIT8 (K3GPExtMetaArtistFormat, "%cART"); 
-_LIT8 (K3GPExtMetaComposerFormat, "%cwrt"); 
-_LIT8 (K3GPExtMetaAlbumFormat, "%calb"); 
-_LIT8 (K3GPExtMetaCommentFormat, "%ccmt"); 
-_LIT8 (K3GPExtMetaCustomGenreFormat, "%cgen");  // mapped to rating
-_LIT8 (K3GPExtMetaYearFormat, "%cday"); 
-_LIT8 (K3GPExtMetaGenre, "gnre");
-_LIT8 (K3GPExtMetaTrack, "trkn"); 
-_LIT8 (K3GPExtMetaJpeg, "covr"); 
-
 
 // CLASS DECLARATION
 
@@ -67,20 +54,18 @@ class C3GPExtParser : public CBase
         /**
 		* Extract meta data boxes from ilst
 		* @since 3.0
-		* @param aBox wanted metadata box
         * @param aFieldId metadata field in 3GPExtParser
 		* @return void
 		*/
-		IMPORT_C void GetilstBoxesL(const TDesC8& aBox, TMetaDataFieldId aFieldId, HBufC** aBuf);
+		IMPORT_C void GetilstBoxesL(TMetaDataFieldId aFieldId, HBufC** aBuf);
 		/**
 		* Extract meta data boxes from ilst
 		* 8-bit version to support international languages in string metadata
 		* @since 3.1
-		* @param aBox wanted metadata box
         * @param aFieldId metadata field in 3GPExtParser
 		* @return void
 		*/
-		IMPORT_C void GetilstBoxesL(const TDesC8& aBox, TMetaDataFieldId aFieldId, HBufC8** aBuf);
+		IMPORT_C void GetilstBoxesL(TMetaDataFieldId aFieldId, HBufC8** aBuf);
 				
 		/** 
 		* Checks if file has 3GPExt metadata

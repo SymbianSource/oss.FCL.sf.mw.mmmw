@@ -383,5 +383,10 @@ TInt CAACAudioPlayControllerDecoder::CodecCmd(TCodecCmd /*aCmd*/)
 	{
 	return KErrNotSupported;
 	}
+TBool CAACAudioPlayControllerDecoder::IsDecodingSufficient()
+    {
+    RDebug::Printf("CAACAudioPlayControllerDecoder::IsDecodingSufficient");
+    return ETrue;
+    }
 
 // End of file

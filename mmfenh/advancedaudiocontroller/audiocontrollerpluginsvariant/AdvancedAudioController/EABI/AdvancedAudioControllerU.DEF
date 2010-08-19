@@ -468,4 +468,5 @@ EXPORTS
 	_ZThn4_N21CAdvancedAudioUtility19SeekPositionReachedEj @ 467 NONAME
 	_ZThn4_N21CAdvancedAudioUtility28PlayWindowEndPositionReachedEv @ 468 NONAME
 	_ZThn56_N24CAdvancedAudioController26GetCustomInterfaceBuilderLEv @ 469 NONAME
+	_ZN21CAdvancedAudioDecoder20IsDecodingSufficientEv @ 470 NONAME
 

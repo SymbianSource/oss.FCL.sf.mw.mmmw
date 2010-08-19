@@ -28,7 +28,8 @@ enum TProgDLSourceCC
         ESetDownloadState,
         EGetBitRate,
         EGetPercentageBuffered,
-        ESetUpdateFileName
+        ESetUpdateFileName,
+        ESetFileMoving
     };
 
 #endif // PROGDLSOURCECUSTOMCOMMANDS_H

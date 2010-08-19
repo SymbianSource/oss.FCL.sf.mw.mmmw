@@ -63,9 +63,6 @@
       <component id="mmmw_plat" filter="s60" name="Multimedia Middleware Platform Interfaces" class="api">
         <unit bldFile="mmmw_plat/group"/>
       </component>
-      <component id="mmmw_metadata" name="Multimedia Middleware Metadata" class="config" introduced="^2" purpose="development" target="desktop">
-        <unit mrp="mmmw_info/mmmw_metadata/mmmw_metadata.mrp"/>
-      </component>
     </collection>
   </package>
 </SystemDefinition>

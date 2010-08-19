@@ -22,8 +22,6 @@
 #include <e32base.h>
 #include <e32msgqueue.h>
 #include "VoIPAudioClientServer.h"   // for TVoIPMsgBuf
-// FORWARD DECLARATIONS
-
 
 /**
  *  MQueueHandlerObserver
