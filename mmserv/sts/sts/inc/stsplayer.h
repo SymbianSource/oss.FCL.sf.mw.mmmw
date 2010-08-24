@@ -18,10 +18,9 @@
 #ifndef STSPLAYER_H_
 #define STSPLAYER_H_
 
-
 #include <systemtoneservice.h>
 #include <mdaaudiosampleplayer.h>
-
+#include "stssettingsmanager.h"
 
 class MStsPlayerObserver
     {
@@ -32,43 +31,35 @@ public:
 class CStsPlayer : private MMdaAudioPlayerCallback
     {
 public:
-
-    static CStsPlayer* CreateTonePlayer(MStsPlayerObserver& aObserver,
-            CSystemToneService::TToneType aTone, unsigned int aContext, 
-           	const TDesC& aFileName, TInt aVolume, 
-           	TUint aAudioPreference, TUint  aAudioPriority);
-    static CStsPlayer* CreateAlarmPlayer(MStsPlayerObserver& aObserver,
-            CSystemToneService::TAlarmType aAlarm, unsigned int aContext,
-            const TDesC& aFileName, TInt aVolume,
-    				TUint aAudioPreference, TUint  aAudioPriority);	
+    static CStsPlayer* Create(MStsPlayerObserver& aObserver,
+            CStsSettingsManager& aSettingsManager, unsigned int aContext,
+            CSystemToneService::TAlarmType aAlarm);
+    static CStsPlayer* Create(MStsPlayerObserver& aObserver,
+            CStsSettingsManager& aSettingsManager, unsigned int aContext,
+            CSystemToneService::TToneType aTone);
     virtual ~CStsPlayer();
     void Play();
     void Stop();
-    
-    
+
 protected:
-        
-    CStsPlayer(MStsPlayerObserver& aObserver, const TDesC& aFileName,
-    int aRepeatNumberOfTimes, unsigned int aContext,
-    TInt aVolume, TUint aAudioPreference, TUint aAudioPriority);
+    CStsPlayer(MStsPlayerObserver& aObserver,
+            CStsSettingsManager::MPlayerSettings& aPlayerSettings,
+            unsigned int aContext, TUint aAudioPreference,
+            TUint aAudioPriority);
     bool Init();
 
 private:
     void MapcInitComplete(TInt aError,
-    const TTimeIntervalMicroSeconds& aDuration);
+            const TTimeIntervalMicroSeconds& aDuration);
     void MapcPlayComplete(TInt aError);
 
     MStsPlayerObserver& iObserver;
-    CMdaAudioPlayerUtility* iPlayer;
-    TPtrC iFileName;
-    int iRepeatNumberOfTimes;
+    CStsSettingsManager::MPlayerSettings& iPlayerSettings;
     unsigned int iContext;
-
-	TInt  iVolume;
-    TBool iWarningToneEnabled;
     TUint iAudioPreference;
     TUint iAudioPriority;
-		
+    TInt iVolume;
+    CMdaAudioPlayerUtility* iPlayer;
     };
 
 #endif // STSPLAYER_H_

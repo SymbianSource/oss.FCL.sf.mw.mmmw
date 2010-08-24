@@ -134,15 +134,21 @@ LIBRARY 	mmfserverbaseclasses.lib
 LIBRARY 	AdvancedAudioController.lib
 LIBRARY         DevSoundAudioOutput.lib
 LIBRARY		FileAudioOutput.lib
-LIBRARY		3GPMP4Lib.lib
+LIBRARY		3gpmp4lib.lib
 LIBRARY         efsrv.lib				// File server session
 LIBRARY		bafl.lib				// Resource file
-LIBRARY		MMFDevSound.lib
+LIBRARY		mmfdevsound.lib
 LIBRARY         caf.lib
 LIBRARY         cafutils.lib
 LIBRARY			3gpDataSourceAdapter.lib
-LIBRARY         FrameTable.lib             // for CFrameTable
-LIBRARY EAacPlusAudioControllerUtility.lib
+
+#ifndef WINSCW					//to support build on Linux
+LIBRARY		FrameTable.lib			// for CFrameTable
+#else
+LIBRARY		frametable.lib
+#endif 
+
+LIBRARY EAACPlusAudioControllerUtility.lib
 
 LIBRARY AMRAudioControllerUtility.lib
 LIBRARY AWBAudioControllerUtility.lib
@@ -152,15 +158,27 @@ LIBRARY AWBAudioControllerUtility.lib
         #ifndef __AAC_PLUS_DECODER_PLUGIN
             LIBRARY	AacDecoderConfig.lib
         #else
+        	#ifndef WINSCW								//to support build on Linux
 			    LIBRARY EAacPlusUtil.lib							// MMF eAAC+ Utility
+			#else
+				LIBRARY eaacplusutil.lib    
+			#endif	
             LIBRARY EAacPlusDecoderIntfc.lib
         #endif
     #else      
-		  LIBRARY EAacPlusUtil.lib								// MMF eAAC+ Utility
+        #ifndef WINSCW									//to support build on Linux
+			LIBRARY EAacPlusUtil.lib							// MMF eAAC+ Utility
+		#else
+			LIBRARY eaacplusutil.lib    
+		#endif									
         LIBRARY	AacDecoderConfig.lib
     #endif
 #else
-    LIBRARY EAacPlusUtil.lib									// MMF eAAC+ Utility 
+    #ifndef WINSCW										//to support build on Linux
+	    LIBRARY EAacPlusUtil.lib							// MMF eAAC+ Utility
+	#else
+		LIBRARY  eaacplusutil.lib    
+	#endif										
     LIBRARY	AacDecoderConfig.lib
 #endif
 

@@ -15,7 +15,6 @@
  * This file defines the interface to the client side session of the
  * STS Server.
  */
-
 #ifndef RSTSSESSION_H_
 #define RSTSSESSION_H_
 
@@ -38,10 +37,10 @@ public:
     void SendPlayAlarm(CSystemToneService::TAlarmType aAlarm,
             unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 
+    void SendPlayToneAlarm(CSystemToneService::TToneType aTone,
+            unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
+
     void SendStopAlarm(unsigned int aAlarmContext);
-    
-    void SendPlayToneForStop(CSystemToneService::TToneType aTone,
-    	      unsigned int& aAlarmContext,  MStsPlayAlarmObserver& aObserver);
 
 private:
 

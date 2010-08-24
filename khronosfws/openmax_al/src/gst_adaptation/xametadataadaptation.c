@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -110,7 +110,7 @@ XAresult XAMetadataAdapt_PreInit(XAAdaptationGstCtx *bCtx)
     XAresult ret = XA_RESULT_SUCCESS;
     XAMetadataAdaptVars* mdv;
     DEBUG_API("->XAMetadataAdapt_PreInit");
-    
+
     if ( bCtx->baseObj.ctxId == XAMediaRecorderAdaptation )
     {
         mdv = (XAMetadataAdaptVars*) calloc(1, sizeof(XAMetadataAdaptVars));
@@ -522,7 +522,7 @@ XAresult XAMetadataInsertionItfAdapt_CreateChildNode(XAAdaptationGstCtx *bCtx,
                 DEBUG_ERR("Nodetype not supported!");
                 ret = XA_RESULT_CONTENT_UNSUPPORTED;
                 DEBUG_API_A1("<-XAMetadataInsertionItfAdapt_CreateChildNode (%d)", (int)ret);
-                return ret;            
+                return ret;
             }
 
             mdv = mCtx->metadatavars;
@@ -530,7 +530,9 @@ XAresult XAMetadataInsertionItfAdapt_CreateChildNode(XAAdaptationGstCtx *bCtx,
             {
                 DEBUG_ERR("Metadata variables not initialized!");
                 ret = XA_RESULT_PRECONDITIONS_VIOLATED;
+                return ret;
             }
+
             switch(type)
             {
             case XA_NODETYPE_IMAGE:
@@ -858,7 +860,7 @@ GstStructure* XAMetadataAdapt_GetChildStructure(XAMetadataAdaptVars* mdv, XAuint
  */
 XAMetadataAdaptVars* XAMetadataAdapt_GetMetadataVars(XAAdaptationGstCtx *bCtx)
 {
-    
+
     if( bCtx->baseObj.ctxId == XAMediaRecorderAdaptation )
     {
         return ((XAMediaRecorderAdaptationCtx*)bCtx)->metadatavars;
@@ -985,7 +987,7 @@ gboolean XAMetadataAdapt_GstTagCb( GstBus *bus, GstMessage *message, gpointer da
                         GST_MESSAGE_TYPE_NAME(message), GST_OBJECT_NAME(GST_MESSAGE_SRC(message)));
         gst_message_parse_tag (message, &new_tags);
         /* NOTE: only general tags received this way (not child nodes)*/
-        
+
         if( bCtx->baseObj.ctxId == XAMediaRecorderAdaptation )
         {
             old_tags = &((XAMediaRecorderAdaptationCtx*)bCtx)->metadatavars->generaltags;

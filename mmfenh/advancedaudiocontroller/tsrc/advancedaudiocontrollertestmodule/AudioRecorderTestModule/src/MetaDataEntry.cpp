@@ -109,7 +109,7 @@ TInt CMetaDataEntry::RunTestL(CTestModuleIf *aConsole, CStifLogger *aLogger, CSt
 
 	CActiveScheduler::Start();
 
-	if (error == KErrNone)
+	if (selfObj->callbackErr != KErrNone)
 	{
 		error = selfObj->callbackErr;
 	}
@@ -143,13 +143,12 @@ void CMetaDataEntry::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
     RDebug::Print (_L ("CMetaDataEntry::MoscoStateChangeEvent"));
 #endif
 	TInt err = KErrNone;
-//	callbackErr = KErrNone;
+	callbackErr = aErrorCode;
 	RArray<TFourCC> dataTypes;
 
 	logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),aErrorCode,aPreviousState,aCurrentState);
 
-
-
+	
 	if (recorder && aErrorCode == KErrNone && aCurrentState == CMdaAudioClipUtility::EOpen && aPreviousState == 0)
 	{
 		// Initialize
@@ -269,6 +268,13 @@ void CMetaDataEntry::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 		logger->Log(_L("before stop....-"));
 		CActiveScheduler::Stop();
 	}
+	if (aErrorCode != KErrNone)
+	    {
+        
+	    CActiveScheduler::Stop();
+	    
+	    }
+
 
 	return;
 

@@ -49,25 +49,28 @@ const TOperationsPage KKeyMap[KKeyMapPageCount] =
                                 },
                             // 0 - 9
                                 {
+                                        STR("Stop Current Alarm"),
+                                        EOperation_StopCurrentAlarm
+                                },
+                                {
                                         STR("Play Default Beep"),
                                         EOperation_PlayDefaultBeep
                                 },
                                 {
-                                        STR("Play Clock Alarm"),
-                                        EOperation_PlayClockAlarm
+                                        STR("Play Default Alarm"),
+                                        EOperation_PlayDefaultAlarm
                                 },
                                 {
-                                        STR("Stop Clock Alarm"),
-                                        EOperation_StopClockAlarm
+                                        STR("Play Default Beep as Alarm"),
+                                        EOperation_PlayDefaultasAlarm
                                 },
                                 {
-                                STR(""), KOperation_None
+                                        STR("Play Incoming Call Alarm"),
+                                        EOperation_PlayIncomingCallAlarm
                                 },
                                 {
-                                STR(""), KOperation_None
-                                },
-                                {
-                                STR(""), KOperation_None
+                                        STR("Play Warning Beep"),
+                                        EOperation_PlayWarningBeep
                                 },
                                 {
                                 STR(""), KOperation_None
@@ -117,9 +120,12 @@ void CStsTester::Main()
 
 void CStsTester::MainL()
     {
+    _LIT(KStopCurrentAlarm, "Stop Current Alarm");
     _LIT(KPlayDefault, "Play Default Beep");
-    _LIT(KPlayClockAlarm, "Play Clock Alarm");
-    _LIT(KStopClockAlarm, "Stop Clock Alarm");
+    _LIT(KPlayDefaultAlarm, "Play Default Alarm");
+    _LIT(KPlayDefaultAsAlarm, "Play Default Beep as Alarm");
+    _LIT(KPlayIncomingCallAlarm, "Play Incoming Call Alarm");
+    _LIT(KPlayWarningBeep, "Play Warning Beep");
     _LIT(KExit, "Exit");
 
     bool done = false;
@@ -127,9 +133,12 @@ void CStsTester::MainL()
     while (!done)
         {
         RPointerArray<TDesC> operations;
+        operations.Append(&KStopCurrentAlarm);
         operations.Append(&KPlayDefault);
-        operations.Append(&KPlayClockAlarm);
-        operations.Append(&KStopClockAlarm);
+        operations.Append(&KPlayDefaultAlarm);
+        operations.Append(&KPlayDefaultAsAlarm);
+        operations.Append(&KPlayIncomingCallAlarm);
+        operations.Append(&KPlayWarningBeep);
         operations.Append(&KExit);
 
         TInt index = SelectFromListL(TPoint(0, 0), iDisplaySize, _L(
@@ -145,15 +154,24 @@ void CStsTester::MainL()
                 done = true;
                 break;
             case 0:
-                ExecuteOperation(EOperation_PlayDefaultBeep, operationName);
+                ExecuteOperation(EOperation_StopCurrentAlarm, operationName);
                 break;
             case 1:
-                ExecuteOperation(EOperation_PlayClockAlarm, operationName);
+                ExecuteOperation(EOperation_PlayDefaultBeep, operationName);
                 break;
             case 2:
-                ExecuteOperation(EOperation_StopClockAlarm, operationName);
+                ExecuteOperation(EOperation_PlayDefaultAlarm, operationName);
                 break;
             case 3:
+                ExecuteOperation(EOperation_PlayDefaultasAlarm, operationName);
+                break;
+            case 4:
+                ExecuteOperation(EOperation_PlayIncomingCallAlarm, operationName);
+                break;
+            case 5:
+                ExecuteOperation(EOperation_PlayWarningBeep, operationName);
+                break;
+            case 6:
                 done = true;
                 break;
             }
@@ -164,6 +182,15 @@ void CStsTester::ExecuteOperation(TInt aOperation, const TDesC& /*aOperationText
     {
     switch (aOperation)
         {
+        case EOperation_StopCurrentAlarm:
+            {
+            TAG_TIME_PROFILING_BEGIN;
+            iSts->StopAlarm(iCurrentContext);
+            TAG_TIME_PROFILING_END;
+            PRINT_TO_CONSOLE_TIME_DIFF;
+            iPlayState = EStopped;
+            break;
+            }
         case EOperation_PlayDefaultBeep:
             {
             TAG_TIME_PROFILING_BEGIN;
@@ -172,7 +199,7 @@ void CStsTester::ExecuteOperation(TInt aOperation, const TDesC& /*aOperationText
             PRINT_TO_CONSOLE_TIME_DIFF;
             break;
             }
-        case EOperation_PlayClockAlarm:
+        case EOperation_PlayDefaultAlarm:
             {
             // Only play if not already playing
             if (iPlayState != EPlaying)
@@ -186,13 +213,41 @@ void CStsTester::ExecuteOperation(TInt aOperation, const TDesC& /*aOperationText
                 }
             break;
             }
-        case EOperation_StopClockAlarm:
+        case EOperation_PlayDefaultasAlarm:
             {
-            TAG_TIME_PROFILING_BEGIN;
-            iSts->StopAlarm(iCurrentContext);
-            TAG_TIME_PROFILING_END;
-            PRINT_TO_CONSOLE_TIME_DIFF;
-            iPlayState = EStopped;
+            // Only play if not already playing
+            if (iPlayState != EPlaying)
+                {
+                iPlayState = EPlaying;
+                TAG_TIME_PROFILING_BEGIN;
+                iSts->PlayAlarm(CSystemToneService::EDefaultBeep,
+                        iCurrentContext, *this);
+                TAG_TIME_PROFILING_END;
+                PRINT_TO_CONSOLE_TIME_DIFF;
+                }
+            break;
+            }
+        case EOperation_PlayIncomingCallAlarm:
+            {
+            // Only play if not already playing
+            if (iPlayState != EPlaying)
+                {
+                iPlayState = EPlaying;
+                TAG_TIME_PROFILING_BEGIN;
+                iSts->PlayAlarm(CSystemToneService::EIncomingCall,
+                        iCurrentContext, *this);
+                TAG_TIME_PROFILING_END;
+                PRINT_TO_CONSOLE_TIME_DIFF;
+                }
+            break;
+            }
+        case EOperation_PlayWarningBeep:
+            {
+            // Only play if not already playing
+                TAG_TIME_PROFILING_BEGIN;
+                iSts->PlayTone(CSystemToneService::EWarningBeep);
+                TAG_TIME_PROFILING_END;
+                PRINT_TO_CONSOLE_TIME_DIFF;
             break;
             }
         default:

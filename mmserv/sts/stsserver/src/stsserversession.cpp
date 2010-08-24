@@ -17,6 +17,7 @@
  * in the STS class.
  */
 
+//  Include Files  
 #include "stsserversession.h"
 #include "stsserver.h"
 #include "sts.h"
@@ -54,6 +55,9 @@ void CStsServerSession::ServiceL(const RMessage2& aMessage)
             break;
         case StsMsg_PlayAlarm:
             DoPlayAlarmL(aMessage);
+            break;
+        case StsMsg_PlayToneAlarm:
+            DoPlayToneAlarmL(aMessage);
             break;
         case StsMsg_StopAlarm:
             DoStopAlarmL(aMessage);
@@ -106,22 +110,12 @@ void CStsServerSession::DoPlayAlarmL(const RMessage2& aMessage)
         }
     }
 
-void CStsServerSession::DoStopAlarmL(const RMessage2& aMessage)
-    {
-    unsigned int context = aMessage.Int0();
-    aMessage.Complete(KErrNone);
-    iObserverMap.erase(context);
-    iSts.StopAlarm(context);
-    }
-
-void CStsServerSession::DoPlayToneStopL(const RMessage2& aMessage)
+void CStsServerSession::DoPlayToneAlarmL(const RMessage2& aMessage)
     {
     CSystemToneService::TToneType tone =
             (CSystemToneService::TToneType) aMessage.Int0();
     unsigned int context = 0;
-    //SR
-    //iSts.PlayTone(tone, context, *this);
-    iSts.PlayToneStop(tone, context, *this);
+    iSts.PlayAlarm(tone, context, *this);
     iObserverMap[context] = (MStsPlayAlarmObserver*) aMessage.Ptr2();
     TPckg<unsigned int> contextPckg(context);
     TRAPD(err,aMessage.WriteL(1,contextPckg));
@@ -134,6 +128,13 @@ void CStsServerSession::DoPlayToneStopL(const RMessage2& aMessage)
         }
     }
 
+void CStsServerSession::DoStopAlarmL(const RMessage2& aMessage)
+    {
+    unsigned int context = aMessage.Int0();
+    aMessage.Complete(KErrNone);
+    iObserverMap.erase(context);
+    iSts.StopAlarm(context);
+    }
 
 void CStsServerSession::CleanUpObservers()
     {

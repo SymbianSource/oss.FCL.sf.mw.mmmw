@@ -1872,7 +1872,8 @@ TInt CMetaDataDisplay::ContainerField( CStifItemParser& aItem )
 						}
 					else
 						{
-						iLog->Log( _L("The content of meta data field [%d] is [%S]."),field.Alloc() );
+						//iLog->Log( _L("The content of meta data field [%d] is [%S]."),field.Alloc() );
+					    iLog->Log( _L("Unknown meta data field"));
 						}
 					break;
 					}

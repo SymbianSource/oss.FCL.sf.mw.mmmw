@@ -167,6 +167,12 @@ void CMetaDataParser3GPExt::ParseL(
 
         TRAP(err, GetDurationL(EMetaDataDuration));
 		
+        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaArtistFormat, EMetaDataAlbumArtist, &buf8));
+        if (KErrNone == err)
+            {
+            ConvertAndAppendL(&buf8, EMetaDataAlbumArtist);
+            }
+        
         TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaJpeg, EMetaDataJpeg, &buf8));
         if (KErrNone == err)
             {
@@ -258,6 +264,14 @@ void CMetaDataParser3GPExt::ParseL(
                         }					
                     break;
 					
+                case EMetaDataAlbumArtist:
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaArtistFormat, EMetaDataAlbumArtist, &buf8));
+                    if (KErrNone == err)
+                        {
+                        ConvertAndAppendL(&buf8, EMetaDataAlbumArtist);
+                        }                   
+                    break;
+                    
                 case EMetaDataJpeg:
                     TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaJpeg, EMetaDataJpeg, &buf8));
                     if (KErrNone == err)

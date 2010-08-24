@@ -41,6 +41,7 @@ SOURCE          ProfileSettingsMonitorServerImpl.cpp
 LIBRARY		    ProfileEngine.lib
 LIBRARY		centralrepository.lib
 LIBRARY         euser.lib
+LIBRARY         ProfileEng.lib
 
 epocprocesspriority background
 

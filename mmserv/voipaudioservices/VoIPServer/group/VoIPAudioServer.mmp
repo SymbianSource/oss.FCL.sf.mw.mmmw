@@ -54,16 +54,16 @@ LIBRARY         euser.lib
 LIBRARY         estor.lib
 LIBRARY         mediaclientaudio.lib
 LIBRARY         mmfdevsound.lib
-LIBRARY         errorconcealmentintfc.lib
-LIBRARY         g711decoderintfc.lib
-LIBRARY         g711encoderintfc.lib
-LIBRARY         g729decoderintfc.lib
-LIBRARY         g729encoderintfc.lib
-LIBRARY         ilbcdecoderintfc.lib
-LIBRARY         ilbcencoderintfc.lib
-LIBRARY         speechencoderconfig.lib
-LIBRARY         audiooutputrouting.lib
-LIBRARY         profileengine.lib
+LIBRARY         ErrorConcealmentIntfc.lib
+LIBRARY         G711DecoderIntfc.lib
+LIBRARY         G711EncoderIntfc.lib
+LIBRARY         G729DecoderIntfc.lib
+LIBRARY         G729EncoderIntfc.lib
+LIBRARY         IlbcDecoderIntfc.lib
+LIBRARY         IlbcEncoderIntfc.lib
+LIBRARY         SpeechEncoderConfig.lib
+LIBRARY         AudioOutputRouting.lib
+LIBRARY         ProfileEngine.lib
 LIBRARY         voipjitterbuffer.lib
 LIBRARY         mmfserverbaseclasses.lib
 

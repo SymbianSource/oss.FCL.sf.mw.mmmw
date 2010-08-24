@@ -225,6 +225,11 @@ void CPlayBalance::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousState
 
 		CActiveScheduler::Stop();
 	}
+	if (aErrorCode != KErrNone)
+	    {
+	    expectedBalance = 0;
+	    CActiveScheduler::Stop();   
+	    }
 
 	return;
 

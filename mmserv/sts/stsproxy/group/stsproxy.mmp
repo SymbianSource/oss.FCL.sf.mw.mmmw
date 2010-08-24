@@ -30,4 +30,5 @@ USERINCLUDE     ../../stsserver/inc
 
 SOURCEPATH      ../src
 
-SOURCE          stsimplementation.cpp rstssession.cpp
+SOURCE          rstssession.cpp
+SOURCE          stsimplementation.cpp

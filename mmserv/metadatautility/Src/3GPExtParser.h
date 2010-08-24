@@ -158,7 +158,9 @@ class C3GPExtParser : public CBase
  		TUint32 iTrackNumberSize;
  		TUint32 iCoverOffset;
  		TUint32 iCoverSize;
- 		
+        TUint32 iAlbumArtistOffset;  
+        TUint32 iAlbumArtistSize;
+        
  	public:
  				// constants
 		TBuf8<4> K3GPExtMetaTitle;

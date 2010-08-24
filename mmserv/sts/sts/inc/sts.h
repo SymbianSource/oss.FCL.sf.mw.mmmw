@@ -18,19 +18,13 @@
  * server.  This class manages all of the active players, and guarantees
  * that the context values are unique.
  */
-
 #ifndef STS_H_
 #define STS_H_
-
 
 #include <systemtoneservice.h>
 #include <map>
 
 #include "stsplayer.h"
-
-class MProEngEngine;
-class MProEngProfile;
-
 
 class CSts : private MStsPlayerObserver
     {
@@ -40,16 +34,14 @@ public:
     void PlayTone(CSystemToneService::TToneType aTone);
     void PlayAlarm(CSystemToneService::TAlarmType aAlarm,
             unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
+    void PlayAlarm(CSystemToneService::TToneType aTone,
+            unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
     void StopAlarm(unsigned int aAlarmContext);
-    void PlayToneStop(CSystemToneService::TToneType aTone,
-    	      unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 
 protected:
     CSts();
     virtual ~CSts();
     bool Init();
-    void LoadActiveProfileSettingsL();
-    
 
 private:
     void CleanUpPlayers();
@@ -59,19 +51,10 @@ private:
 
 private:
     unsigned int iNextContext;
+    CStsSettingsManager* iSettingsManager;
     class CPlayerNode;
     typedef std::map<unsigned int, CPlayerNode*> TPlayerMap;
     TPlayerMap iPlayerMap;
-    
-    TPtrC iFileName;
-    MProEngEngine* iEngine;
-    MProEngProfile* iProfile;
-
-    TInt  iVolume;
-    TBool iWarningToneEnabled;
-    TUint iAudioPreference;
-    TUint iAudioPriority;
-    
     };
 
 #endif //STS_H

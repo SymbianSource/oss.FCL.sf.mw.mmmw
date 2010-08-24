@@ -801,20 +801,27 @@ TInt TMSServer::NotifyTarClients(TRoutingMsgBufPckg routingpckg)
     TRACE_PRN_FN_ENT;
 
     TInt vol;
-    iCurrentRouting = routingpckg().iOutput;
-    if (iCurrentRouting == TMS_AUDIO_OUTPUT_PUBLIC ||
-            iCurrentRouting == TMS_AUDIO_OUTPUT_LOUDSPEAKER)
-        {
-        iEffectSettings->GetLoudSpkrVolume(vol);
-        TRACE_PRN_N1(_L("TMSServer::NotifyTarClients loudspkr vol %d"),vol);
-        }
-    else
-        {
-        iEffectSettings->GetEarPieceVolume(vol);
-        TRACE_PRN_N1(_L("TMSServer::NotifyTarClients ear vol %d"),vol);
-        }
+    TInt status(TMS_RESULT_SUCCESS);
+    FindActiveCallType();
 
-    TInt status = SendMessageToCallServ(TMS_EFFECT_GLOBAL_VOL_SET, vol);
+    if (iActiveCallType == TMS_CALL_CS)
+        {
+
+        iCurrentRouting = routingpckg().iOutput;
+        if (iCurrentRouting == TMS_AUDIO_OUTPUT_PUBLIC || 
+        	  iCurrentRouting == TMS_AUDIO_OUTPUT_LOUDSPEAKER)
+            {
+            iEffectSettings->GetLoudSpkrVolume(vol);
+            TRACE_PRN_N1(_L("TMSServer::NotifyTarClients loudspkr vol %d"),vol);
+            }
+        else
+            {
+            iEffectSettings->GetEarPieceVolume(vol);
+            TRACE_PRN_N1(_L("TMSServer::NotifyTarClients ear vol %d"),vol);
+            }
+
+        status = SendMessageToCallServ(TMS_EFFECT_GLOBAL_VOL_SET, vol);
+        }
 
     iSessionIter.SetToFirst();
     TMSServerSession* ss = static_cast<TMSServerSession*> (iSessionIter++);
@@ -825,8 +832,11 @@ TInt TMSServer::NotifyTarClients(TRoutingMsgBufPckg routingpckg)
             {
             ss->HandleRoutingChange(routingpckg);
             }
-        ss->HandleGlobalEffectChange(TMS_EVENT_EFFECT_VOL_CHANGED, vol, ETrue,
-                iCurrentRouting);
+        if (iActiveCallType == TMS_CALL_CS)
+            {
+            ss->HandleGlobalEffectChange(TMS_EVENT_EFFECT_VOL_CHANGED, vol,
+                    ETrue, iCurrentRouting);
+            }
         ss = static_cast<TMSServerSession*> (iSessionIter++);
         }
 

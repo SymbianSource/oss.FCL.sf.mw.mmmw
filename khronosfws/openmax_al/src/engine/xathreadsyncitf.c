@@ -128,9 +128,9 @@ XAThreadSyncItfImpl* XAThreadSyncItfImpl_Create()
 void XAThreadSyncItfImpl_Free(XAThreadSyncItfImpl* self)
     {
     DEBUG_API("->XAThreadSyncItfImpl_Free");
-    assert(self==self->self);
     if(self)
         {
+        assert(self==self->self);
         XAImpl_DeleteMutex(self->engCriticalSection);
         free(self);
         }

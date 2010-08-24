@@ -73,14 +73,14 @@ void CStsImplementation::PlayAlarm(CSystemToneService::TAlarmType aAlarm,
     iSession->SendPlayAlarm(aAlarm, aAlarmContext, aObserver);
     }
 
+void CStsImplementation::PlayAlarm(CSystemToneService::TToneType aTone,
+        unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
+    {
+    iSession->SendPlayToneAlarm(aTone, aAlarmContext, aObserver);
+    }
+
 void CStsImplementation::StopAlarm(unsigned int aAlarmContext)
     {
     //TODO: Add logging and error checking
     iSession->SendStopAlarm(aAlarmContext);
     }
-    
-void CStsImplementation::PlayAlarm(CSystemToneService::TToneType aTone,
-	      unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver) 
-	   {  
-	   	iSession->SendPlayToneForStop(aTone, aAlarmContext, aObserver);  
-		 }

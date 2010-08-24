@@ -16,6 +16,7 @@
  * to the STS Server.
  */
 
+//  Include Files  
 #include "rstssession.h"
 #include "stsclientservercommon.h"
 
@@ -96,6 +97,7 @@ void RStsSession::RunThreadL()
 
 void RStsSession::HandleMessage(TStsCallBack& aMessage)
     {
+    bool signalObserver = false;
     TStsCallBackType type = aMessage.callBackType;
     if (type == EStsPlayAlarmComplete)
         {
@@ -104,7 +106,7 @@ void RStsSession::HandleMessage(TStsCallBack& aMessage)
         iObserverMutex.Wait();
         if (observer == iObserverMap[context])
             {
-            observer->PlayAlarmComplete(aMessage.alarmContext);
+            signalObserver = true;
             }
         else
             {
@@ -112,6 +114,10 @@ void RStsSession::HandleMessage(TStsCallBack& aMessage)
             }
         iObserverMap.erase(context);
         iObserverMutex.Signal();
+        if (signalObserver)
+            {
+            observer->PlayAlarmComplete(aMessage.alarmContext);
+            }
         }
     else if (type == EStsShutdown)
         {
@@ -165,7 +171,6 @@ TInt RStsSession::StartThread()
     {
     TInt result = iThread.Create(KNullDesC, RStsSession::CallBackThreadMain,
             KDefaultStackSize, &User::Heap(), (TAny*) this);
-
     if (result == KErrNone)
         {
         TRequestStatus rendezvousStatus = KRequestPending;
@@ -186,7 +191,6 @@ TInt RStsSession::StartThread()
             iThread.Kill(result);
             }
         }
-
     return result;
     }
 
@@ -208,14 +212,12 @@ TInt RStsSession::CreateServerSession()
                     KStsServerBuild), KNumSlots, EIpcSession_Sharable);
             }
         }
-
     if (result == KErrNone)
         {
         TPckg<TThreadId> idPckg(iServerThreadId);
         result = SendReceive(StsMsg_RegisterMsgQueue, TIpcArgs(iMsgQueue,
                 &idPckg));
         }
-
     return result;
     }
 
@@ -239,7 +241,6 @@ TInt RStsSession::Connect()
                 }
             }
         }
-
     return result;
     }
 
@@ -267,19 +268,56 @@ void RStsSession::SendPlayTone(CSystemToneService::TToneType aTone)
 void RStsSession::SendPlayAlarm(CSystemToneService::TAlarmType aAlarm,
         unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
     {
+    bool signalObserver = false;
     TPckg<unsigned int> alarmContextPckg(aAlarmContext);
+    // Need to do the SendReceive and adding the observer to the
+    // observer map in a critical section in case the playback
+    // completes before this method has a chance to update the
+    // observer list.
+    iObserverMutex.Wait();
     TInt err = SendReceive(StsMsg_PlayAlarm, TIpcArgs(aAlarm,
             &alarmContextPckg, &aObserver));
     if (err != KErrNone)
         {
         //TODO: Log a message
-        aObserver.PlayAlarmComplete(aAlarmContext);
+        signalObserver = true;
         }
     else
         {
-        iObserverMutex.Wait();
         iObserverMap[aAlarmContext] = &aObserver;
-        iObserverMutex.Signal();
+        }
+    iObserverMutex.Signal();
+    if (signalObserver)
+        {
+        aObserver.PlayAlarmComplete(aAlarmContext);
+        }
+    }
+
+void RStsSession::SendPlayToneAlarm(CSystemToneService::TToneType aTone,
+        unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
+    {
+    bool signalObserver = false;
+    TPckg<unsigned int> alarmContextPckg(aAlarmContext);
+    // Need to do the SendReceive and adding the observer to the
+    // observer map in a critical section in case the playback
+    // completes before this method has a chance to update the
+    // observer list.
+    iObserverMutex.Wait();
+    TInt err = SendReceive(StsMsg_PlayToneAlarm, TIpcArgs(aTone,
+            &alarmContextPckg, &aObserver));
+    if (err != KErrNone)
+        {
+        //TODO: Log a message
+        signalObserver = true;
+        }
+    else
+        {
+        iObserverMap[aAlarmContext] = &aObserver;
+        }
+    iObserverMutex.Signal();
+    if (signalObserver)
+        {
+        aObserver.PlayAlarmComplete(aAlarmContext);
         }
     }
 
@@ -294,26 +332,6 @@ void RStsSession::SendStopAlarm(unsigned int aAlarmContext)
         //TODO: Log a message
         }
     }
-
-void RStsSession::SendPlayToneForStop(CSystemToneService::TToneType aTone,
-        unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
-    {
-    TPckg<unsigned int> alarmContextPckg(aAlarmContext);
-    TInt err = SendReceive(StsMsg_PlayTone, TIpcArgs(aTone,
-            &alarmContextPckg, &aObserver));
-    if (err != KErrNone)
-        {
-        //TODO: Log a message
-        aObserver.PlayAlarmComplete(aAlarmContext);
-        }
-    else
-        {
-        iObserverMutex.Wait();
-        iObserverMap[aAlarmContext] = &aObserver;
-        iObserverMutex.Signal();
-        }
-   }   
-    
 
 void RStsSession::CleanUpObservers()
     {

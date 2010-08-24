@@ -413,12 +413,12 @@ void CMMFBackendEngine::MvpuoEvent(class TMMFEvent const & event)
         {
         //RDebug::Print(_L("CMMFBackendEngine::MvpuoEvent: Audio Device taken"));
         PausePlayback();
-        XAAdaptEvent event =
+        XAAdaptEvent alEvent =
             {
             XA_PLAYITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL
             };
         XAAdaptationBase_SendAdaptEvents(
-                (XAAdaptationBaseCtx*) iAdaptContext, &event);
+                (XAAdaptationBaseCtx*) iAdaptContext, &alEvent);
         }
     else if (event.iEventType == KMMFRefreshMetaData)
         {

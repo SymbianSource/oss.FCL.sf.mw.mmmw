@@ -76,10 +76,10 @@ LIBRARY 	mmfstandardcustomcommands.lib
 LIBRARY 	mmfserverbaseclasses.lib
 LIBRARY 	AdvancedAudioController.lib
 LIBRARY         DevSoundAudioInput.lib
-LIBRARY		3GPMP4Lib.lib
+LIBRARY		3gpmp4lib.lib
 LIBRARY         efsrv.lib				// File server session
 LIBRARY		bafl.lib				// Resource file
-LIBRARY		MMFDevSound.lib
+LIBRARY		mmfdevsound.lib
 
 // for MP4MetaDataWrite
 LIBRARY         MetaDataWrite.lib			// for MMetaDataWriteCustomCommandImplementor

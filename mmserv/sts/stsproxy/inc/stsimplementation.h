@@ -15,7 +15,6 @@
  * This file defines the interface to the class that provides the
  * implementation logic of the STS API.
  */
-
 #ifndef STSIMPLEMENTATION_H_
 #define STSIMPLEMENTATION_H_
 
@@ -30,13 +29,11 @@ public:
     virtual ~CStsImplementation();
 public:
     void PlayTone(CSystemToneService::TToneType aTone);
-    void
-    PlayAlarm(CSystemToneService::TAlarmType aAlarm,
+    void PlayAlarm(CSystemToneService::TAlarmType aAlarm,
+            unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
+    void PlayAlarm(CSystemToneService::TToneType aTone,
             unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
     void StopAlarm(unsigned int aAlarmContext);
-    void
-    PlayAlarm(CSystemToneService::TToneType aTone,
-            unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 private:
     CStsImplementation();
     bool Init();

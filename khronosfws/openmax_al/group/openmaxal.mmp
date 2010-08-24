@@ -148,7 +148,7 @@ LIBRARY         mediaclientvideodisplay.lib
 LIBRARY         ws32.lib
 LIBRARY		inetprotutil.lib
 LIBRARY         mediaclientaudio.lib
-LIBRARY         MMFControllerFramework.lib
+LIBRARY         mmfcontrollerframework.lib
 LIBRARY         mediaclientvideo.lib
 LIBRARY         AudioInputRouting.lib
 LIBRARY		Radio_Utility.lib
