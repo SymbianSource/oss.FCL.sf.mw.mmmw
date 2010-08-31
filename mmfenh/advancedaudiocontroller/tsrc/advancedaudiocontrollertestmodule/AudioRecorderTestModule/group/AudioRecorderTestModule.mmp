@@ -87,9 +87,9 @@ SYSTEMINCLUDE   /epoc32/include/ecom
 LIBRARY         euser.lib
 LIBRARY         ecom.lib
 LIBRARY         stiftestinterface.lib
-LIBRARY		      MediaClientAudio.lib
+LIBRARY		      mediaclientaudio.lib
 LIBRARY		      efsrv.lib 
-LIBRARY		      MMFControllerFramework.lib
+LIBRARY		      mmfcontrollerframework.lib
 LIBRARY         mmcommon.lib
 LIBRARY     	ecom.lib
 

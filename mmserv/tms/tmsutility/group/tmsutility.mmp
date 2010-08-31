@@ -38,7 +38,9 @@ USERINCLUDE     ../../inc
 
 SOURCEPATH      ../src
 SOURCE          tmsutility.cpp
+SOURCE          tmstimer.cpp
 
+LIBRARY         euser.lib
 LIBRARY         libc.lib
 LIBRARY         libglib.lib
 

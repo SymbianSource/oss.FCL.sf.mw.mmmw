@@ -18,9 +18,7 @@
 
 #include <MultimediaDataSourceFactory.h>
 #include "DataBufferSourceUid.h"
-#include "ProgDLSourceUid.h"
 #include "DataBufferDataSource.h"
-#include "ProgDLMultimediaSource.h"  
 #include "FileDataSource.h"
 #include "DescriptorDataSource.h"
 #include "CacheSource.h"
@@ -39,10 +37,6 @@ EXPORT_C TInt CMultimediaDataSourceFactory::CreateDataSource(
         {
         TRAP(status,aMultimediaDataSource  = CDataBufferMultimediaSource::NewL(aMDataSource));
         }
-    else if ( aMDataSource.DataSourceType() == KMmfProgDLSource )
-        {
-        TRAP(status,aMultimediaDataSource  = CProgDLMultimediaSource::NewL(aMDataSource));
-        }        
     else if ( aMDataSource.DataSourceType() == KFileDataSourcePlugin )
         {
         TRAP(status,aMultimediaDataSource  = CFileMultimediaSource::NewL(aMDataSource));
@@ -70,15 +64,6 @@ EXPORT_C TInt CMultimediaDataSourceFactory::CreateSeekableDataSource(
         	aDataSourceConfigIntfc = config;
         	TRAP(status,aMultimediaDataSource = CCacheSource::NewL(dataBufferSource,config));
         	}
-        } 
-    else if ( aMDataSource.DataSourceType() == KMmfProgDLSource )
-        {
-        aMultimediaDataSource  = CProgDLMultimediaSource::NewL(aMDataSource);
-        TRAP(status,config =  CDataSourceConfigIntfcImpl::NewL());           
-		if(status == KErrNone)	        
-	        {
-        	aDataSourceConfigIntfc = config;
-	        }
         } 
     return status;
     }

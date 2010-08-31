@@ -22,7 +22,9 @@
 #include "tmssourceimpl.h"
 #include "tmssinkimpl.h"
 #include "tmsglobalroutingimpl.h"
-
+#include "tmsringtoneimpl.h"
+#include "tmsdtmfimpl.h"
+#include "tmsinbandtoneimpl.h"
 #include "tmsutility.h"
 #include "tmsproxy.h"
 #include "tmsfactoryimpl.h"
@@ -187,6 +189,56 @@ gint TMSFactoryImpl::DeleteGlobalRouting(TMSGlobalRouting*& globrouting)
     {
     gint ret(TMS_RESULT_SUCCESS);
     ret = TMSGlobalRoutingImpl::Delete(globrouting);
+    return ret;
+    }
+
+gint TMSFactoryImpl::CreateDTMF(TMSStreamType streamtype, TMSDTMF*& dtmf)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    ret = TMSDTMFImpl::Create(streamtype, dtmf);
+    return ret;
+    }
+
+gint TMSFactoryImpl::DeleteDTMF(TMSDTMF*& dtmf)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    ret = TMSDTMFImpl::Delete(dtmf);
+    return ret;
+    }
+
+gint TMSFactoryImpl::CreateRingTonePlayer(TMSRingTone*& rt)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    ret = TMSRingToneImpl::Create(rt);
+    return ret;
+    }
+
+gint TMSFactoryImpl::CreateRingTonePlayer(TMSRingTone*& rt, RWindow& window,
+        gint scrid)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    ret = TMSRingToneImpl::Create(rt, window, scrid);
+    return ret;
+    }
+
+gint TMSFactoryImpl::DeleteRingTonePlayer(TMSRingTone*& rt)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    ret = TMSRingToneImpl::Delete(rt);
+    return ret;
+    }
+
+gint TMSFactoryImpl::CreateInbandTonePlayer(TMSInbandTone*& inbandtone)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    ret = TMSInbandToneImpl::Create(inbandtone);
+    return ret;
+    }
+
+gint TMSFactoryImpl::DeleteInbandTonePlayer(TMSInbandTone*& inbandtone)
+    {
+    gint ret(TMS_RESULT_SUCCESS);
+    ret = TMSInbandToneImpl::Delete(inbandtone);
     return ret;
     }
 

@@ -21,6 +21,7 @@
 #include <RadioRdsUtility.h>
 #include "RadioUtilityBody.h"
 #include "RadioServerData.h"
+#include "trace.h"
 
 // ======== MEMBER FUNCTIONS ========
 
@@ -32,10 +33,11 @@
 CRadioUtility::CBody* CRadioUtility::CBody::NewL(
     TBool aPrimaryClient )
     {
+    FUNC_LOG;
     CRadioUtility::CBody* self = new (ELeave) CRadioUtility::CBody();
     CleanupStack::PushL(self);
     self->ConstructL(aPrimaryClient);
-    CleanupStack::Pop();
+    CleanupStack::Pop(self);
     return self;
     }
 
@@ -47,7 +49,9 @@ CRadioUtility::CBody* CRadioUtility::CBody::NewL(
 void CRadioUtility::CBody::ConstructL(
     TBool aPrimaryClient )
     {
-    iRadioSession = new (ELeave) RRadioSession();
+    FUNC_LOG;
+    INFO_1("Size of RRadioSession: %i", sizeof(RRadioSession) );
+    iRadioSession = RRadioSession::NewL();
     User::LeaveIfError(iRadioSession->Connect(*this, aPrimaryClient));
     }
 
@@ -62,6 +66,7 @@ CRadioUtility::CBody::CBody()
         iPlayerUtility(NULL),
         iRdsUtility(NULL)
     {
+    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -70,9 +75,7 @@ CRadioUtility::CBody::CBody()
 //
 CRadioUtility::CBody::~CBody()
     {
-#ifdef _DEBUG
-   RDebug::Print(_L("CRadioUtility::CBody::~CBody"));
-#endif
+    FUNC_LOG;
     delete iFmTunerUtility;
     delete iPlayerUtility;
     delete iRdsUtility;
@@ -91,9 +94,7 @@ CRadioUtility::CBody::~CBody()
 CRadioFmTunerUtility& CRadioUtility::CBody::RadioFmTunerUtilityL(
     MRadioFmTunerObserver& aObserver)
     {
-#ifdef _DEBUG
-   RDebug::Print(_L("CRadioUtility::CBody::RadioFmTunerUtilityL"));
-#endif
+    FUNC_LOG;
 
     if ( !iFmTunerUtility )
         {
@@ -116,9 +117,7 @@ CRadioFmTunerUtility& CRadioUtility::CBody::RadioFmTunerUtilityL(
 CRadioPlayerUtility& CRadioUtility::CBody::RadioPlayerUtilityL(
     MRadioPlayerObserver& aObserver)
     {
-#ifdef _DEBUG
-   RDebug::Print(_L("CRadioUtility::CBody::RadioPlayerUtilityL"));
-#endif
+    FUNC_LOG;
 
     if ( !iPlayerUtility )
         {
@@ -141,9 +140,7 @@ CRadioPlayerUtility& CRadioUtility::CBody::RadioPlayerUtilityL(
 CRadioRdsUtility& CRadioUtility::CBody::RadioRdsUtilityL(
     MRadioRdsObserver& aObserver)
     {
-#ifdef _DEBUG
-   RDebug::Print(_L("CRadioUtility::CBody::RadioRdsUtility"));
-#endif
+    FUNC_LOG;
 
     if ( !iRdsUtility )
         {
@@ -167,9 +164,7 @@ CRadioRdsUtility& CRadioUtility::CBody::RadioRdsUtilityL(
 void CRadioUtility::CBody::RequestTunerControlComplete(
     TRadioServerError aError )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RequestTunerControlComplete"));
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoRequestTunerControlComplete( aError );
@@ -184,9 +179,7 @@ void CRadioUtility::CBody::RequestTunerControlComplete(
 void CRadioUtility::CBody::SetFrequencyRangeComplete(
     TRadioServerError aError )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::SetFrequencyRangeComplete"));
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoSetFrequencyRangeComplete( aError );
@@ -201,9 +194,7 @@ void CRadioUtility::CBody::SetFrequencyRangeComplete(
 void CRadioUtility::CBody::SetFrequencyComplete(
     TRadioServerError aError )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::SetFrequencyComplete"));
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoSetFrequencyComplete( aError );
@@ -219,9 +210,7 @@ void CRadioUtility::CBody::StationSeekComplete(
     TRadioServerError aError,
     TInt aFrequency )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::StationSeekComplete"));
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoStationSeekComplete( aError, aFrequency );
@@ -236,9 +225,7 @@ void CRadioUtility::CBody::StationSeekComplete(
 void CRadioUtility::CBody::RadioEventTransmitterStatusChange(
     TBool aActive )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::TransmitterStatusChange"));
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoFmTransmitterStatusChange( aActive );
@@ -253,9 +240,7 @@ void CRadioUtility::CBody::RadioEventTransmitterStatusChange(
 void CRadioUtility::CBody::RadioEventAntennaStatusChange(
     TBool aAttached )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventAntennaStatusChange"));
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoAntennaStatusChange( aAttached );
@@ -270,9 +255,7 @@ void CRadioUtility::CBody::RadioEventAntennaStatusChange(
 void CRadioUtility::CBody::RadioEventOfflineModeChange(
     TBool aOfflineMode )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventOfflineModeChange Start offline mode = %d"), aOfflineMode);
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoOfflineModeStatusChange( aOfflineMode );
@@ -287,9 +270,7 @@ void CRadioUtility::CBody::RadioEventOfflineModeChange(
 void CRadioUtility::CBody::RadioEventFrequencyRangeChanged(
     TRsFrequencyRange aNewRange )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventFrequencyRangeChanged"));
-#endif
+    FUNC_LOG;
 
     if ( iTunerObserver )
         {
@@ -318,9 +299,7 @@ void CRadioUtility::CBody::RadioEventFrequencyRangeChanged(
 void CRadioUtility::CBody::RadioEventFrequencyChange(
     TInt aNewFrequency )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventFrequencyChange"));
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoFrequencyChange( aNewFrequency );
@@ -335,9 +314,7 @@ void CRadioUtility::CBody::RadioEventFrequencyChange(
 void CRadioUtility::CBody::RadioEventForcedMonoChanged(
     TBool aForceMono )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventForcedMonoChanged"));
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoForcedMonoChange( aForceMono );
@@ -352,9 +329,7 @@ void CRadioUtility::CBody::RadioEventForcedMonoChanged(
 void CRadioUtility::CBody::RadioEventSquelchChanged(
     TBool aSquelch )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventSquelchChanged"));
-#endif
+    FUNC_LOG;
     if ( iTunerObserver )
         {
         iTunerObserver->MrftoSquelchChange( aSquelch );
@@ -370,9 +345,7 @@ void CRadioUtility::CBody::RadioEventStateChange(
     TBool aRadioOn,
     TRadioServerError aError )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventStateChange"));
-#endif
+    FUNC_LOG;
     if ( iPlayerObserver )
         {
         TPlayerState state = ERadioPlayerIdle;
@@ -393,9 +366,7 @@ void CRadioUtility::CBody::RadioEventStateChange(
 void CRadioUtility::CBody::RadioEventVolumeChange(
     TInt aVolume )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventVolumeChange"));
-#endif
+    FUNC_LOG;
     if ( iPlayerObserver )
         {
         iPlayerObserver->MrpoVolumeChange( aVolume );
@@ -410,9 +381,7 @@ void CRadioUtility::CBody::RadioEventVolumeChange(
 void CRadioUtility::CBody::RadioEventMuteChange(
     TBool aMute )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventMuteChange"));
-#endif
+    FUNC_LOG;
     if ( iPlayerObserver )
         {
         iPlayerObserver->MrpoMuteChange( aMute );
@@ -428,9 +397,7 @@ void CRadioUtility::CBody::RadioEventBalanceChange(
     TInt aLeftPercentage,
     TInt aRightPercentage )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventBalanceChange"));
-#endif
+    FUNC_LOG;
     if ( iPlayerObserver )
         {
         iPlayerObserver->MrpoBalanceChange( aLeftPercentage, aRightPercentage );
@@ -446,9 +413,7 @@ void CRadioUtility::CBody::StationSeekByPTYComplete(
     TInt aError,
     TInt aFrequency )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::StationSeekByPTYComplete"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroStationSeekByPTYComplete(aError, aFrequency );
@@ -465,9 +430,7 @@ void CRadioUtility::CBody::StationSeekByTAComplete(
     TInt aError,
     TInt aFrequency )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::StationSeekByTAComplete"));
-#endif
+    FUNC_LOG;
 
     if ( iRdsObserver )
         {
@@ -484,9 +447,7 @@ void CRadioUtility::CBody::StationSeekByTPComplete(
     TInt aError,
     TInt aFrequency )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::StationSeekByTPComplete"));
-#endif
+    FUNC_LOG;
 
     if ( iRdsObserver )
         {
@@ -503,9 +464,7 @@ void CRadioUtility::CBody::GetFreqByPTYComplete(
     TInt aError,
     RArray<TInt>& aFreqList )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::GetFreqByPTYComplete"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroGetFreqByPTYComplete( aError, aFreqList );
@@ -521,9 +480,7 @@ void CRadioUtility::CBody::GetFreqByTAComplete(
     TInt aError,
     RArray<TInt>& aFreqList )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::GetFreqByTAComplete"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroGetFreqByTAComplete( aError, aFreqList );
@@ -539,9 +496,7 @@ void CRadioUtility::CBody::GetPSByPTYComplete(
     TInt aError,
     RArray<TRsRdsPSName>& aPsList )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::GetPSByPTYComplete"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         RArray<TRdsPSName> psList;
@@ -569,9 +524,7 @@ void CRadioUtility::CBody::GetPSByTAComplete(
     TInt aError,
     RArray<TRsRdsPSName>& aPsList )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::GetPSByTAComplete"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         RArray<TRdsPSName> psList;
@@ -598,9 +551,7 @@ void CRadioUtility::CBody::GetPSByTAComplete(
 void CRadioUtility::CBody::RadioEventRdsDataPI(
     TInt aPi )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsDataPI"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsDataPI( aPi );
@@ -615,9 +566,7 @@ void CRadioUtility::CBody::RadioEventRdsDataPI(
 void CRadioUtility::CBody::RadioEventRdsDataPTY(
     TRsRdsProgrammeType aPty )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsDataPTY"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsDataPTY( aPty );
@@ -632,9 +581,7 @@ void CRadioUtility::CBody::RadioEventRdsDataPTY(
 void CRadioUtility::CBody::RadioEventRdsDataPS(
     TRsRdsPSName& aPs )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsDataPS"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         TRdsPSName ps;
@@ -655,9 +602,7 @@ void CRadioUtility::CBody::RadioEventRdsDataPS(
 void CRadioUtility::CBody::RadioEventRdsDataRT(
     TRsRdsRadioText& aRt )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsDataRT"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         TRdsRadioText rt;
@@ -680,9 +625,7 @@ void CRadioUtility::CBody::RadioEventRdsDataRTplus(
     TRsRdsRTplusClass aRtPlusClass,
     TRsRdsRadioText& aRtPlusData )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsDataRTplus"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         TRdsRTplusClass rtPlusClass;
@@ -706,9 +649,7 @@ void CRadioUtility::CBody::RadioEventRdsDataRTplus(
 void CRadioUtility::CBody::RadioEventRdsDataCT(
     TDateTime& aCt )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsDataCT"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsDataCT( aCt );
@@ -723,9 +664,7 @@ void CRadioUtility::CBody::RadioEventRdsDataCT(
 void CRadioUtility::CBody::RadioEventRdsDataTA(
     TBool aTaOn )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsDataTA"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsDataTA( aTaOn );
@@ -739,9 +678,7 @@ void CRadioUtility::CBody::RadioEventRdsDataTA(
 //
 void CRadioUtility::CBody::RadioEventRdsSearchBeginAF()
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsSearchBeginAF"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsSearchBeginAF();
@@ -758,9 +695,7 @@ void CRadioUtility::CBody::RadioEventRdsSearchEndAF(
     TInt aError,
     TInt aFrequency )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsSearchEndAF"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsSearchEndAF( aError, aFrequency );
@@ -775,9 +710,7 @@ void CRadioUtility::CBody::RadioEventRdsSearchEndAF(
 void CRadioUtility::CBody::RadioEventRdsStationChangeTA(
     TInt aFrequency )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsStationChangeTA"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsStationChangeTA( aFrequency );
@@ -792,9 +725,7 @@ void CRadioUtility::CBody::RadioEventRdsStationChangeTA(
 void CRadioUtility::CBody::RadioEventRdsAutomaticSwitchingChange(
     TBool aAuto )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsAutomaticSwitchingChange"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsEventAutomaticSwitchingChange( aAuto );
@@ -809,9 +740,7 @@ void CRadioUtility::CBody::RadioEventRdsAutomaticSwitchingChange(
 void CRadioUtility::CBody::RadioEventRdsAutomaticTrafficAnnouncement(
     TBool aAuto )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsAutomaticTrafficAnnouncement"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsEventAutomaticTrafficAnnouncement( aAuto );
@@ -826,9 +755,7 @@ void CRadioUtility::CBody::RadioEventRdsAutomaticTrafficAnnouncement(
 void CRadioUtility::CBody::RadioEventRdsSignalChange(
     TBool aSignal )
     {
-#ifdef _DEBUG
-    RDebug::Print(_L("CRadioUtility::CBody::RadioEventRdsSignalChange"));
-#endif
+    FUNC_LOG;
     if ( iRdsObserver )
         {
         iRdsObserver->MrroRdsEventSignalChange( aSignal );

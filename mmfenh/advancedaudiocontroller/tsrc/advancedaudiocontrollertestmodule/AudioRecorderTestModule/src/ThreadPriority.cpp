@@ -106,8 +106,10 @@ TInt CThreadPriority::RunTestL(CTestModuleIf *aConsole, CStifLogger *aLogger, CS
 	CleanupStack::PushL(selfObj);
 
 	CActiveScheduler::Start();
-
-
+	
+	if(selfObj->iCallbackErr != KErrNone)
+	    error = selfObj->iCallbackErr;
+	
 	CleanupStack::PopAndDestroy(2); // schedule, selfObj
 
 	return error;
@@ -136,10 +138,12 @@ void CThreadPriority::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSt
 #ifdef _DEBUG
     RDebug::Print (_L ("CThreadPriority::MoscoStateChangeEvent"));
 #endif
-	TInt err = KErrNone;
+	
 
 	logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),aErrorCode,aPreviousState,aCurrentState);
 logger->Log(_L("Before Checking Duaration."));
+iCallbackErr = aErrorCode;
+    
 		TTimeIntervalMicroSeconds aDuration, aRecordTime;
   	    TMMFDurationInfo clipDuration = recorder->Duration(aDuration);
 		logger->Log(_L("Duaration is %d"), aDuration.Int64());
@@ -191,10 +195,17 @@ logger->Log(_L("Before Checking Duaration."));
 
 
 		CActiveScheduler::Stop();
+		return;
 	}
+	 if (aErrorCode != KErrNone)
+        {
+        
+        CActiveScheduler::Stop();
+        return ;
+        }
 
 
-	return;
+
 
 }
 

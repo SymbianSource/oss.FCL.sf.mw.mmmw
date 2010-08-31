@@ -18,6 +18,7 @@
 
 #include <RadioFmTunerUtility.h>
 #include "RadioFmTunerUtilityBody.h"
+#include "trace.h"
 
 // -----------------------------------------------------------------------------
 // CRadioFmTunerUtility::NewL
@@ -28,6 +29,7 @@ CRadioFmTunerUtility* CRadioFmTunerUtility::NewL(
     RRadioSession& aRadioSession,
     MRadioFmTunerObserver& aObserver)
     {
+    FUNC_LOG;
     CRadioFmTunerUtility* self = new(ELeave) CRadioFmTunerUtility;
     CleanupStack::PushL(self);
     self->iBody = CRadioFmTunerUtility::CBody::NewL(aRadioSession, aObserver);
@@ -42,6 +44,7 @@ CRadioFmTunerUtility* CRadioFmTunerUtility::NewL(
 //
 EXPORT_C CRadioFmTunerUtility::~CRadioFmTunerUtility()
     {
+    FUNC_LOG;
     delete iBody;
     }
 
@@ -52,6 +55,7 @@ EXPORT_C CRadioFmTunerUtility::~CRadioFmTunerUtility()
 //
 CRadioFmTunerUtility::CRadioFmTunerUtility()
     {
+    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -61,6 +65,7 @@ CRadioFmTunerUtility::CRadioFmTunerUtility()
 //
 EXPORT_C void CRadioFmTunerUtility::RequestTunerControl()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->RequestTunerControl();
     }
@@ -72,6 +77,7 @@ EXPORT_C void CRadioFmTunerUtility::RequestTunerControl()
 //
 EXPORT_C void CRadioFmTunerUtility::Close()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->Close();
     }
@@ -84,6 +90,7 @@ EXPORT_C void CRadioFmTunerUtility::Close()
 EXPORT_C TInt CRadioFmTunerUtility::GetCapabilities(
     TFmTunerCapabilities& aCaps)
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetCapabilities(aCaps);
     }
@@ -97,6 +104,7 @@ EXPORT_C TInt CRadioFmTunerUtility::EnableTunerInOfflineMode(
     TBool aEnable )
 
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->EnableTunerInOfflineMode(aEnable);
     }
@@ -109,6 +117,7 @@ EXPORT_C TInt CRadioFmTunerUtility::EnableTunerInOfflineMode(
 EXPORT_C void CRadioFmTunerUtility::SetFrequency(
     TInt aFrequency )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->SetFrequency(aFrequency);
     }
@@ -120,6 +129,7 @@ EXPORT_C void CRadioFmTunerUtility::SetFrequency(
 //
 EXPORT_C void CRadioFmTunerUtility::CancelSetFrequency()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelSetFrequency();
     }
@@ -132,6 +142,7 @@ EXPORT_C void CRadioFmTunerUtility::CancelSetFrequency()
 EXPORT_C TInt CRadioFmTunerUtility::GetFrequency(
     TInt& aFrequency ) const
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetFrequency(aFrequency);
     }
@@ -144,6 +155,7 @@ EXPORT_C TInt CRadioFmTunerUtility::GetFrequency(
 EXPORT_C void CRadioFmTunerUtility::SetFrequencyRange(
     TFmRadioFrequencyRange aRange )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->SetFrequencyRange(aRange);
     }
@@ -155,6 +167,7 @@ EXPORT_C void CRadioFmTunerUtility::SetFrequencyRange(
 //
 EXPORT_C void CRadioFmTunerUtility::CancelSetFrequencyRange()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelSetFrequencyRange();
     }
@@ -169,6 +182,7 @@ EXPORT_C TInt CRadioFmTunerUtility::GetFrequencyRange(
     TInt& aMinFreq,
     TInt& aMaxFreq ) const
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetFrequencyRange(aRange, aMinFreq, aMaxFreq);
     }
@@ -181,6 +195,7 @@ EXPORT_C TInt CRadioFmTunerUtility::GetFrequencyRange(
 EXPORT_C void CRadioFmTunerUtility::StationSeek(
     TBool aUpwards )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->StationSeek(aUpwards);
     }
@@ -192,6 +207,7 @@ EXPORT_C void CRadioFmTunerUtility::StationSeek(
 //
 EXPORT_C void CRadioFmTunerUtility::CancelStationSeek()
     {
+    FUNC_LOG;
     ASSERT(iBody);
     iBody->CancelStationSeek();
     }
@@ -204,6 +220,7 @@ EXPORT_C void CRadioFmTunerUtility::CancelStationSeek()
 EXPORT_C TInt CRadioFmTunerUtility::GetSignalStrength(
     TInt& aSignalStrength ) const
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetSignalStrength(aSignalStrength);
     }
@@ -216,6 +233,7 @@ EXPORT_C TInt CRadioFmTunerUtility::GetSignalStrength(
 EXPORT_C TInt CRadioFmTunerUtility::GetMaxSignalStrength(
     TInt& aMaxSignalStrength ) const
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetMaxSignalStrength(aMaxSignalStrength);
     }
@@ -228,6 +246,7 @@ EXPORT_C TInt CRadioFmTunerUtility::GetMaxSignalStrength(
 EXPORT_C TInt CRadioFmTunerUtility::GetStereoMode(
     TBool& aStereo ) const
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetStereoMode(aStereo);
     }
@@ -240,6 +259,7 @@ EXPORT_C TInt CRadioFmTunerUtility::GetStereoMode(
 EXPORT_C TInt CRadioFmTunerUtility::ForceMonoReception(
     TBool aForcedMono )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->ForceMonoReception(aForcedMono);
     }
@@ -252,6 +272,7 @@ EXPORT_C TInt CRadioFmTunerUtility::ForceMonoReception(
 EXPORT_C TInt CRadioFmTunerUtility::GetForcedMonoReception(
     TBool& aForcedMono ) const
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetForcedMonoReception(aForcedMono);
     }
@@ -264,6 +285,7 @@ EXPORT_C TInt CRadioFmTunerUtility::GetForcedMonoReception(
 EXPORT_C TInt CRadioFmTunerUtility::SetSquelch(
     TBool aSquelch )
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->SetSquelch(aSquelch);
     }
@@ -276,6 +298,7 @@ EXPORT_C TInt CRadioFmTunerUtility::SetSquelch(
 EXPORT_C TInt CRadioFmTunerUtility::GetSquelch(
     TBool& aSquelch ) const
     {
+    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetSquelch(aSquelch);
     }

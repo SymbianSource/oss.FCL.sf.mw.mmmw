@@ -52,7 +52,7 @@ LIBRARY 	efsrv.lib
 LIBRARY		mmfcontrollerframework.lib 
 LIBRARY		mmfstandardcustomcommands.lib 
 LIBRARY 	caf.lib
-LIBRARY 	ECom.lib
+LIBRARY 	ecom.lib
 LIBRARY		S60AudioSource.lib
 LIBRARY		S60AudioClientStreamSource.lib
 LIBRARY		S60AudioUtility.lib

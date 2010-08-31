@@ -28,6 +28,8 @@ namespace TMS {
 
 // FORWARD DECLARATIONS
 class TMSServerThread;
+class TMSAudioInbandTonePlayer;
+class TMSRingTonePlayer;
 
 // -----------------------------------------------------------------------------
 //  Class Name:  TMSServerSession
@@ -67,6 +69,10 @@ private:
     void SetVolLevel(const RMessage2& aMessage);
     void SetMicGain(const RMessage2& aMessage);
 
+    // for Inband tone player
+    void StartInbandTone(const RMessage2& aMessage);
+    void StopInbandTone(const RMessage2& aMessage);
+
 private:
     TMSServer& iServer;
     RHandleBase iTMSCallSessionHandle;
@@ -75,6 +81,8 @@ private:
     TBool iMsgQueued;
     RMsgQueue<TmsMsgBuf> iMsgQueue;
     TmsMsgBuf iMsgBuffer;
+    TMSAudioInbandTonePlayer* iInbandTonePlayer;
+    TBool iHasRtPlayer;
     };
 
 } //namespace TMS

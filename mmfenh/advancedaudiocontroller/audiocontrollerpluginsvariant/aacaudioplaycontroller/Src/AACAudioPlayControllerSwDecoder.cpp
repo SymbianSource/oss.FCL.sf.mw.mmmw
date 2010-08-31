@@ -251,8 +251,5 @@ TInt CAACAudioPlayControllerDecoder::SeekSync(TUint8* /*aBuf*/, TInt /*aBufLen*/
 	{
 	return KErrNotSupported;
 	}
-TBool CAACAudioPlayControllerDecoder::IsDecodingSufficient()
-    {
-     return CAdvancedAudioDecoder::IsDecodingSufficient();
-    }
+
 // End of file

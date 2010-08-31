@@ -593,13 +593,6 @@ EXPORT_C void CAdvancedAudioDecoder::HandleFillBufferL()
                             // it will be sent for refill later by NextSharedBufferL().
                             static_cast<CMMFDataBuffer*>(iNextBuffer)->SetStatus(EBeingEmptied);
                             NextSharedBufferL();
-                            //added to send only 8kb of data to devsound for aac during progressive download,fix for ou1cimx1#447299
-                         if(IsDecodingSufficient() && !(iObserver->IsTimePosSeekable()))
-                             {
-                              
-                              moreProcessing=EFalse;
-                             }
-                            
                             // length can only be <= maxlength
 							if (dstlength == dstmaxlength)
 								{
@@ -809,11 +802,5 @@ EXPORT_C TInt CAdvancedAudioDecoder::CodecCmd(TCodecCmd aCmd)
 	return stat;	
 	}
 
-EXPORT_C TBool CAdvancedAudioDecoder::IsDecodingSufficient()
-    {
-      DP0(_L("CAdvancedAudioDecoder::IsDecodingSufficient"));
-      return EFalse;
-    }
-//added
 
 // End of file

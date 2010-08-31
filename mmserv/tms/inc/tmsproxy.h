@@ -32,6 +32,12 @@ class TMSEffect;
 class TMSEffectObserver;
 class TMSGlobalRouting;
 class TMSGlobalRoutingObserver;
+class TMSDTMF;
+class TMSDTMFObserver;
+class TMSRingTone;
+class TMSRingToneObserver;
+class TMSInbandTone;
+class TMSInbandToneObserver;
 
 // TMSProxy class
 class TMSProxy : public RSessionBase,
@@ -77,9 +83,26 @@ public:
     IMPORT_C gint GetMaxGain(guint& level);
     IMPORT_C gint SetGain(guint level);
 
+    // Ringtone
+    IMPORT_C gint InitRT(const TMSRingToneType type, GString* str,
+            GString* tts);
+    IMPORT_C gint DeinitRT();
+    IMPORT_C gint PlayRT();
+    IMPORT_C gint StopRT();
+    IMPORT_C gint PauseRT();
+    IMPORT_C gint MuteRT();
+
+    // TMSDTMF
+    IMPORT_C gint InitDTMFPlayer(TMSStreamType streamtype);
+    IMPORT_C gint StartDTMF(TMSStreamType streamtype, GString* tone);
+    IMPORT_C gint StopDTMF(TMSStreamType streamtype);
+    IMPORT_C gint ContinueDTMFStringSending(TBool continuesending);
+
+    // TMSInbandTone
+    IMPORT_C gint StartInbandTone(TMSInbandToneType inbandtonetype);
+    IMPORT_C gint StopInbandTone();
+
     // Global notifiers
-    IMPORT_C gint StartDTMFNotifier();
-    IMPORT_C gint CancelDTMFNotifier();
     IMPORT_C gint StartGlobalEffectNotifier();
     IMPORT_C gint CancelGlobalEffectNotifier();
     IMPORT_C gint StartRoutingNotifier();
@@ -107,6 +130,15 @@ private:
     gint AddRoutingObserver(TMSGlobalRoutingObserver& obsrvr,
             TMSGlobalRouting& parent, gint clientid);
     gint RemoveRoutingObserver(TMSGlobalRoutingObserver& obsrvr);
+    gint AddRingToneObserver(TMSRingToneObserver& obsrvr, TMSRingTone& parent,
+            gint clientid);
+    gint RemoveRingToneObserver(TMSRingToneObserver& obsrvr);
+    gint AddDTMFObserver(TMSDTMFObserver& obsrvr, TMSDTMF& parent,
+            gint clientid);
+    gint RemoveDTMFObserver(TMSDTMFObserver& obsrvr);
+    gint AddInbandToneObserver(TMSInbandToneObserver& obsrvr,
+            TMSInbandTone& parent, gint clientid);
+    gint RemoveInbandToneObserver(TMSInbandToneObserver& obsrvr);
 
     gint CreateQueue(const gint aNumSlots);
     void ReceiveMsgQHandlerEventsL();
@@ -117,8 +149,15 @@ private:
 
     RPointerArray<TMSEffectObserver> iEffectsObsrvrList;
     RPointerArray<TMSGlobalRoutingObserver> iRoutingObsrvrList;
+    RPointerArray<TMSRingToneObserver> iRingToneObsrvrList;
+    RPointerArray<TMSDTMFObserver> iDTMFObsrvrList;
+    RPointerArray<TMSInbandToneObserver> iInbandToneObsrvrList;
+
     RPointerArray<TMSEffect> iEffectsParentList;
     RPointerArray<TMSGlobalRouting> iRoutingParentList;
+    RPointerArray<TMSRingTone> iRingToneParentList;
+    RPointerArray<TMSDTMF> iDTMFParentList;
+    RPointerArray<TMSInbandTone> iInbandToneParentList;
 
     // Message queue and the handler
     RMsgQueue<TmsMsgBuf> iMsgQueue;

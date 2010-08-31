@@ -98,12 +98,6 @@ class MAdvancedAudioDecoderObserver
         * @return  void
         */
         virtual void SendEvent(const TMMFEvent& aEvent) = 0;
-        /**
-        * Callback function from CAdvancedAudioDecoder to check if source is position and time seekable
-        * @param   None
-        * @return  TBool
-        */
-        virtual TBool IsTimePosSeekable() = 0;
     };
     
 /**
@@ -337,8 +331,7 @@ class CAdvancedAudioDecoder : public CActive, public MFrameTableEventObserver
 		IMPORT_C virtual void ParseL(TUint8* aSrc, TInt& aSrcUsed, TUint8* aDst, TInt& aDstLen);
 		virtual TInt SeekSync(TUint8* aBuf, TInt aBufLen);
 		virtual TInt FrameLength(const TUint8* aBuf, TInt aBufLen, TInt& aFrameLength);
-    public:
-		IMPORT_C virtual TBool IsDecodingSufficient();
+
 	private:	
         /**
         * Completes own request.

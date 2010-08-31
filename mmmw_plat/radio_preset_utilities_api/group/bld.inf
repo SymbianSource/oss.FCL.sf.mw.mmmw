@@ -26,3 +26,6 @@ PRJ_EXPORTS
 
 ../inc/RadioFmPresetUtility.h     MW_LAYER_PLATFORM_EXPORT_PATH(RadioFmPresetUtility.h)
 ../inc/RadioPresetUtility.h     MW_LAYER_PLATFORM_EXPORT_PATH(RadioPresetUtility.h)
+../inc/preset.h     MW_LAYER_PLATFORM_EXPORT_PATH(preset.h)
+../inc/presetutility.h     MW_LAYER_PLATFORM_EXPORT_PATH(presetutility.h)
+../inc/presetutilityobserver.h     MW_LAYER_PLATFORM_EXPORT_PATH(presetutilityobserver.h)

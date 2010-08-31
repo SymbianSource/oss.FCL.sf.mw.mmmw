@@ -22,7 +22,7 @@
 #include "MP3AudioPlayControllerDecoder.h"
 #include "DebugMacros.h"
 #include <mmfpaniccodes.h>
-#include <Mmfcodec.h>
+#include <mmfcodec.h>
 
 const TUint KRawMp3MaxFrameSize  = 1441;
 const TUint KSizeOfInBuffer   = 2*KRawMp3MaxFrameSize;
@@ -149,7 +149,7 @@ void CMP3AudioPlayControllerDecoder::ResetL()
     iOutBufferPtr = iOutBuffer;
 
     iAccLen = 0;
-    iEnabled = ETrue; 
+
     DP0(_L ("CMP3AudioPlayControllerDecoder::Reset - Exit"));
 	}
 

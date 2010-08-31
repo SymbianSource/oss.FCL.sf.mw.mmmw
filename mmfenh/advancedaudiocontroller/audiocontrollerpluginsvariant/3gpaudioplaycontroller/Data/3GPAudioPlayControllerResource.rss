@@ -32,9 +32,7 @@ RESOURCE ADVANCED_AUDIO_CONTROLLER_RESOURCE aacDecoder
     {
     shared_buffer_max_num = 2;
     shared_buffer_max_size = 20480;
-   
-    shared_buffer_max_size_non_seekable_source = 8192;
-    
+    shared_buffer_max_size_non_seekable_source = 20480;
     sampling_rate = EAapSampleRate16000Hz;
     stereo_support = 2;
     metadata_support = EAapMetadataSupportTrue;

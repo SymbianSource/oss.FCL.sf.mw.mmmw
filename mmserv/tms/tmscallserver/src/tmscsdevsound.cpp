@@ -16,6 +16,7 @@
  */
 
 #include <AudioPreference.h>
+#include <tms.h>
 #include <S60FourCC.h>
 #include "tmsutility.h"
 #include "tmscsdevsound.h"
@@ -23,22 +24,35 @@
 
 using namespace TMS;
 
+// CONSTANTS
+const gint KTimeoutInitial = 250000; // 250 ms initial timeout
+const gint KTimeoutMultiplier = 2;   // Double the timeout for each retry
+const gint KPeriodicTimeoutMax = 2000000; // 2 sec max periodic timeout
+const gint KMicroSecMultiply = 1000000;   // 1 sec
+
 // -----------------------------------------------------------------------------
-// TMSCSPDevSound
+// TMSCSDevSound
 // -----------------------------------------------------------------------------
 //
 TMSCSDevSound::TMSCSDevSound(TMSCSDevSoundObserver& observer) :
     iObserver(observer)
     {
+    iTimer = NULL;
+    iPeriodic = KTimeoutInitial;
+    iElapsedTime = 0;
+    iInitRetryTime = 0;
+    iStartRetryTime = 0;
     }
 
 // -----------------------------------------------------------------------------
 // ConstructL
 // -----------------------------------------------------------------------------
 //
-void TMSCSDevSound::ConstructL(const TMSStreamType strmtype)
+void TMSCSDevSound::ConstructL(const TMSStreamType strmtype,
+        const gint retrytime)
     {
     TRACE_PRN_FN_ENT;
+    iInitRetryTime = retrytime;
     iStreamType = strmtype;
 
     if (strmtype == TMS_STREAM_UPLINK)
@@ -53,6 +67,8 @@ void TMSCSDevSound::ConstructL(const TMSStreamType strmtype)
         iPriority = KAudioPriorityCSCallDownlink;
         iPreference = KAudioPrefCSCallDownlink;
         }
+
+    iTimer = TMSTimer::NewL();
     InitializeL();
     TRACE_PRN_FN_EXT;
     }
@@ -94,15 +110,21 @@ void TMSCSDevSound::InitializeL()
 //
 TMSCSDevSound::~TMSCSDevSound()
     {
+    TRACE_PRN_FN_ENT;
+    CancelTimer();
+    delete iTimer;
     delete iDevSound;
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
 // Tries to activate the audio stream if not already active or activating
 // -----------------------------------------------------------------------------
 //
-void TMSCSDevSound::Activate()
+void TMSCSDevSound::Activate(const gint retrytime)
     {
+    iStartRetryTime = retrytime;
+
     if (!iActive && !iActivationOngoing)
         {
         iActivationOngoing = ETrue;
@@ -114,14 +136,21 @@ void TMSCSDevSound::Activate()
 // Deactivates the audio device.
 // -----------------------------------------------------------------------------
 //
-void TMSCSDevSound::Deactivate()
+void TMSCSDevSound::Deactivate(gboolean reset)
     {
+    TRACE_PRN_FN_ENT;
+    if (reset)
+        {
+        iPeriodic = KTimeoutInitial;
+        }
+    CancelTimer();
     if (iDevSound && (iActive || iActivationOngoing))
         {
         iDevSound->Stop();
         iActive = EFalse;
         iActivationOngoing = EFalse;
         }
+    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -140,10 +169,17 @@ CMMFDevSound& TMSCSDevSound::DevSound()
 void TMSCSDevSound::InitializeComplete(TInt aError)
     {
     TRACE_PRN_FN_ENT;
-    if (aError == TMS_RESULT_SUCCESS)
+    if (aError != TMS_RESULT_SUCCESS && iInitRetryTime != 0)
         {
+        StartTimer();
+        }
+    else
+        {
+        iPeriodic = KTimeoutInitial;
+        CancelTimer();
         NotifyEvent(aError);
         }
+    TRACE_PRN_IF_ERR(aError);
     TRACE_PRN_FN_EXT;
     }
 
@@ -160,6 +196,75 @@ void TMSCSDevSound::NotifyEvent(gint error)
     else if (iStreamType == TMS_STREAM_UPLINK)
         {
         iObserver.UplinkInitCompleted(error);
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// TMSCSDevSound::CancelTimer
+// Resets timer
+// -----------------------------------------------------------------------------
+//
+void TMSCSDevSound::CancelTimer()
+    {
+    iInitRetryTime = 0;
+    iStartRetryTime = 0;
+    iElapsedTime = 0;
+
+    if (iTimer)
+        {
+        if (iTimer->IsRunning())
+            {
+            iTimer->CancelNotify();
+            }
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// TMSCSDevSound::StartTimer
+// Activates timer
+// -----------------------------------------------------------------------------
+//
+void TMSCSDevSound::StartTimer()
+    {
+    if (iTimer && (iInitRetryTime != 0 || iStartRetryTime != 0))
+        {
+        iTimer->NotifyAfter(iPeriodic, *this);
+        }
+    }
+
+// -----------------------------------------------------------------------------
+// From TMSTimerObserver
+// Notification upon TMSTimer timeout.
+// -----------------------------------------------------------------------------
+//
+void TMSCSDevSound::TimerEvent()
+    {
+    if (iPeriodic < KPeriodicTimeoutMax)
+        {
+        iPeriodic *= KTimeoutMultiplier;
+        }
+    iElapsedTime += iPeriodic;
+
+    if (!iActivationOngoing) //Initializing
+        {
+        if (iElapsedTime >= (iInitRetryTime * KMicroSecMultiply))
+            {
+            iInitRetryTime = 0; //timer will not start again
+            }
+        TRAPD(status, InitializeL());
+        if (status != TMS_RESULT_SUCCESS)
+            {
+            NotifyEvent(status);
+            }
+        }
+    else //Activating
+        {
+        if (iElapsedTime >= (iStartRetryTime * KMicroSecMultiply))
+            {
+            iStartRetryTime = 0; //timer will not start again
+            }
+        Deactivate(FALSE);
+        Activate(iStartRetryTime);
         }
     }
 

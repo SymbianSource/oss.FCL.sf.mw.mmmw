@@ -107,7 +107,11 @@ TInt CRecordDataType::RunTestL(CTestModuleIf *aConsole, CStifLogger *aLogger, CS
 	CleanupStack::PushL(selfObj);
 
 	CActiveScheduler::Start();
-
+	
+	if(selfObj->callbackErr != KErrNone)
+	    {
+        error = selfObj->callbackErr;
+	    }
 
 	CleanupStack::PopAndDestroy(2); // schedule, selfObj
 
@@ -137,8 +141,8 @@ void CRecordDataType::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSt
 #ifdef _DEBUG
     RDebug::Print (_L ("CRecordDataType::MoscoStateChangeEvent"));
 #endif
-	TInt err = KErrNone;
-	callbackErr = KErrNone;
+	
+	callbackErr = aErrorCode;
 	RArray<TFourCC> dataTypes;
 
 	logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),aErrorCode,aPreviousState,aCurrentState);
@@ -207,7 +211,11 @@ void CRecordDataType::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSt
 
 		CActiveScheduler::Stop();
 	}
-
+	if (aErrorCode != KErrNone)
+	    {
+	    CActiveScheduler::Stop();
+	    
+	    }
 
 
 	return;

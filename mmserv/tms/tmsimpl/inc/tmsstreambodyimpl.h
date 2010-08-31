@@ -66,9 +66,9 @@ public:
     virtual TMSStreamState GetState();
     virtual TMSStreamType GetStreamType();
     virtual gint GetStreamId();
-    virtual gint Init();
+    virtual gint Init(gint retrytime);
     virtual gint Pause();
-    virtual gint Start();
+    virtual gint Start(gint retrytime);
     virtual gint Stop();
     virtual void Deinit();
 
@@ -118,4 +118,3 @@ private:
 
 #endif // TMS_STREAM_BODY_IMPL_H
 
-// End of file

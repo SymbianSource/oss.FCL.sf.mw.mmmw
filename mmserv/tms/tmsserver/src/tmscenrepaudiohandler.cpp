@@ -33,10 +33,10 @@ const TUint32 KTelIncallLoudspeakerVolume = 0x00000002;
 #include "tmspubsublistener.h"
 #include "tmsutility.h"
 
-#ifndef __WINS__
-const TInt KDefaultMaxGain = 1;
-#else
+#ifdef __WINSCW__
 const TInt KDefaultMaxGain = 64;
+#else
+const TInt KDefaultMaxGain = 1;
 #endif
 
 using namespace TMS;
@@ -78,30 +78,33 @@ void TMSCenRepAudioHandler::HandleNotifyPSL(const TUid /*aUid*/,
     {
     TInt muteVal;
     TInt err = KErrNotFound;
-
-    if (iMuteListener)
+    if (iPublish)
         {
-        err = iMuteListener->Get(muteVal);
-        }
-    if (err == KErrNone && muteVal == EPSTelMicMuteOn)
-        {
-#if !defined(__WINSCW__)
-        if (iTMSSer)
+        if (iMuteListener)
             {
-            iTMSSer->SetGain(NULL, 0);
+            err = iMuteListener->Get(muteVal);
             }
-#endif //__WINSCW__
-        }
-    else if (err == KErrNone)
-        {
-#if !defined(__WINSCW__)
-        // Change when gain is really changed
-        if (iTMSSer)
+        if (err == KErrNone && muteVal == EPSTelMicMuteOn)
             {
-            iTMSSer->SetGain(NULL, KDefaultMaxGain);
-            }
+#if !defined(__WINSCW__)
+            if (iTMSSer)
+                {
+                iTMSSer->SetGain(NULL, 0);
+                }
 #endif //__WINSCW__
+            }
+        else if (err == KErrNone)
+            {
+#if !defined(__WINSCW__)
+            // Change when gain is really changed
+            if (iTMSSer)
+                {
+                iTMSSer->SetGain(NULL, KDefaultMaxGain);
+                }
+#endif //__WINSCW__
+            }
         }
+    iPublish = TRUE;
     }
 
 // ---------------------------------------------------------------------------
@@ -121,6 +124,7 @@ void TMSCenRepAudioHandler::SetMuteState(TInt level)
             iMuteListener->Set(EPSTelMicMuteOff);
             }
         }
+    iPublish = FALSE;
     }
 
 // ---------------------------------------------------------------------------
@@ -216,6 +220,7 @@ void TMSCenRepAudioHandler::ConstructL()
         /*volGetRes =*/ iIncallLoudspeakerVolumeListener->Get(volLoud);
         }
 
+    iPublish = TRUE;
     TRACE_PRN_FN_EXT;
     }
 

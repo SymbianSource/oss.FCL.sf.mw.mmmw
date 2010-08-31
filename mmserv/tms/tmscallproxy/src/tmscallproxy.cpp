@@ -119,7 +119,8 @@ EXPORT_C gint TMSCallProxy::CreateStream(TMSCallType callType,
 //
 EXPORT_C gint TMSCallProxy::InitStream(const TMSCallType callType,
         const TMSStreamType strmType, gint strmId,
-        const TMSFormatType frmtType, RHandleBase* msgQueue)
+        const TMSFormatType frmtType, RHandleBase* msgQueue,
+        const gint retrytime)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -128,6 +129,7 @@ EXPORT_C gint TMSCallProxy::InitStream(const TMSCallType callType,
     inPckg().StreamType = strmType;
     inPckg().StreamId = strmId;
     inPckg().FormatType = frmtType;
+    inPckg().RetryTime = retrytime;
     status = RSessionBase::SendReceive(TMS_INIT_STREAM, TIpcArgs(&inPckg,
             *msgQueue));
     TRACE_PRN_FN_EXT;
@@ -140,7 +142,7 @@ EXPORT_C gint TMSCallProxy::InitStream(const TMSCallType callType,
 // -----------------------------------------------------------------------------
 //
 EXPORT_C gint TMSCallProxy::StartStream(const TMSCallType callType,
-        const TMSStreamType strmType, gint strmId)
+        const TMSStreamType strmType, gint strmId, const gint retrytime)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -148,6 +150,7 @@ EXPORT_C gint TMSCallProxy::StartStream(const TMSCallType callType,
     inPckg().CallType = callType;
     inPckg().StreamType = strmType;
     inPckg().StreamId = strmId;
+    inPckg().RetryTime = retrytime;
     status = RSessionBase::SendReceive(TMS_START_STREAM, TIpcArgs(&inPckg));
     TRACE_PRN_FN_EXT;
     return TMSRESULT(status);

@@ -37,20 +37,7 @@ PRJ_EXPORTS
 
 PRJ_TESTEXPORTS
 
-..\init\TestFramework.ini                      \epoc32\winscw\c\testframework\TestFramework.ini
 
-..\conf\MetaDataDisplay.cfg                   \epoc32\winscw\c\testframework\MetaDataDisplay.cfg
-
-..\data\mmc\GodRest.WMA                   \epoc32\winscw\c\testing\data\GodRest.WMA
-..\data\mmc\DRM_NRTmeta.dcf                   \epoc32\winscw\c\testing\data\DRM_NRTmeta.dcf
-..\data\mmc\DownUnder_remix.aac                   \epoc32\winscw\c\testing\data\DownUnder_remix.aac
-..\data\mmc\JapJap.mp3                   \epoc32\winscw\c\testing\data\JapJap.mp3
-..\data\mmc\JepJep.mp3                   \epoc32\winscw\c\testing\data\JepJep.mp3
-..\data\mmc\JipJip.mp3                   \epoc32\winscw\c\testing\data\JipJip.mp3
-..\data\mmc\MP3_MD.mp3                   \epoc32\winscw\c\testing\data\MP3_MD.mp3
-..\data\mmc\test3gp.3gp                   \epoc32\winscw\c\testing\data\test3gp.3gp
-..\data\mmc\testm4a.m4a                   \epoc32\winscw\c\testing\data\testm4a.m4a
-..\data\mmc\testmp4.mp4                   \epoc32\winscw\c\testing\data\testmp4.mp4
 
 PRJ_MMPFILES
 

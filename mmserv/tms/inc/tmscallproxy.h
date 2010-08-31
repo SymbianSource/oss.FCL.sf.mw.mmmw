@@ -42,9 +42,10 @@ public:
             const TMSStreamType strmType, gint& strmId);
     IMPORT_C gint InitStream(const TMSCallType callType,
             const TMSStreamType strmType, gint strmId,
-            const TMSFormatType frmtType, RHandleBase* msgQueue);
+            const TMSFormatType frmtType, RHandleBase* msgQueue,
+            const gint retrytime);
     IMPORT_C gint StartStream(const TMSCallType callType,
-            const TMSStreamType strmType, gint strmId);
+            const TMSStreamType strmType, gint strmId, const gint retrytime);
     IMPORT_C gint PauseStream(const TMSCallType callType,
             const TMSStreamType strmType, gint strmId);
     IMPORT_C gint StopStream(const TMSCallType callType,

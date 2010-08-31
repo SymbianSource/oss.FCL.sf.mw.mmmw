@@ -42,7 +42,7 @@ const TInt KErrNotExecuted = -1003;
 const TInt KErrExecuted = KErrNone;
 const TInt KErrLeft = -1503;
 const TInt KBadParameter = 1004;
-const TInt KNumMetaDataField = 23;
+const TInt KNumMetaDataField = 19;
 // MACROS
 //#define ?macro ?macro_def
 #define TEST_CLASS_VERSION_MAJOR 0
@@ -304,6 +304,7 @@ NONSHARABLE_CLASS(CMetaDataDisplay) : public CScriptBase,
     	
         HBufC*   iMetaDataField[KNumMetaDataField];
         TBuf<50> iMetaDataFieldName[KNumMetaDataField];
+        TMetaDataFieldId iMetaDataFieldID[KNumMetaDataField];
 
 		// For X-pcs Metadata
 		HBufC* iArtistXpcs;

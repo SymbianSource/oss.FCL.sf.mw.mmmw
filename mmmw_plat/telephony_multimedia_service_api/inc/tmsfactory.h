@@ -18,6 +18,7 @@
 #ifndef TMS_FACTORY_H
 #define TMS_FACTORY_H
 
+#include <w32std.h>
 #include <tms.h>
 
 namespace TMS {
@@ -32,6 +33,10 @@ class TMSSink;
 class TMSFactoryImpl;
 class TMSVer;
 class TMSGlobalRouting;
+class TMSDTMF;
+class TMSRTPSession;
+class TMSRingTone;
+class TMSInbandTone;
 
 /**
  * TMSFactory class
@@ -351,6 +356,145 @@ public:
      */
     IMPORT_C gint DeleteGlobalRouting(TMSGlobalRouting*& globrouting);
 
+    /**
+     * Create DTMF player object.
+     *
+     * @param  streamtype
+     *     Stream ID to be used to create the DTMF player.
+     *     TMS_STREAM_UPLINK
+     *     TMS_STREAM_DOWNLINK
+     *
+     * @param  dtmf
+     *      Created DTMF player.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
+     *      TMS_RESULT_INSUFFICIENT_MEMORY if DTMF player creation failed due
+     *      to insufficient memory.
+     *      TMS_RESULT_FATAL_ERROR if an error occured.
+     *      TMS_REASON_EMERGENCY_CALL_ONGOING if emergency call is active.
+     *      TMS_REASON_PERMISSION_DENIED if permission is denied.
+     *
+     */
+    IMPORT_C gint CreateDTMF(TMSStreamType streamtype, TMSDTMF*& dtmf);
+
+    /**
+     * Delete DTMF player object.
+     *
+     * @param  dtmf
+     *      DTMF player to be deleted.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS if the operation was successful otherwise
+     *      system error.
+     *      TMS_RESULT_INVALID_ARGUMENT if the DTMF player is not valid.
+     *
+     */
+    IMPORT_C gint DeleteDTMF(TMSDTMF*& dtmf);
+
+    /**
+     * FEATURE IS CURRENTLY NOT SUPPORTED
+     *
+     * Creates TMSRTPSession object.
+     *
+     * @param  rtpsession
+     *      RTP Session object to be created.
+     *
+     * @param  sdp
+     *      Session description protocol message.
+     *
+     * @param  mode
+     *      Buffer processing mode: either PULL or PUSH.
+     *
+     * @return
+     *      TMS_RESULT_FEATURE_NOT_SUPPORTED
+     */
+    IMPORT_C gint CreateRTPSession(TMSRTPSession*& rtpsession, guint8* sdp,
+            guint mode);
+
+    /**
+     * FEATURE IS CURRENTLY NOT SUPPORTED
+     *
+     * Deletes TMSRTPSession object.
+     *
+     * @param  rtpsession
+     *      RTP Session object to be deleted.
+     *
+     * @return
+     *      TMS_RESULT_FEATURE_NOT_SUPPORTED
+     */
+    IMPORT_C gint DeleteRTPSession(TMSRTPSession*& rtpsession);
+
+    /**
+     * Creates TMSRingTone player object for audio ring tone.
+     *
+     * @param  rt
+     *      RingTone player object to be created.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS when object is created successfully.
+     *      TMS_RESULT_INSUFFICIENT_MEMORY when object creation failed due to
+     *      insufficient memory.
+     */
+    IMPORT_C gint CreateRingTonePlayer(TMSRingTone*& rt);
+
+    /**
+     * Creates TMSRingTone player object for video ring tone.
+     *
+     * @param  rt
+     *      Video RingTone player object to be created.
+     *
+     * @param window
+     *      A handle to window to which video should be rendered.
+     *
+     * @param scrid
+     *      An ID of the screen to which video should be rendered.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS when object is created successfully.
+     *      TMS_RESULT_INSUFFICIENT_MEMORY when object creation failed due to
+     *      insufficient memory.
+     */
+    IMPORT_C gint CreateRingTonePlayer(TMSRingTone*& rt, RWindow& window,
+            gint scrid);
+
+    /**
+     * Deletes TMSRingTone object.
+     *
+     * @param  rt
+     *      RingTone player object to be deleted.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS when object is deleted successfully.
+     *      TMS_RESULT_INVALID_ARGUMENT if RingTone player object is invalid.
+     */
+    IMPORT_C gint DeleteRingTonePlayer(TMSRingTone*& rt);
+
+    /**
+     * Creates TMSInbandTone player object.
+     *
+     * @param  inbandtone
+     *      InbandTone player object to be created.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS when object is created successfully.
+     *      TMS_RESULT_INSUFFICIENT_MEMORY when object creation failed due to
+     *      insufficient memory.
+     */
+    IMPORT_C gint CreateInbandTonePlayer(TMSInbandTone*& inbandtone);
+
+    /**
+     * Deletes TMSInbandTone object.
+     *
+     * @param  inbandtone
+     *      InbandTone player object to be deleted.
+     *
+     * @return
+     *      TMS_RESULT_SUCCESS when object is deleted successfully.
+     *      TMS_RESULT_INVALID_ARGUMENT if InbandTone player object is invalid.
+     */
+    IMPORT_C gint DeleteInbandTonePlayer(TMSInbandTone*& inbandtone);
 
 private:
     /**

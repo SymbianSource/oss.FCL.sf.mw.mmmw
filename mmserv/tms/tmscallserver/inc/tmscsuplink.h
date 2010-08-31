@@ -31,7 +31,8 @@ NONSHARABLE_CLASS(TMSCSUplink) : public TMSCSDevSound
     {
 public:
 
-    static TMSCSUplink* NewL(TMSCSDevSoundObserver& observer);
+    static TMSCSUplink* NewL(TMSCSDevSoundObserver& observer,
+            const gint retrytime);
 
     virtual ~TMSCSUplink();
 
@@ -83,7 +84,7 @@ private:
 protected:
 
     TMSCSUplink(TMSCSDevSoundObserver& aObserver);
-    void ConstructL();
+    void ConstructL(const gint retrytime);
     };
 
 } //namespace TMS

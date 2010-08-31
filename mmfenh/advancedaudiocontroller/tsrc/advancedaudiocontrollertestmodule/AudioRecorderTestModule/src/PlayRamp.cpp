@@ -201,6 +201,13 @@ void CPlayRamp::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousState, T
 		logger->Log(_L("MoscoStateChangeEvent GetVolume after play: %d  "),expectedVol);
 		CActiveScheduler::Stop();
 	}
+	
+	if (aErrorCode != KErrNone)
+	    {
+	    expectedVol = 0;
+	    CActiveScheduler::Stop();
+	    
+	    }
 	return;
 
 }

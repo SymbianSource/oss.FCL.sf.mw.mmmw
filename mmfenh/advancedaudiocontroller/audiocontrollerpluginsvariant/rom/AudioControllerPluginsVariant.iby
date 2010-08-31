@@ -35,6 +35,9 @@ file=ABI_DIR\BUILD_DIR\MetaDataWrite.dll                        SHARED_LIB_DIR\M
 file=ABI_DIR\BUILD_DIR\3GPAudioMetaDataComposer.dll             SHARED_LIB_DIR\3GPAudioMetaDataComposer.dll
 #endif
 
+//For Wav Controller
+ECOM_PLUGIN(mmfaudiocontroller.dll,101f55bf.rsc)
+
 //For 3GP
 ECOM_PLUGIN(3GPAudioPlayControllerPlugin.DLL,3GPAudioPlayControllerPlugin.rsc)
 ECOM_PLUGIN(3GPAudioPlayControllerRecognizer.DLL,3GPAudioPlayControllerRecognizer.rsc)

@@ -22,6 +22,8 @@
 #include <TelephonyAudioRouting.h>
 #include <MTelephonyAudioRoutingObserver.h>
 #include <e32msgqueue.h>
+#include <etelmm.h>
+#include <rmmcustomapi.h>
 #include "tmsclientserver.h"
 #include "tmscalladpt.h"
 #include "tmscsdevsoundobserver.h"
@@ -32,6 +34,7 @@ namespace TMS {
 class TMSCSUplink;
 class TMSCSDownlink;
 class TMSTarSettings;
+class TMSSyncVol;
 
 /*
  * TMSCallCSAdpt class
@@ -50,9 +53,11 @@ public:
             const TMSStreamType strmType, gint& outStrmId);
     virtual gint InitStream(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId,
-            const TMSFormatType frmtType, const RMessage2& message);
+            const TMSFormatType frmtType, const gint retryTime,
+            const RMessage2& message);
     virtual gint StartStream(const TMSCallType callType,
-            const TMSStreamType strmType, const gint strmId);
+            const TMSStreamType strmType, const gint strmId,
+            const gint retrytime);
     virtual gint PauseStream(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId);
     virtual gint StopStream(const TMSCallType callType,
@@ -116,8 +121,8 @@ private:
     TMSCallCSAdpt();
     void ConstructL();
 
-    gint InitUplink();
-    gint InitDownlink();
+    gint InitUplink(const gint retrytime);
+    gint InitDownlink(const gint retrytime);
     void AvailableOutputsChanged(
             CTelephonyAudioRouting& aTelephonyAudioRouting);
     void OutputChanged(CTelephonyAudioRouting& aTelephonyAudioRouting);
@@ -139,14 +144,12 @@ private:
     RMsgQueue<TmsMsgBuf> iMsgQueueDn;
     TmsMsgBuf iMsgBuffer;
 
-    gboolean iUplinkInitialized;
     gint iUplinkStreamId;
-    gboolean iDnlinkInitialized;
     gint iDnlinkStreamId;
+    TMSSyncVol* iResetVolNotifier;
     };
 
 } //namespace TMS
 
 #endif // CALLCSADPT_H
 
-// End of file

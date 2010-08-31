@@ -61,10 +61,7 @@ class CAACAudioPlayControllerDecoder : public CAdvancedAudioDecoder
 		TCodecProcessResult ProcessL(CMMFBuffer& aSrc, CMMFBuffer& aDst);
 		TInt CodecConfig(RArray<TInt>& aCodecConfigData);
 		TInt CodecCmd(TCodecCmd aCmd);
-     
-		TBool IsDecodingSufficient();
-		
-		
+        
     private: // Functions from base classes
 		void ResetL();
 		

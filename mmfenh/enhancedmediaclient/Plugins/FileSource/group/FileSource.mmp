@@ -58,7 +58,6 @@ LIBRARY         estor.lib
 LIBRARY         mmfserverbaseclasses.lib
 LIBRARY         caf.lib
 LIBRARY	        cafutils.lib
-LIBRARY         TransferRateMonitor.lib
 LIBRARY         centralrepository.lib
 
 DEFFILE         FileSource.def

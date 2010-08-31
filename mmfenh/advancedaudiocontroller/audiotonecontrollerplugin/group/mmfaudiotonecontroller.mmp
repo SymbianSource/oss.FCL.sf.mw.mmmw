@@ -56,6 +56,9 @@ LIBRARY mmfserverbaseclasses.lib
 LIBRARY mmfdevsound.lib
 LIBRARY mmfcontrollerframework.lib
 LIBRARY mmfstandardcustomcommands.lib
+LIBRARY	ConfigurationComponentsFactory.lib
+LIBRARY	AudioOutputControlUtility.lib
+LIBRARY	AudioOutputRouting.lib
 #ifdef EABI
 LIBRARY ecom.lib
 #endif

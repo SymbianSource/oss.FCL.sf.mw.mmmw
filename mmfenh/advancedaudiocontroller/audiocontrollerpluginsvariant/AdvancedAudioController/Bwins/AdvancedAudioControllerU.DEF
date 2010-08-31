@@ -291,5 +291,4 @@ EXPORTS
 	?MapcSetRepeats@CAdvancedAudioPlayController@@MAEHHABVTTimeIntervalMicroSeconds@@@Z @ 290 NONAME ; int CAdvancedAudioPlayController::MapcSetRepeats(int, class TTimeIntervalMicroSeconds const &)
 	?TrailingSilenceTimerComplete@CAdvancedAudioPlayController@@UAEXXZ @ 291 NONAME ; void CAdvancedAudioPlayController::TrailingSilenceTimerComplete(void)
 	?QueueThisBuffer@CAdvancedAudioDecoder@@UAEXI@Z @ 292 NONAME ; void CAdvancedAudioDecoder::QueueThisBuffer(unsigned int)
-	?IsDecodingSufficient@CAdvancedAudioDecoder@@UAEHXZ @ 293 NONAME ; int CAdvancedAudioDecoder::IsDecodingSufficient(void)
 

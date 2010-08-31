@@ -61,11 +61,12 @@ TMSIPUplink::~TMSIPUplink()
 // -----------------------------------------------------------------------------
 //
 TMSIPUplink* TMSIPUplink::NewL(TMSIPDevSoundObserver& observer,
-        const guint32 codecID, const TMMFPrioritySettings priority)
+        const guint32 codecID, const TMMFPrioritySettings priority,
+        const gint retrytime)
     {
     TMSIPUplink* self = new (ELeave) TMSIPUplink(observer);
     CleanupStack::PushL(self);
-    self->ConstructL(codecID, priority);
+    self->ConstructL(codecID, priority, retrytime);
     CleanupStack::Pop(self);
     return self;
     }
@@ -76,7 +77,7 @@ TMSIPUplink* TMSIPUplink::NewL(TMSIPDevSoundObserver& observer,
 // -----------------------------------------------------------------------------
 //
 void TMSIPUplink::ConstructL(const guint32 codecID,
-        const TMMFPrioritySettings priority)
+        const TMMFPrioritySettings priority, const gint /*retrytime*/)
     {
     TRACE_PRN_FN_ENT;
     iCodecID = codecID;
@@ -100,7 +101,7 @@ void TMSIPUplink::ConstructL(const guint32 codecID,
 //
 // -----------------------------------------------------------------------------
 //
-void TMSIPUplink::Start()
+void TMSIPUplink::Start(const gint /*retrytime*/)
     {
     TRACE_PRN_FN_ENT;
 
@@ -111,12 +112,7 @@ void TMSIPUplink::Start()
         {
         TRAP(err, iDevSound->RecordInitL());
         TRACE_PRN_IF_ERR(err);
-
-        if (err != TMS_RESULT_SUCCESS)
-            {
-            iStatus = EReady;
-            iObserver.UplinkStarted(err);
-            }
+        iObserver.UplinkStarted(err);
         }
     TRACE_PRN_FN_EXT;
     }

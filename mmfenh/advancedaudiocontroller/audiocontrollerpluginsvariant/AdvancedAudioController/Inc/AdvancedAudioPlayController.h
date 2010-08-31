@@ -976,6 +976,7 @@ class CAdvancedAudioPlayController : public CAdvancedAudioController,
         
         mutable CActiveSchedulerWait* iWait;
         mutable CActiveSchedulerWait* iBlockSetPos;
+        mutable CActiveSchedulerWait* iBlockPrime;
 
         TUint32 iPlayStartTime;
         TUint32 iZeroTime;

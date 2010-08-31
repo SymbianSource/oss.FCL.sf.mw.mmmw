@@ -43,7 +43,7 @@ gint TMSG711FormatImpl::PostConstruct()
     if (ret == TMS_RESULT_SUCCESS)
         {
         this->iBody = bodyimpl;
-        this->iFormatBody = static_cast<TMSG711FormatBodyImpl*>(bodyimpl);
+        this->iFormatBody = static_cast<TMSG711FormatBodyImpl*> (bodyimpl);
         }
     TRACE_PRN_FN_EXT;
     return ret;
@@ -52,7 +52,7 @@ gint TMSG711FormatImpl::PostConstruct()
 gint TMSG711FormatImpl::Create(TMSFormat*& tmsformat)
     {
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSG711FormatImpl *self = new TMSG711FormatImpl();
+    TMSG711FormatImpl* self = new TMSG711FormatImpl();
 
     TRACE_PRN_FN_ENT;
     if (self)
@@ -75,7 +75,7 @@ gint TMSG711FormatImpl::SetProxy(TMSGlobalContext* context,
     gint ret(TMS_RESULT_SUCCESS);
     if (this->iBody)
         {
-        static_cast<TMSG711FormatBodyImpl*>(this->iBody)->SetProxy(context,
+        static_cast<TMSG711FormatBodyImpl*> (this->iBody)->SetProxy(context,
                 queuehandler);
         }
     else
@@ -85,4 +85,3 @@ gint TMSG711FormatImpl::SetProxy(TMSGlobalContext* context,
     return ret;
     }
 
-// End of file

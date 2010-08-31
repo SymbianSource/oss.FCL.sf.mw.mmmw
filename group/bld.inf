@@ -28,8 +28,7 @@ PRJ_MMPFILES
 #include "../mmmw_plat/group/bld.inf"
 #include "../mmfenh/group/bld.inf"
 #include "../mmserv/group/bld.inf"
-
-//#include "../mmfw/group/bld.inf"  //Uncomment when OpenAX AL or other stuffs are ready under mmfw
+#include "../khronosfws/group/bld.inf"
 
 
 //  End of File  

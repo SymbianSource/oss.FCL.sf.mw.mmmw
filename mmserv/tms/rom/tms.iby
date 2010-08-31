@@ -1,28 +1,26 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: Telephony Multimedia Service
-*
-*/
-/*
- * tms.iby
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: Telephony Multimedia Service
  *
  */
 
-#ifndef __TMS_IBY__
-#define __TMS_IBY__
+#ifndef TMS_IBY
+#define TMS_IBY
 
+#include <data_caging_paths_for_iby.hrh>
 #include <bldvariant.hrh>
+
 #ifdef FF_TMS
 
 file=ABI_DIR/BUILD_DIR/tmsapi.dll         SHARED_LIB_DIR/tmsapi.dll
@@ -39,6 +37,6 @@ data=ZSYSTEM/install/tms_stub.sis         System/Install/tms_stub.sis
 
 #endif //FF_TMS
 
-#endif //__TMS_IBY__
+#endif //TMS_IBY
 
 //End of File

@@ -84,12 +84,19 @@ SOURCE          tmsmicsourcebodyimpl.cpp
 SOURCE          tmsmicsourceimpl.cpp
 SOURCE          tmsmodemsourcebodyimpl.cpp
 SOURCE          tmsmodemsourceimpl.cpp
+SOURCE          tmsringtonebodyimpl.cpp
+SOURCE          tmsringtoneimpl.cpp
+SOURCE          tmsdtmfbodyimpl.cpp
+SOURCE          tmsdtmfimpl.cpp
+SOURCE          tmsinbandtonebodyimpl.cpp
+SOURCE          tmsinbandtoneimpl.cpp
 
 LIBRARY         euser.lib
 LIBRARY         libglib.lib
 LIBRARY         tmsapi.lib
 LIBRARY         tmscallproxy.lib
 LIBRARY         tmsproxy.lib
+LIBRARY         tmsutility.lib
 LIBRARY         libc.lib
 
 DEFFILE         tmsimpl.def

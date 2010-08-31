@@ -2099,7 +2099,8 @@ TInt CRadioServer::ProcessRemovePrimaryClientL(
                 }
             }
         }
-
+    process.Close();
+    client.Close();
 #endif // RD_TSP_CLIENT_MAPPER
 
     if ( --iSessionCountPrimary == 0 )
@@ -3348,6 +3349,8 @@ void CRadioServer::RegisterClientPidL(
         {
         iProcessId = process.Id();
         }
+    process.Close();
+    client.Close();
 #endif // RD_TSP_CLIENT_MAPPER
     }
 //  End of File
