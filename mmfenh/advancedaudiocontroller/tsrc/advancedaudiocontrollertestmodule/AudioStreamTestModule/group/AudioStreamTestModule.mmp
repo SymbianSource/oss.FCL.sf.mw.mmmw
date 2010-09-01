@@ -54,8 +54,8 @@ LIBRARY         euser.lib
 LIBRARY         ecom.lib
 LIBRARY         stiftestinterface.lib
 LIBRARY	        efsrv.lib
-LIBRARY     		mediaclientaudiostream.lib
-LIBRARY     		mediaclientaudioinputstream.lib
+LIBRARY     		MediaClientAudioStream.lib
+LIBRARY     		MediaClientAudioInputStream.lib
 
 LANG            SC
 

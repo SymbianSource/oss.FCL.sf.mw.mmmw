@@ -18,7 +18,6 @@
 
 #include "RadioFmTunerUtilityBody.h"
 #include "RadioUtilityBody.h"
-#include "trace.h"
 
 // -----------------------------------------------------------------------------
 // CRadioFmTunerUtility::CBody::NewL
@@ -29,8 +28,9 @@ CRadioFmTunerUtility::CBody* CRadioFmTunerUtility::CBody::NewL(
     RRadioSession& aRadioSession,
     MRadioFmTunerObserver& aObserver )
     {
-    FUNC_LOG;
-    CRadioFmTunerUtility::CBody* s = new(ELeave) CRadioFmTunerUtility::CBody( aRadioSession, aObserver );
+    CRadioFmTunerUtility::CBody* s = new(ELeave) CRadioFmTunerUtility::CBody();
+    s->iRadioFmTunerUtilityClient = &aObserver;
+    s->iRadioSession = &aRadioSession;
     CleanupStack::PushL(s);
     s->ConstructL();
     CleanupStack::Pop();
@@ -44,21 +44,14 @@ CRadioFmTunerUtility::CBody* CRadioFmTunerUtility::CBody::NewL(
 //
 void CRadioFmTunerUtility::CBody::ConstructL()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
 // CRadioFmTunerUtility::CBody::CBody
 // -----------------------------------------------------------------------------
 //
-CRadioFmTunerUtility::CBody::CBody( 
-        RRadioSession& aRadioSession,
-        MRadioFmTunerObserver& aObserver )
-    : iRadioSession(aRadioSession),
-    iRadioFmTunerUtilityClient(aObserver)
-   
+CRadioFmTunerUtility::CBody::CBody()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -67,7 +60,6 @@ CRadioFmTunerUtility::CBody::CBody(
 //
 CRadioFmTunerUtility::CBody::~CBody()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -77,8 +69,7 @@ CRadioFmTunerUtility::CBody::~CBody()
 //
 void CRadioFmTunerUtility::CBody::RequestTunerControl()
     {
-    FUNC_LOG;
-    iRadioSession.RequestTunerControl( ERsTunerFm );
+    iRadioSession->RequestTunerControl( ERsTunerFm );
     }
 
 // -----------------------------------------------------------------------------
@@ -88,7 +79,6 @@ void CRadioFmTunerUtility::CBody::RequestTunerControl()
 //
 void CRadioFmTunerUtility::CBody::Close()
     {
-    FUNC_LOG;
     // Consider releasing tuner control here.
     }
 
@@ -100,9 +90,8 @@ void CRadioFmTunerUtility::CBody::Close()
 TInt CRadioFmTunerUtility::CBody::GetCapabilities(
     TFmTunerCapabilities& aCaps ) const
     {
-    FUNC_LOG;
     TRsTunerCapabilities caps;
-    TInt error = iRadioSession.GetTunerCapabilities( caps );
+    TInt error = iRadioSession->GetTunerCapabilities( caps );
 
     if ( !error )
         {
@@ -123,8 +112,7 @@ TInt CRadioFmTunerUtility::CBody::GetCapabilities(
 TInt CRadioFmTunerUtility::CBody::EnableTunerInOfflineMode(
     TBool aEnable )
     {
-    FUNC_LOG;
-    return iRadioSession.EnableTunerInOfflineMode( aEnable );
+    return iRadioSession->EnableTunerInOfflineMode( aEnable );
     }
 
 // -----------------------------------------------------------------------------
@@ -137,10 +125,9 @@ TInt CRadioFmTunerUtility::CBody::GetFrequencyRange(
     TInt& aMinFreq,
     TInt& aMaxFreq ) const
     {
-    FUNC_LOG;
 
     TRsFrequencyRange range;
-    TInt error = iRadioSession.GetFrequencyRange( range, aMinFreq, aMaxFreq );
+    TInt error = iRadioSession->GetFrequencyRange( range, aMinFreq, aMaxFreq );
     if ( !error )
         {
     switch ( range )
@@ -155,7 +142,10 @@ TInt CRadioFmTunerUtility::CBody::GetFrequencyRange(
             break;
             }
         }
-    INFO_3("aRange = %d, aMinFreq = %d, aMaxFreq = %d", aRange, aMinFreq, aMaxFreq);
+#ifdef _DEBUG
+    RDebug::Print(_L("CRadioFmTunerUtility::CBody::GetFrequencyRange, aRange = %d, aMinFreq = %d, aMaxFreq = %d"),
+        aRange, aMinFreq, aMaxFreq);
+#endif
     return error;
     }
 
@@ -168,8 +158,9 @@ TInt CRadioFmTunerUtility::CBody::GetFrequencyRange(
 void CRadioFmTunerUtility::CBody::SetFrequencyRange(
     TFmRadioFrequencyRange aRange )
     {
-    FUNC_LOG;
-    INFO_1("aRange = %d", aRange);
+#ifdef _DEBUG
+    RDebug::Print(_L("CRadioFmTunerUtility::CBody::SetFrequencyRange, aRange = %d"), aRange);
+#endif
     TRsFrequencyRange range = ERsRangeFmEuroAmerica;    //default
     switch (aRange)
         {
@@ -182,7 +173,7 @@ void CRadioFmTunerUtility::CBody::SetFrequencyRange(
         default:
             break;
         }
-    iRadioSession.SetFrequencyRange( range );
+    iRadioSession->SetFrequencyRange( range );
     }
 
 
@@ -193,8 +184,7 @@ void CRadioFmTunerUtility::CBody::SetFrequencyRange(
 //
 void CRadioFmTunerUtility::CBody::CancelSetFrequencyRange()
     {
-    FUNC_LOG;
-    iRadioSession.CancelSetFrequencyRange();
+    iRadioSession->CancelSetFrequencyRange();
     }
 
 // -----------------------------------------------------------------------------
@@ -205,9 +195,10 @@ void CRadioFmTunerUtility::CBody::CancelSetFrequencyRange()
 void CRadioFmTunerUtility::CBody::SetFrequency(
     TInt aFrequency )
     {
-    FUNC_LOG;
-    INFO_1("aFrequency = %d", aFrequency);
-    iRadioSession.SetFrequency(aFrequency);
+#ifdef _DEBUG
+    RDebug::Print(_L("CRadioFmTunerUtility::CBody::SetFrequency, aFrequency = %d"), aFrequency);
+#endif
+    iRadioSession->SetFrequency(aFrequency);
     }
 
 // -----------------------------------------------------------------------------
@@ -218,8 +209,7 @@ void CRadioFmTunerUtility::CBody::SetFrequency(
 //
 void CRadioFmTunerUtility::CBody::CancelSetFrequency()
     {
-    FUNC_LOG;
-    iRadioSession.CancelSetFrequency();
+    iRadioSession->CancelSetFrequency();
     }
 
 // -----------------------------------------------------------------------------
@@ -230,8 +220,7 @@ void CRadioFmTunerUtility::CBody::CancelSetFrequency()
 TInt CRadioFmTunerUtility::CBody::GetFrequency(
     TInt& aFrequency ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetFrequency(aFrequency);
+    return iRadioSession->GetFrequency(aFrequency);
     }
 
 // -----------------------------------------------------------------------------
@@ -242,9 +231,10 @@ TInt CRadioFmTunerUtility::CBody::GetFrequency(
 void CRadioFmTunerUtility::CBody::StationSeek(
     TBool aUpwards )
     {
-    FUNC_LOG;
-    INFO_1("aUpwards = %d", aUpwards);
-    iRadioSession.StationSeek(aUpwards);
+#ifdef _DEBUG
+    RDebug::Print(_L("CRadioFmTunerUtility::CBody::StationSeek, aUpwards = %d"), aUpwards);
+#endif
+    iRadioSession->StationSeek(aUpwards);
     }
 
 // -----------------------------------------------------------------------------
@@ -254,8 +244,7 @@ void CRadioFmTunerUtility::CBody::StationSeek(
 //
 void CRadioFmTunerUtility::CBody::CancelStationSeek()
     {
-    FUNC_LOG;
-    iRadioSession.CancelStationSeek();
+    iRadioSession->CancelStationSeek();
     }
 
 // -----------------------------------------------------------------------------
@@ -266,8 +255,7 @@ void CRadioFmTunerUtility::CBody::CancelStationSeek()
 TInt CRadioFmTunerUtility::CBody::GetSignalStrength(
     TInt& aSignalStrength ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetSignalStrength(aSignalStrength);
+    return iRadioSession->GetSignalStrength(aSignalStrength);
     }
 
 // -----------------------------------------------------------------------------
@@ -278,8 +266,7 @@ TInt CRadioFmTunerUtility::CBody::GetSignalStrength(
 TInt CRadioFmTunerUtility::CBody::GetMaxSignalStrength(
     TInt& aMaxSignalStrength ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetMaxSignalStrength(aMaxSignalStrength);
+    return iRadioSession->GetMaxSignalStrength(aMaxSignalStrength);
     }
 
 // -----------------------------------------------------------------------------
@@ -290,8 +277,7 @@ TInt CRadioFmTunerUtility::CBody::GetMaxSignalStrength(
 TInt CRadioFmTunerUtility::CBody::GetStereoMode(
     TBool& aStereo ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetStereoMode(aStereo);
+    return iRadioSession->GetStereoMode(aStereo);
     }
 
 // -----------------------------------------------------------------------------
@@ -302,8 +288,7 @@ TInt CRadioFmTunerUtility::CBody::GetStereoMode(
 TInt CRadioFmTunerUtility::CBody::ForceMonoReception(
     TBool aForcedMono)
     {
-    FUNC_LOG;
-    return iRadioSession.ForceMonoReception(aForcedMono);
+    return iRadioSession->ForceMonoReception(aForcedMono);
     }
 
 // -----------------------------------------------------------------------------
@@ -314,8 +299,7 @@ TInt CRadioFmTunerUtility::CBody::ForceMonoReception(
 TInt CRadioFmTunerUtility::CBody::GetForcedMonoReception(
     TBool& aForcedMono ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetForceMonoReception(aForcedMono);
+    return iRadioSession->GetForceMonoReception(aForcedMono);
     }
 
 // -----------------------------------------------------------------------------
@@ -326,8 +310,7 @@ TInt CRadioFmTunerUtility::CBody::GetForcedMonoReception(
 TInt CRadioFmTunerUtility::CBody::SetSquelch(
     TBool aSquelch )
     {
-    FUNC_LOG;
-    return iRadioSession.SetSquelch(aSquelch);
+    return iRadioSession->SetSquelch(aSquelch);
     }
 
 // -----------------------------------------------------------------------------
@@ -338,8 +321,7 @@ TInt CRadioFmTunerUtility::CBody::SetSquelch(
 TInt CRadioFmTunerUtility::CBody::GetSquelch(
     TBool& aSquelch ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetSquelch(aSquelch);
+    return iRadioSession->GetSquelch(aSquelch);
     }
 
 // End of File

@@ -39,7 +39,9 @@ PRJ_MMPFILES
 
 #ifdef  __3GP_EXTENTION
 #include "../3GPExtParserLib/group/bld.inf"
-#endif 
+#else
+#include "../3GPExtParserLib_stub/group/bld.inf"
+#endif
 
 MetaDataUtility.mmp
 

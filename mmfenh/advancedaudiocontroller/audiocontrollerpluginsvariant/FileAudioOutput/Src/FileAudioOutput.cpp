@@ -547,7 +547,10 @@ EXPORT_C TBool CFileAudioOutput::IsDSStopped()
     {
     return EFalse;
     }
-
+TBool CFileAudioOutput::IsTimePosSeekable()
+    {
+    return EFalse;
+    }
 // ========================== OTHER EXPORTED FUNCTIONS =========================
 
 // End of file

@@ -116,11 +116,6 @@ void CTmsAudioServicesTestClass::Delete()
     iLog->Log(_L(""));
     iLog->Log(_L(""));
 
-    delete iRingTonePlayer;
-    delete iDTMFTonePlayerDn;
-    delete iDTMFTonePlayerUp;
-    delete iInbandTonePlayer;
-
     // delete iPlayBuf;
 
     if (iTmsDnlink)
@@ -197,23 +192,6 @@ TInt CTmsAudioServicesTestClass::RunMethodL(CStifItemParser& aItem)
         ENTRY( "GetBitRateList", CTmsAudioServicesTestClass::GetBitRateList ),
         ENTRY( "SetBitrates", CTmsAudioServicesTestClass::SetBitrates ),
         ENTRY( "GetBitrates", CTmsAudioServicesTestClass::GetBitrates ),
-        ENTRY( "CreateDTMFTonePlayer", CTmsAudioServicesTestClass::CreateDTMFTonePlayer ),
-        ENTRY( "DTMFTonePlay", CTmsAudioServicesTestClass::DTMFTonePlay ),
-        ENTRY( "StopDTMFTonePlayer", CTmsAudioServicesTestClass::StopDTMFTonePlayer ),
-        ENTRY( "ContinueDTMFStringSending", CTmsAudioServicesTestClass::ContinueDTMFStringSending ),
-        ENTRY( "CloseDTMFPlayer", CTmsAudioServicesTestClass::CloseDTMFPlayer ),
-        ENTRY( "CreateRingTonePlayer", CTmsAudioServicesTestClass::CreateRingTonePlayer ),
-        ENTRY( "InitRingTonePlayer", CTmsAudioServicesTestClass::InitRingTonePlayer ),
-        ENTRY( "PlayRingTone", CTmsAudioServicesTestClass::PlayRingTone ),
-        ENTRY( "PlayRingToneNoEvent", CTmsAudioServicesTestClass::PlayRingToneNoEvent ),
-        ENTRY( "PauseRingTone", CTmsAudioServicesTestClass::PauseRingTone ),
-        ENTRY( "MuteRingTone", CTmsAudioServicesTestClass::MuteRingTone ),
-        ENTRY( "StopRingTone", CTmsAudioServicesTestClass::StopRingTone ),
-        ENTRY( "CloseRingTonePlayer", CTmsAudioServicesTestClass::CloseRingTonePlayer ),
-        ENTRY( "CreateInbandTonePlayer", CTmsAudioServicesTestClass::CreateInbandTonePlayer ),
-        ENTRY( "StartInbandTone", CTmsAudioServicesTestClass::StartInbandTone ),
-        ENTRY( "StopInbandTone", CTmsAudioServicesTestClass::StopInbandTone ),
-        ENTRY( "CloseInbandTonePlayer", CTmsAudioServicesTestClass::CloseInbandTonePlayer ),
         ENTRY( "GetDownlinkVersion", CTmsAudioServicesTestClass::GetDownlinkVersion ),
         ENTRY( "GetUplinkVersion", CTmsAudioServicesTestClass::GetUplinkVersion ),
         ENTRY( "GetType", CTmsAudioServicesTestClass::GetType ),
@@ -280,13 +258,6 @@ TPtrC CTmsAudioServicesTestClass::EventName(TInt aKey)
         (TText*)L"EFillBuffer",
         (TText*)L"EOutputChanged",
         (TText*)L"ESetOutputComplete",
-        (TText*)L"ERTInitComplete",
-        (TText*)L"ERTPlayComplete",
-        (TText*)L"ERTDeinitComplete",
-        (TText*)L"EInbToneStarted",
-        (TText*)L"EInbToneStopped",
-        (TText*)L"EDTMFToneStarted",
-        (TText*)L"EDTMFToneStopped",
         };
 
     if( (TUint)aKey >= (sizeof( keywords )/sizeof(TText*)) )
@@ -1272,7 +1243,7 @@ TInt CTmsAudioServicesTestClass::OpenDownlink(CStifItemParser& /*aItem */)
             {
             iLog->Log(_L("CTmsAudioServicesTestClass::OpenDownlink - init Downlink"));
             iTmsDnlink->AddObserver(*this, NULL);
-            error = iTmsDnlink->Init(4);
+            error = iTmsDnlink->Init();
             }
 
         if (error != KErrNone)
@@ -1358,7 +1329,7 @@ TInt CTmsAudioServicesTestClass::OpenUplink(CStifItemParser& /*aItem */)
             {
             iLog->Log(_L("CTmsAudioServicesTestClass::OpenDownlink - init Uplink"));
             iTmsUplink->AddObserver(*this, NULL);
-            error = iTmsUplink->Init(4);
+            error = iTmsUplink->Init();
             }
 
         if (error != KErrNone)
@@ -1460,7 +1431,7 @@ TInt CTmsAudioServicesTestClass::Start(CStifItemParser& aItem)
             {
             if ((iUpLinkStatus == INITIALIZED) || (iUpLinkStatus == PAUSED))
                 {
-                iTmsUplink->Start(2);
+                iTmsUplink->Start();
 
                 if (iUpLinkStatus == INITIALIZED)
                     {
@@ -1483,7 +1454,7 @@ TInt CTmsAudioServicesTestClass::Start(CStifItemParser& aItem)
             {
             if ((iDnLinkStatus == INITIALIZED) || (iDnLinkStatus == PAUSED))
                 {
-                iTmsDnlink->Start(2);
+                iTmsDnlink->Start();
                 if (iDnLinkStatus == INITIALIZED)
                     {
                     AddExpectedEvent(EFillBuffer, KMediumTimeout);
@@ -2926,509 +2897,6 @@ TInt CTmsAudioServicesTestClass::RemoveGlobalGainEffectToStream(
         {
         error = iTmsUplink->RemoveEffect(iGlobalGain);
         }
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::CreateDTMFTonePlayer(CStifItemParser& aItem)
-    {
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateDTMFTonePlayer"));
-    TInt error = TMS_RESULT_SUCCESS;
-    TPtrC StreamType;
-    error = aItem.GetNextString(StreamType);
-
-    if (error == TMS_RESULT_SUCCESS)
-        {
-        if (StreamType == KTagDnlink)
-            {
-            if (iFactory && !iDTMFTonePlayerDn)
-                {
-                error = iFactory->CreateDTMF(TMS_STREAM_DOWNLINK,
-                        iDTMFTonePlayerDn);
-                error |= iDTMFTonePlayerDn->AddObserver(*this, NULL);
-                }
-            FTRACE(FPrint(_L("CreateDTMF-DNL Error [%d]"), error));
-            }
-        else if (StreamType == KTagUplink)
-            {
-            if (iFactory && !iDTMFTonePlayerUp)
-                {
-                error = iFactory->CreateDTMF(TMS_STREAM_UPLINK,
-                        iDTMFTonePlayerUp);
-                error |= iDTMFTonePlayerUp->AddObserver(*this, NULL);
-                }
-            FTRACE(FPrint(_L("CreateDTMF-UPL Error [%d]"), error));
-            }
-        else
-            {
-            iLog->Log(KMsgBadTestParameters);
-            error = KErrBadTestParameter;
-            }
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateDTMFTonePlayer Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::DTMFTonePlay(CStifItemParser& aItem)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::DTMFTonePlay")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::DTMFTonePlay"));
-    GString* dtmfstring;
-    TInt error = TMS_RESULT_SUCCESS;
-    TPtrC StreamType;
-    error = aItem.GetNextString(StreamType);
-
-    if (error == TMS_RESULT_SUCCESS)
-        {
-        if (StreamType == KTagDnlink)
-            {
-            if (iDTMFTonePlayerDn)
-                {
-                // NOTE: UpLink Status must be READY or STREAMING
-                dtmfstring = g_string_new("4723");
-                dtmfstring = g_string_append_c(dtmfstring, '4');
-                error = iDTMFTonePlayerDn->SetTone(dtmfstring);
-                if (error == TMS_RESULT_SUCCESS)
-                    {
-                    error = iDTMFTonePlayerDn->Start();
-                    }
-                g_string_free(dtmfstring, TRUE);
-                }
-            }
-        else if (StreamType == KTagUplink)
-            {
-            if (iDTMFTonePlayerUp)
-                {
-                // NOTE: UpLink Status must be READY or STREAMING
-                dtmfstring = g_string_new("987");
-                dtmfstring = g_string_append_c(dtmfstring, '4');
-                error = iDTMFTonePlayerUp->SetTone(dtmfstring);
-                if (error == TMS_RESULT_SUCCESS)
-                    {
-                    error = iDTMFTonePlayerUp->Start();
-                    }
-                g_string_free(dtmfstring, TRUE);
-                }
-            }
-        else
-            {
-            iLog->Log(KMsgBadTestParameters);
-            error = KErrBadTestParameter;
-            }
-        }
-
-    if (error == TMS_RESULT_SUCCESS)
-        {
-        AddExpectedEvent(EDTMFToneStopped, KMediumTimeout);
-        }
-
-    iLog->Log(_L("CTmsAudioServicesTestClass::DTMFTonePlay Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::StopDTMFTonePlayer(CStifItemParser& aItem)
-    {
-    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::StopDTMFTonePlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::StopDTMFTonePlay"));
-    TInt error = TMS_RESULT_SUCCESS;
-    TPtrC StreamType;
-    error = aItem.GetNextString(StreamType);
-
-    if (error == TMS_RESULT_SUCCESS)
-        {
-        if (StreamType == KTagDnlink)
-            {
-            if (iFactory && iDTMFTonePlayerDn)
-                {
-                iDTMFTonePlayerDn->Stop();
-                RemoveExpectedEvent(EDTMFToneStopped);
-                }
-            }
-        else if (StreamType == KTagUplink)
-            {
-            if (iFactory && iDTMFTonePlayerUp)
-                {
-                iDTMFTonePlayerUp->Stop();
-                RemoveExpectedEvent(EDTMFToneStopped);
-                }
-            }
-        else
-            {
-            iLog->Log(KMsgBadTestParameters);
-            error = KErrBadTestParameter;
-            }
-        }
-
-    iLog->Log(_L("CTmsAudioServicesTestClass::StopDTMFTonePlayer Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::ContinueDTMFStringSending(
-        CStifItemParser& aItem)
-    {
-    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::ContinueDTMFStringSending")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::ContinueDTMFStringSending"));
-    TInt error = TMS_RESULT_SUCCESS;
-    TPtrC StreamType;
-    error = aItem.GetNextString(StreamType);
-
-    if (error == TMS_RESULT_SUCCESS)
-        {
-        if (StreamType == KTagDnlink)
-            {
-            if (iFactory && iDTMFTonePlayerDn)
-                {
-                //case not supported for DNL, should return valid error
-                error = iDTMFTonePlayerDn->ContinueDTMFStringSending(TRUE);
-                }
-            }
-        else if (StreamType == KTagUplink)
-            {
-            if (iFactory && iDTMFTonePlayerUp)
-                {
-                error = iDTMFTonePlayerUp->ContinueDTMFStringSending(TRUE);
-                }
-            }
-        else
-            {
-            iLog->Log(KMsgBadTestParameters);
-            error = KErrBadTestParameter;
-            }
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::ContinueDTMFStringSending Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::CloseDTMFPlayer(CStifItemParser& aItem)
-    {
-    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::CloseDTMFPlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::CloseDTMFPlayer"));
-    TInt error = TMS_RESULT_SUCCESS;
-    TPtrC StreamType;
-    error = aItem.GetNextString(StreamType);
-
-    if (error == TMS_RESULT_SUCCESS)
-        {
-        if (StreamType == KTagDnlink)
-            {
-            if (iFactory && iDTMFTonePlayerDn)
-                {
-                iDTMFTonePlayerDn->RemoveObserver(*this);
-                iFactory->DeleteDTMF(iDTMFTonePlayerDn);
-                }
-            }
-        else if (StreamType == KTagUplink)
-            {
-            if (iFactory && iDTMFTonePlayerUp)
-                {
-                iDTMFTonePlayerUp->RemoveObserver(*this);
-                iFactory->DeleteDTMF(iDTMFTonePlayerUp);
-                }
-            }
-        else
-            {
-            iLog->Log(KMsgBadTestParameters);
-            error = KErrBadTestParameter;
-            }
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::StopDTMFTonePlayer Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::CreateRingTonePlayer(
-        CStifItemParser& /*aItem */)
-    {
-    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::CreateRingTonePlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateRingTonePlayer"));
-    TInt error = TMS_RESULT_SUCCESS;
-    if (iFactory)
-        {
-        error = iFactory->CreateRingTonePlayer(iRingTonePlayer);
-        if (error == TMS_RESULT_SUCCESS)
-            {
-            iRingTonePlayer->AddObserver(*this, NULL);
-            }
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateRingTonePlayer Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::InitRingTonePlayer(CStifItemParser& aItem)
-    {
-    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::InitRingTonePlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::InitRingTonePlayer"));
-
-    TInt error = TMS_RESULT_SUCCESS;
-    TPtrC StreamType;
-    error = aItem.GetNextString(StreamType);
-
-    if (error == TMS_RESULT_SUCCESS && iRingTonePlayer)
-        {
-        if (StreamType == KTagRTDefault)
-            {
-            error = iRingTonePlayer->Init(TMS_RINGTONE_DEFAULT);
-            }
-        else if (StreamType == KTagRTFile)
-            {
-            TBuf<sizeof(KTestFile3)> buf(KTestFile3);
-            iRTStr = g_string_new_len((gchar*) buf.Ptr(), buf.Length() * 2);
-            error = iRingTonePlayer->Init(TMS_RINGTONE_FILE, iRTStr);
-            g_string_free(iRTStr, TRUE);
-            iRTStr = NULL;
-            }
-        else if (StreamType == KTagRTBeepOnce)
-            {
-            error = iRingTonePlayer->Init(TMS_RINGTONE_BEEP_ONCE);
-            }
-        else if (StreamType == KTagRTSilent)
-            {
-            error = iRingTonePlayer->Init(TMS_RINGTONE_SILENT);
-            }
-        else if (StreamType == KTagRTUnsecureVoIP)
-            {
-            error = iRingTonePlayer->Init(TMS_RINGTONE_UNSECURE_VOIP);
-            }
-        else if (StreamType == KTagRTSequence)
-            {
-            TBuf8<sizeof(KRTBeepSequence)> buf(KRTBeepSequence);
-            iRTStr = g_string_new_len((gchar*) buf.Ptr(), buf.Length());
-            error = iRingTonePlayer->Init(TMS_RINGTONE_SEQUENCE, iRTStr);
-            g_string_free(iRTStr, TRUE);
-            }
-        else if (StreamType == KTagRTTts)
-            {
-            TBuf<sizeof(KTextToSpeak)> buf(KTextToSpeak);
-            iTTSStr = g_string_new_len((gchar*) buf.Ptr(), buf.Length() * 2);
-            error = iRingTonePlayer->Init(TMS_RINGTONE_DEFAULT, NULL,
-                    iTTSStr);
-            g_string_free(iTTSStr, TRUE);
-            iTTSStr = NULL;
-            }
-        else
-            {
-            iLog->Log(KMsgBadTestParameters);
-            error = KErrBadTestParameter;
-            }
-
-        if (error == TMS_RESULT_SUCCESS)
-            {
-            AddExpectedEvent(ERTInitComplete, KMediumTimeout);
-            }
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::InitRingTonePlayer Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::PlayRingTone(CStifItemParser& /*aItem*/)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::PlayRingTone")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::PlayRingTone"));
-    TInt error = KErrNone;
-
-    if (iRingTonePlayer)
-        {
-        iRingTonePlayer->Play();
-        AddExpectedEvent(ERTPlayComplete, KMediumTimeout);
-        }
-    else
-        {
-        error = KErrNotFound;
-        }
-
-    iLog->Log(_L("CTmsAudioServicesTestClass::PlayRingTone Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::PlayRingToneNoEvent(CStifItemParser& /*aItem*/)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::PlayRingToneNoEvent")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::PlayRingToneNoEvent"));
-    TInt error = KErrNone;
-
-    if (iRingTonePlayer)
-        {
-        iRingTonePlayer->Play();
-        // Not expecting any event - will allow to cancel
-        }
-    else
-        {
-        error = KErrNotFound;
-        }
-
-    iLog->Log(_L("CTmsAudioServicesTestClass::PlayRingToneNoEvent Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::PauseRingTone(CStifItemParser& /*aItem*/)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::PauseRingTone")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::PauseRingTone"));
-    TInt error = KErrNone;
-
-    if (iRingTonePlayer)
-        {
-        iRingTonePlayer->Pause();
-        RemoveExpectedEvent(ERTPlayComplete);
-        }
-    else
-        {
-        error = KErrNotFound;
-        }
-
-    iLog->Log(_L("CTmsAudioServicesTestClass::PauseRingTone Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::StopRingTone(CStifItemParser& /*aItem*/)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::StopRingTone")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::StopRingTone"));
-    TInt error = KErrNotFound;
-    if (iRingTonePlayer)
-        {
-        error = iRingTonePlayer->Stop();
-        RemoveExpectedEvent(ERTPlayComplete);
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::StopRingTone Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::MuteRingTone(CStifItemParser& /*aItem*/)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::MuteRingTone")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::MuteRingTone"));
-    TInt error = KErrNotFound;
-    if (iRingTonePlayer)
-        {
-        error = iRingTonePlayer->Mute();
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::MuteRingTone Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::CloseRingTonePlayer(CStifItemParser& /*aItem*/)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::CloseRingTonePlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::CloseRingTonePlayer"));
-    TInt error = KErrNotFound;
-    if (iFactory && iRingTonePlayer)
-        {
-        error = iRingTonePlayer->Deinit();
-        error |= iRingTonePlayer->RemoveObserver(*this);
-        error |= iFactory->DeleteRingTonePlayer(iRingTonePlayer);
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::CloseRingTonePlayer Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::CreateInbandTonePlayer(CStifItemParser& /*aItem*/)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::CreateInbandTonePlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateInbandTonePlayer"));
-    TInt error = KErrNotFound;
-
-    if (iFactory && !iInbandTonePlayer)
-        {
-        error = iFactory->CreateInbandTonePlayer(iInbandTonePlayer);
-        if (iInbandTonePlayer)
-            {
-            iInbandTonePlayer->AddObserver(*this, NULL);
-            }
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::CreateInbandTonePlayer Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::StartInbandTone(CStifItemParser& aItem)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::StartInbandTone")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::StartInbandTone"));
-    TInt error = TMS_RESULT_SUCCESS;
-    TPtrC StreamType;
-    error = aItem.GetNextString(StreamType);
-
-    if (error == TMS_RESULT_SUCCESS && iInbandTonePlayer)
-        {
-        if (StreamType == KTagUserBusy)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_USER_BUSY);
-            }
-        else if (StreamType == KTagRadioPathNotFound)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_RADIO_PATH_NOT_AVAIL);
-            }
-        else if (StreamType == KTagCongestion)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_CONGESTION);
-            }
-        else if (StreamType == KTagSpecialInfo)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_SPECIAL_INFO);
-            }
-        else if (StreamType == KTagReorder)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_REORDER);
-            }
-        else if (StreamType == KTagAlerting)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_REMOTE_ALEARTING);
-            }
-        else if (StreamType == KTagWaiting)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_CALL_WAITING);
-            }
-        else if (StreamType == KTagDataCall)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_DATA_CALL);
-            }
-        else if (StreamType == KTagNoSequence)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_NO_SEQUENCE);
-            }
-        else if (StreamType == KTagBeepSequence)
-            {
-            error = iInbandTonePlayer->Start(TMS_INBAND_BEEP_SEQUENCE);
-            }
-        else
-            {
-            iLog->Log(KMsgBadTestParameters);
-            error = KErrBadTestParameter;
-            }
-        }
-
-    if (error == TMS_RESULT_SUCCESS)
-        {
-        AddExpectedEvent(EInbToneStarted, KShortTimeout);
-        }
-
-    iLog->Log(_L("CTmsAudioServicesTestClass::StartInbandTone Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::StopInbandTone(CStifItemParser& /*aItem*/)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::StopInbandTone")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::StopInbandTone"));
-    TInt error = KErrNotFound;
-    if (iFactory && iInbandTonePlayer)
-        {
-        error = iInbandTonePlayer->Stop();
-        RemoveExpectedEvent(EInbToneStarted);
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::StopInbandTone Error [%d]"), error);
-    return error;
-    }
-
-TInt CTmsAudioServicesTestClass::CloseInbandTonePlayer(CStifItemParser& /*aItem*/)
-    {
-    FTRACE (FPrint(_L("CTmsAudioServicesTestClass::CloseInbandTonePlayer")));
-    iLog->Log(_L("CTmsAudioServicesTestClass::CloseInbandTonePlayer"));
-    TInt error = KErrNotFound;
-    if (iFactory && iInbandTonePlayer)
-        {
-        error = iInbandTonePlayer->RemoveObserver(*this);
-        error |= iFactory->DeleteInbandTonePlayer(iInbandTonePlayer);
-        }
-    iLog->Log(_L("CTmsAudioServicesTestClass::CloseInbandTonePlayer Error [%d]"), error);
     return error;
     }
 

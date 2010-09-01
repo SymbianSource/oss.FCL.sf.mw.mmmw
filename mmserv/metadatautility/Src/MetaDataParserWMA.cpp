@@ -69,8 +69,6 @@ _LIT(KWMUniqueFileIdentifier,	"WM/UniqueFileIdentifier\0");
 _LIT(KWMAudioFileURL,	"WM/AudioFileURL\0");
 _LIT(KWMSharedUserRating, "WM/SharedUserRating\0");
 _LIT(KWMDate, "WM/OriginalReleaseTime\0");
-_LIT(KWMAlbumArtist, "WM/AlbumArtist\0");
-
 #ifdef __WINDOWS_MEDIA
 _LIT(KWMProvider, "WM/Provider\0");
 #endif
@@ -183,7 +181,6 @@ void CMetaDataParserWMA::ParseL(
 		TRAP(err, GetExtContDesEntryL(EMetaDataAlbumTrack, iTrackNumberOffset));
 		TRAP(err, GetExtContDesEntryL(EMetaDataUniqueFileIdentifier, iUniqueFileIdentifierOffset));
 		TRAP(err, GetExtContDesEntryL(EMetaDataUrl, iAudioFileURLOffset));
-        TRAP(err, GetExtContDesEntryL(EMetaDataAlbumArtist, iAlbumArtistOffset));
 		TRAP(err, GetDurationL());
 		TRAP(err, GetExtContDesEntryL(EMetaDataDate, iDateOffset));
 	#ifdef __WINDOWS_MEDIA
@@ -247,9 +244,6 @@ void CMetaDataParserWMA::ParseL(
 					break;
 				case EMetaDataDate:
 					TRAP(err, GetExtContDesEntryL(EMetaDataDate, iDateOffset));
-					break;
-                case EMetaDataAlbumArtist:
-                    TRAP(err, GetExtContDesEntryL(EMetaDataAlbumArtist, iAlbumArtistOffset));
 					break;
 			#ifdef __WINDOWS_MEDIA
 				case EMetaDataVendor:
@@ -892,10 +886,6 @@ void CMetaDataParserWMA::ParseExtendedContentDescriptionObjectL()
 				{
 				iDateOffset = offset; 
 				}
-            else if(!name16.Compare(KWMAlbumArtist))
-                {
-                iAlbumArtistOffset = offset; 
-                }
 		#ifdef __WINDOWS_MEDIA
 			else if(!name16.Compare(KWMProvider))
 				{

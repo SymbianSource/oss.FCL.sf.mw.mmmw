@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
  * All rights reserved.
  * This component and the accompanying materials are made available
  * under the terms of "Eclipse Public License v1.0"
@@ -114,52 +114,6 @@ EXPORT_C gint TMSUtility::TMSResult(const gint aError)
         case KErrNoSecureTime: //-49
         default:
             result = TMS_RESULT_GENERAL_ERROR;
-            break;
-        }
-    return result;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSUtility::SymbianResult
-//
-// -----------------------------------------------------------------------------
-//
-EXPORT_C TInt TMSUtility::SymbianResult(const gint aError)
-    {
-    TInt result(KErrNone);
-
-    if (aError <= TMS_RESULT_SUCCESS)
-        {
-        return aError; //return Symbian error
-        }
-
-    switch (aError)
-        {
-        case TMS_RESULT_DOES_NOT_EXIST:
-            result = KErrNotFound;
-            break;
-        case TMS_RESULT_OPERATION_CANCELLED:
-            result = KErrCancel;
-            break;
-        case TMS_RESULT_INSUFFICIENT_MEMORY:
-            result = KErrNoMemory;
-            break;
-        case TMS_RESULT_ILLEGAL_OPERATION:
-            result = KErrNotSupported;
-            break;
-        case TMS_RESULT_INVALID_ARGUMENT:
-            result = KErrArgument;
-            break;
-        case TMS_RESULT_BUFFER_LATENCY_ERROR:
-            result = KErrUnderflow;
-            break;
-        case TMS_RESULT_ALREADY_EXIST:
-            result = KErrAlreadyExists;
-            break;
-        case TMS_RESULT_FATAL_ERROR:
-        case TMS_RESULT_GENERAL_ERROR:
-        default:
-            result = KErrGeneral;
             break;
         }
     return result;

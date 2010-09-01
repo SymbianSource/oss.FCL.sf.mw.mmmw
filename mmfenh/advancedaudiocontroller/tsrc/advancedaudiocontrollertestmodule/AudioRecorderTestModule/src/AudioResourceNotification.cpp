@@ -28,7 +28,6 @@ CAudioResourceNotification::CAudioResourceNotification(CTestModuleIf *aConsole, 
 {
 	console = aConsole;
 	logger = aLogger;
-	iCallBackErr = KErrNone;
 
 }
 
@@ -108,10 +107,7 @@ TInt CAudioResourceNotification::RunTestL(CTestModuleIf *aConsole, CStifLogger *
 	CleanupStack::PushL(selfObj);
 
 	CActiveScheduler::Start();
-	if(selfObj->iCallBackErr != KErrNone)
-	    {
-        error = selfObj->iCallBackErr;
-        }
+
 
 	CleanupStack::PopAndDestroy(2); // schedule, selfObj
 
@@ -145,7 +141,7 @@ void CAudioResourceNotification::MoscoStateChangeEvent(CBase* /*aObject*/, TInt 
 
 	logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),aErrorCode,aPreviousState,aCurrentState);
 
-	iCallBackErr = aErrorCode;	
+
 
 	if (recorder && aErrorCode == KErrNone && aCurrentState == CMdaAudioClipUtility::EOpen && aPreviousState == 0)
 	{
@@ -209,15 +205,9 @@ void CAudioResourceNotification::MoscoStateChangeEvent(CBase* /*aObject*/, TInt 
 
 		recorder->WillResumePlay();
 		CActiveScheduler::Stop();
-		return;
 	}
-	if (aErrorCode != KErrNone)
-	        {
-	        
-	        CActiveScheduler::Stop();
-	        return;
-	        }
-	
+
+	return;
 
 }
 
@@ -232,7 +222,7 @@ void CAudioResourceNotification::MaloLoadingComplete()
 }
 
 
-void CAudioResourceNotification::MarncResourceAvailable(TUid /*aNotificationEventId*/, const TDesC8 &/*aNotificationData*/)
+void CAudioResourceNotification::MarncResourceAvailable(TUid aNotificationEventId, const TDesC8 &aNotificationData)
 {
 		logger->Log(_L("MarncResourceAvailable "));
 }

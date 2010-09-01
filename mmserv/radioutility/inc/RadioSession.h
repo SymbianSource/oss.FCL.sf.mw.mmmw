@@ -360,8 +360,6 @@ public: // New functions
 class RRadioSession : public RSessionBase,
 					  public MCustomCommand
     {
-public: // New functions
-    IMPORT_C static RRadioSession* NewL();
 public:  // Constructors and destructor
 
 	/**

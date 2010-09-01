@@ -36,7 +36,7 @@ SYSTEMINCLUDE   /epoc32/include/ecom
 
 SOURCE          recrt.cpp
 
-LIBRARY         euser.lib
-LIBRARY         apmime.lib
+LIBRARY         EUSER.LIB
+LIBRARY         APMIME.LIB
 
 // End of File

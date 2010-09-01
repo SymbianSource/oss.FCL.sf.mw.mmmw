@@ -142,8 +142,7 @@ void CRecordingBase::MoscoStateChangeEvent(CBase* /*aObject*/,
     RDebug::Print (_L ("CRecordingBase::MoscoStateChangeEvent"));
 #endif
 
-    
-
+    if (aErrorCode != KErrNone)
 	    logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),
 	                   aErrorCode,aPreviousState,aCurrentState);
 /*

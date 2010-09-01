@@ -17,7 +17,6 @@
 
 
 #include "RadioUtilityBody.h"
-#include "trace.h"
 
 
 // ======== MEMBER FUNCTIONS ========
@@ -30,11 +29,10 @@
 EXPORT_C CRadioUtility* CRadioUtility::NewL(
     TBool aPrimaryClient )
     {
-    FUNC_LOG;
     CRadioUtility* self = new(ELeave) CRadioUtility();
     CleanupStack::PushL(self);
     self->iBody = CRadioUtility::CBody::NewL(aPrimaryClient);
-    CleanupStack::Pop(self);
+    CleanupStack::Pop();
     return self;
     }
 
@@ -44,7 +42,6 @@ EXPORT_C CRadioUtility* CRadioUtility::NewL(
 //
 EXPORT_C CRadioUtility::~CRadioUtility()
     {
-    FUNC_LOG;
     delete iBody;
     }
 
@@ -55,7 +52,6 @@ EXPORT_C CRadioUtility::~CRadioUtility()
 //
 CRadioUtility::CRadioUtility()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -66,7 +62,6 @@ CRadioUtility::CRadioUtility()
 EXPORT_C CRadioFmTunerUtility& CRadioUtility::RadioFmTunerUtilityL(
     MRadioFmTunerObserver& aObserver )
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->RadioFmTunerUtilityL(aObserver);
     }
@@ -79,7 +74,6 @@ EXPORT_C CRadioFmTunerUtility& CRadioUtility::RadioFmTunerUtilityL(
 EXPORT_C CRadioPlayerUtility& CRadioUtility::RadioPlayerUtilityL(
     MRadioPlayerObserver& aObserver )
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->RadioPlayerUtilityL(aObserver);
     }
@@ -92,7 +86,6 @@ EXPORT_C CRadioPlayerUtility& CRadioUtility::RadioPlayerUtilityL(
 EXPORT_C CRadioRdsUtility& CRadioUtility::RadioRdsUtilityL(
     MRadioRdsObserver& aObserver )
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->RadioRdsUtilityL(aObserver);
     }

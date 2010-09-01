@@ -19,11 +19,14 @@
 
 
 #include "../multimedia_data_source_api/group/bld.inf"
+#include "../progressive_download_api/group/bld.inf"
+#include "../equalizer_ui_api/group/bld.inf"
 #include "../enhanced_media_client_api/group/bld.inf"
 #include "../stream_control_custom_command_api/group/bld.inf"
 #include "../emc_buffer_source_api/group/bld.inf"
 #include "../emc_file_source_api/group/bld.inf"
 #include "../audio_metadata_reader_api/group/bld.inf"
+#include "../emc_progressive_download_source_api/group/bld.inf"
 #include "../emc_volume_effect_api/group/bld.inf"
 #include "../emc_balance_effect_api/group/bld.inf"
 #include "../emc_descriptor_source_api/group/bld.inf"
@@ -39,6 +42,3 @@
 #include "../radio_monitor_api/group/bld.inf"
 #include "../thumbnail_engine_api/group/bld.inf"
 #include "../telephony_multimedia_service_api/group/bld.inf"
-#include "../openmax_al_api/group/bld.inf"
-#include "../system_tone_service_api/group/bld.inf"
-#include "../openmax_al_ext_api/group/bld.inf"

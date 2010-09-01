@@ -1,0 +1,73 @@
+/*
+* Copyright (c) 2004 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  Project file for Progressive Dowload DataSource
+*
+*/
+
+
+#include <data_caging_paths.hrh>
+#include <platform_paths.hrh>
+
+
+TARGET        	ProgressiveDownloadSource.dll
+
+TARGETTYPE	PLUGIN
+
+
+UID           	0x10009d8d 0x10207A7B
+
+
+CAPABILITY  CAP_ECOM_PLUGIN
+VENDORID    VID_DEFAULT
+
+
+
+TARGETPATH /System/Libs/Plugins
+
+
+SOURCEPATH      ../src
+SOURCE          fileaccess.cpp 
+SOURCE			ProgressiveDownloadSource.cpp
+
+SOURCEPATH      ../data
+
+
+START RESOURCE	10207a7b.rss
+TARGET ProgressiveDownloadSource.rsc
+END
+
+
+
+USERINCLUDE     ../inc ../src
+USERINCLUDE	../../../../inc
+ 
+MW_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE	/epoc32/include/ecom
+SYSTEMINCLUDE	/epoc32/include/mmf/server
+SYSTEMINCLUDE	/epoc32/include/mmf/common
+SYSTEMINCLUDE	/epoc32/include/mmf/plugin
+
+
+
+LIBRARY 	euser.lib
+LIBRARY 	ECom.lib
+LIBRARY 	efsrv.lib
+LIBRARY 	mmfcontrollerframework.lib
+LIBRARY 	estor.lib
+LIBRARY 	mmfserverbaseclasses.lib
+LIBRARY 	caf.lib
+LIBRARY		cafutils.lib
+
+
+

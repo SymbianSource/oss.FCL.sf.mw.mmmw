@@ -64,8 +64,8 @@ void CMetaDataParserMP4::InitializeFileL(
 	RDebug::Print(_L("CMetaDataParserMP4::InitializeFileL - MP4ParseOpen err = %d"), err);
 #endif
 	User::LeaveIfError(TranslateMP4Err(err));
-	MP4Err mp4Err = MP4SetCustomFileBufferSizes( iMP4Handle, 0, 0, KCustomFileBufferSize);
-	if ( (mp4Err == MP4_OK) && ValidateL() )
+	MP4SetCustomFileBufferSizes( iMP4Handle, 0, 0, KCustomFileBufferSize);
+	if ( ValidateL() )
 		{
 		User::LeaveIfError(iFs.Connect());
 		// Get list of charconv supported character sets

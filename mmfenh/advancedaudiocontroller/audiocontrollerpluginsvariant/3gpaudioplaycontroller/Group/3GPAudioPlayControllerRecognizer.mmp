@@ -47,5 +47,5 @@ SOURCE          3GPAudioPlayControllerRecognizer.cpp
 LIBRARY         euser.lib 
 LIBRARY	        apmime.lib
 LIBRARY	        efsrv.lib
-LIBRARY	        3gpmp4lib.lib
+LIBRARY	        3GPMP4Lib.lib
 

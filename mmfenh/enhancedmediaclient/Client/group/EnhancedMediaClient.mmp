@@ -13,7 +13,7 @@
 *
 * Description:  Project file for EnhancedMediaClient Utility
 *
-*  Version     : %version: 10.1.8 %
+*  Version     : %version: bh1mmcf#10.1.7 %
 */
 
 
@@ -47,6 +47,11 @@ SOURCE          DataBufferQueueItem.cpp
 SOURCE          BufTypeSupEventAO.cpp
 SOURCE          DRMConfigIntfcImpl.cpp
 SOURCE          ParentChildIntfc.cpp
+
+SOURCEPATH      ../src/Components/ClientProgDLSource
+SOURCE          EventAO.cpp
+SOURCE          ClientProgDLSource.cpp
+SOURCE          DownloadGateway.cpp
 
 SOURCEPATH      ../src/Components/CMMFAudioOutputSink
 SOURCE          CMMFAudioOutputSink.cpp
@@ -100,6 +105,7 @@ USERINCLUDE     ../inc
 USERINCLUDE     ../src/Components/StreamControl
 USERINCLUDE     ../src/Components/EventNotifier
 USERINCLUDE     ../src/Components/ClientDataBufferSource
+USERINCLUDE     ../src/Components/ClientProgDLSource
 USERINCLUDE     ../src/Components/ClientFileSource
 USERINCLUDE     ../src/Components/ClientDescriptorSource
 USERINCLUDE     ../src/Components/CMMFAudioOutputSink
@@ -107,10 +113,12 @@ USERINCLUDE     ../src/Components/EventObjects
 USERINCLUDE     ../src/Components/SinkBase
 USERINCLUDE     ../src/Components/SourceBase
 USERINCLUDE     ../../Plugins/DataBufferSource/inc
+USERINCLUDE     ../../Plugins/ProgDLSource/inc
 USERINCLUDE     ../src/Components/EffectBase
 USERINCLUDE     ../src/Components/VolumeEffect
 USERINCLUDE		../src/Components/BalanceEffect
 USERINCLUDE     ../src/Components/AudioEffects
+USERINCLUDE     ../../Plugins/TransferRateMonitor/inc
 USERINCLUDE     ../../../../inc
 USERINCLUDE     ../../inc
 USERINCLUDE     ../../Plugins/DescriptorSource/inc
@@ -130,6 +138,8 @@ LIBRARY         estor.lib
 LIBRARY         cafutils.lib
 LIBRARY         ecom.lib
 LIBRARY         StreamControlCustomCommands.lib
+LIBRARY			downloadmgr.lib
+LIBRARY			transferratemonitor.lib
 LIBRARY         mmfstandardcustomcommands.lib
 
 LIBRARY			AudioEqualizerProxy.lib

@@ -37,6 +37,7 @@
 #include <SourceControl.h>
 #include <ControlObserver.h>
 #include <Events.h>
+#include <ProgDLSource.h>
 #include <DataBufferSource.h>
 #include <FileSource.h>
 #include <DataBuffer.h>
@@ -70,8 +71,10 @@
 
 #include "CEMCConstants.h"
 
+#include <DownloadMgrClientApiExt.h>
 using multimedia::MStreamControl;
 using multimedia::MControlObserver;
+using multimedia::MProgDLSource;
 using multimedia::MDataBufferSource;
 using multimedia::MDescriptorSource;
 using multimedia::MDataBuffer;
@@ -116,7 +119,8 @@ class CDRMConfigIntfc;
 */
 NONSHARABLE_CLASS(CEnhanMediaTestClass) : public CScriptBase,
 										  public MTimeoutObserver
-										  ,public MControlObserver
+										  ,public MControlObserver,
+										  public MHttpDownloadMgrObserver
 											//public MDevSoundObserver,
 											//public MMdaAudioOutputStreamCallback
 										//	public MRadioFmTunerObserver,
@@ -136,6 +140,14 @@ NONSHARABLE_CLASS(CEnhanMediaTestClass) : public CScriptBase,
         virtual ~CEnhanMediaTestClass();
 
         void Event( MControl* aObject,TUint aEvent, TAny* aData );
+        /**
+        * From MhttpDownloadMgrObserver.
+        * Callback from the DownloadManager notifying Client Events.
+        * @since S60 v3.2
+        * @param aDownload Download for which the Event is meant
+        * @param aEvent Actual Event
+        */
+        void HandleDMgrEventL( RHttpDownload& aDownload, THttpDownloadEvent aEvent );
 
 		enum TAEnhsExpectedEvent
 		{
@@ -405,6 +417,21 @@ NONSHARABLE_CLASS(CEnhanMediaTestClass) : public CScriptBase,
 
 	    TInt CreateSeekableData(CStifItemParser& aItem);
 
+	    TInt GeneralGen_StartProgDLL(CStifItemParser& aItem);
+	    TInt PDLSOpenL(CStifItemParser& aItem);
+	    TInt PDLSGetCurFileSizeL(CStifItemParser& aItem);
+	    TInt PDLSGetExpFileSizeL(CStifItemParser& aItem);
+	    TInt PDLSGetDLStatusL(CStifItemParser& aItem);
+	    TInt PDLSIsDLCompleteL(CStifItemParser& aItem);
+	    TInt PDLSGetPerDownloadedL(CStifItemParser& aItem);
+	    TInt PDLSGetPerBufferedL(CStifItemParser& aItem);
+	    TInt PDLSGetDLRateL(CStifItemParser& aItem);
+	    TInt PDLSGetBitRateL(CStifItemParser& aItem);
+	    TInt PDLSResumeDownloadL(CStifItemParser& aItem);
+	    TInt PDLSMoveFileL(CStifItemParser& aItem);
+	    TInt PDLSGetSize(CStifItemParser& aItem);
+	    TInt PDLSCancelDownloadL(CStifItemParser& aItem);
+
 	    TInt AudioEffectIsEnabled (CStifItemParser& aItem);
 
 	    TInt HandleAudioEffectEnableL(CStifItemParser& aItem);
@@ -530,6 +557,7 @@ NONSHARABLE_CLASS(CEnhanMediaTestClass) : public CScriptBase,
         MSourceControl* iSourceControl;
         RPointerArray<MDataBuffer>  iBuffers;
         RArray<TInt> iAvailable;
+        MProgDLSource* iMProgDLSource;
         MEqualizerControl* iMEqualizerControl;
         MBassBoostControl* iMBassBoostControl;
         MVolumeControl* iMVolumeControl;
@@ -568,6 +596,20 @@ NONSHARABLE_CLASS(CEnhanMediaTestClass) : public CScriptBase,
         TInt         iFileSizeInBytes;
 
         TInt iAllowedDevice;
+
+        // Url used to Open the PDL
+        HBufC8*  iUrlName;
+        // Download Manager instance to which we connect
+        RHttpDownloadMgrApiExt  iDownloadMgr;
+        // Whether the DMgr is connected or not
+        TBool iDMgrConnected;
+        // Download for which we connect
+        RHttpDownload* iDownload;
+        // Current Download ID
+        TInt32 iDownloadId;
+        // Temp FileName
+        HBufC* iAccessPtName;
+
 
         CActiveSchedulerWait* iActive;
     	// ?one_line_short_description_of_data

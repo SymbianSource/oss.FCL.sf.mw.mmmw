@@ -28,7 +28,6 @@
 
 #include <mmf/common/mmfstandardcustomcommands.h>
 #include <mmf/server/sounddevice.h>
-#include <mmf/common/mmfdrmcustomcommands.h>
 
 
 /** 
@@ -47,14 +46,12 @@ enum TMMFMdaAudioToneControllerPanicCodes
 The public API for clients of the MMFAudioToneController
 @internalTechnology
 */
-class CConfigurationComponentsFactory;
-class CAudioOutputControlUtility; 
+
 class CMMFAudioToneController : public CMMFController, 
 							public MMMFAudioPlayDeviceCustomCommandImplementor,
 							public MMMFAudioPlayControllerCustomCommandImplementor,
 							public MDevSoundObserver,
-							public MMMFAudioPlayControllerSetRepeatsCustomCommandImplementor,
-							public MMMFDRMCustomCommandImplementor 
+							public MMMFAudioPlayControllerSetRepeatsCustomCommandImplementor
 	{
 public:
 	static CMMFController* NewL();
@@ -111,12 +108,6 @@ public:
 	
 	//from MMMFAudioPlayControllerSetRepeatsCustomCommandImplementor
 	virtual TInt MapcSetRepeats(TInt aRepeatNumberOfTimes, const TTimeIntervalMicroSeconds& aTrailingSilence);
-	
-	// From MMMFDRMCustomCommandImplementor
-    virtual TInt MdcExecuteIntent(ContentAccess::TIntent aIntent);
-    virtual TInt MdcEvaluateIntent(ContentAccess::TIntent aIntent);
-    virtual TInt MdcDisableAutomaticIntent(TBool aDisableAutoIntent);
-    virtual TInt MdcSetAgentProperty(ContentAccess::TAgentProperty aProperty, TInt aValue);
 
 
 public:
@@ -149,8 +140,7 @@ protected:
 	TBool            IsValidStateTransition( TControllerState aState ) const;
 	TBool            Invariant() const;
 	TBool            IsValidState( TControllerState aState ) const ;
-	TBool            ResetPostCondition() const;	
-	
+	TBool            ResetPostCondition() const;
 
 	void             CalculateLeftRightBalance( TInt& aLeft, TInt& aRight, TInt aBalance ) const;
 	void			 CalculateBalance( TInt& aBalance, TInt aLeft, TInt aRight ) const;
@@ -168,10 +158,6 @@ private:
 /** the Dev Sound that will be used to play the tone*/
 	CMMFDevSound*            iMMFDevSound;
 
-    // for drm CR/Error 417-45879/ESLM-82JAHL
-	CConfigurationComponentsFactory*   iFactory;
-	CAudioOutputControlUtility*        iAudioOutputControlUtility; // used for audio routing for DRM files
-	// end drm cr
 /** Current state of the controller, see TControllerState*/
 	TControllerState         iState;
 
@@ -186,10 +172,6 @@ private:
 
 /** Used to store message */	
 	TMMFMessage*			 iMessage;
-
-	TBool                   iDisableAutoIntent;
-	
-	MDataSink*              iDataSink;
 	};
 
 

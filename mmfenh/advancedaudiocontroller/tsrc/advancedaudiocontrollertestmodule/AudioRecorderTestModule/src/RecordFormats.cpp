@@ -29,7 +29,6 @@ CRecordFormats::CRecordFormats(CTestModuleIf *aConsole, CStifLogger *aLogger)
 {
 	console = aConsole;
 	logger = aLogger;
-	iCallBackErr = KErrNone;
 }
 
 CRecordFormats::~CRecordFormats()
@@ -82,8 +81,7 @@ void CRecordFormats::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 #endif
 
 	logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),aErrorCode,aPreviousState,aCurrentState);
-	iCallBackErr = aErrorCode;
-	
+
 	if (recorder && aErrorCode == KErrNone && aCurrentState == CMdaAudioClipUtility::EOpen)
 	{
 		TRAPD(err3, recorder->AudioRecorderControllerImplementationInformationL());
@@ -108,7 +106,6 @@ void CRecordFormats::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 
 TInt CRecordFormats::RunTestL(CTestModuleIf* aConsole, CStifLogger *aLogger, CStifSectionParser* aParser, TInt* /*clipCounter*/)
 {
-    TInt error = KErrNone;
 	aLogger->Log(_L("Creating scheduler"));
 
 	CActiveScheduler*  scheduler = new (ELeave) CActiveScheduler;
@@ -139,11 +136,8 @@ TInt CRecordFormats::RunTestL(CTestModuleIf* aConsole, CStifLogger *aLogger, CSt
 	CActiveScheduler::Start();
 
 	CleanupStack::PopAndDestroy(2);
-	
-	if(selfObj->iCallBackErr != KErrNone)
-	    error = selfObj->iCallBackErr;
-	
-	return error;
+
+	return KErrNone;
 }
 
 

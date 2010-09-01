@@ -91,7 +91,7 @@ public:
 public:
     virtual ~TMSIPCallStreamBase();
 
-    virtual void Start(const gint retrytime) = 0;
+    virtual void Start() = 0;
     virtual void Stop() = 0;
     virtual gint SetCodecCi() = 0;
 
@@ -162,11 +162,10 @@ public:
 #endif //__USE_GSTREAMER__
 
     static TMSIPDownlink* NewL(TMSIPDevSoundObserver& observer,
-            const guint32 codecID, const TMMFPrioritySettings priority,
-            const gint retrytime);
+            const guint32 codecID, const TMMFPrioritySettings priority);
 
     gint SetCodecCi();
-    void Start(const gint retrytime);
+    void Start();
     void Stop();
     void BufferFilled(const guint buflen);
     gint SetVolume(const guint volume);
@@ -195,7 +194,7 @@ public:
 protected:
     TMSIPDownlink(TMSIPDevSoundObserver& observer);
     void ConstructL(const guint32 codecID,
-            const TMMFPrioritySettings priority, const gint retrytime);
+            const TMMFPrioritySettings priority);
 
 private:
     void SetCodecCiL();
@@ -260,11 +259,10 @@ public:
 #endif //__USE_GSTREAMER__
 
     static TMSIPUplink* NewL(TMSIPDevSoundObserver& observer,
-            const guint32 codecID, const TMMFPrioritySettings priority,
-            const gint retrytime);
+            const guint32 codecID, const TMMFPrioritySettings priority);
 
     gint SetCodecCi();
-    void Start(const gint retrytime);
+    void Start();
     void Stop();
     void BufferEmptied();
     gint SetGain(const guint gain);
@@ -286,7 +284,7 @@ public:
 protected:
     TMSIPUplink(TMSIPDevSoundObserver& observer);
     void ConstructL(const guint32 codecID,
-            const TMMFPrioritySettings priority, const gint retrytime);
+            const TMMFPrioritySettings priority);
 
 private:
     void SetCodecCiL();

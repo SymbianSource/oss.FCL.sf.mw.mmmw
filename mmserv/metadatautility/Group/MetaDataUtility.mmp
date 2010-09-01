@@ -85,12 +85,12 @@ SYSTEMINCLUDE		/epoc32/include/libc
 LIBRARY                 euser.lib
 LIBRARY                 efsrv.lib	// File handling
 LIBRARY                 charconv.lib
-LIBRARY                 3gpmp4lib.lib
+LIBRARY                 3GPMP4Lib.lib
 LIBRARY                 caf.lib
 LIBRARY                 estlib.lib
 LIBRARY                 centralrepository.lib
 LIBRARY                 bafl.lib 
-LIBRARY                 syslangutil.lib 
+LIBRARY                 SysLangUtil.lib 
 LIBRARY                 DrmRightsInfo.lib
 
 LIBRARY			        3GPExtParser.lib

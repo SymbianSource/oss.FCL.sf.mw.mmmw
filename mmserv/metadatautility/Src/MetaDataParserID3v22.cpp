@@ -47,7 +47,6 @@ _LIT8( KID3v2FrameIdJpeg, 			"PIC" );
 _LIT8( KID3v2FrameIdDuration, 		"TLE" );
 _LIT8( KID3v2FrameIdDate, 			"TDA" );
 _LIT8( KID3v2FrameIdRating, 		"POP" );
-_LIT8( KID3v2FrameIdAlbumArtist,    "TP2" );
 
 _LIT8( KID3v2ImageFormatPng, 		"PNG" );
 _LIT8( KID3v2ImageFormatJpeg, 		"JPG" );
@@ -254,10 +253,6 @@ void CMetaDataParserID3v22::GetNextFieldL(
 		{
 		aFieldId = EMetaDataRating;
 		}
-    else if ( frameId.Compare( KID3v2FrameIdAlbumArtist ) == 0 )
-        {
-        aFieldId = EMetaDataAlbumArtist;
-        }
 	else
 		{
 		aFieldId = EUnknownMetaDataField;

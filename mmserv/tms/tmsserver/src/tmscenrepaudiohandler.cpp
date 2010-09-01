@@ -33,10 +33,10 @@ const TUint32 KTelIncallLoudspeakerVolume = 0x00000002;
 #include "tmspubsublistener.h"
 #include "tmsutility.h"
 
-#ifdef __WINSCW__
-const TInt KDefaultMaxGain = 64;
-#else
+#ifndef __WINS__
 const TInt KDefaultMaxGain = 1;
+#else
+const TInt KDefaultMaxGain = 64;
 #endif
 
 using namespace TMS;
@@ -78,33 +78,30 @@ void TMSCenRepAudioHandler::HandleNotifyPSL(const TUid /*aUid*/,
     {
     TInt muteVal;
     TInt err = KErrNotFound;
-    if (iPublish)
+
+    if (iMuteListener)
         {
-        if (iMuteListener)
-            {
-            err = iMuteListener->Get(muteVal);
-            }
-        if (err == KErrNone && muteVal == EPSTelMicMuteOn)
-            {
-#if !defined(__WINSCW__)
-            if (iTMSSer)
-                {
-                iTMSSer->SetGain(NULL, 0);
-                }
-#endif //__WINSCW__
-            }
-        else if (err == KErrNone)
-            {
-#if !defined(__WINSCW__)
-            // Change when gain is really changed
-            if (iTMSSer)
-                {
-                iTMSSer->SetGain(NULL, KDefaultMaxGain);
-                }
-#endif //__WINSCW__
-            }
+        err = iMuteListener->Get(muteVal);
         }
-    iPublish = TRUE;
+    if (err == KErrNone && muteVal == EPSTelMicMuteOn)
+        {
+#if !defined(__WINSCW__)
+        if (iTMSSer)
+            {
+            iTMSSer->SetGain(NULL, 0);
+            }
+#endif //__WINSCW__
+        }
+    else if (err == KErrNone)
+        {
+#if !defined(__WINSCW__)
+        // Change when gain is really changed
+        if (iTMSSer)
+            {
+            iTMSSer->SetGain(NULL, KDefaultMaxGain);
+            }
+#endif //__WINSCW__
+        }
     }
 
 // ---------------------------------------------------------------------------
@@ -124,7 +121,6 @@ void TMSCenRepAudioHandler::SetMuteState(TInt level)
             iMuteListener->Set(EPSTelMicMuteOff);
             }
         }
-    iPublish = FALSE;
     }
 
 // ---------------------------------------------------------------------------
@@ -220,7 +216,6 @@ void TMSCenRepAudioHandler::ConstructL()
         /*volGetRes =*/ iIncallLoudspeakerVolumeListener->Get(volLoud);
         }
 
-    iPublish = TRUE;
     TRACE_PRN_FN_EXT;
     }
 

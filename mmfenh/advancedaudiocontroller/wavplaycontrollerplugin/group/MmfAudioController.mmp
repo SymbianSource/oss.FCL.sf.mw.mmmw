@@ -49,7 +49,7 @@ LIBRARY mmfserverbaseclasses.lib
 LIBRARY mmfdevsound.lib
 LIBRARY mmfcontrollerframework.lib
 LIBRARY mmfstandardcustomcommands.lib
-LIBRARY	CustomInterfaceBuilder.lib
+LIBRARY	custominterfacebuilder.lib
 LIBRARY	AudioOutputRouting.lib
 LIBRARY DrmDcf.lib
 LIBRARY	ConfigurationComponentsFactory.lib

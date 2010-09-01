@@ -53,12 +53,6 @@ private:
      **/
     void RunL();
 
-    /**
-     * From CActive
-     * Called when RunL leaves.
-     **/
-    TInt RunError(TInt aError);
-
 private:
 
     /**
@@ -80,3 +74,4 @@ private:
 
 #endif //TMSTAREVENTHANDLER_H
 
+// End of File

@@ -122,7 +122,7 @@ TInt CRecordDataFormat::RunTestL(CTestModuleIf *aConsole, CStifLogger *aLogger, 
 
 	CActiveScheduler::Start();
 
-	if (selfObj->callbackErr != KErrNone)
+	if (error == KErrNone)
 	{
 		error = selfObj->callbackErr;
 	}
@@ -160,6 +160,7 @@ void CRecordDataFormat::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrevious
 
 	if (recorder && aErrorCode == KErrNone && aCurrentState == CMdaAudioClipUtility::EOpen && aPreviousState == 0)
 	{
+
 		if (dataFormat == KFormatWav)
 		{
 			logger->Log(_L("SetDestinationFormatL(KMmfUidFormatWAVWrite)"));
@@ -173,11 +174,13 @@ void CRecordDataFormat::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrevious
 				CActiveScheduler::Stop();
 				return;
 			}
+
 			if (recorder->DestinationFormatL() != id)
 			{
 				logger->Log(_L("Retrieved format is not same as set format") );
 				callbackErr = KErrOutOfRange;
 			}
+
 		}
 		else
 		{
@@ -206,10 +209,6 @@ void CRecordDataFormat::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrevious
 			}*/
 		}
 	}
-	if (aErrorCode != KErrNone)
-	    {
-        callbackErr = aErrorCode;	    
-	    }
 
 	CActiveScheduler::Stop();
 	return;

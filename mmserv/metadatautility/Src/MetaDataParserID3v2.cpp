@@ -232,7 +232,6 @@ void CMetaDataParserID3v2::ParseFramesL()
 				case EMetaDataComposer:
 				case EMetaDataCopyright:
 				case EMetaDataOriginalArtist:
-                case EMetaDataAlbumArtist:
 					TRAP(err, GetTextInfoL( fieldId, frameSize ));
 					break;
 
@@ -340,7 +339,6 @@ void CMetaDataParserID3v2::ParseFramesL(
 						case EMetaDataComposer:
 						case EMetaDataCopyright:
 						case EMetaDataOriginalArtist:
-		                case EMetaDataAlbumArtist:
 							TRAP(err, GetTextInfoL( fieldId, frameSize ));
 							break;
 

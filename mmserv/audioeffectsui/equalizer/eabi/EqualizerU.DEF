@@ -1,0 +1,7 @@
+EXPORTS
+	_ZN23CEqualizerPresetsDialog18SetAudioEqualizerLEP22CAudioEqualizerUtility @ 1 NONAME
+	_ZN23CEqualizerPresetsDialog4NewLEP22CAudioEqualizerUtilityiR34MEqualizerPresetActivationObserver @ 2 NONAME
+	_ZN23CEqualizerPresetsDialog9ExecuteLDEv @ 3 NONAME
+	_ZTI23CEqualizerPresetsDialog @ 4 NONAME ; #<TI>#
+	_ZTV23CEqualizerPresetsDialog @ 5 NONAME ; #<VT>#
+

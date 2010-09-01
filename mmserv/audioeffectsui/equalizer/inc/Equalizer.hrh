@@ -1,0 +1,70 @@
+/*
+* Copyright (c) 2005 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:    This file contains declarations for constants of Equalizer
+*
+*/
+
+
+
+#ifndef EQUALIZER_HRH
+#define EQUALIZER_HRH
+
+// DATA TYPES
+
+// Used as Command ids for menubar
+enum TEqualizerCommandIds
+    {
+    EEqualizerCmdActivate = 1,
+    EEqualizerCmdEdit,
+    EEqualizerCmdCreateNew,
+    EEqualizerCmdDelete,
+    EEqualizerCmdRename,
+    EEqualizerCmdHelp,
+    EEqualizerCmdReset
+    };
+
+// Used for custom Control Id and type   
+enum TEqualizerCustomControlIds
+    {    
+    EEqualizerCustomCtrlDlgCIdCustomControl = 1000,
+    EEqualizerCustomCtrlDlgCtCustomControl
+    };
+
+//Used for the equalizer varieties   
+enum TEqualizerVarieties
+    {
+    EEqualizerVarietyNotUsed = -1,
+    EEqualizerVarietyOne = 0,
+    EEqualizerVarietyTwo
+    };    
+
+//Used for retriving the rect from the layout information
+enum TEqualizerComponents
+    {
+    EEqualizerFreqBand1 = 0,
+    EEqualizerFreqBand2,
+    EEqualizerFreqBand3,
+    EEqualizerFreqBand4,
+    EEqualizerFreqBand5,
+    EEqualizerFreqBand6,
+    EEqualizerFreqBand7,
+    EEqualizerFreqBand8,
+    EEqualizerMainPane,
+    EEqualizerScale,
+    EEqualizerBackground,
+    EEqualizerSlider
+    };    
+    
+#endif     //EQUALIZER_HRH
+// End of File

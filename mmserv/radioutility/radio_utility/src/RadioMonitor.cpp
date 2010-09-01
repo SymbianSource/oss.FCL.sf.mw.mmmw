@@ -17,7 +17,6 @@
 
 
 #include "RadioMonitorBody.h"
-#include "trace.h"
 
 
 // ======== MEMBER FUNCTIONS ========
@@ -30,7 +29,6 @@
 EXPORT_C CRadioMonitor* CRadioMonitor::NewL(
     MRadioMonitorObserver& aObserver )
     {
-    FUNC_LOG;
     CRadioMonitor* self = new(ELeave) CRadioMonitor( aObserver );
     CleanupStack::PushL(self);
     self->iBody = CRadioMonitor::CBody::NewL( aObserver );
@@ -44,7 +42,6 @@ EXPORT_C CRadioMonitor* CRadioMonitor::NewL(
 //
 EXPORT_C CRadioMonitor::~CRadioMonitor()
     {
-    FUNC_LOG;
     delete iBody;
     }
 
@@ -56,7 +53,6 @@ EXPORT_C CRadioMonitor::~CRadioMonitor()
 CRadioMonitor::CRadioMonitor(
     MRadioMonitorObserver& /*aObserver*/ )
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -67,7 +63,6 @@ CRadioMonitor::CRadioMonitor(
 //
 EXPORT_C TBool CRadioMonitor::IsRadioOn() const
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->IsRadioOn();
     }

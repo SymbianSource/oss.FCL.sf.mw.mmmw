@@ -36,23 +36,21 @@ TMSStreamImpl::~TMSStreamImpl()
 gint TMSStreamImpl::PostConstruct(TMSCallType callType, TMSStreamType stype,
         TMSCallProxy* proxy)
     {
-    TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
-    TMSStreamBody* bodyimpl(NULL);
-    ret = TMSStreamBodyImpl::Create(callType, stype, proxy, *this, bodyimpl);
+    TMSStreamBody* tmsstreamimplbody(NULL);
+    ret = TMSStreamBodyImpl::Create(callType, stype, proxy, *this,
+            tmsstreamimplbody);
 
     if (ret == TMS_RESULT_SUCCESS)
         {
-        this->iBody = bodyimpl;
+        this->iBody = tmsstreamimplbody;
         }
-    TRACE_PRN_FN_EXT;
     return ret;
     }
 
 gint TMSStreamImpl::Create(TMSCallType callType, TMSStreamType stype,
         TMSCallProxy* proxy, TMSStream*& strm)
     {
-    TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_INSUFFICIENT_MEMORY);
     TMSStreamImpl *self = new TMSStreamImpl();
 
@@ -66,7 +64,6 @@ gint TMSStreamImpl::Create(TMSCallType callType, TMSStreamType stype,
             }
         }
     strm = self;
-    TRACE_PRN_FN_EXT;
     return ret;
     }
 
@@ -74,7 +71,7 @@ gint TMSStreamImpl::Delete(TMSStream*& strm)
     {
     TRACE_PRN_FN_ENT;
     gint ret(TMS_RESULT_SUCCESS);
-    delete (static_cast<TMSStreamImpl*> (strm));
+    delete (static_cast<TMSStreamImpl*>(strm));
     strm = NULL;
     TRACE_PRN_FN_EXT;
     return ret;

@@ -20,7 +20,6 @@
 #include "RadioServerData.h"
 #include "RadioPlayerUtilityBody.h"
 #include "RadioSession.h"
-#include "trace.h"
 
 // ======== MEMBER FUNCTIONS ========
 
@@ -34,8 +33,9 @@ CRadioPlayerUtility::CBody* CRadioPlayerUtility::CBody::NewL(
     RRadioSession& aRadioSession,
     MRadioPlayerObserver& aObserver )
     {
-    FUNC_LOG;
-    CRadioPlayerUtility::CBody* s = new(ELeave) CRadioPlayerUtility::CBody( aRadioSession, aObserver );
+    CRadioPlayerUtility::CBody* s = new(ELeave) CRadioPlayerUtility::CBody();
+    s->iRadioPlayerUtilityClient = &aObserver;
+    s->iRadioSession = &aRadioSession;
     CleanupStack::PushL(s);
     s->ConstructL();
     CleanupStack::Pop();
@@ -49,20 +49,14 @@ CRadioPlayerUtility::CBody* CRadioPlayerUtility::CBody::NewL(
 //
 void CRadioPlayerUtility::CBody::ConstructL()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
 // CRadioPlayerUtility::CBody::CBody
 // -----------------------------------------------------------------------------
 //
-CRadioPlayerUtility::CBody::CBody(
-        RRadioSession& aRadioSession,
-        MRadioPlayerObserver& aObserver )
-    :iRadioSession(aRadioSession),
-    iRadioPlayerUtilityClient(aObserver)
+CRadioPlayerUtility::CBody::CBody()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -71,7 +65,6 @@ CRadioPlayerUtility::CBody::CBody(
 //
 CRadioPlayerUtility::CBody::~CBody()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -84,10 +77,9 @@ CRadioPlayerUtility::CBody::~CBody()
 void CRadioPlayerUtility::CBody::PlayerState(
     TPlayerState& aPlayerState ) const
     {
-    FUNC_LOG;
     TRsPlayerState playerState;
 
-    if ( !iRadioSession.PlayerState( playerState ) )
+    if ( !iRadioSession->PlayerState( playerState ) )
         {
         aPlayerState = (TPlayerState)playerState;
         }
@@ -106,8 +98,7 @@ void CRadioPlayerUtility::CBody::PlayerState(
 //
 void CRadioPlayerUtility::CBody::Close()
     {
-    FUNC_LOG;
-    iRadioSession.Stop( ETrue );
+    iRadioSession->Stop( ETrue );
     }
 
 // -----------------------------------------------------------------------------
@@ -117,8 +108,7 @@ void CRadioPlayerUtility::CBody::Close()
 //
 void CRadioPlayerUtility::CBody::Play()
     {
-    FUNC_LOG;
-    iRadioSession.Play();
+    iRadioSession->Play();
     }
 
 // -----------------------------------------------------------------------------
@@ -128,8 +118,7 @@ void CRadioPlayerUtility::CBody::Play()
 //
 void CRadioPlayerUtility::CBody::Stop()
     {
-    FUNC_LOG;
-    iRadioSession.Stop();
+    iRadioSession->Stop();
     }
 
 // -----------------------------------------------------------------------------
@@ -140,8 +129,7 @@ void CRadioPlayerUtility::CBody::Stop()
 TInt CRadioPlayerUtility::CBody::Mute(
     TBool aMute )
     {
-    FUNC_LOG;
-    return iRadioSession.Mute( aMute );
+    return iRadioSession->Mute( aMute );
     }
 
 // -----------------------------------------------------------------------------
@@ -151,9 +139,8 @@ TInt CRadioPlayerUtility::CBody::Mute(
 //
 TBool CRadioPlayerUtility::CBody::IsMute()
     {
-    FUNC_LOG;
     TBool Mute = EFalse;
-    iRadioSession.GetMuteStatus( Mute );
+    iRadioSession->GetMuteStatus( Mute );
     return Mute;
     }
 
@@ -165,8 +152,7 @@ TBool CRadioPlayerUtility::CBody::IsMute()
 TInt CRadioPlayerUtility::CBody::SetVolume(
     TInt aVolume )
     {
-    FUNC_LOG;
-    return iRadioSession.SetVolume( aVolume );
+    return iRadioSession->SetVolume( aVolume );
     }
 
 // -----------------------------------------------------------------------------
@@ -177,8 +163,7 @@ TInt CRadioPlayerUtility::CBody::SetVolume(
 TInt CRadioPlayerUtility::CBody::GetVolume(
     TInt& aVolume ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetVolume( aVolume );
+    return iRadioSession->GetVolume( aVolume );
     }
 
 // -----------------------------------------------------------------------------
@@ -189,8 +174,10 @@ TInt CRadioPlayerUtility::CBody::GetVolume(
 TInt CRadioPlayerUtility::CBody::SetVolumeRamp(
     const TTimeIntervalMicroSeconds& aRampInterval )
     {
-    FUNC_LOG;
-    return iRadioSession.SetVolumeRamp( aRampInterval );
+#ifdef _DEBUG
+    RDebug::Print(_L("CRadioPlayerUtility::CBody::SetVolumeRamp"));
+#endif
+    return iRadioSession->SetVolumeRamp( aRampInterval );
     }
 
 // -----------------------------------------------------------------------------
@@ -201,8 +188,7 @@ TInt CRadioPlayerUtility::CBody::SetVolumeRamp(
 TInt CRadioPlayerUtility::CBody::GetMaxVolume(
     TInt& aMaxVolume ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetMaxVolume( aMaxVolume );
+    return iRadioSession->GetMaxVolume( aMaxVolume );
     }
 
 // -----------------------------------------------------------------------------
@@ -214,9 +200,11 @@ TInt CRadioPlayerUtility::CBody::SetBalance(
     TInt aLeftPercentage,
     TInt aRightPercentage )
     {
-    FUNC_LOG;
-    INFO_2("aLeftPercentage = %d, aRightPercentage = %d", aLeftPercentage, aRightPercentage);
-    return iRadioSession.SetBalance( aLeftPercentage, aRightPercentage );
+#ifdef _DEBUG
+    RDebug::Print(_L("CRadioPlayerUtility::CBody::SetBalance, aLeftPercentage = %d, aRightPercentage = %d"),
+        aLeftPercentage, aRightPercentage);
+#endif
+    return iRadioSession->SetBalance( aLeftPercentage, aRightPercentage );
     }
 
 // -----------------------------------------------------------------------------
@@ -228,8 +216,7 @@ TInt CRadioPlayerUtility::CBody::GetBalance(
     TInt& aLeftPercentage,
     TInt& aRightPercentage ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetBalance( aLeftPercentage, aRightPercentage );
+    return iRadioSession->GetBalance( aLeftPercentage, aRightPercentage );
     }
 
 // -----------------------------------------------------------------------------
@@ -241,12 +228,13 @@ TInt CRadioPlayerUtility::CBody::GetBalance(
 TAny* CRadioPlayerUtility::CBody::CustomInterface(
     TUid aInterfaceId )
     {
-    FUNC_LOG;
-    INFO_1("aInterfaceId = %d", aInterfaceId);
+#ifdef _DEBUG
+    RDebug::Print(_L("CRadioPlayerUtility::CBody::CustomInterface, aInterfaceId = %d"), aInterfaceId);
+#endif
     TAny* ci = NULL;
     CCustomInterfaceUtility* customInterfaceUtil = NULL;
 
-    TRAPD( error, customInterfaceUtil = CCustomInterfaceUtility::NewL( iRadioSession ) );
+    TRAPD( error, customInterfaceUtil = CCustomInterfaceUtility::NewL( *iRadioSession ) );
 
     if ( !error )
         {

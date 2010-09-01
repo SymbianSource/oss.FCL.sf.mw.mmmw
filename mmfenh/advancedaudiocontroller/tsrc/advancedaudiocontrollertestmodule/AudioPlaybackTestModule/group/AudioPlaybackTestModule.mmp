@@ -65,8 +65,8 @@ LIBRARY         stiftestinterface.lib
 //LIBRARY	    parser.lib
 //LIBRARY	    logger.lib
 LIBRARY	    efsrv.lib
-LIBRARY     mediaclientaudio.lib
-LIBRARY     mmfcontrollerframework.lib
+LIBRARY     MediaClientAudio.lib
+LIBRARY     MMFControllerFramework.lib
 LIBRARY     ecom.lib
 LIBRARY     mmcommon.lib
 //LIBRARY     estor.lib

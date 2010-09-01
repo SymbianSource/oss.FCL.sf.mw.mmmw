@@ -188,35 +188,6 @@ void TMSQueueHandler::RunL()
                 iObserver->QueueEvent(msgBuf.iInt, msgBuf.iStatus,
                         &msgBuf.iUint);
                 break;
-            case ECmdRingToneOpenComplete:
-                iObserver->QueueEvent(TMS_EVENT_RINGTONE_OPEN_COMPLETE,
-                        msgBuf.iStatus, NULL);
-                break;
-            case ECmdRingTonePlayComplete:
-                iObserver->QueueEvent(TMS_EVENT_RINGTONE_PLAY_COMPLETE,
-                        msgBuf.iStatus, NULL);
-                break;
-            case ECmdRingToneDeinitComplete:
-                iObserver->QueueEvent(TMS_EVENT_RINGTONE_DEINIT_COMPLETE,
-                        msgBuf.iStatus, NULL);
-                break;
-            case ECmdDTMFToneDnlPlayStarted:
-            case ECmdDTMFToneUplPlayStarted:
-                iObserver->QueueEvent(TMS_EVENT_DTMF_TONE_STARTED,
-                        msgBuf.iStatus, NULL);
-                break;
-            case ECmdDTMFTonePlayFinished:
-                iObserver->QueueEvent(TMS_EVENT_DTMF_TONE_STOPPED,
-                        msgBuf.iStatus, NULL);
-                break;
-            case ECmdInbandToneStarted:
-                iObserver->QueueEvent(TMS_EVENT_INBAND_TONE_STARTED,
-                        msgBuf.iStatus, NULL);
-                break;
-            case ECmdInbandToneStopped:
-                iObserver->QueueEvent(TMS_EVENT_INBAND_TONE_STOPPED,
-                        msgBuf.iStatus, NULL);
-                break;
             default:
                 break;
             }

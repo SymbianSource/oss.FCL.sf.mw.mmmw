@@ -48,11 +48,9 @@ public:
             const TMSStreamType strmType, gint& outStrmId);
     virtual gint InitStream(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId,
-            const TMSFormatType frmtType, const gint retryTime,
-            const RMessage2& message);
+            const TMSFormatType frmtType, const RMessage2& message);
     virtual gint StartStream(const TMSCallType callType,
-            const TMSStreamType strmType, const gint strmId,
-            const gint retrytime);
+            const TMSStreamType strmType, const gint strmId);
     virtual gint PauseStream(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId);
     virtual gint StopStream(const TMSCallType callType,
@@ -134,9 +132,10 @@ private:
     TMSCallIPAdpt();
     void ConstructL();
 
-    gint OpenDownlink(const RMessage2& message, const gint retrytime);
-    gint OpenUplink(const RMessage2& message, const gint retrytime);
+    gint OpenDownlink(const RMessage2& message);
+    gint OpenUplink(const RMessage2& message);
 
+    gint InitDTMF(TMSStreamType strmtype);
     void GetSupportedBitRatesL(CBufFlat*& brbuffer);
     void NotifyClient(const gint strmId, const gint command,
             const gint status = KErrNone, const gint64 int64 = TInt64(0));
@@ -151,7 +150,9 @@ private:
     RMsgQueue<TmsMsgBuf> iMsgQueueDn;
     TmsMsgBuf iMsgBuffer;
 
+    gboolean iUplinkInitialized;
     gint iUplinkStreamId;
+    gboolean iDnlinkInitialized;
     gint iDnlinkStreamId;
 
     TMMFPrioritySettings iPriority;

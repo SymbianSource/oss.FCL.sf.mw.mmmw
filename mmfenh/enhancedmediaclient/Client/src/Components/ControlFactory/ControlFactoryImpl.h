@@ -30,6 +30,7 @@ namespace multimedia
     class MDataBuffer;
     class MSinkControl;
     class CMultimediaFactoryImpl;
+    class CDownloadGateway;
     
     /**
     *  Implements the MultimediaFactor Implementation
@@ -130,6 +131,10 @@ namespace multimedia
             CMultimediaFactoryImpl();
             void ConstructL();
                 
+        private:
+            // Pointer to the Download Gateway.
+            CDownloadGateway* iGateway;
+                        
         };
     } // namespace multimedia
 

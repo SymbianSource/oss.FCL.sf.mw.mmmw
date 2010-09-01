@@ -23,7 +23,7 @@ TARGETTYPE      EXE
 UID             0 0x10207C7C
 EPOCSTACKSIZE   0x5000
 EPOCHEAPSIZE    0x500000 0x1000000
-CAPABILITY      ProtServ MultiMediaDD ReadDeviceData WriteDeviceData ReadUserData WriteUserData UserEnvironment NetworkServices
+CAPABILITY      ProtServ MultiMediaDD ReadDeviceData WriteDeviceData ReadUserData WriteUserData UserEnvironment
 VENDORID        VID_DEFAULT
 
 EPOCPROCESSPRIORITY high
@@ -37,17 +37,7 @@ SOURCE          tmsglobaleffectssettings.cpp
 SOURCE          tmstareventhandler.cpp
 SOURCE          tmscenreplistener.cpp
 SOURCE          tmscenrepaudiohandler.cpp
-SOURCE          tmsaudiotoneutilityimpl.cpp
-SOURCE          tmsaudioinbandtoneplayer.cpp
 SOURCE          tmspubsublistener.cpp
-SOURCE          tmsrtcontainer.cpp
-SOURCE          tmsrtaudiohdlr.cpp
-SOURCE          tmsrtplayer.cpp
-SOURCE          tmsasyncreqao.cpp
-SOURCE          tmsdtmftoneplayer.cpp
-SOURCE          tmsdtmfprovider.cpp
-SOURCE          tmseteldtmfmonitor.cpp
-SOURCE          tmseteldtmfstopmonitor.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../inc
@@ -61,28 +51,15 @@ SYSTEMINCLUDE   /epoc32/include/mda/common
 SYSTEMINCLUDE   /epoc32/include/mmf/server
 SYSTEMINCLUDE   /epoc32/include/mmf/common
 
-LIBRARY         bafl.lib
 LIBRARY         ecom.lib
 LIBRARY         euser.lib
 LIBRARY         estor.lib
-LIBRARY         efsrv.lib
 LIBRARY         libglib.lib
 LIBRARY         mmfdevsound.lib
 LIBRARY         tmscallserver.lib
-LIBRARY         tmsutility.lib
 LIBRARY         centralrepository.lib
 LIBRARY         cenrepnotifhandler.lib
-LIBRARY         profileengine.lib
-LIBRARY         audiooutputrouting.lib
 LIBRARY         mediaclientaudio.lib
-LIBRARY         apgrfx.lib
-LIBRARY         apmime.lib
-LIBRARY         charconv.lib
-LIBRARY         caf.lib
-// Libraries for ETel
-LIBRARY         etelmm.lib
-LIBRARY         etel.lib
-LIBRARY         customapi.lib
 
 SMPSAFE
 

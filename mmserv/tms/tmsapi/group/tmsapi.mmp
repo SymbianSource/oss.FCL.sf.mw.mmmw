@@ -55,9 +55,6 @@ SOURCE      tmsmodemsink.cpp
 SOURCE      tmsspeakersink.cpp
 SOURCE      tmsmodemsource.cpp
 SOURCE      tmsmicsource.cpp
-SOURCE      tmsringtone.cpp
-SOURCE      tmsdtmf.cpp
-SOURCE      tmsinbandtone.cpp
 
 LIBRARY     euser.lib
 LIBRARY     libglib.lib

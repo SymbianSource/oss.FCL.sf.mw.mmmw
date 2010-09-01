@@ -78,14 +78,14 @@ private:
 private:
 
     void ConstructL();
-    CBody( MRadioMonitorObserver& aObserver  );
+    CBody();
 
 private:
 
     // The monitored P&S key
     RProperty iProperty;
     // Radio monitoring client
-    MRadioMonitorObserver& iRadioMonitorClient;
+    MRadioMonitorObserver* iRadioMonitorClient;
 
     };
 

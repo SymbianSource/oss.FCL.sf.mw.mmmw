@@ -29,7 +29,6 @@
 #include <MProEngActiveProfileObserver.h>
 #include <MProEngProfileActivationObserver.h>
 #include <MProEngNotifyHandler.h>
-#include <MProEngTones.h>
 #include <MProEngToneSettings.h>
 #include <e32property.h>
 #include <GlobalAudioSettingsPSKeys.h>
@@ -37,15 +36,13 @@
 #include <ProfileEngineDomainCRKeys.h>
 #include <ProfilesVariant.hrh>
 #include <e32capability.h>
-#include <GlobalAudioSettings.h>
-#include <MProfileEngineExtended2.h>
 class CProfileSettingsMonitorServerImpl : 
 public CBase, 
 public MProEngProfileActivationObserver, 
 public MProEngActiveProfileObserver
 	{
 public:
-	static CProfileSettingsMonitorServerImpl* NewL(); 
+	IMPORT_C static CProfileSettingsMonitorServerImpl* NewL(); 
 	~CProfileSettingsMonitorServerImpl();
 	
 	//MProEngProfileActivationObserver
@@ -65,42 +62,21 @@ private:
 	// Initializes publish and subscribe keys used for
 	// audio clients list implementation
 	void InitializeAudioClientsListPSKeysL();
-	void CMapGASRingingType(TProfileRingingType aRingingType);
-	void CMapGASKeypadVolume(TProfileKeypadVolume aKeypadVolume);
 
 private:
     MProEngEngine* iEngine;
     MProEngNotifyHandler* iNotifyHandler;
-    MProfileEngineExtended2* iProfileEngineExtended;
     TInt iActiveProfileId;
     TBool iWarningTones;
     TBool iMessagingTones;
     TBool iSilentProfile;
     TBool iVibra;
     TBool iPublicSilence;
-    HBufC* iMessageToneName;
-    HBufC* iEmailToneName;
-    HBufC* iVideoCallToneName;
-    HBufC* iRingingTone1Name;
-    HBufC* iRingingTone2Name;
-  
-    CGlobalAudioSettings::TGASRingingType iGASRingingType;
-  
-    CGlobalAudioSettings::TGASKeypadVolume iGASKeypadVolume;
-    TBool iSilenceMode;
     RProperty iWarningTonesProperty;
     RProperty iMessagingTonesProperty;
     RProperty iSilentProfileProperty;
     RProperty iVibraProperty;
     RProperty iPublicSilenceProperty;
-    RProperty iMessageToneNameProperty;
-    RProperty iEmailToneNameProperty;
-    RProperty iRingingTypeProperty;
-    RProperty iVideoCallToneNameProperty;
-    RProperty iRingingTone1NameProperty;
-    RProperty iRingingTone2NameProperty;
-    RProperty iKeypadVolumeProperty;
-    RProperty iSilenceModeProperty;
 	};
 
 #endif

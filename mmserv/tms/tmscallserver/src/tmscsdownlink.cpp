@@ -16,7 +16,6 @@
  */
 
 #include <AudioPreference.h>
-#include "tmsutility.h"
 #include "tmscsdownlink.h"
 #include "tmscsdevsoundobserver.h"
 
@@ -38,9 +37,9 @@ TMSCSDownlink::TMSCSDownlink(TMSCSDevSoundObserver& observer) :
 // Second phase constructor
 // -----------------------------------------------------------------------------
 //
-void TMSCSDownlink::ConstructL(const gint retrytime)
+void TMSCSDownlink::ConstructL()
     {
-    TMSCSDevSound::ConstructL(TMS_STREAM_DOWNLINK, retrytime);
+    TMSCSDevSound::ConstructL(TMS_STREAM_DOWNLINK);
 
     if (iDevSound)
         {
@@ -52,12 +51,11 @@ void TMSCSDownlink::ConstructL(const gint retrytime)
 // Static constructor
 // -----------------------------------------------------------------------------
 //
-TMSCSDownlink* TMSCSDownlink::NewL(TMSCSDevSoundObserver& observer,
-        const gint retrytime)
+TMSCSDownlink* TMSCSDownlink::NewL(TMSCSDevSoundObserver& observer)
     {
     TMSCSDownlink* self = new (ELeave) TMSCSDownlink(observer);
     CleanupStack::PushL(self);
-    self->ConstructL(retrytime);
+    self->ConstructL();
     CleanupStack::Pop(self);
     return self;
     }
@@ -120,7 +118,7 @@ gint TMSCSDownlink::MaxVolume()
 //
 void TMSCSDownlink::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
     {
-    TRACE_PRN_N(_L("TMSCSDownlink::BufferToBeFilled"));
+    //TRACE_PRN_N(_L("TMSCSDownlink::BufferToBeFilled"));
 
     // We dont react to devsound messages unless we are activating.
     if (iActivationOngoing)
@@ -138,22 +136,13 @@ void TMSCSDownlink::BufferToBeFilled(CMMFBuffer* /*aBuffer*/)
 //
 void TMSCSDownlink::PlayError(TInt aError)
     {
-    TRACE_PRN_N1(_L("TMSCSDownlink::PlayError[%d]"), aError);
+    //TRACE_PRN_N1(_L("TMSCSDownlink::PlayError[%d]"), aError);
 
     // We don't react to devsound errors unless we are activating.
-    if (iActivationOngoing && (aError == KErrAccessDenied ||
-            aError == KErrInUse))
+    if (iActivationOngoing && aError == KErrAccessDenied)
         {
-        if (iStartRetryTime != 0)
-            {
-            StartTimer();
-            }
-        else
-            {
-            CancelTimer();
-            iActivationOngoing = EFalse;
-            iObserver.DownlinkActivationCompleted(aError);
-            }
+        iActivationOngoing = EFalse;
+        iObserver.DownlinkActivationCompleted(aError);
         }
     }
 

@@ -24,9 +24,11 @@
 #include "ControlFactoryImpl.h"
 #include "ClientStreamControl.h"
 #include "ClientDataBufferSource.h"
+#include "ClientProgDLSource.h"
 #include "ClientFileSource.h"
 #include "ClientDescriptorSource.h"
 #include "ClientDataBuffer.h"
+#include "DownloadGateway.h"
 #include "VolumeEffectImpl.h"
 #include "BalanceEffectImpl.h"
 #include "CMMFAudioOutputSink.h"
@@ -64,10 +66,19 @@ CMultimediaFactoryImpl* CMultimediaFactoryImpl::NewL()
 void CMultimediaFactoryImpl::ConstructL()
     {
     // No impl
+    if(iGateway)
+        {
+        delete iGateway;
+        iGateway = NULL;        
+        }    
     }
 
 CMultimediaFactoryImpl::~CMultimediaFactoryImpl()
     {
+    if(iGateway)
+        {
+        delete iGateway;
+        }
     }
     
 TInt CMultimediaFactoryImpl::CreateStreamControl( TUid aType, MStreamControl*& aControl )
@@ -121,6 +132,39 @@ TInt CMultimediaFactoryImpl::CreateSourceControl( TUid aType, MSourceControl*& a
         
         if ( status == KErrNone )
             {
+            aControl = srcControl;
+            }
+        else
+            {
+            delete srcControl;
+            }
+        }
+    
+    if(aType == KProgDLSourceControl)
+        {
+        if(!iGateway)
+            {
+            iGateway = new CDownloadGateway;
+            TInt status = iGateway->Initialize(TUid::Uid(0));
+            if(status != KErrNone)
+                {
+                return status;    
+                }
+            }
+            
+        CClientProgDLSource* srcControl = new CClientProgDLSource;
+        if ( !srcControl )
+            {
+            status = KErrNoMemory;
+            }
+        else
+            {
+            status = srcControl->PostConstructor();
+            }
+
+        if ( status == KErrNone )
+            {
+            srcControl->SetDownloadGateway(iGateway);
             aControl = srcControl;
             }
         else

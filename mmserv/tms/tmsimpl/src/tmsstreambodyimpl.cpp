@@ -49,13 +49,11 @@ TMSStreamBodyImpl::TMSStreamBodyImpl() :
     iFormat(NULL),
     iStreamState(TMS_STREAM_UNINITIALIZED)
     {
-    TRACE_PRN_FN_ENT;
-    TRACE_PRN_FN_EXT;
+    //TMSStream::Construct(this);
     }
 
 TMSStreamBodyImpl::~TMSStreamBodyImpl()
     {
-    TRACE_PRN_FN_ENT;
     if (iMsgQHandler)
         {
         iMsgQHandler->Cancel();
@@ -73,7 +71,6 @@ TMSStreamBodyImpl::~TMSStreamBodyImpl()
         iContext.CallProxy->DeleteStream(iContext.CallType,
                 iContext.StreamType, iContext.StreamId);
         }
-    TRACE_PRN_FN_EXT;
     }
 
 gint TMSStreamBodyImpl::Create(TMSCallType callType, TMSStreamType stype,
@@ -337,7 +334,7 @@ gint TMSStreamBodyImpl::GetStreamId()
     return iContext.StreamId;
     }
 
-gint TMSStreamBodyImpl::Init(gint retrytime)
+gint TMSStreamBodyImpl::Init()
     {
     gint ret(TMS_RESULT_SUCCESS);
 
@@ -358,8 +355,7 @@ gint TMSStreamBodyImpl::Init(gint retrytime)
     if (iContext.CallProxy)
         {
         ret = (iContext.CallProxy)->InitStream(iContext.CallType,
-                iContext.StreamType, iContext.StreamId, fmttype, &iMsgQueue,
-                retrytime);
+                iContext.StreamType, iContext.StreamId, fmttype, &iMsgQueue);
         }
     else
         {
@@ -493,13 +489,13 @@ gint TMSStreamBodyImpl::Pause()
     return ret;
     }
 
-gint TMSStreamBodyImpl::Start(gint retrytime)
+gint TMSStreamBodyImpl::Start()
     {
     gint ret(TMS_RESULT_SUCCESS);
     if (iContext.CallProxy)
         {
         ret = (iContext.CallProxy)->StartStream(iContext.CallType,
-                iContext.StreamType, iContext.StreamId, retrytime);
+                iContext.StreamType, iContext.StreamId);
         }
     else
         {
@@ -722,7 +718,7 @@ void TMSStreamBodyImpl::QueueEvent(TInt aEventType, TInt aError,
         void* user_data)
     {
     TMSSignalEvent event = {}; //all elements initialized to zeros
-    event.reason = TMSRESULT(aError);
+    event.reason = aError;
     event.user_data = user_data;
     iStreamState = aEventType;
 
@@ -737,14 +733,7 @@ void TMSStreamBodyImpl::QueueEvent(TInt aEventType, TInt aError,
             event.prev_state = iPrevState;
             if (iObserver)
                 {
-                if (aError != TMS_RESULT_SUCCESS)
-                    {
-                    event.type = TMS_EVENT_STREAM_STATE_CHANGE_ERROR;
-                    }
-                else
-                    {
-                    event.type = TMS_EVENT_STREAM_STATE_CHANGED;
-                    }
+                event.type = TMS_EVENT_STREAM_STATE_CHANGED;
                 iObserver->TMSStreamEvent(*iParent, event);
                 }
             break;

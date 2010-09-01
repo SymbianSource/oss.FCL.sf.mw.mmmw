@@ -107,7 +107,7 @@ TInt CCropFromBeginning::RunTestL(CTestModuleIf *aConsole, CStifLogger *aLogger,
 
 	CActiveScheduler::Start();
 
-	if (selfObj->callbackErr != KErrNone)
+	if (error == KErrNone)
 	{
 		error = selfObj->callbackErr;
 	}
@@ -140,8 +140,8 @@ void CCropFromBeginning::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviou
 #ifdef _DEBUG
     RDebug::Print (_L ("CCropFromBeginning::MoscoStateChangeEvent"));
 #endif
-
-	callbackErr = aErrorCode;
+	TInt err = KErrNone;
+//	callbackErr = KErrNone;
 
 	logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),aErrorCode,aPreviousState,aCurrentState);
 
@@ -185,12 +185,6 @@ void CCropFromBeginning::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviou
 
 		CActiveScheduler::Stop();
 	}
-	if (aErrorCode != KErrNone)
-	        {
-
-	        CActiveScheduler::Stop();
-	        
-	        }
 
 
 	return;

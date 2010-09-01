@@ -19,13 +19,6 @@
 #include <RadioMonitor.h>
 #include "RadioMonitorBody.h"
 #include "RadioServerData.h"
-#include "trace.h"
-
-// This has to be the last include. 
-#ifdef STUB_CONSTELLATION
-#   include "RadioStubManager.h"
-#   define KRadioServerPropertyCategory KStub_KRadioServerPropertyCategory
-#endif //STUB_CONSTELLATION
 
 // ======== MEMBER FUNCTIONS ========
 
@@ -37,8 +30,8 @@
 CRadioMonitor::CBody* CRadioMonitor::CBody::NewL(
     MRadioMonitorObserver& aObserver )
     {
-    FUNC_LOG;
-    CRadioMonitor::CBody* s = new(ELeave) CRadioMonitor::CBody( aObserver );
+    CRadioMonitor::CBody* s = new(ELeave) CRadioMonitor::CBody();
+    s->iRadioMonitorClient = &aObserver;
     CleanupStack::PushL(s);
     s->ConstructL();
     CleanupStack::Pop();
@@ -51,7 +44,6 @@ CRadioMonitor::CBody* CRadioMonitor::CBody::NewL(
 //
 CRadioMonitor::CBody::~CBody()
     {
-    FUNC_LOG;
     Cancel();
     iProperty.Close();
     }
@@ -61,11 +53,9 @@ CRadioMonitor::CBody::~CBody()
 // Two-phased constructor.
 // -----------------------------------------------------------------------------
 //
-CRadioMonitor::CBody::CBody( MRadioMonitorObserver& aObserver ) :
-    CActive(EPriorityStandard),
-    iRadioMonitorClient(aObserver)
+CRadioMonitor::CBody::CBody() :
+    CActive(EPriorityStandard)
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -75,7 +65,6 @@ CRadioMonitor::CBody::CBody( MRadioMonitorObserver& aObserver ) :
 //
 void CRadioMonitor::CBody::ConstructL()
     {
-    FUNC_LOG;
     CActiveScheduler::Add(this);
 
     // Attach property
@@ -93,7 +82,6 @@ void CRadioMonitor::CBody::ConstructL()
 //
 TBool CRadioMonitor::CBody::IsRadioOn() const
     {
-    FUNC_LOG;
     TBool radioState = ERadioStateOff;
     RProperty::Get(KRadioServerPropertyCategory,
                    KRadioServPsMonitorState,
@@ -109,7 +97,6 @@ TBool CRadioMonitor::CBody::IsRadioOn() const
 //
 void CRadioMonitor::CBody::RunL()
     {
-    FUNC_LOG;
     TBool radioState = ERadioStateOff;
 
     // Resubscribe before processing new value to prevent missing updates
@@ -119,11 +106,11 @@ void CRadioMonitor::CBody::RunL()
     TInt error = iProperty.Get(radioState);
     if ( error == KErrNone )
         {
-        iRadioMonitorClient.MrmEvent((TRadioMonitorEvent)radioState);
+        iRadioMonitorClient->MrmEvent((TRadioMonitorEvent)radioState);
         }
     else if ( error == KErrNotFound )
         {
-        iRadioMonitorClient.MrmEvent(ERadioStateOff);
+        iRadioMonitorClient->MrmEvent(ERadioStateOff);
         }
     else
         {
@@ -138,7 +125,6 @@ void CRadioMonitor::CBody::RunL()
 //
 void CRadioMonitor::CBody::DoCancel()
     {
-    FUNC_LOG;
     iProperty.Cancel();
     }
 

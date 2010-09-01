@@ -87,7 +87,6 @@ private:
     void HandleRoutingGetOutputL(const RMessage2& aMessage);
     void HandleRoutingGetPreviousOutputL(const RMessage2& aMessage);
     void HandleRoutingGetAvailableOutputsL(const RMessage2& aMessage);
-    void HandleGetActiveCallL(const RMessage2& aMessage);
 
 private:
     TMSCallServer& iTMSCallServer;

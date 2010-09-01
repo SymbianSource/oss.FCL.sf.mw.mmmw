@@ -39,4 +39,4 @@ SYSTEMINCLUDE   /epoc32/include/mmf/common
 
 LIBRARY         euser.lib
 LIBRARY         mediaclientaudio.lib
-LIBRARY         mmfcontrollerframework.lib
+LIBRARY         MMFControllerFramework.lib

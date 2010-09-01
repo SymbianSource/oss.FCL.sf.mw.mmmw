@@ -42,14 +42,9 @@ SYSTEMINCLUDE   /epoc32/include/mmf/plugin
 
 LIBRARY         euser.lib
 LIBRARY         AdvancedAudioController.lib
-#ifndef WINSCW						//to support build on Linux
-LIBRARY         EAacPlusUtil.lib	// MMF eAAC+ Utility - Kirit
-#else
-LIBRARY         eaacplusutil.lib
-#endif
-																
+LIBRARY         EAacPlusUtil.lib																// MMF eAAC+ Utility - Kirit
 LIBRARY         mmfserverbaseclasses.lib
 
 #ifdef EABI
-LIBRARY         ecom.lib
+LIBRARY         ECOM.LIB
 #endif

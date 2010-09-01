@@ -111,55 +111,55 @@ void CMetaDataParser3GPExt::ParseL(
 	
 	if ( aWantedFields.Count() == 0 )
         {
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaTitleFormat, EMetaDataSongTitle, &buf8));
+        TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataSongTitle, &buf8));
         if (KErrNone == err)
             {
             ConvertAndAppendL(&buf8, EMetaDataSongTitle);
             }
 
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaArtistFormat, EMetaDataArtist, &buf8));
+        TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataArtist, &buf8));
         if (KErrNone == err)
             {
             ConvertAndAppendL(&buf8, EMetaDataArtist);
             }
 		
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaComposerFormat, EMetaDataComposer, &buf8));
+        TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataComposer, &buf8));
         if (KErrNone == err)
             {
             ConvertAndAppendL(&buf8, EMetaDataComposer);
             }
 
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaAlbumFormat, EMetaDataAlbum, &buf8));
+        TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataAlbum, &buf8));
         if (KErrNone == err)
             {
             ConvertAndAppendL(&buf8, EMetaDataAlbum);
             }
             
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaCommentFormat, EMetaDataComment, &buf8));
+        TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataComment, &buf8));
         if (KErrNone == err)
             {
             ConvertAndAppendL(&buf8, EMetaDataComment);
             }
 
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaGenre, EMetaDataGenre, &buf));
+        TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataGenre, &buf));
         if (KErrNone == err)
             {
             AppendL(&buf, EMetaDataGenre);
             }
 		
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaYearFormat, EMetaDataYear, &buf));
+        TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataYear, &buf));
         if (KErrNone == err)
             {
             AppendL(&buf, EMetaDataYear);
             }
 
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaCustomGenreFormat, EMetaDataRating, &buf8));
+        TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataRating, &buf8));
         if (KErrNone == err)
             {
             ConvertAndAppendL(&buf8, EMetaDataGenre);
             }
 			
-		TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaTrack, EMetaDataAlbumTrack, &buf));
+		TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataAlbumTrack, &buf));
         if (KErrNone == err)
             {
             AppendL(&buf, EMetaDataAlbumTrack);
@@ -167,13 +167,7 @@ void CMetaDataParser3GPExt::ParseL(
 
         TRAP(err, GetDurationL(EMetaDataDuration));
 		
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaArtistFormat, EMetaDataAlbumArtist, &buf8));
-        if (KErrNone == err)
-            {
-            ConvertAndAppendL(&buf8, EMetaDataAlbumArtist);
-            }
-        
-        TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaJpeg, EMetaDataJpeg, &buf8));
+        TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataJpeg, &buf8));
         if (KErrNone == err)
             {
             AppendL(&buf8, EMetaDataJpeg);
@@ -189,7 +183,7 @@ void CMetaDataParser3GPExt::ParseL(
             switch ( aWantedFields[ i ] )
                 {
                 case EMetaDataSongTitle:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaTitleFormat, EMetaDataSongTitle, &buf8));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataSongTitle, &buf8));
                     if (KErrNone == err)
                         {
                         ConvertAndAppendL(&buf8, EMetaDataSongTitle);
@@ -197,7 +191,7 @@ void CMetaDataParser3GPExt::ParseL(
                     break;
 					
                 case EMetaDataComment:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaCommentFormat, EMetaDataComment, &buf8));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataComment, &buf8));
                     if (KErrNone == err)
                         {
                         ConvertAndAppendL(&buf8, EMetaDataComment);
@@ -205,7 +199,7 @@ void CMetaDataParser3GPExt::ParseL(
                     break;
 					
                 case EMetaDataAlbumTrack:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaTrack, EMetaDataAlbumTrack, &buf));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataAlbumTrack, &buf));
                     if (KErrNone == err)
                         {
                         AppendL(&buf, EMetaDataAlbumTrack);
@@ -213,7 +207,7 @@ void CMetaDataParser3GPExt::ParseL(
                     break;
 					
                 case EMetaDataArtist:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaArtistFormat, EMetaDataArtist, &buf8));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataArtist, &buf8));
                     if (KErrNone == err)
                         {
                         ConvertAndAppendL(&buf8, EMetaDataArtist);
@@ -221,7 +215,7 @@ void CMetaDataParser3GPExt::ParseL(
                     break;
 					
                 case EMetaDataComposer:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaComposerFormat, EMetaDataComposer, &buf8));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataComposer, &buf8));
                     if (KErrNone == err)
                         {
                         ConvertAndAppendL(&buf8, EMetaDataComposer);
@@ -229,7 +223,7 @@ void CMetaDataParser3GPExt::ParseL(
                     break;
 					
                 case EMetaDataAlbum:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaAlbumFormat, EMetaDataAlbum, &buf8));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataAlbum, &buf8));
                     if (KErrNone == err)
                         {
                         ConvertAndAppendL(&buf8, EMetaDataAlbum);
@@ -237,7 +231,7 @@ void CMetaDataParser3GPExt::ParseL(
                     break;
 					
                 case EMetaDataGenre:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaGenre, EMetaDataGenre, &buf));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataGenre, &buf));
                     if (KErrNone == err)
                         {
                         AppendL(&buf, EMetaDataGenre);
@@ -249,7 +243,7 @@ void CMetaDataParser3GPExt::ParseL(
                     break;
 					
                 case EMetaDataYear:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaYearFormat, EMetaDataYear, &buf));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataYear, &buf));
                     if (KErrNone == err)
                         {
                         AppendL(&buf, EMetaDataYear);
@@ -257,23 +251,15 @@ void CMetaDataParser3GPExt::ParseL(
                     break;
 					
                 case EMetaDataRating:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaCustomGenreFormat, EMetaDataRating, &buf8));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataRating, &buf8));
                     if (KErrNone == err)
                         {
                         ConvertAndAppendL(&buf8, EMetaDataGenre);
                         }					
                     break;
 					
-                case EMetaDataAlbumArtist:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaArtistFormat, EMetaDataAlbumArtist, &buf8));
-                    if (KErrNone == err)
-                        {
-                        ConvertAndAppendL(&buf8, EMetaDataAlbumArtist);
-                        }                   
-                    break;
-                    
                 case EMetaDataJpeg:
-                    TRAP(err, i3GPExtParser->GetilstBoxesL(K3GPExtMetaJpeg, EMetaDataJpeg, &buf8));
+                    TRAP(err, i3GPExtParser->GetilstBoxesL(EMetaDataJpeg, &buf8));
                     if (KErrNone == err)
                         {
                         AppendL(&buf8, EMetaDataJpeg);

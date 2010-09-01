@@ -94,6 +94,14 @@ void CEnhanMediaTestClass::Event( MControl* aControl, TUint aEventType, TAny* aE
  			    {
  			    switch (aEventType)
 			        {
+			        case MSourceControlObserver::KPercentageDownloadedChangedEvent:
+			        	{
+			        	TUint percent;
+			        	MProgDLSource* control1 = (MProgDLSource*)(aControl);
+			        	control1->GetPercentageBuffered(percent);
+			            iLog->Log(_L("KPercentageDownloadedChangedEvent"));
+			        	}
+			            break;
 			        case MSourceControlObserver::KBufferingTypesSupportChangedEvent:
 			        	{
 			            iLog->Log(_L("KBufferingTypesSupportChangedEvent"));
@@ -114,12 +122,73 @@ void CEnhanMediaTestClass::Event( MControl* aControl, TUint aEventType, TAny* aE
 			            iLog->Log(_L("CEnhanMediaTestClass::Event:BitRateChanged[%d]"),rate);
 			        	}
 			            break;
+			        case MSourceControlObserver::KDownloadStatusChangedEvent:
+			            {
+			            MProgDLSource* control1 = (MProgDLSource*)(aControl);
+			            RDebug::Print(_L("CMPlayerAudioUIController::Event:DownloadStatus[%d]"),control1->GetDownloadStatus());
+			            iLog->Log(_L("CMPlayerAudioUIController::Event:DownloadStatus[%d]"),control1->GetDownloadStatus());
+			            switch(control1->GetDownloadStatus())
+			            	{
+
+			            	case MProgDLSource::EConnecting:
+			            	    {
+			            	    RDebug::Print(_L("CEnhanMediaTestClass::Event:DownloadStatus [connecting]"));
+					            iLog->Log(_L("CEnhanMediaTestClass::Event:DownloadStatus [connecting]"));
+			            	    }
+			            	    break;
+
+			            	case MProgDLSource::EStarted:
+			            		{
+			            		RDebug::Print(_L("CEnhanMediaTestClass::Event:DownloadStatus [started]"));
+					            iLog->Log(_L("CEnhanMediaTestClass::Event:DownloadStatus [started]"));
+			            		}
+			            	    break;
+
+			            	case MProgDLSource::EPaused:
+			            		{
+			            	    RDebug::Print(_L("CEnhanMediaTestClass::Event:DownloadStatus [paused]"));
+					            iLog->Log(_L("CEnhanMediaTestClass::Event:DownloadStatus [paused]"));
+			            		}
+			            	    break;
+
+			            	case MProgDLSource::EDeleted:
+			            		{
+			            	    RDebug::Print(_L("CEnhanMediaTestClass::Event:DownloadStatus [deleted]"));
+					            iLog->Log(_L("CEnhanMediaTestClass::Event:DownloadStatus [deleted]"));
+			            		}
+			                    break;
+			            	case MProgDLSource::ECompleted:
+			            		{
+			            	    RDebug::Print(_L("CEnhanMediaTestClass::Event:DownloadStatus [completed]"));
+					            iLog->Log(_L("CEnhanMediaTestClass::Event:DownloadStatus [completed]"));
+			            		}
+			            	    break;
+			   	            case MProgDLSource::EFailed:
+			                    {
+			        	        RDebug::Print(_L("CEnhanMediaTestClass::Event:DownloadStatus [failed]"));
+					            iLog->Log(_L("CEnhanMediaTestClass::Event:DownloadStatus [failed]"));
+			                    break;
+			                    }
+			    	        case MProgDLSource::EUnknown:
+			        	        {
+			        	        RDebug::Print(_L("CEnhanMediaTestClass::Event:DownloadStatus [EUnknown]"));
+					            iLog->Log(_L("CEnhanMediaTestClass::Event:DownloadStatus [EUnknown]"));
+			        	        }
+			        	        break;
+			            	default:
+			            	  break;
+			            	}
+			            }
+			            break;
+
 			        case MSourceControlObserver::KFileMoveCompleteEvent:
 			            {
 				            RDebug::Print(_L("CEnhanMediaTestClass::Event:KFileMoveCompleteEvent"));
 				            iLog->Log(_L("CEnhanMediaTestClass::Event:KFileMoveCompleteEvent"));
 			            }
 			            break;
+
+
 			        };
 			    }
        			break;
@@ -144,4 +213,54 @@ void CEnhanMediaTestClass::Event( MControl* aControl, TUint aEventType, TAny* aE
 		};
 	}
 
+
+void CEnhanMediaTestClass::HandleDMgrEventL( RHttpDownload& aDownload, THttpDownloadEvent aEvent )
+    {
+    RDebug::Print(_L("HandleDMgrEventL DownloadState[%d] ProgressState[%d]"),aEvent.iDownloadState,aEvent.iProgressState);
+    iLog->Log(_L("HandleDMgrEventL DownloadState[%d] ProgressState[%d]"),aEvent.iDownloadState,aEvent.iProgressState);
+
+    TInt32 downloadSize = 0;
+    TInt32 length = 0;
+    TInt status = aDownload.GetIntAttribute(EDlAttrDownloadedSize, downloadSize);
+    status = aDownload.GetIntAttribute(EDlAttrLength, length);
+
+
+    TInt percentageDL = (downloadSize*100/length);
+
+    if(percentageDL > 8 && iActive->IsStarted())
+        {
+        iActive->AsyncStop();
+        }
+
+    //iLog->Log(_L("iMProgDLSource->GetDownloadingRate = [%d]"),rate);
+   // RDebug::Print(_L("CEnhanMediaTestClass::Event:EStateChanged[Opened]"));
+
+
+    if(aEvent.iDownloadState == EHttpDlPaused)
+        {
+        iDownload->Start();
+        }
+
+    if(aEvent.iDownloadState == EHttpDlCreated)
+        {
+        iLog->Log(_L("EHttpDlCreated"));
+        }
+
+    if(aEvent.iDownloadState == EHttpDlInprogress)
+        {
+        iLog->Log(_L("EHttpDlInprogress "));
+        }
+    if(aEvent.iDownloadState == EHttpDlPaused)
+        {
+        iLog->Log(_L("EHttpDlPaused "));
+        }
+    if(aEvent.iDownloadState == EHttpDlCompleted)
+        {
+        iLog->Log(_L("EHttpDlCompleted "));
+        }
+    if(aEvent.iDownloadState == EHttpDlFailed)
+        {
+        iLog->Log(_L("EHttpDlFailed "));
+        }
+    }
 // End of File

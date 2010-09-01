@@ -45,7 +45,7 @@ SOURCE		S60AudioUtility.cpp
 
 library			euser.lib
 library			efsrv.lib
-library			mmfcontrollerframework.lib
+library			MmfControllerFramework.lib
 library			caf.lib
 library			cafutils.lib
 library			ecom.lib

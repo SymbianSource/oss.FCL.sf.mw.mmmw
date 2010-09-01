@@ -63,12 +63,11 @@ TMSIPDownlink::~TMSIPDownlink()
 // -----------------------------------------------------------------------------
 //
 TMSIPDownlink* TMSIPDownlink::NewL(TMSIPDevSoundObserver& observer,
-        const guint32 codecID, const TMMFPrioritySettings priority,
-        const gint retrytime)
+        const guint32 codecID, const TMMFPrioritySettings priority)
     {
     TMSIPDownlink* self = new (ELeave) TMSIPDownlink(observer);
     CleanupStack::PushL(self);
-    self->ConstructL(codecID, priority, retrytime);
+    self->ConstructL(codecID, priority);
     CleanupStack::Pop(self);
     return self;
     }
@@ -79,7 +78,7 @@ TMSIPDownlink* TMSIPDownlink::NewL(TMSIPDevSoundObserver& observer,
 // -----------------------------------------------------------------------------
 //
 void TMSIPDownlink::ConstructL(const guint32 codecID,
-        const TMMFPrioritySettings priority, const gint /*retrytime*/)
+        const TMMFPrioritySettings priority)
     {
     TRACE_PRN_FN_ENT;
     iCodecID = codecID;
@@ -103,7 +102,7 @@ void TMSIPDownlink::ConstructL(const guint32 codecID,
 //
 // -----------------------------------------------------------------------------
 //
-void TMSIPDownlink::Start(const gint /*retrytime*/)
+void TMSIPDownlink::Start()
     {
     TRACE_PRN_FN_ENT;
     gint err = TMS_RESULT_ILLEGAL_OPERATION;
@@ -112,7 +111,11 @@ void TMSIPDownlink::Start(const gint /*retrytime*/)
         {
         TRAP(err, iDevSound->PlayInitL());
         TRACE_PRN_IF_ERR(err);
-        iObserver.DownlinkStarted(err);
+        if (err != TMS_RESULT_SUCCESS)
+            {
+            iStatus = EReady;
+            iObserver.DownlinkStarted(err);
+            }
         }
     TRACE_PRN_FN_EXT;
     }
@@ -706,13 +709,15 @@ void TMSIPDownlink::GetAudioDeviceL(TMSAudioOutput& output)
 
         switch (outputDev)
             {
-            case CAudioOutput::EPublic:
-                output = TMS_AUDIO_OUTPUT_PUBLIC;
-                break;
             case CAudioOutput::ENoPreference:
             case CAudioOutput::EAll:
             case CAudioOutput::ENoOutput:
             case CAudioOutput::EPrivate:
+                output = TMS_AUDIO_OUTPUT_PRIVATE;
+                break;
+            case CAudioOutput::EPublic:
+                output = TMS_AUDIO_OUTPUT_PUBLIC;
+                break;
             default:
                 output = TMS_AUDIO_OUTPUT_PRIVATE;
                 break;

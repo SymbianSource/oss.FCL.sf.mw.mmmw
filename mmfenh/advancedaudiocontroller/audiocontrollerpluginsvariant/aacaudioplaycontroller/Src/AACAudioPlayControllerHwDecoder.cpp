@@ -21,7 +21,7 @@
 // INCLUDE FILES
 #include "AACAudioPlayControllerDecoder.h"
 #include "DebugMacros.h"
-#include <mmfcodec.h>
+#include <Mmfcodec.h>
 
 #include <mmfpaniccodes.h>
 
@@ -292,6 +292,7 @@ void CAACAudioPlayControllerDecoder::ResetL()
     iAccLen = 0;
 
 	iAacUtil->Config(iFrameLenConfig);
+	iEnabled = ETrue;
     DP0(_L ("CAACAudioPlayControllerDecoder::Reset - Exit"));
 	}
 	
@@ -382,5 +383,10 @@ TInt CAACAudioPlayControllerDecoder::CodecCmd(TCodecCmd /*aCmd*/)
 	{
 	return KErrNotSupported;
 	}
+TBool CAACAudioPlayControllerDecoder::IsDecodingSufficient()
+    {
+    RDebug::Printf("CAACAudioPlayControllerDecoder::IsDecodingSufficient");
+    return ETrue;
+    }
 
 // End of file

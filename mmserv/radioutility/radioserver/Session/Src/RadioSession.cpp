@@ -25,7 +25,6 @@
 #include	"RadioRequest.h"
 #include	"RadioEventHandler.h"
 #include    "RadioDebug.h"
-#include    "trace.h"
 
 // CONSTANTS
 // Index to list of asynchronous requests that generates response to MRadioObserver.
@@ -55,7 +54,7 @@ const TInt KRadioMessageSlots = 11;
 //
 static TInt StartServer()
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] StartServer()"));
 
     const TUidType serverUid(KNullUid, KNullUid, KRadioServerUid3);
 
@@ -67,7 +66,7 @@ static TInt StartServer()
 
     if ( r != KErrNone )
 	    {
-		INFO_1("server.Create() failed [%d]", r);
+		RADIO_RDEBUG_INT(_L("[RADIO-SESS] server.Create() failed [%d]"), r);
         return r;
 	    }
 	TRequestStatus stat;
@@ -92,18 +91,6 @@ static TInt StartServer()
 // ============================ MEMBER FUNCTIONS ===============================
 
 // -----------------------------------------------------------------------------
-// RRadioSession::NewL
-// Two-phased constructor except no need for ConstrucL
-// -----------------------------------------------------------------------------
-//
-EXPORT_C RRadioSession* RRadioSession::NewL()
-    {
-    FUNC_LOG;
-    RRadioSession* self = new (ELeave) RRadioSession();
-    return self;
-    }
-
-// -----------------------------------------------------------------------------
 // RRadioSession::RRadioSession
 // C++ default constructor can NOT contain any code, that
 // might leave.
@@ -116,7 +103,6 @@ EXPORT_C RRadioSession::RRadioSession()
 		iPrimaryClient(EFalse),
 		iRdsNotify(EFalse)
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -128,11 +114,11 @@ EXPORT_C TInt RRadioSession::Connect(
 	MRadioObserver& aObserver,
 	TBool aPrimaryClient )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] Connect() entry"));
 	// check if already connected
 	if ( iConnected )
 		{
-		INFO("already connected");
+		RADIO_RDEBUG(_L("[RADIO-SESS] Connect(): already connected"));
 		return KErrAlreadyExists;
 		}
 
@@ -161,7 +147,7 @@ EXPORT_C TInt RRadioSession::Connect(
 
 	if ( err != KErrNone )
 		{
-		INFO_1("Unable to start server [%d]", err);
+		RADIO_RDEBUG_INT(_L("[RADIO-SESS] Connect(): Unable to start server [%d]"), err);
 		return err;
 		}
 
@@ -191,7 +177,8 @@ EXPORT_C TInt RRadioSession::Connect(
 		{
 		iRequests.ResetAndDestroy();
 		}
-	INFO_1("exit err=[%d]", err);
+
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] Connect() exit err=[%d]"), err);
 	return err;
 	}
 
@@ -201,7 +188,6 @@ EXPORT_C TInt RRadioSession::Connect(
 //
 EXPORT_C TVersion RRadioSession::Version() const
 	{
-    FUNC_LOG;
 	return(TVersion(KRadioServerVersionMajor, KRadioServerVersionMinor, KRadioServerVersionBuild));
 	}
 
@@ -211,7 +197,7 @@ EXPORT_C TVersion RRadioSession::Version() const
 //
 EXPORT_C void RRadioSession::Close()
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] Close() entry"));
 	iRequests.ResetAndDestroy();
 	iRequests.Close();
 
@@ -230,6 +216,7 @@ EXPORT_C void RRadioSession::Close()
 			}
 		RSessionBase::Close();
 		}
+	RADIO_RDEBUG(_L("[RADIO-SESS] Close() exit"));
 	}
 
 //********** TunerUtility control begins
@@ -241,6 +228,7 @@ EXPORT_C void RRadioSession::Close()
 EXPORT_C void RRadioSession::RequestTunerControl(
 	TRsTuner aTuner )
 	{
+	RADIO_RDEBUG(_L("[RADIO-SESS] RequestTunerControl()"));
 	if ( iConnected )
 		{
 		if ( iRequests[KReqRequestTunerControl]->IsActive() )
@@ -265,6 +253,7 @@ EXPORT_C void RRadioSession::RequestTunerControl(
 EXPORT_C TInt RRadioSession::GetTunerCapabilities(
 	TRsTunerCapabilities& aCaps ) const
 	{
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetTunerCapabilities()"));
 	if ( iConnected )
 		{
 		TPckg<TRsTunerCapabilities> caps(aCaps);
@@ -284,7 +273,7 @@ EXPORT_C TInt RRadioSession::GetTunerCapabilities(
 EXPORT_C TInt RRadioSession::EnableTunerInOfflineMode(
 	TBool aEnable )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] EnableTunerInOfflineMode() [%d]"), aEnable);
 	if ( iConnected )
 		{
 		return SendReceive(ERadioServEnableTunerInOfflineMode,
@@ -303,7 +292,7 @@ EXPORT_C TInt RRadioSession::EnableTunerInOfflineMode(
 EXPORT_C void RRadioSession::SetFrequencyRange(
 	TRsFrequencyRange aRange )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] SetFrequencyRange() [%d]"), aRange);
 	if ( iConnected )
 		{
 		if ( iRequests[KReqSetFrequencyRange]->IsActive() )
@@ -327,7 +316,7 @@ EXPORT_C void RRadioSession::SetFrequencyRange(
 //
 EXPORT_C void RRadioSession::CancelSetFrequencyRange()
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] CancelSetFrequencyRange()"));
 	if ( iConnected && iRequests[KReqSetFrequencyRange]->IsActive() )
 		{
 		iRequests[KReqSetFrequencyRange]->Cancel();
@@ -343,7 +332,7 @@ EXPORT_C TInt RRadioSession::GetFrequencyRange(
 	TInt& aMinFreq,
 	TInt& aMaxFreq) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetFrequencyRange()"));
 	if ( iConnected )
 		{
 		TPckg<TRsFrequencyRange> range(aRange);
@@ -365,7 +354,7 @@ EXPORT_C TInt RRadioSession::GetFrequencyRange(
 EXPORT_C void RRadioSession::SetFrequency(
 	TInt aFrequency )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] SetFrequency() [%d]"), aFrequency);
 	if ( iConnected )
 		{
 		if ( iRequests[KReqSetFrequency]->IsActive() )
@@ -389,7 +378,7 @@ EXPORT_C void RRadioSession::SetFrequency(
 //
 EXPORT_C void RRadioSession::CancelSetFrequency()
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] CancelSetFrequency()"));
 	if ( iConnected && iRequests[KReqSetFrequency]->IsActive() )
 		{
 		iRequests[KReqSetFrequency]->Cancel();
@@ -403,7 +392,7 @@ EXPORT_C void RRadioSession::CancelSetFrequency()
 EXPORT_C TInt RRadioSession::GetFrequency(
 	TInt& aFrequency ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetFrequency()"));
 	if ( iConnected )
 		{
 		TPckg<TInt> frequency(aFrequency);
@@ -422,7 +411,7 @@ EXPORT_C TInt RRadioSession::GetFrequency(
 EXPORT_C void RRadioSession::StationSeek(
 	TBool aUpwards )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] StationSeek() [%d]"), aUpwards);
 	if ( iConnected )
 		{
 		if ( iRequests[KReqStationSeek]->IsActive() )
@@ -445,7 +434,7 @@ EXPORT_C void RRadioSession::StationSeek(
 // -----------------------------------------------------------------------------
 EXPORT_C void RRadioSession::CancelStationSeek()
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] CancelStationSeek()"));
 	if ( iConnected && iRequests[KReqStationSeek]->IsActive() )
 		{
 		iRequests[KReqStationSeek]->Cancel();
@@ -458,7 +447,7 @@ EXPORT_C void RRadioSession::CancelStationSeek()
 EXPORT_C TInt RRadioSession::GetSignalStrength(
 	TInt& aSignalStrength ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetSignalStrength()"));
 	if ( iConnected )
 		{
 		TPckg<TInt> strength(aSignalStrength);
@@ -477,7 +466,7 @@ EXPORT_C TInt RRadioSession::GetSignalStrength(
 EXPORT_C TInt RRadioSession::GetMaxSignalStrength(
 	TInt& aMaxSignalStrength ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetMaxSignalStrength()"));
 	if ( iConnected )
 		{
 		TPckg<TInt> maxStrength(aMaxSignalStrength);
@@ -496,7 +485,7 @@ EXPORT_C TInt RRadioSession::GetMaxSignalStrength(
 EXPORT_C TInt RRadioSession::GetStereoMode(
 	TBool& aStereo ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetStereoMode()"));
 	if ( iConnected )
 		{
 		TPckg<TBool> stereo(aStereo);
@@ -515,7 +504,7 @@ EXPORT_C TInt RRadioSession::GetStereoMode(
 EXPORT_C TInt RRadioSession::ForceMonoReception(
 	TBool aForcedMono )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] ForceMonoReception() [%d]"), aForcedMono);
 	if ( iConnected )
 		{
 		return SendReceive(ERadioServForceMonoReception,
@@ -533,7 +522,7 @@ EXPORT_C TInt RRadioSession::ForceMonoReception(
 EXPORT_C TInt RRadioSession::GetForceMonoReception(
 	TBool& aForcedMono ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetForceMonoReception()"));
 	if ( iConnected )
 		{
 		TPckg<TBool> mono(aForcedMono);
@@ -552,7 +541,7 @@ EXPORT_C TInt RRadioSession::GetForceMonoReception(
 EXPORT_C TInt RRadioSession::SetSquelch(
 	TBool aEnabled )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] SetSquelch() [%d]"), aEnabled);
 	if ( iConnected )
 		{
 		return SendReceive(ERadioServSetSquelch,
@@ -570,7 +559,7 @@ EXPORT_C TInt RRadioSession::SetSquelch(
 EXPORT_C TInt RRadioSession::GetSquelch(
 	TBool& aSquelch ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetSquelch()"));
 	if ( iConnected )
 		{
 		TPckg<TBool> squelch(aSquelch);
@@ -591,7 +580,7 @@ EXPORT_C TInt RRadioSession::GetSquelch(
 EXPORT_C TInt RRadioSession::PlayerState(
 	TRsPlayerState& aState ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetPlayerState()"));
 	if ( iConnected )
 		{
 		TPckg<TRsPlayerState> state(aState);
@@ -609,7 +598,7 @@ EXPORT_C TInt RRadioSession::PlayerState(
 // -----------------------------------------------------------------------------
 EXPORT_C void RRadioSession::Play()
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] Play()"));
 	if ( iConnected )
 		{
 		if ( iRequests[KReqPlay]->IsActive() )
@@ -630,14 +619,14 @@ EXPORT_C void RRadioSession::Play()
 EXPORT_C void RRadioSession::Stop(
 	TBool aIfOnlyPrimaryClient )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] Stop() [%d]"), aIfOnlyPrimaryClient);
 	if ( iConnected )
 		{
 		TInt err = Send(ERadioServStop,
 						TIpcArgs(&iDestinationPckg, aIfOnlyPrimaryClient));
 		if (err != KErrNone)
 			{
-			INFO_1("err[%d]", err);
+			RADIO_RDEBUG_INT(_L("[RADIO-SESS] Stop() - err[%d]"), err);
 			}
 		}
 	}
@@ -648,7 +637,7 @@ EXPORT_C void RRadioSession::Stop(
 EXPORT_C TInt RRadioSession::GetMaxVolume(
     TInt& aMaxVolume ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetMaxVolume()"));
 	if ( iConnected )
 		{
 		TPckg<TInt> maxVolume(aMaxVolume);
@@ -667,7 +656,7 @@ EXPORT_C TInt RRadioSession::GetMaxVolume(
 EXPORT_C TInt RRadioSession::SetVolume(
 	TInt aVolume )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] SetVolume() [%d]"), aVolume);
 	if ( iConnected )
 		{
 		return SendReceive(ERadioServSetVolume,
@@ -685,7 +674,7 @@ EXPORT_C TInt RRadioSession::SetVolume(
 EXPORT_C TInt RRadioSession::GetVolume(
 	TInt& aVolume ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetVolume()"));
 	if ( iConnected )
 		{
 		TPckg<TInt> volume(aVolume);
@@ -704,7 +693,7 @@ EXPORT_C TInt RRadioSession::GetVolume(
 EXPORT_C TInt RRadioSession::SetVolumeRamp(
 	const TTimeIntervalMicroSeconds& aRampInterval )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] SetVolumeRamp()"));
 	if ( iConnected )
 		{
 		TPckgBuf<TTimeIntervalMicroSeconds> interval(aRampInterval);
@@ -723,7 +712,7 @@ EXPORT_C TInt RRadioSession::SetVolumeRamp(
 EXPORT_C TInt RRadioSession::Mute(
 	TBool aMute )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] Mute() [%d]"), aMute);
 	if ( iConnected )
 		{
 		return SendReceive(ERadioServSetMute,
@@ -741,7 +730,7 @@ EXPORT_C TInt RRadioSession::Mute(
 EXPORT_C TInt RRadioSession::GetMuteStatus(
 	TBool& aMute ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] Mute()"));
 	if ( iConnected )
 		{
 		TPckg<TBool> mute(aMute);
@@ -761,7 +750,7 @@ EXPORT_C TInt RRadioSession::SetBalance(
 	TInt aLeftPercentage,
 	TInt aRightPercentage )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT2(_L("[RADIO-SESS] SetBalance() left=[%d] right=[%d]"), aLeftPercentage, aRightPercentage);
 	if ( iConnected )
 		{
 		return SendReceive(ERadioServSetBalance,
@@ -781,7 +770,7 @@ EXPORT_C TInt RRadioSession::GetBalance(
 	TInt& aLeftPercentage,
 	TInt& aRightPercentage ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetBalance()"));
 	if ( iConnected )
 		{
 		TPckg<TInt> left(aLeftPercentage);
@@ -804,7 +793,7 @@ EXPORT_C TInt RRadioSession::GetBalance(
 EXPORT_C TInt RRadioSession::GetRdsCapabilities(
 	TRsRdsCapabilities& aCaps ) const
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetRdsCapabilities()"));
 	if ( iConnected )
 		{
 		TPckg<TRsRdsCapabilities> caps(aCaps);
@@ -824,7 +813,7 @@ EXPORT_C TInt RRadioSession::GetRdsCapabilities(
 EXPORT_C TInt RRadioSession::GetRdsSignalStatus(
 	TBool& aRdsSignal ) const
     {
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] GetRdsSignalStatus()"));
 	if ( iConnected )
 		{
 		TPckg<TBool> signal(aRdsSignal);
@@ -844,7 +833,7 @@ EXPORT_C TInt RRadioSession::GetRdsSignalStatus(
 EXPORT_C TInt RRadioSession::NotifyRdsDataChange(
 	TRsRdsData aRdsData )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] NotifyRdsDataChange() [%d]"), aRdsData.iRdsFunctions);
 	if ( !iConnected )
 		{
 		return KErrDisconnected;
@@ -858,7 +847,7 @@ EXPORT_C TInt RRadioSession::NotifyRdsDataChange(
 	TRAPD(err, StartRdsEventHandlersL(aRdsData.iRdsFunctions));
 	if ( err != KErrNone )
 		{
-		INFO_1("err=[%d]", err);
+		RADIO_RDEBUG_INT(_L("[RADIO-SESS] NotifyRdsDataChange() err=[%d]"), err);
 		return err;
 		}
 	err = SendReceive(ERadioServNotifyRdsDataChange,
@@ -876,7 +865,7 @@ EXPORT_C TInt RRadioSession::NotifyRdsDataChange(
 //
 EXPORT_C void RRadioSession::CancelNotifyRdsDataChange()
     {
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] CancelNotifyRdsDataChange()"));
 	if ( iConnected && iRdsNotify )
 		{
 		iRdsEventHandlers.ResetAndDestroy();
@@ -892,7 +881,7 @@ EXPORT_C void RRadioSession::CancelNotifyRdsDataChange()
 EXPORT_C TInt RRadioSession::NotifyRadioTextPlusChange(
 	RArray<TInt>& /*aRtPlusClasses*/ )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] NotifyRadioTextPlusChange()"));
 	return KErrNotSupported;
 	}
 
@@ -902,7 +891,7 @@ EXPORT_C TInt RRadioSession::NotifyRadioTextPlusChange(
 //
 EXPORT_C void RRadioSession::CancelNotifyRadioTextPlusChange()
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] CancelNotifyRadioTextPlusChange()"));
 	// NotifyRadioTextPlusChange is not supported
 	}
 
@@ -913,7 +902,7 @@ EXPORT_C void RRadioSession::CancelNotifyRadioTextPlusChange()
 EXPORT_C TInt RRadioSession::SetAutomaticSwitching(
 	TBool aAuto )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] SetAutomaticSwitching() [%d]"), aAuto);
 	if ( iConnected )
 		{
 		return SendReceive(ERadioServSetAutomaticSwitching,
@@ -932,7 +921,7 @@ EXPORT_C TInt RRadioSession::SetAutomaticSwitching(
 EXPORT_C TInt RRadioSession::GetAutomaticSwitching(
 	TBool& aAuto )
 	{
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] GetAutomaticSwitching()"));
 	if ( iConnected )
 		{
 		TPckg<TBool> autoSwitching(aAuto);
@@ -951,7 +940,7 @@ EXPORT_C TInt RRadioSession::GetAutomaticSwitching(
 //
 EXPORT_C void RRadioSession::CancelAFSearch()
 	{
-    FUNC_LOG;
+   	RADIO_RDEBUG(_L("[RADIO-SESS] CancelAFSearch()"));
 	if ( iConnected )
 		{
 		SendReceive(ERadioServCancelAFSearch, TIpcArgs(&iDestinationPckg));
@@ -965,7 +954,7 @@ EXPORT_C void RRadioSession::CancelAFSearch()
 EXPORT_C TInt RRadioSession::SetAutomaticTrafficAnnouncement(
 	TBool /*aAuto*/ )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] SetAutomaticTrafficAnnouncement()"));
 	return KErrNotSupported;
 	}
 
@@ -976,7 +965,7 @@ EXPORT_C TInt RRadioSession::SetAutomaticTrafficAnnouncement(
 EXPORT_C TInt RRadioSession::GetAutomaticTrafficAnnouncement(
 	TBool& /*aAuto*/ )
 	{
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] GetAutomaticTrafficAnnouncement()"));
 	return KErrNotSupported;
    	}
 
@@ -988,7 +977,7 @@ EXPORT_C void RRadioSession::StationSeekByPTY(
 	TRsRdsProgrammeType aPty,
 	TBool aSeekUp )
    	{
-    FUNC_LOG;
+   	RADIO_RDEBUG_INT(_L("[RADIO-SESS] StationSeekByPTY() pty=[%d]"), aPty);
 	if ( iConnected )
 		{
 		if ( iRequests[KReqStationSeekByPTY]->IsActive() )
@@ -1013,7 +1002,7 @@ EXPORT_C void RRadioSession::StationSeekByPTY(
 EXPORT_C void RRadioSession::StationSeekByTA(
 	TBool aSeekUp )
    	{
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] StationSeekByTA()"));
 	if ( iConnected )
 		{
 		if ( iRequests[KReqStationSeekByTA]->IsActive() )
@@ -1038,7 +1027,7 @@ EXPORT_C void RRadioSession::StationSeekByTA(
 EXPORT_C void RRadioSession::StationSeekByTP(
 	TBool aSeekUp )
    	{
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] StationSeekByTP()"));
 	if ( iConnected )
 		{
 		if ( iRequests[KReqStationSeekByTP]->IsActive() )
@@ -1062,7 +1051,7 @@ EXPORT_C void RRadioSession::StationSeekByTP(
 //
 EXPORT_C void RRadioSession::CancelRdsStationSeek()
   	{
-    FUNC_LOG;
+   	RADIO_RDEBUG(_L("[RADIO-SESS] CancelRdsStationSeek()"));
 	if ( iConnected )
 		{
 		if ( iRequests[KReqStationSeekByPTY]->IsActive() )
@@ -1087,7 +1076,7 @@ EXPORT_C void RRadioSession::CancelRdsStationSeek()
 EXPORT_C void RRadioSession::GetFreqByPTY(
 	TRsRdsProgrammeType /*aPty*/ )
 	{
-    FUNC_LOG;
+  	RADIO_RDEBUG(_L("[RADIO-SESS] GetFreqByPTY()"));
 	iRequests[KReqInternal]->CompleteRequest(ERadioServGetFreqByPTY, KErrNotSupported);
   	}
 
@@ -1097,7 +1086,7 @@ EXPORT_C void RRadioSession::GetFreqByPTY(
 //
 EXPORT_C void RRadioSession::CancelGetFreqByPTY()
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] CancelGetFreqByPTY()"));
 	// GetFreqByPTY is not supported
 	}
 
@@ -1107,7 +1096,7 @@ EXPORT_C void RRadioSession::CancelGetFreqByPTY()
 //
 EXPORT_C void RRadioSession::GetFreqByTA()
 	{
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] GetFreqByTA()"));
 	iRequests[KReqInternal]->CompleteRequest(ERadioServGetFreqByTA, KErrNotSupported);
     }
 
@@ -1117,7 +1106,7 @@ EXPORT_C void RRadioSession::GetFreqByTA()
 //
 EXPORT_C void RRadioSession::CancelGetFreqByTA()
     {
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] CancelGetFreqByTA()"));
     // GetFreqByTA is not supported
 	}
 
@@ -1128,7 +1117,7 @@ EXPORT_C void RRadioSession::CancelGetFreqByTA()
 EXPORT_C void RRadioSession::GetPSByPTY(
 	TRsRdsProgrammeType /*aPty*/ )
     {
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] GetPSByPTY()"));
 	iRequests[KReqInternal]->CompleteRequest(ERadioServGetPSByPTY, KErrNotSupported);
     }
 
@@ -1138,7 +1127,7 @@ EXPORT_C void RRadioSession::GetPSByPTY(
 //
 EXPORT_C void RRadioSession::CancelGetPSByPTY()
     {
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] CancelGetPSByPTY()"));
     // GetPSByPTY is not supported
 	}
 
@@ -1148,7 +1137,7 @@ EXPORT_C void RRadioSession::CancelGetPSByPTY()
 //
 EXPORT_C void RRadioSession::GetPSByTA()
     {
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] GetPSByTA()"));
 	iRequests[KReqInternal]->CompleteRequest(ERadioServGetPSByTA, KErrNotSupported);
     }
 
@@ -1158,7 +1147,7 @@ EXPORT_C void RRadioSession::GetPSByTA()
 //
 EXPORT_C void RRadioSession::CancelGetPSByTA()
     {
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] CancelGetPSByTA()"));
     // GetPSByTA is not supported
 	}
 
@@ -1169,7 +1158,7 @@ EXPORT_C void RRadioSession::CancelGetPSByTA()
 EXPORT_C TInt RRadioSession::GetProgrammeIdentification(
 	TInt& aPi )
     {
-    FUNC_LOG;
+ 	RADIO_RDEBUG(_L("[RADIO-SESS] GetProgrammeIdentification()"));
 	if ( iConnected )
 		{
 		TPckg<TInt> pi(aPi);
@@ -1189,7 +1178,7 @@ EXPORT_C TInt RRadioSession::GetProgrammeIdentification(
 EXPORT_C TInt RRadioSession::GetProgrammeType(
 	TRsRdsProgrammeType& aPty )
     {
-    FUNC_LOG;
+  	RADIO_RDEBUG(_L("[RADIO-SESS] GetProgrammeType()"));
 	if ( iConnected )
 		{
 		TPckg<TRsRdsProgrammeType> pty(aPty);
@@ -1209,7 +1198,7 @@ EXPORT_C TInt RRadioSession::GetProgrammeType(
 EXPORT_C TInt RRadioSession::GetProgrammeService(
 	TRsRdsPSName& aPs )
     {
-    FUNC_LOG;
+ 	RADIO_RDEBUG(_L("[RADIO-SESS] GetProgrammeService()"));
 	if ( iConnected )
 		{
 		TPckg<TRsRdsPSName> ps(aPs);
@@ -1229,7 +1218,7 @@ EXPORT_C TInt RRadioSession::GetProgrammeService(
 EXPORT_C TInt RRadioSession::GetRadioText(
 	TRsRdsRadioText& aRt )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetRadioText()"));
 	if ( iConnected )
 		{
 		TPckg<TRsRdsRadioText> rt(aRt);
@@ -1250,7 +1239,7 @@ EXPORT_C TInt RRadioSession::GetRadioTextPlus(
 	TRsRdsRTplusClass /*aRtPlusClass*/,
 	TRsRdsRadioText& /*aRtPlusData*/ )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetRadioText()"));
 	return KErrNotSupported;
 	}
 
@@ -1261,7 +1250,7 @@ EXPORT_C TInt RRadioSession::GetRadioTextPlus(
 EXPORT_C TInt RRadioSession::GetClockTime(
 	TDateTime& aCt )
 	{
-    FUNC_LOG;
+    RADIO_RDEBUG(_L("[RADIO-SESS] GetClockTime()"));
 	if ( iConnected )
 		{
 		TPckg<TDateTime> ct(aCt);
@@ -1281,7 +1270,7 @@ EXPORT_C TInt RRadioSession::GetClockTime(
 EXPORT_C TInt RRadioSession::GetTrafficAnnouncementStatus(
 	TBool& aTaStatus )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetTrafficAnnouncementStatus()"));
 	if ( iConnected )
 		{
 		TPckg<TBool> taStatus(aTaStatus);
@@ -1301,7 +1290,7 @@ EXPORT_C TInt RRadioSession::GetTrafficAnnouncementStatus(
 EXPORT_C TInt RRadioSession::GetTrafficProgrammeStatus(
 	TBool& aTpStatus )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] GetTrafficProgrammeStatus()"));
 	if ( iConnected )
 		{
 		TPckg<TBool> tpStatus(aTpStatus);
@@ -1323,7 +1312,7 @@ EXPORT_C TInt RRadioSession::CustomCommandSync(
 	const TDesC8& aDataTo1,
 	const TDesC8& aDataTo2 )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] CustomCommandSync NoReturn()"));
 	if ( iConnected )
 		{
 		return SendReceive(aFunction, TIpcArgs(&aDestination, &aDataTo1, &aDataTo2));
@@ -1344,7 +1333,7 @@ EXPORT_C TInt RRadioSession::CustomCommandSync(
 	const TDesC8& aDataTo2,
 	TDes8& aDataFrom )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] CustomCommandSync Return()"));
 	if ( iConnected )
 		{
 		return SendReceive(aFunction, TIpcArgs(&aDestination, &aDataTo1, &aDataTo2, &aDataFrom));
@@ -1365,7 +1354,7 @@ EXPORT_C void RRadioSession::CustomCommandAsync(
 	const TDesC8& aDataTo2,
 	TRequestStatus& aStatus )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] CustomCommandAsync NoReturn()"));
 	if ( iConnected )
 		{
 		SendReceive(aFunction, TIpcArgs(&aDestination, &aDataTo1, &aDataTo2), aStatus);
@@ -1388,7 +1377,7 @@ EXPORT_C void RRadioSession::CustomCommandAsync(
 	TDes8& aDataFrom,
 	TRequestStatus& aStatus )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] CustomCommandAsync Return()"));
 	if ( iConnected )
 		{
 		SendReceive(aFunction, TIpcArgs(&aDestination, &aDataTo1, &aDataTo2, &aDataFrom), aStatus);
@@ -1407,8 +1396,7 @@ EXPORT_C void RRadioSession::CustomCommandAsync(
 void RRadioSession::CancelRequest(
 	TInt aRequest )
 	{
-    FUNC_LOG;
-	INFO_1("aRequest: [%d]", aRequest);
+	RADIO_RDEBUG_INT(_L("[RADIO-SESS] CancelRequest(): [%d]"), aRequest);
 	if ( iConnected )
 		{
 		SendReceive(ERadioServCancel, TIpcArgs(&iDestinationPckg, aRequest));
@@ -1425,7 +1413,8 @@ void RRadioSession::CancelRequest(
 void RRadioSession::StartRequestHandlersL(
 	MRadioObserver& aObserver )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] StartRequestHandlersL()"));
+
 	CRadioRequest* req = NULL;
 
 	req = CRadioRequest::NewLC(*this, aObserver, ERadioServNone);
@@ -1472,7 +1461,7 @@ void RRadioSession::StartRequestHandlersL(
 void RRadioSession::StartEventHandlersL(
 	MRadioObserver& aEventObserver )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] StartEventHandlersL()"));
 
 	CRadioEventHandler* handler = NULL;
 
@@ -1528,7 +1517,7 @@ void RRadioSession::StartEventHandlersL(
 void RRadioSession::StartRdsEventHandlersL(
 	TUint32 aRdsFunction )
 	{
-    FUNC_LOG;
+	RADIO_RDEBUG(_L("[RADIO-SESS] StartRdsEventHandlersL()"));
 
 	iRdsEventHandlers.ResetAndDestroy();
 	CRadioEventHandler* handler = NULL;

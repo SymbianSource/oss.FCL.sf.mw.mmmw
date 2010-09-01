@@ -46,4 +46,3 @@ MW_LAYER_SYSTEMINCLUDE
 LIBRARY		euser.lib 
 LIBRARY		RadioSession.lib
 LIBRARY		CustomInterfaceUtility.lib 
-LIBRARY		flogger.lib 

@@ -35,6 +35,7 @@ class TMSCenRepAudioHandler : public TMSPubSubObserver,
                               public TMSCenRepObserver
     {
 public:
+    //Constructors and descructor
 
     /**
      * Two-phased constructing for the monitor.
@@ -73,6 +74,28 @@ public:
     virtual void HandleNotifyCenRepL(const TUid aUid, const TUint32 aKey,
             TInt aVal);
 
+protected:
+    // From CActive
+    /**
+     * From CActive
+     * RunL
+     */
+    void RunL();
+
+    /**
+     * From CActive
+     * Catches errors if RunL leaves
+     * @param aError error code
+     * @return error code
+     */
+    TInt RunError(TInt aError);
+
+    /**
+     * From CActive
+     * Cancels the monitor
+     */
+    void DoCancel();
+
 private:
     /**
      * C++ default constructor
@@ -88,6 +111,7 @@ private:
     void ConstructL();
 
 private:
+    // data
 
     /**
      * Mute listening from Publish&Subscribe.
@@ -114,7 +138,6 @@ private:
      */
     TInt iCallCount;
     TMSServer* iTMSSer;
-    gboolean iPublish;
     };
 
 } //namespace TMS

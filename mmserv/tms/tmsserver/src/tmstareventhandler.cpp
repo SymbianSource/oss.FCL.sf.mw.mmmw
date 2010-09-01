@@ -108,12 +108,5 @@ void TMSTarEventHandler::RunL()
     TRACE_PRN_FN_EXT;
     }
 
-// -----------------------------------------------------------------------------
-// TMSTarEventHandler::RunError
-// -----------------------------------------------------------------------------
-//
-TInt TMSTarEventHandler::RunError(TInt aError)
-    {
-    return aError;
-    }
+//  End of File
 

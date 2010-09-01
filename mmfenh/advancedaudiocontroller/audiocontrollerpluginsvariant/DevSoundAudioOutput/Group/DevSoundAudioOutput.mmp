@@ -49,5 +49,5 @@ LIBRARY		AudioOutputControlUtility.lib
 LIBRARY		DataSourceAdapter.lib
 #ifdef EABI
 // modified by BuildTeam
-LIBRARY     ecom.lib
+LIBRARY     ECOM.LIB
 #endif

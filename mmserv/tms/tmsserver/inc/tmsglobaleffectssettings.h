@@ -90,12 +90,6 @@ public:
      */
     TInt MaxGain() const;
 
-    /**
-     * Resets volume to default if level is 0 when new call starts.
-     * @return
-     */
-    void ResetDefaultVolume();
-
 private:
 
     /**

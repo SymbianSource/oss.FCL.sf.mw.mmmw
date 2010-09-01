@@ -76,19 +76,15 @@ protected:
      * Constructor
      *
      */
-    #ifdef __WINSCW__
     IMPORT_C CConfigurationComponentsFactory();
-    IMPORT_C void ConstructL();
-    #else 
-    CConfigurationComponentsFactory();
-    void ConstructL();
-    #endif
 
     /**
      * Second phase constructor. The derived class should call this during
      * construction.
      *
      */
+    IMPORT_C void ConstructL();
+
     protected:  // Data
         // Actual implementation class.
         class CBody;

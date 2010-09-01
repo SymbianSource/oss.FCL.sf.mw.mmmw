@@ -37,7 +37,7 @@ MW_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE   /epoc32/include/mmf/common 
 SYSTEMINCLUDE   /epoc32/include/mmf/server
 
-LIBRARY    	euser.lib
+LIBRARY    	Euser.lib
 LIBRARY		AudioOutputControlUtility.lib
 LIBRARY		ConfigurationComponentsFactory.lib
 LIBRARY		RestrictedAudioOutput.lib

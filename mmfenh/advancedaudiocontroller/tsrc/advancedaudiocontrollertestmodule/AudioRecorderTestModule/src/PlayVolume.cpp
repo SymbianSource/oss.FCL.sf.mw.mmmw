@@ -115,14 +115,8 @@ void CPlayVolume::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousState,
 		this->volume = volume;
 		logger->Log(_L("MoscoStateChangeEvent getVolume:  %d "),volume);
 		CActiveScheduler::Stop();
-		return;
 	}
-	if (aErrorCode != KErrNone)
-	    {
-        CActiveScheduler::Stop();
-		return;
-        }
-    
+	return;
 }
 
 

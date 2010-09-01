@@ -58,7 +58,8 @@ enum TMSClientServerRequest
     ETMSRingTonePause,
     ETMSRingToneStop,
     ETMSRingToneMute,
-    ETMSInitDTMF,
+    ETMSStartDTMFNotifier,
+    ETMSCancelDTMFNotifier,
     ETMSStartDTMF,
     ETMSStopDTMF,
     ETMSContinueDTMF,
@@ -81,8 +82,7 @@ enum TMSGlobalEffectsPsKey
     EGlobalEffectsPsVolume = 10,
     EGlobalEffectsPsGain,
     ERoutingPs,
-    EDtmfPs,
-    ESyncVolume
+    EDtmfPs
     };
 
 // TMSServer message queue notifier type keys

@@ -371,4 +371,3 @@ TInt CMetaDataParserRA::GetCopyrightL(TInt aCount)
 	}	
 
 //  End of File
-

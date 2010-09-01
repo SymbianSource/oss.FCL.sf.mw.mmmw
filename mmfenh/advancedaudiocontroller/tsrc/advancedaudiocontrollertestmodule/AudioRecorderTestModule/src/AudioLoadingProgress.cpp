@@ -142,15 +142,9 @@ void CAudioLoadingProgress::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrev
 #ifdef _DEBUG
     RDebug::Print (_L ("CAudioLoadingProgress::MoscoStateChangeEvent"));
 #endif
-    
-    callbackErr = aErrorCode;
+	TInt err = KErrNone;
+	callbackErr = KErrNone;
 
-    if (aErrorCode != KErrNone)
-        {
-
-        CActiveScheduler::Stop();
-
-        }
 	logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),aErrorCode,aPreviousState,aCurrentState);
 
     TInt aState = recorder->State();

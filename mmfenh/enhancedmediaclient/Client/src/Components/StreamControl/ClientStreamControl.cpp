@@ -22,6 +22,7 @@
 #include <EffectControl.h>
 #include <SinkControl.h>
 #include <SourceControl.h>
+#include <ProgDLSource.h>
 #include <FileSource.h>
 #include <DescriptorSource.h>
 #include <SCCustomInterfaceUIDs.h>
@@ -777,6 +778,53 @@ TInt CStreamControl::LaunchController()
                 }
             }
         }
+    else
+        if (iSourceControl->Type() == KProgDLSourceControl)
+            {
+            MProgDLSource* progDLSource =
+                    static_cast<MProgDLSource*>(iSourceControl);
+            HBufC* fileName = HBufC::NewLC(KMaxPath);
+            TPtr fileNamePtr = fileName->Des();
+
+            TInt err = progDLSource->FileName(fileNamePtr);
+
+            HBufC8* mimeType = HBufC8::NewLC(KMaxMimeLength);
+            TPtr8 mimeTypePtr = mimeType->Des();
+
+            status = iSourceControl->GetMimeType(mimeTypePtr);
+
+            iFindAndOpenController->ConfigureSourceSink(
+                    TMMFileSource(fileNamePtr,
+                            ContentAccess::KDefaultContentObject,
+                            ContentAccess::EPlay),
+                    CMMFFindAndOpenController::TSourceSink(/*KUidMmfAudioOutput*/sinkUID/*,fileHandle*/));
+
+            TMMFileSource source(fileNamePtr,
+                    ContentAccess::KDefaultContentObject,
+                    ContentAccess::EPlay);
+
+            // This Flag is defined so that if the Helix Controller Supports
+            // the playback of Local Media for WMA, then the Progressive Download
+            //  for WMA still goes through the Old WMA Controller( AdvancedAudioController)
+            // We are launching the Old WMA Controller using the UID.                
+
+#ifdef __WINDOWS_MEDIA        
+#ifndef RD_PD_FOR_AUDIO_CONTENT_VIA_HELIX_ENGINE       
+            if(!mimeTypePtr.Compare(KWMAMimeType()))
+                {
+                iFindAndOpenController->OpenByControllerUid(TUid::Uid(0x10207A9B),KNullUid);
+                }
+            else
+#endif        
+#endif
+                {
+                iFindAndOpenController->OpenByFileSource(source);
+                }
+
+            CleanupStack::PopAndDestroy(mimeType); // mimeType
+            CleanupStack::PopAndDestroy(fileName); // fileName
+            //fileHandle.Close();
+            }
 
     if (iSourceControl->Type() == KFileSourceControl)
         {

@@ -19,12 +19,11 @@
 #define TMSCSDEVSOUND_H
 
 #include <sounddevice.h>
-#include "tmstimer.h"
+#include <tms.h>
 
 namespace TMS {
 
 // FORWARD DECLARATIONS
-class TMSTimer;
 class TMSCSDevSoundObserver;
 
 /**
@@ -32,8 +31,7 @@ class TMSCSDevSoundObserver;
  *
  */
 NONSHARABLE_CLASS(TMSCSDevSound) : public CBase,
-                                   public MDevSoundObserver,
-                                   public TMSTimerObserver
+                                   public MDevSoundObserver
     {
 public:
 
@@ -48,12 +46,12 @@ public:
      * methods. If the stream is already active or being activated, call to
      * this will result in no action.
      */
-    virtual void Activate(const gint retrytime);
+    virtual void Activate();
 
     /**
      * Deactivates an active DevSound stream.
      */
-    virtual void Deactivate(gboolean reset = TRUE);
+    virtual void Deactivate();
 
     /*
      * Returns DevSound instance associated with the stream.
@@ -108,20 +106,12 @@ public:
      */
     void DeviceMessage(TUid /*aMessageType*/, const TDesC8& /*aMsg*/) {}
 
-    /*
-     * From TMSTimerObserver.
-     * Called upon timer timeout event.
-     */
-    void TimerEvent();
-
 protected:
 
     TMSCSDevSound(TMSCSDevSoundObserver& observer);
-    void ConstructL(const TMSStreamType strmtype, const gint retrytime);
+    void ConstructL(const TMSStreamType strmtype);
     void InitializeL();
     void NotifyEvent(gint error);
-    void StartTimer();
-    void CancelTimer();
 
 private:
 
@@ -158,15 +148,6 @@ protected:
     gint iPreference;
     gint iPriority;
     TMMFState iMode;
-
-    /*
-     * For retry timer
-     */
-    gint iInitRetryTime;
-    gint iStartRetryTime;
-    TMSTimer* iTimer;
-    gint iPeriodic;
-    gint iElapsedTime;
     };
 
 } //namespace TMS

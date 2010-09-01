@@ -15,7 +15,7 @@
 *
 */
 
-// Version : %version: 5 %
+// Version : %version: bh1mmcf#4 %
 
 
 
@@ -42,7 +42,7 @@ SYSTEMINCLUDE   /epoc32/include/ecom
 
 LIBRARY         euser.lib
 LIBRARY         apmime.lib
-LIBRARY         efsrv.lib
+LIBRARY         EFSRV.LIB
 LIBRARY         playbackhelper.lib
 
 #ifdef __WINDOWS_MEDIA

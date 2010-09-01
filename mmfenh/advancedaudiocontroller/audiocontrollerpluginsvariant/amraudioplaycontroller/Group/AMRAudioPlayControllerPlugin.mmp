@@ -87,12 +87,7 @@ LIBRARY         DevSoundAudioOutput.lib
 LIBRARY		FileAudioOutput.lib
 LIBRARY		bafl.lib				// Resource file
 LIBRARY		efsrv.lib 
-
-#ifndef WINSCW					//to support build on Linux
 LIBRARY		FrameTable.lib
-#else
-LIBRARY		frametable.lib
-#endif
 
 #ifdef EABI
 LIBRARY     	ecom.lib

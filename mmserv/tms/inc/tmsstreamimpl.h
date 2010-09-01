@@ -45,3 +45,4 @@ private:
 
 #endif // TMS_STREAM_IMPL_H
 
+// End of file

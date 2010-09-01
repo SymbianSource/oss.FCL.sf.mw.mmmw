@@ -50,14 +50,15 @@ public:
     virtual gint GetState() = 0;
     virtual gint GetStreamType() = 0;
     virtual gint GetStreamId() = 0;
-    virtual gint Init(gint retrytime) = 0;
+    virtual gint Init() = 0;
     virtual gint Pause() = 0;
-    virtual gint Start(gint retrytime) = 0;
+    virtual gint Start() = 0;
     virtual gint Stop() = 0;
     virtual void Deinit() = 0;
+
+private:
     };
 
 } //namespace TMS
 
 #endif //TMS_STREAM_BODY_H
-

@@ -12,86 +12,92 @@ EXPORTS
 	_ZN10multimedia18CMultimediaFactory19DeleteStreamControlERPNS_14MStreamControlE @ 11 NONAME
 	_ZN10multimedia18CMultimediaFactoryD1Ev @ 12 NONAME
 	_ZN10multimedia18CMultimediaFactoryD2Ev @ 13 NONAME
-	_ZTI11CChildIntfc @ 14 NONAME
-	_ZTI12CParentIntfc @ 15 NONAME
-	_ZTI19CDRMConfigIntcfImpl @ 16 NONAME
-	_ZTIN10multimedia10CErrorCodeE @ 17 NONAME
-	_ZTIN10multimedia10CEventBaseE @ 18 NONAME
-	_ZTIN10multimedia11CSourceBaseE @ 19 NONAME
-	_ZTIN10multimedia13CReverbEffectE @ 20 NONAME
-	_ZTIN10multimedia13CVolumeEffectE @ 21 NONAME
-	_ZTIN10multimedia14CBalanceEffectE @ 22 NONAME
-	_ZTIN10multimedia14CEventNotifierE @ 23 NONAME
-	_ZTIN10multimedia14CStreamControlE @ 24 NONAME
-	_ZTIN10multimedia15CEventQueueItemE @ 25 NONAME
-	_ZTIN10multimedia15CLoudnessEffectE @ 26 NONAME
-	_ZTIN10multimedia15CMCustomCommandE @ 27 NONAME
-	_ZTIN10multimedia16CBassBoostEffectE @ 28 NONAME
-	_ZTIN10multimedia16CEqualizerEffectE @ 29 NONAME
-	_ZTIN10multimedia16CObserverManagerE @ 30 NONAME
-	_ZTIN10multimedia16CRoomLevelEffectE @ 31 NONAME
-	_ZTIN10multimedia17CClientDataBufferE @ 32 NONAME
-	_ZTIN10multimedia17CClientFileSourceE @ 33 NONAME
-	_ZTIN10multimedia18CBufTypeSupEventAOE @ 34 NONAME
-	_ZTIN10multimedia18CEffectControlBaseE @ 35 NONAME
-	_ZTIN10multimedia18CStateChangedEventE @ 36 NONAME
-	_ZTIN10multimedia19CMmfAudioOutputSinkE @ 37 NONAME
-	_ZTIN10multimedia20CDataBufferQueueItemE @ 38 NONAME
-	_ZTIN10multimedia20CSourceDopplerEffectE @ 39 NONAME
-	_ZTIN10multimedia21CSourceLocationEffectE @ 40 NONAME
-	_ZTIN10multimedia21CStereoWideningEffectE @ 41 NONAME
-	_ZTIN10multimedia22CEffectControlBaseImplE @ 42 NONAME
-	_ZTIN10multimedia22CListenerDopplerEffectE @ 43 NONAME
-	_ZTIN10multimedia22CMultimediaFactoryImplE @ 44 NONAME
-	_ZTIN10multimedia23CClientDataBufferSourceE @ 45 NONAME
-	_ZTIN10multimedia23CClientDescriptorSourceE @ 46 NONAME
-	_ZTIN10multimedia23CListenerLocationEffectE @ 47 NONAME
-	_ZTIN10multimedia24CSourceOrientationEffectE @ 48 NONAME
-	_ZTIN10multimedia25CDataBufferProcessedEventE @ 49 NONAME
-	_ZTIN10multimedia25CMMFFindAndOpenController7CConfigE @ 50 NONAME
-	_ZTIN10multimedia26CDistanceAttenuationEffectE @ 51 NONAME
-	_ZTIN10multimedia26CListenerOrientationEffectE @ 52 NONAME
-	_ZTIN10multimedia8CAsyncAOE @ 53 NONAME
-	_ZTIN10multimedia9CSinkBaseE @ 54 NONAME
-	_ZTV11CChildIntfc @ 55 NONAME
-	_ZTV12CParentIntfc @ 56 NONAME
-	_ZTV19CDRMConfigIntcfImpl @ 57 NONAME
-	_ZTVN10multimedia10CErrorCodeE @ 58 NONAME
-	_ZTVN10multimedia10CEventBaseE @ 59 NONAME
-	_ZTVN10multimedia11CSourceBaseE @ 60 NONAME
-	_ZTVN10multimedia13CReverbEffectE @ 61 NONAME
-	_ZTVN10multimedia13CVolumeEffectE @ 62 NONAME
-	_ZTVN10multimedia14CBalanceEffectE @ 63 NONAME
-	_ZTVN10multimedia14CEventNotifierE @ 64 NONAME
-	_ZTVN10multimedia14CStreamControlE @ 65 NONAME
-	_ZTVN10multimedia15CEventQueueItemE @ 66 NONAME
-	_ZTVN10multimedia15CLoudnessEffectE @ 67 NONAME
-	_ZTVN10multimedia15CMCustomCommandE @ 68 NONAME
-	_ZTVN10multimedia16CBassBoostEffectE @ 69 NONAME
-	_ZTVN10multimedia16CEqualizerEffectE @ 70 NONAME
-	_ZTVN10multimedia16CObserverManagerE @ 71 NONAME
-	_ZTVN10multimedia16CRoomLevelEffectE @ 72 NONAME
-	_ZTVN10multimedia17CClientDataBufferE @ 73 NONAME
-	_ZTVN10multimedia17CClientFileSourceE @ 74 NONAME
-	_ZTVN10multimedia18CBufTypeSupEventAOE @ 75 NONAME
-	_ZTVN10multimedia18CEffectControlBaseE @ 76 NONAME
-	_ZTVN10multimedia18CStateChangedEventE @ 77 NONAME
-	_ZTVN10multimedia19CMmfAudioOutputSinkE @ 78 NONAME
-	_ZTVN10multimedia20CDataBufferQueueItemE @ 79 NONAME
-	_ZTVN10multimedia20CSourceDopplerEffectE @ 80 NONAME
-	_ZTVN10multimedia21CSourceLocationEffectE @ 81 NONAME
-	_ZTVN10multimedia21CStereoWideningEffectE @ 82 NONAME
-	_ZTVN10multimedia22CEffectControlBaseImplE @ 83 NONAME
-	_ZTVN10multimedia22CListenerDopplerEffectE @ 84 NONAME
-	_ZTVN10multimedia22CMultimediaFactoryImplE @ 85 NONAME
-	_ZTVN10multimedia23CClientDataBufferSourceE @ 86 NONAME
-	_ZTVN10multimedia23CClientDescriptorSourceE @ 87 NONAME
-	_ZTVN10multimedia23CListenerLocationEffectE @ 88 NONAME
-	_ZTVN10multimedia24CSourceOrientationEffectE @ 89 NONAME
-	_ZTVN10multimedia25CDataBufferProcessedEventE @ 90 NONAME
-	_ZTVN10multimedia25CMMFFindAndOpenController7CConfigE @ 91 NONAME
-	_ZTVN10multimedia26CDistanceAttenuationEffectE @ 92 NONAME
-	_ZTVN10multimedia26CListenerOrientationEffectE @ 93 NONAME
-	_ZTVN10multimedia8CAsyncAOE @ 94 NONAME
-	_ZTVN10multimedia9CSinkBaseE @ 95 NONAME
+	_ZTIN10multimedia10CErrorCodeE @ 14 NONAME ; #<TI>#
+	_ZTIN10multimedia10CEventBaseE @ 15 NONAME ; #<TI>#
+	_ZTIN10multimedia11CSourceBaseE @ 16 NONAME ; #<TI>#
+	_ZTIN10multimedia13CVolumeEffectE @ 17 NONAME ; #<TI>#
+	_ZTIN10multimedia14CEventNotifierE @ 18 NONAME ; #<TI>#
+	_ZTIN10multimedia14CStreamControlE @ 19 NONAME ; #<TI>#
+	_ZTIN10multimedia15CEventQueueItemE @ 20 NONAME ; #<TI>#
+	_ZTIN10multimedia15CMCustomCommandE @ 21 NONAME ; #<TI>#
+	_ZTIN10multimedia16CDownloadGatewayE @ 22 NONAME ; #<TI>#
+	_ZTIN10multimedia16CObserverManagerE @ 23 NONAME ; #<TI>#
+	_ZTIN10multimedia17CClientDataBufferE @ 24 NONAME ; #<TI>#
+	_ZTIN10multimedia18CBufTypeSupEventAOE @ 25 NONAME ; #<TI>#
+	_ZTIN10multimedia18CEffectControlBaseE @ 26 NONAME ; #<TI>#
+	_ZTIN10multimedia18CStateChangedEventE @ 27 NONAME ; #<TI>#
+	_ZTIN10multimedia19CClientProgDLSourceE @ 28 NONAME ; #<TI>#
+	_ZTIN10multimedia19CMmfAudioOutputSinkE @ 29 NONAME ; #<TI>#
+	_ZTIN10multimedia20CDataBufferQueueItemE @ 30 NONAME ; #<TI>#
+	_ZTIN10multimedia22CEffectControlBaseImplE @ 31 NONAME ; #<TI>#
+	_ZTIN10multimedia22CMultimediaFactoryImplE @ 32 NONAME ; #<TI>#
+	_ZTIN10multimedia23CClientDataBufferSourceE @ 33 NONAME ; #<TI>#
+	_ZTIN10multimedia25CDataBufferProcessedEventE @ 34 NONAME ; #<TI>#
+	_ZTIN10multimedia25CMMFFindAndOpenController7CConfigE @ 35 NONAME ; #<TI>#
+	_ZTIN10multimedia8CEventAOE @ 36 NONAME ; #<TI>#
+	_ZTIN10multimedia9CSinkBaseE @ 37 NONAME ; #<TI>#
+	_ZTVN10multimedia10CErrorCodeE @ 38 NONAME ; #<VT>#
+	_ZTVN10multimedia10CEventBaseE @ 39 NONAME ; #<VT>#
+	_ZTVN10multimedia11CSourceBaseE @ 40 NONAME ; #<VT>#
+	_ZTVN10multimedia13CVolumeEffectE @ 41 NONAME ; #<VT>#
+	_ZTVN10multimedia14CEventNotifierE @ 42 NONAME ; #<VT>#
+	_ZTVN10multimedia14CStreamControlE @ 43 NONAME ; #<VT>#
+	_ZTVN10multimedia15CEventQueueItemE @ 44 NONAME ; #<VT>#
+	_ZTVN10multimedia15CMCustomCommandE @ 45 NONAME ; #<VT>#
+	_ZTVN10multimedia16CDownloadGatewayE @ 46 NONAME ; #<VT>#
+	_ZTVN10multimedia16CObserverManagerE @ 47 NONAME ; #<VT>#
+	_ZTVN10multimedia17CClientDataBufferE @ 48 NONAME ; #<VT>#
+	_ZTVN10multimedia18CBufTypeSupEventAOE @ 49 NONAME ; #<VT>#
+	_ZTVN10multimedia18CEffectControlBaseE @ 50 NONAME ; #<VT>#
+	_ZTVN10multimedia18CStateChangedEventE @ 51 NONAME ; #<VT>#
+	_ZTVN10multimedia19CClientProgDLSourceE @ 52 NONAME ; #<VT>#
+	_ZTVN10multimedia19CMmfAudioOutputSinkE @ 53 NONAME ; #<VT>#
+	_ZTVN10multimedia20CDataBufferQueueItemE @ 54 NONAME ; #<VT>#
+	_ZTVN10multimedia22CEffectControlBaseImplE @ 55 NONAME ; #<VT>#
+	_ZTVN10multimedia22CMultimediaFactoryImplE @ 56 NONAME ; #<VT>#
+	_ZTVN10multimedia23CClientDataBufferSourceE @ 57 NONAME ; #<VT>#
+	_ZTVN10multimedia25CDataBufferProcessedEventE @ 58 NONAME ; #<VT>#
+	_ZTVN10multimedia25CMMFFindAndOpenController7CConfigE @ 59 NONAME ; #<VT>#
+	_ZTVN10multimedia8CEventAOE @ 60 NONAME ; #<VT>#
+	_ZTVN10multimedia9CSinkBaseE @ 61 NONAME ; #<VT>#
+	_ZTIN10multimedia17CClientFileSourceE @ 62 NONAME ; #<TI>#
+	_ZTIN10multimedia23CClientDescriptorSourceE @ 63 NONAME ; #<TI>#
+	_ZTIN10multimedia8CAsyncAOE @ 64 NONAME ; #<TI>#
+	_ZTVN10multimedia17CClientFileSourceE @ 65 NONAME ; #<VT>#
+	_ZTVN10multimedia23CClientDescriptorSourceE @ 66 NONAME ; #<VT>#
+	_ZTVN10multimedia8CAsyncAOE @ 67 NONAME ; #<VT>#
+	_ZTI11CChildIntfc @ 68 NONAME ; #<TI>#
+	_ZTI12CParentIntfc @ 69 NONAME ; #<TI>#
+	_ZTI19CDRMConfigIntcfImpl @ 70 NONAME ; #<TI>#
+	_ZTV11CChildIntfc @ 71 NONAME ; #<VT>#
+	_ZTV12CParentIntfc @ 72 NONAME ; #<VT>#
+	_ZTV19CDRMConfigIntcfImpl @ 73 NONAME ; #<VT>#
+	_ZTIN10multimedia13CReverbEffectE @ 74 NONAME ; #<TI>#
+	_ZTIN10multimedia15CLoudnessEffectE @ 75 NONAME ; #<TI>#
+	_ZTIN10multimedia16CBassBoostEffectE @ 76 NONAME ; #<TI>#
+	_ZTIN10multimedia16CEqualizerEffectE @ 77 NONAME ; #<TI>#
+	_ZTIN10multimedia16CRoomLevelEffectE @ 78 NONAME ; #<TI>#
+	_ZTIN10multimedia20CSourceDopplerEffectE @ 79 NONAME ; #<TI>#
+	_ZTIN10multimedia21CSourceLocationEffectE @ 80 NONAME ; #<TI>#
+	_ZTIN10multimedia21CStereoWideningEffectE @ 81 NONAME ; #<TI>#
+	_ZTIN10multimedia22CListenerDopplerEffectE @ 82 NONAME ; #<TI>#
+	_ZTIN10multimedia23CListenerLocationEffectE @ 83 NONAME ; #<TI>#
+	_ZTIN10multimedia24CSourceOrientationEffectE @ 84 NONAME ; #<TI>#
+	_ZTIN10multimedia26CDistanceAttenuationEffectE @ 85 NONAME ; #<TI>#
+	_ZTIN10multimedia26CListenerOrientationEffectE @ 86 NONAME ; #<TI>#
+	_ZTVN10multimedia13CReverbEffectE @ 87 NONAME ; #<VT>#
+	_ZTVN10multimedia15CLoudnessEffectE @ 88 NONAME ; #<VT>#
+	_ZTVN10multimedia16CBassBoostEffectE @ 89 NONAME ; #<VT>#
+	_ZTVN10multimedia16CEqualizerEffectE @ 90 NONAME ; #<VT>#
+	_ZTVN10multimedia16CRoomLevelEffectE @ 91 NONAME ; #<VT>#
+	_ZTVN10multimedia20CSourceDopplerEffectE @ 92 NONAME ; #<VT>#
+	_ZTVN10multimedia21CSourceLocationEffectE @ 93 NONAME ; #<VT>#
+	_ZTVN10multimedia21CStereoWideningEffectE @ 94 NONAME ; #<VT>#
+	_ZTVN10multimedia22CListenerDopplerEffectE @ 95 NONAME ; #<VT>#
+	_ZTVN10multimedia23CListenerLocationEffectE @ 96 NONAME ; #<VT>#
+	_ZTVN10multimedia24CSourceOrientationEffectE @ 97 NONAME ; #<VT>#
+	_ZTVN10multimedia26CDistanceAttenuationEffectE @ 98 NONAME ; #<VT>#
+	_ZTVN10multimedia26CListenerOrientationEffectE @ 99 NONAME ; #<VT>#
+	_ZTIN10multimedia14CBalanceEffectE @ 100 NONAME
+	_ZTVN10multimedia14CBalanceEffectE @ 101 NONAME
 

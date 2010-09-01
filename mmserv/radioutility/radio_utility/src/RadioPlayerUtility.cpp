@@ -19,7 +19,6 @@
 #include <RadioPlayerUtility.h>
 #include "RadioPlayerUtilityBody.h"
 #include "RadioSession.h"
-#include "trace.h"
 
 // ======== MEMBER FUNCTIONS ========
 
@@ -32,7 +31,6 @@ CRadioPlayerUtility* CRadioPlayerUtility::NewL(
      RRadioSession& aRadioSession,
      MRadioPlayerObserver& aObserver)
     {
-    FUNC_LOG;
     CRadioPlayerUtility* self = new(ELeave) CRadioPlayerUtility;
     CleanupStack::PushL(self);
     self->iBody = CRadioPlayerUtility::CBody::NewL(aRadioSession, aObserver);
@@ -47,7 +45,6 @@ CRadioPlayerUtility* CRadioPlayerUtility::NewL(
 //
 EXPORT_C CRadioPlayerUtility::~CRadioPlayerUtility()
     {
-    FUNC_LOG;
     delete iBody;
     }
 
@@ -58,7 +55,6 @@ EXPORT_C CRadioPlayerUtility::~CRadioPlayerUtility()
 //
 CRadioPlayerUtility::CRadioPlayerUtility()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -68,7 +64,6 @@ CRadioPlayerUtility::CRadioPlayerUtility()
 //
 EXPORT_C TPlayerState CRadioPlayerUtility::PlayerState() const
     {
-    FUNC_LOG;
     TPlayerState playerState;
     ASSERT(iBody);
     iBody->PlayerState(playerState);
@@ -84,7 +79,6 @@ EXPORT_C TPlayerState CRadioPlayerUtility::PlayerState() const
 //
 EXPORT_C void CRadioPlayerUtility::Close()
     {
-    FUNC_LOG;
     ASSERT(iBody);
     iBody->Close();
     }
@@ -97,7 +91,6 @@ EXPORT_C void CRadioPlayerUtility::Close()
 //
 EXPORT_C void CRadioPlayerUtility::Play()
     {
-    FUNC_LOG;
     ASSERT(iBody);
     iBody->Play();
     }
@@ -110,7 +103,6 @@ EXPORT_C void CRadioPlayerUtility::Play()
 //
 EXPORT_C void CRadioPlayerUtility::Stop()
     {
-    FUNC_LOG;
     ASSERT(iBody);
     iBody->Stop();
     }
@@ -123,7 +115,6 @@ EXPORT_C void CRadioPlayerUtility::Stop()
 //
 EXPORT_C TInt CRadioPlayerUtility::Mute(TBool aMute)
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->Mute(aMute);
     }
@@ -136,7 +127,6 @@ EXPORT_C TInt CRadioPlayerUtility::Mute(TBool aMute)
 //
 EXPORT_C TBool CRadioPlayerUtility::IsMute()
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->IsMute();
     }
@@ -150,7 +140,6 @@ EXPORT_C TBool CRadioPlayerUtility::IsMute()
 //
 EXPORT_C TInt CRadioPlayerUtility::SetVolume(TInt aVolume)
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->SetVolume(aVolume);
     }
@@ -163,7 +152,6 @@ EXPORT_C TInt CRadioPlayerUtility::SetVolume(TInt aVolume)
 //
 EXPORT_C TInt CRadioPlayerUtility::GetVolume(TInt& aVolume) const
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetVolume(aVolume);
     }
@@ -177,7 +165,6 @@ EXPORT_C TInt CRadioPlayerUtility::GetVolume(TInt& aVolume) const
 EXPORT_C TInt CRadioPlayerUtility::SetVolumeRamp(
     const TTimeIntervalMicroSeconds& aRampInterval)
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->SetVolumeRamp(aRampInterval);
     }
@@ -191,7 +178,6 @@ EXPORT_C TInt CRadioPlayerUtility::SetVolumeRamp(
 EXPORT_C TInt CRadioPlayerUtility::GetMaxVolume(
     TInt& aMaxVolume ) const
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetMaxVolume(aMaxVolume);
     }
@@ -206,7 +192,6 @@ EXPORT_C TInt CRadioPlayerUtility::SetBalance(
     TInt aLeftPercentage,
     TInt aRightPercentage )
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->SetBalance(aLeftPercentage, aRightPercentage);
     }
@@ -221,7 +206,6 @@ EXPORT_C TInt CRadioPlayerUtility::GetBalance(
     TInt& aLeftPercentage,
     TInt& aRightPercentage ) const
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->GetBalance(aLeftPercentage, aRightPercentage);
     }
@@ -235,7 +219,6 @@ EXPORT_C TInt CRadioPlayerUtility::GetBalance(
 EXPORT_C TAny* CRadioPlayerUtility::CustomInterface(
     TUid aInterfaceId )
     {
-    FUNC_LOG;
     ASSERT(iBody);
     return iBody->CustomInterface(aInterfaceId);
     }

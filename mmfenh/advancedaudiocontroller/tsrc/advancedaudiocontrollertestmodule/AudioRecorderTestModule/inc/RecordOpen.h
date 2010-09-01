@@ -25,7 +25,7 @@
 
 #include <MdaAudioSampleEditor.h>
 #include "TestCaseBase.h"
-#include <mmf/common/mmcaf.h>
+#include <mmf/common/mmcaf.h> 	    
 
 class CRecordOpen : public CTestCaseBase, public MMdaObjectStateChangeObserver
 {

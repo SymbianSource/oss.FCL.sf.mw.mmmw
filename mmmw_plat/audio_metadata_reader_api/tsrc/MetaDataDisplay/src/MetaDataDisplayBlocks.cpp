@@ -295,7 +295,7 @@ TInt CMetaDataDisplay::TestOpenFileWithFieldL( CStifItemParser& aItem )
 		iLog->Log(_L("Input file [%S]"), &FileNamePtr);
 		while( aItem.GetNextInt( wantedField ) == KErrNone )			
 			{
-			aWantedFields.Append(iMetaDataFieldID[wantedField]);					    		    
+			aWantedFields.Append( (TMetaDataFieldId)wantedField );
 			}
 		TRAP(err, iMetaData->OpenFileL( FileName, aWantedFields ));
 		aWantedFields.Close();
@@ -375,7 +375,7 @@ TInt CMetaDataDisplay::TestOpenRFileWithFieldL( CStifItemParser& aItem )
 		User::LeaveIfError(file.Open( fs, FileName, EFileRead));
 		while( aItem.GetNextInt( wantedField ) == KErrNone )			
 			{
-			aWantedFields.Append(iMetaDataFieldID[wantedField]);					    		    
+			aWantedFields.Append((TMetaDataFieldId)wantedField);					    		    
 			}
 	    TRAP(err, iMetaData->OpenFileL( file, aWantedFields ));
 	    fs.Close();
@@ -523,7 +523,7 @@ TInt CMetaDataDisplay::TestOpenDesWithFieldL( CStifItemParser& aItem )
 		// Get aWantedFields
 		while( aItem.GetNextInt( wantedField ) == KErrNone )			
 			{
-			aWantedFields.Append(iMetaDataFieldID[wantedField]);					    		    
+			aWantedFields.Append((TMetaDataFieldId)wantedField);					    		    
 			}
 		TRAP(err, iMetaData->OpenDesL(*SoundFile, aWantedFields));
 		CleanupStack::PopAndDestroy(SoundFile);		
@@ -802,7 +802,7 @@ TInt CMetaDataDisplay::TestOpenDesLWith3paras(CStifItemParser& aItem )
 
 	   while( !aItem.GetNextInt( wantedField ) )
 		   {
-		   aWantedFields.Append( iMetaDataFieldID[wantedField] );
+		   aWantedFields.Append( (TMetaDataFieldId)wantedField );
 		   }
 	   if( SoundFileDes && SoundFile )
 		   {
@@ -950,7 +950,7 @@ TInt CMetaDataDisplay::TestOpenFileLWith3paras(CStifItemParser& aItem )
 	   
 	   while( !aItem.GetNextInt( wantedField ) )
 		   {
-		   aWantedFields.Append( iMetaDataFieldID[wantedField] );
+		   aWantedFields.Append( (TMetaDataFieldId)wantedField );
 		   }
 	   if( SoundFile )
 		   {
@@ -1114,7 +1114,7 @@ TInt CMetaDataDisplay::TestOpenFileLFNFeildsMime(CStifItemParser& aItem )
 	   
 	   while( !aItem.GetNextInt( wantedField ) )
 		   {
-		   aWantedFields.Append( iMetaDataFieldID[wantedField] );
+		   aWantedFields.Append( (TMetaDataFieldId)wantedField );
 		   }
 	   if( SoundFile )
 		   {
@@ -1872,8 +1872,7 @@ TInt CMetaDataDisplay::ContainerField( CStifItemParser& aItem )
 						}
 					else
 						{
-						//iLog->Log( _L("The content of meta data field [%d] is [%S]."),field.Alloc() );
-					    iLog->Log( _L("Unknown meta data field"));
+						iLog->Log( _L("The content of meta data field [%d] is [%S]."),field.Alloc() );
 						}
 					break;
 					}

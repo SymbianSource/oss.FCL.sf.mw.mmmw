@@ -96,8 +96,8 @@ gint TMSCallIPAdpt::PostConstruct()
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
     iNextStreamId = 1;
-    iUplState = EIdle;
-    iDnlState = EIdle;
+    iUplinkInitialized = FALSE;
+    iDnlinkInitialized = FALSE;
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -117,11 +117,12 @@ gint TMSCallIPAdpt::CreateStream(const TMSCallType /*callType*/,
         case TMS_STREAM_UPLINK:
             {
             status = TMS_RESULT_ALREADY_EXIST;
-            if (iUplState == EIdle)
+            if (!iUplinkInitialized)
                 {
                 iUplinkStreamId = iNextStreamId;
                 outStrmId = iUplinkStreamId;
                 iNextStreamId++;
+                //iUplinkInitialized = TRUE; //not initialized yet!
                 status = TMS_RESULT_SUCCESS;
                 }
             break;
@@ -129,11 +130,12 @@ gint TMSCallIPAdpt::CreateStream(const TMSCallType /*callType*/,
         case TMS_STREAM_DOWNLINK:
             {
             status = TMS_RESULT_ALREADY_EXIST;
-            if (iDnlState == EIdle)
+            if (!iDnlinkInitialized)
                 {
                 iDnlinkStreamId = iNextStreamId;
                 outStrmId = iDnlinkStreamId;
                 iNextStreamId++;
+                //iDnlinkInitialized = TRUE; //not initialized yet!
                 status = TMS_RESULT_SUCCESS;
                 }
             break;
@@ -155,8 +157,7 @@ gint TMSCallIPAdpt::CreateStream(const TMSCallType /*callType*/,
 //
 gint TMSCallIPAdpt::InitStream(const TMSCallType /*callType*/,
         const TMSStreamType strmType, const gint strmId,
-        const TMSFormatType frmtType, const gint retrytime,
-        const RMessage2& message)
+        const TMSFormatType frmtType, const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -174,7 +175,7 @@ gint TMSCallIPAdpt::InitStream(const TMSCallType /*callType*/,
             if (strmId == iUplinkStreamId)
                 {
                 SetFormat(iUplinkStreamId, fourCC);
-                status = OpenUplink(message, retrytime);
+                status = OpenUplink(message);
                 }
             break;
             }
@@ -184,7 +185,7 @@ gint TMSCallIPAdpt::InitStream(const TMSCallType /*callType*/,
             if (strmId == iDnlinkStreamId)
                 {
                 SetFormat(iDnlinkStreamId, fourCC);
-                status = OpenDownlink(message, retrytime);
+                status = OpenDownlink(message);
                 }
             break;
             }
@@ -206,7 +207,7 @@ gint TMSCallIPAdpt::InitStream(const TMSCallType /*callType*/,
 // -----------------------------------------------------------------------------
 //
 gint TMSCallIPAdpt::StartStream(const TMSCallType /*callType*/,
-        const TMSStreamType strmType, const gint strmId, const gint retrytime)
+        const TMSStreamType strmType, const gint strmId)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
@@ -214,21 +215,21 @@ gint TMSCallIPAdpt::StartStream(const TMSCallType /*callType*/,
         {
         case TMS_STREAM_UPLINK:
             {
-            if (iIPUplink && strmId == iUplinkStreamId &&
-                    iUplState == EInitialized)
+            if (iIPUplink && strmId == iUplinkStreamId)
                 {
-                iIPUplink->Start(retrytime);
+                iIPUplink->Start();
                 status = TMS_RESULT_SUCCESS;
+                NotifyClient(iUplinkStreamId, ECmdUplinkStarted, status);
                 }
             break;
             }
         case TMS_STREAM_DOWNLINK:
             {
-            if (iIPDownlink && strmId == iDnlinkStreamId &&
-                    iDnlState == EInitialized)
+            if (iIPDownlink && strmId == iDnlinkStreamId)
                 {
-                iIPDownlink->Start(retrytime);
+                iIPDownlink->Start();
                 status = TMS_RESULT_SUCCESS;
+                NotifyClient(iDnlinkStreamId, ECmdDownlinkStarted, status);
                 }
             break;
             }
@@ -259,7 +260,6 @@ gint TMSCallIPAdpt::PauseStream(const TMSCallType /*callType*/,
             if (strmId == iUplinkStreamId && iIPUplink)
                 {
                 iIPUplink->Stop();
-                iUplState = EInitialized;
                 status = TMS_RESULT_SUCCESS;
                 NotifyClient(iUplinkStreamId, ECmdUplinkPaused, status);
                 }
@@ -270,7 +270,6 @@ gint TMSCallIPAdpt::PauseStream(const TMSCallType /*callType*/,
             if (strmId == iDnlinkStreamId && iIPDownlink)
                 {
                 iIPDownlink->Stop();
-                iDnlState = EInitialized;
                 status = TMS_RESULT_SUCCESS;
                 NotifyClient(iDnlinkStreamId, ECmdDownlinkPaused, status);
                 }
@@ -301,11 +300,9 @@ gint TMSCallIPAdpt::StopStream(const TMSCallType /*callType*/,
         {
         case TMS_STREAM_UPLINK:
             {
-            if (iIPUplink && strmId == iUplinkStreamId &&
-                    iUplState == EActivated)
+            if (iIPUplink && strmId == iUplinkStreamId)
                 {
                 iIPUplink->Stop();
-                iUplState = EInitialized;
                 status = TMS_RESULT_SUCCESS;
                 NotifyClient(iUplinkStreamId, ECmdUplinkInitComplete, status);
                 }
@@ -313,11 +310,9 @@ gint TMSCallIPAdpt::StopStream(const TMSCallType /*callType*/,
             }
         case TMS_STREAM_DOWNLINK:
             {
-            if (iIPDownlink && strmId == iDnlinkStreamId &&
-                    iDnlState == EActivated)
+            if (iIPDownlink && strmId == iDnlinkStreamId)
                 {
                 iIPDownlink->Stop();
-                iDnlState = EInitialized;
                 status = TMS_RESULT_SUCCESS;
                 NotifyClient(iDnlinkStreamId, ECmdDownlinkInitComplete, status);
                 }
@@ -348,10 +343,11 @@ gint TMSCallIPAdpt::DeinitStream(const TMSCallType /*callType*/,
         {
         case TMS_STREAM_UPLINK:
             {
-            if (iIPUplink && strmId == iUplinkStreamId && iUplState != EIdle)
+            if (iIPUplink && strmId == iUplinkStreamId)
                 {
                 iIPUplink->Stop();
-                iUplState = EIdle;
+                //iUplinkStreamId = -1;
+                iUplinkInitialized = FALSE;
                 status = TMS_RESULT_SUCCESS;
                 NotifyClient(iUplinkStreamId, ECmdUplinkDeInitComplete, status);
                 }
@@ -359,10 +355,11 @@ gint TMSCallIPAdpt::DeinitStream(const TMSCallType /*callType*/,
             }
         case TMS_STREAM_DOWNLINK:
             {
-            if (iIPDownlink && strmId == iDnlinkStreamId && iDnlState != EIdle)
+            if (iIPDownlink && strmId == iDnlinkStreamId)
                 {
                 iIPDownlink->Stop();
-                iDnlState = EIdle;
+                //iDnlinkStreamId = -1;
+                iDnlinkInitialized = FALSE;
                 status = TMS_RESULT_SUCCESS;
                 NotifyClient(iDnlinkStreamId, ECmdDownlinkDeInitComplete,
                         status);
@@ -375,6 +372,7 @@ gint TMSCallIPAdpt::DeinitStream(const TMSCallType /*callType*/,
             break;
             }
         }
+
     TRACE_PRN_FN_EXT;
     return status;
     }
@@ -396,7 +394,7 @@ gint TMSCallIPAdpt::DeleteStream(const TMSCallType /*callType*/,
             if (strmId == iUplinkStreamId)
                 {
                 iUplinkStreamId = -1;
-                iUplState = EIdle;
+                iUplinkInitialized = FALSE;
                 }
             break;
             }
@@ -405,7 +403,7 @@ gint TMSCallIPAdpt::DeleteStream(const TMSCallType /*callType*/,
             if (strmId == iDnlinkStreamId)
                 {
                 iDnlinkStreamId = -1;
-                iDnlState = EIdle;
+                iDnlinkInitialized = FALSE;
                 }
             break;
             }
@@ -525,7 +523,7 @@ gint TMSCallIPAdpt::GetMaxVolume(guint& volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
+    if (iDnlinkInitialized && iIPDownlink)
         {
         status = iIPDownlink->GetMaxVolume(volume);
         iMaxVolume = volume;
@@ -544,7 +542,7 @@ gint TMSCallIPAdpt::SetVolume(const guint volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
+    if (iDnlinkInitialized && iIPDownlink)
         {
         status = iIPDownlink->SetVolume(volume);
         NotifyClient(iDnlinkStreamId, ECmdSetVolume, status);
@@ -562,7 +560,7 @@ gint TMSCallIPAdpt::GetVolume(guint& volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
+    if (iDnlinkInitialized && iIPDownlink)
         {
         status = iIPDownlink->GetVolume(volume);
         }
@@ -579,7 +577,7 @@ gint TMSCallIPAdpt::GetMaxGain(guint& gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iUplinkInitialized && iIPUplink)
         {
         status = iIPUplink->GetMaxGain(gain);
         iMaxGain = gain;
@@ -598,7 +596,7 @@ gint TMSCallIPAdpt::SetGain(const guint gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iUplinkInitialized && iIPUplink)
         {
         status = iIPUplink->SetGain(gain);
         NotifyClient(iUplinkStreamId, ECmdSetGain, status);
@@ -616,7 +614,7 @@ gint TMSCallIPAdpt::GetGain(guint& gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iUplinkInitialized && iIPUplink)
         {
         status = iIPUplink->GetGain(gain);
         }
@@ -633,7 +631,7 @@ gint TMSCallIPAdpt::GetGlobalMaxVolume(guint& volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
+    if (iDnlinkInitialized && iIPDownlink)
         {
         status = iIPDownlink->GetMaxVolume(volume);
         iMaxVolume = volume;
@@ -653,7 +651,7 @@ gint TMSCallIPAdpt::SetGlobalVolume(const guint volume)
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
     //iGlobalVol = volume;
-    if (iIPDownlink && iDnlState != EIdle)
+    if (iDnlinkInitialized && iIPDownlink)
         {
         status = iIPDownlink->SetVolume(volume);
         }
@@ -670,7 +668,7 @@ gint TMSCallIPAdpt::GetGlobalVolume(guint& volume)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
+    if (iDnlinkInitialized && iIPDownlink)
         {
         status = iIPDownlink->GetVolume(volume);
         }
@@ -687,7 +685,7 @@ gint TMSCallIPAdpt::GetGlobalMaxGain(guint& gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iUplinkInitialized && iIPUplink)
         {
         status = iIPUplink->GetMaxGain(gain);
         iMaxGain = gain;
@@ -707,7 +705,7 @@ gint TMSCallIPAdpt::SetGlobalGain(const guint gain)
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
     //iGlobalGain = gain;
-    if (iIPUplink && iUplState != EIdle)
+    if (iUplinkInitialized && iIPUplink)
         {
         status = iIPUplink->SetGain(gain);
         }
@@ -724,7 +722,7 @@ gint TMSCallIPAdpt::GetGlobalGain(guint& gain)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iUplinkInitialized && iIPUplink)
         {
         status = iIPUplink->GetGain(gain);
         }
@@ -793,7 +791,7 @@ gint TMSCallIPAdpt::GetSupportedBitRatesCount(guint& count)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iIPUplink)
         {
         status = iIPUplink->GetSupportedBitrates(iArrBitrates);
         count = iArrBitrates.Count();
@@ -849,7 +847,7 @@ gint TMSCallIPAdpt::GetBitRate(guint& bitrate)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iIPUplink)
         {
         status = iIPUplink->GetBitrate(bitrate);
         }
@@ -866,7 +864,7 @@ gint TMSCallIPAdpt::SetBitRate(const guint bitrate)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iIPUplink)
         {
         status = iIPUplink->SetBitrate(bitrate);
         }
@@ -883,7 +881,7 @@ gint TMSCallIPAdpt::GetVAD(const TMSFormatType fmttype, gboolean& vad)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iIPUplink)
         {
         status = iIPUplink->GetVad(fmttype, vad);
         }
@@ -900,7 +898,7 @@ gint TMSCallIPAdpt::SetVAD(const TMSFormatType fmttype, const gboolean vad)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
+    if (iIPUplink)
         {
         status = iIPUplink->SetVad(fmttype, vad);
         }
@@ -917,7 +915,7 @@ gint TMSCallIPAdpt::GetCNG(const TMSFormatType fmttype, gboolean& cng)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EInitialized)
+    if (iIPDownlink)
         {
         status = iIPDownlink->GetCng(fmttype, cng);
         }
@@ -934,7 +932,7 @@ gint TMSCallIPAdpt::SetCNG(const TMSFormatType fmttype, const gboolean cng)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EInitialized)
+    if (iIPDownlink)
         {
         status = iIPDownlink->SetCng(fmttype, cng);
         }
@@ -951,7 +949,7 @@ gint TMSCallIPAdpt::GetPlc(const TMSFormatType fmttype, gboolean& plc)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
+    if (iIPDownlink)
         {
         status = iIPDownlink->GetPlc(fmttype, plc);
         }
@@ -968,7 +966,7 @@ gint TMSCallIPAdpt::SetPlc(const TMSFormatType fmttype, const gboolean plc)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EInitialized)
+    if (iIPDownlink)
         {
         status = iIPDownlink->SetPlc(fmttype, plc);
         }
@@ -981,7 +979,7 @@ gint TMSCallIPAdpt::SetPlc(const TMSFormatType fmttype, const gboolean plc)
 // Method for player initialization.
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::OpenDownlink(const RMessage2& message, const gint retrytime)
+gint TMSCallIPAdpt::OpenDownlink(const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -1001,8 +999,8 @@ gint TMSCallIPAdpt::OpenDownlink(const RMessage2& message, const gint retrytime)
 
     delete iIPDownlink;
     iIPDownlink = NULL;
-    TRAP(status, iIPDownlink = TMSIPDownlink::NewL(*this, iDnFourCC, iPriority,
-            retrytime));
+    TRAP(status, iIPDownlink = TMSIPDownlink::NewL(*this, iDnFourCC,
+            iPriority));
 
     if (iIPDownlink && status == TMS_RESULT_SUCCESS)
         {
@@ -1029,7 +1027,7 @@ gint TMSCallIPAdpt::OpenDownlink(const RMessage2& message, const gint retrytime)
 // Method for recorder initialization.
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::OpenUplink(const RMessage2& message, const gint retrytime)
+gint TMSCallIPAdpt::OpenUplink(const RMessage2& message)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
@@ -1042,13 +1040,12 @@ gint TMSCallIPAdpt::OpenUplink(const RMessage2& message, const gint retrytime)
      * 2) KAudioPrefVoipAudioUplink             -NOK native VoIP?
      *    KAudioPriorityVoipAudioUplink         -NOK native VoIP?
      */
-    iPriority.iPref = KAudioPrefVoipAudioUplinkNonSignal;
+    iPriority.iPref = KAudioPrefVoipAudioUplink;
     iPriority.iPriority = KAudioPriorityVoipAudioUplink;
 
     delete iIPUplink;
     iIPUplink = NULL;
-    TRAP(status, iIPUplink = TMSIPUplink::NewL(*this, iUpFourCC, iPriority,
-            retrytime));
+    TRAP(status, iIPUplink = TMSIPUplink::NewL(*this, iUpFourCC, iPriority));
 
     if (iIPUplink && status == TMS_RESULT_SUCCESS)
         {
@@ -1159,22 +1156,23 @@ gint TMSCallIPAdpt::GetDataXferChunkHndl(const TMSStreamType strmType,
 gint TMSCallIPAdpt::SetIlbcCodecMode(const gint mode,
         const TMSStreamType strmtype)
     {
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_INVALID_ARGUMENT);
 
-    if (strmtype == TMS_STREAM_DOWNLINK && iIPDownlink &&
-            iDnlState == EInitialized)
+    if (strmtype == TMS_STREAM_DOWNLINK)
         {
-        status = iIPDownlink->SetIlbcCodecMode(mode);
+        if (iDnlinkInitialized && iIPDownlink)
+            {
+            status = iIPDownlink->SetIlbcCodecMode(mode);
+            }
         }
-    else if (strmtype == TMS_STREAM_UPLINK && iIPUplink &&
-            iUplState == EInitialized)
+    else if (strmtype == TMS_STREAM_UPLINK)
         {
-        status = iIPUplink->SetIlbcCodecMode(mode);
+        if (iUplinkInitialized && iIPUplink)
+            {
+            status = iIPUplink->SetIlbcCodecMode(mode);
+            }
         }
-    else
-        {
-        status = TMS_RESULT_INVALID_STATE;
-        }
+
     return status;
     }
 
@@ -1185,22 +1183,23 @@ gint TMSCallIPAdpt::SetIlbcCodecMode(const gint mode,
 //
 gint TMSCallIPAdpt::GetIlbcCodecMode(gint& mode, const TMSStreamType strmtype)
     {
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_INVALID_ARGUMENT);
 
-    if (strmtype == TMS_STREAM_DOWNLINK && iIPDownlink &&
-            iDnlState != EIdle)
+    if (strmtype == TMS_STREAM_DOWNLINK)
         {
-        status = iIPDownlink->GetIlbcCodecMode(mode);
+        if (iDnlinkInitialized && iIPDownlink)
+            {
+            status = iIPDownlink->GetIlbcCodecMode(mode);
+            }
         }
-    else if (strmtype == TMS_STREAM_UPLINK && iIPUplink &&
-            iUplState != EIdle)
+    else if (strmtype == TMS_STREAM_UPLINK)
         {
-        status = iIPUplink->GetIlbcCodecMode(mode);
+        if (iUplinkInitialized && iIPUplink)
+            {
+            status = iIPUplink->GetIlbcCodecMode(mode);
+            }
         }
-    else
-        {
-        status = TMS_RESULT_INVALID_STATE;
-        }
+
     return status;
     }
 
@@ -1212,22 +1211,23 @@ gint TMSCallIPAdpt::GetIlbcCodecMode(gint& mode, const TMSStreamType strmtype)
 gint TMSCallIPAdpt::SetG711CodecMode(const gint mode,
         const TMSStreamType strmtype)
     {
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_INVALID_ARGUMENT);
 
-    if (strmtype == TMS_STREAM_DOWNLINK && iIPDownlink &&
-            iDnlState == EInitialized)
+    if (strmtype == TMS_STREAM_DOWNLINK)
         {
-        status = iIPDownlink->SetG711CodecMode(mode);
+        if (iDnlinkInitialized && iIPDownlink)
+            {
+            status = iIPDownlink->SetG711CodecMode(mode);
+            }
         }
-    else if (strmtype == TMS_STREAM_UPLINK && iIPUplink &&
-            iUplState == EInitialized)
+    else if (strmtype == TMS_STREAM_UPLINK)
         {
-        status = iIPUplink->SetG711CodecMode(mode);
+        if (iUplinkInitialized && iIPUplink)
+            {
+            status = iIPUplink->SetG711CodecMode(mode);
+            }
         }
-    else
-        {
-        status = TMS_RESULT_INVALID_STATE;
-        }
+
     return status;
     }
 
@@ -1238,22 +1238,23 @@ gint TMSCallIPAdpt::SetG711CodecMode(const gint mode,
 //
 gint TMSCallIPAdpt::GetG711CodecMode(gint& mode, const TMSStreamType strmtype)
     {
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_INVALID_ARGUMENT);
 
-    if (strmtype == TMS_STREAM_DOWNLINK && iIPDownlink &&
-            iDnlState != EIdle)
+    if (strmtype == TMS_STREAM_DOWNLINK)
         {
-        status = iIPDownlink->GetG711CodecMode(mode);
+        if (iDnlinkInitialized && iIPDownlink)
+            {
+            status = iIPDownlink->GetG711CodecMode(mode);
+            }
         }
-    else if (strmtype == TMS_STREAM_UPLINK && iIPUplink &&
-            iUplState != EIdle)
+    else if (strmtype == TMS_STREAM_UPLINK)
         {
-        status = iIPUplink->GetG711CodecMode(mode);
+        if (iUplinkInitialized && iIPUplink)
+            {
+            status = iIPUplink->GetG711CodecMode(mode);
+            }
         }
-    else
-        {
-        status = TMS_RESULT_INVALID_STATE;
-        }
+
     return status;
     }
 
@@ -1264,8 +1265,8 @@ gint TMSCallIPAdpt::GetG711CodecMode(gint& mode, const TMSStreamType strmtype)
 //
 gint TMSCallIPAdpt::FrameModeRqrdForEC(gboolean& frmodereq)
     {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EInitialized)
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (iIPDownlink)
         {
         status = iIPDownlink->FrameModeRqrdForEC(frmodereq);
         }
@@ -1279,8 +1280,8 @@ gint TMSCallIPAdpt::FrameModeRqrdForEC(gboolean& frmodereq)
 //
 gint TMSCallIPAdpt::SetFrameMode(const gboolean frmode)
     {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EInitialized)
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (iIPDownlink)
         {
         status = iIPDownlink->SetFrameMode(frmode);
         }
@@ -1294,8 +1295,8 @@ gint TMSCallIPAdpt::SetFrameMode(const gboolean frmode)
 //
 gint TMSCallIPAdpt::GetFrameMode(gboolean& frmode)
     {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (iIPDownlink)
         {
         status = iIPDownlink->GetFrameMode(frmode);
         }
@@ -1308,8 +1309,8 @@ gint TMSCallIPAdpt::GetFrameMode(gboolean& frmode)
 //
 gint TMSCallIPAdpt::ConcealErrorForNextBuffer()
     {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EActivated)
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (iIPDownlink)
         {
         status = iIPDownlink->ConcealErrorForNextBuffer();
         }
@@ -1323,8 +1324,8 @@ gint TMSCallIPAdpt::ConcealErrorForNextBuffer()
 //
 gint TMSCallIPAdpt::BadLsfNextBuffer()
     {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EActivated)
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (iIPDownlink)
         {
         status = iIPDownlink->BadLsfNextBuffer();
         }
@@ -1339,15 +1340,14 @@ gint TMSCallIPAdpt::BadLsfNextBuffer()
 gint TMSCallIPAdpt::SetOutput(TMSAudioOutput output)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (iDnlinkInitialized && iIPDownlink)
         {
         TRAP(status, iIPDownlink->SetAudioDeviceL(output));
         }
     TRACE_PRN_FN_EXT;
     return status;
     }
-
 // -----------------------------------------------------------------------------
 // TMSCallIPAdpt::GetOutput
 //
@@ -1356,8 +1356,8 @@ gint TMSCallIPAdpt::SetOutput(TMSAudioOutput output)
 gint TMSCallIPAdpt::GetOutput(TMSAudioOutput& output)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
+    gint status(TMS_RESULT_UNINITIALIZED_OBJECT);
+    if (iDnlinkInitialized && iIPDownlink)
         {
         TRAP(status, iIPDownlink->GetAudioDeviceL(output));
         }
@@ -1383,10 +1383,10 @@ gint TMSCallIPAdpt::GetPreviousOutput(TMSAudioOutput& /*output*/)
 gint TMSCallIPAdpt::GetAvailableOutputsL(gint& /*count*/,
         CBufFlat*& /*outputsbuf*/)
     {
-    //TODO: return public & private
     return TMS_RESULT_FEATURE_NOT_SUPPORTED;
     }
 
+// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // TMSCallIPAdpt::DownlinkInitCompleted
 // From TMSIPDevSoundObserver
@@ -1397,7 +1397,7 @@ void TMSCallIPAdpt::DownlinkInitCompleted(gint status)
     TRACE_PRN_FN_ENT;
     if (status == TMS_RESULT_SUCCESS)
         {
-        iDnlState = EInitialized;
+        iDnlinkInitialized = TRUE;
         }
     NotifyClient(iDnlinkStreamId, ECmdDownlinkInitComplete, status);
     TRACE_PRN_FN_EXT;
@@ -1413,7 +1413,7 @@ void TMSCallIPAdpt::UplinkInitCompleted(gint status)
     TRACE_PRN_FN_ENT;
     if (status == TMS_RESULT_SUCCESS)
         {
-        iUplState = EInitialized;
+        iUplinkInitialized = TRUE;
         }
     NotifyClient(iUplinkStreamId, ECmdUplinkInitComplete, status);
     TRACE_PRN_FN_EXT;
@@ -1427,10 +1427,6 @@ void TMSCallIPAdpt::UplinkInitCompleted(gint status)
 void TMSCallIPAdpt::UplinkStarted(gint status)
     {
     TRACE_PRN_FN_ENT;
-    if (status == TMS_RESULT_SUCCESS)
-        {
-        iUplState = EActivated;
-        }
     NotifyClient(iUplinkStreamId, ECmdUplinkStarted, status);
     TRACE_PRN_FN_EXT;
     }
@@ -1443,10 +1439,6 @@ void TMSCallIPAdpt::UplinkStarted(gint status)
 void TMSCallIPAdpt::DownlinkStarted(gint status)
     {
     TRACE_PRN_FN_ENT;
-    if (status == TMS_RESULT_SUCCESS)
-        {
-        iDnlState = EActivated;
-        }
     NotifyClient(iDnlinkStreamId, ECmdDownlinkStarted, status);
     TRACE_PRN_FN_EXT;
     }
@@ -1471,3 +1463,4 @@ void TMSCallIPAdpt::NotifyClient(const gint strmId, const gint command,
         }
     }
 
+// End of file

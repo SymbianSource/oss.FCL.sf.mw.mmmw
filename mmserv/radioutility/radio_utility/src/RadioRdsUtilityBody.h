@@ -415,14 +415,14 @@ public:
 private:
 
     void ConstructL();
-    CBody( RRadioSession& aRadioSession, MRadioRdsObserver& aObserver );
+    CBody();
 
 private: // data
 
     // The radio server session
-    RRadioSession& iRadioSession;
+    RRadioSession* iRadioSession; // not own
     // RDS Utility Observer
-    MRadioRdsObserver& iRadioRdsUtilityClient;
+    MRadioRdsObserver* iRadioRdsUtilityClient; // not own
     // RDS notification reqs
     TRsRdsData iRdsDataReq;
     };

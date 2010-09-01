@@ -28,7 +28,7 @@ CCustomCommand::CCustomCommand(CTestModuleIf *aConsole, CStifLogger *aLogger)
 {
 	console = aConsole;
 	logger = aLogger;
-	iCallBackErr = KErrNone;
+
 }
 
 CCustomCommand::~CCustomCommand()
@@ -107,12 +107,8 @@ TInt CCustomCommand::RunTestL(CTestModuleIf *aConsole, CStifLogger *aLogger, CSt
 	CleanupStack::PushL(selfObj);
 
 	CActiveScheduler::Start();
-	
-	if(selfObj->iCallBackErr != KErrNone)
-	    {
-        error = selfObj->iCallBackErr;
-	    }
-	
+
+
 	CleanupStack::PopAndDestroy(2); // schedule, selfObj
 
 	return error;
@@ -141,16 +137,13 @@ void CCustomCommand::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 #ifdef _DEBUG
     RDebug::Print (_L ("CCustomCommand::MoscoStateChangeEvent"));
 #endif
-	
+	TInt err = KErrNone;
 
 	logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),aErrorCode,aPreviousState,aCurrentState);
-	
-	iCallBackErr = aErrorCode;
-	
+
 	TUint bitRate = recorder->SourceBitRateL();
 	logger->Log(_L("SourceBitRateL %d "),bitRate);
-	
-	
+
 
 	if (recorder && aErrorCode == KErrNone && aCurrentState == CMdaAudioClipUtility::EOpen && aPreviousState == 0)
 	{
@@ -244,12 +237,6 @@ void CCustomCommand::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousSta
 		recorder->WillResumePlay();
 		CActiveScheduler::Stop();
 	}
-	if(aErrorCode != KErrNone)
-	        {
-	            
-	            CActiveScheduler::Stop();
-	            
-	        }
 
 	return;
 

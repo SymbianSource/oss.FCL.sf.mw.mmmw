@@ -225,9 +225,6 @@ void TMSCallSession::HandleMessageL(const RMessage2& aMessage)
         case TMS_ROUTING_AVAILABLE_OUTPUT_GET:
             HandleRoutingGetAvailableOutputsL(aMessage);
             break;
-        case TMS_GET_ACTIVE_CALL_PARAMS:
-            HandleGetActiveCallL(aMessage);
-            break;
         default:
             User::Leave(TMS_RESULT_ILLEGAL_OPERATION);
             break;
@@ -294,7 +291,7 @@ void TMSCallSession::HandleInitStreamL(const RMessage2& aMessage)
         TMSCliSrvStreamInitDataStructBufPckg pckg;
         aMessage.ReadL(0, pckg);
         status = iCallAdpt->InitStream(pckg().CallType, pckg().StreamType,
-                pckg().StreamId, pckg().FormatType, pckg().RetryTime, aMessage);
+                pckg().StreamId, pckg().FormatType, aMessage);
 
         switch (pckg().StreamType)
             {
@@ -330,7 +327,7 @@ void TMSCallSession::HandleStartStreamL(const RMessage2& aMessage)
         TMSCliSrvStreamOpDataStructBufPckg pckg;
         aMessage.ReadL(0, pckg);
         status = iCallAdpt->StartStream(pckg().CallType, pckg().StreamType,
-                pckg().StreamId, pckg().RetryTime);
+                pckg().StreamId);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -670,7 +667,9 @@ void TMSCallSession::HandleGlobalEffectVolumeSetVolL(const RMessage2& aMessage)
     iGlobalVol = aMessage.Int0();
     if (iCallAdpt)
         {
-        status = iCallAdpt->SetGlobalVolume(iGlobalVol);
+        guint vol(0);
+        vol = aMessage.Int0();
+        status = iCallAdpt->SetGlobalVolume(vol);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -736,7 +735,9 @@ void TMSCallSession::HandleGlobalEffectVolumeSetGainL(
     iGlobalGain = aMessage.Int0();
     if (iCallAdpt)
         {
-        status = iCallAdpt->SetGlobalGain(iGlobalGain);
+        guint gain;
+        gain = aMessage.Int0();
+        status = iCallAdpt->SetGlobalGain(gain);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -1107,24 +1108,6 @@ void TMSCallSession::HandleRoutingGetAvailableOutputsL(
         CleanupStack::PopAndDestroy(outputbuf);
         }
     aMessage.Complete(status);
-    TRACE_PRN_FN_EXT;
     }
 
-void TMSCallSession::HandleGetActiveCallL(const RMessage2& aMessage)
-    {
-    gint status(TMS_RESULT_DOES_NOT_EXIST);
-    TMSCallType callType;
-    gboolean active(FALSE);
-    if (iCallAdpt)
-        {
-        iCallAdpt->GetCallType(callType);
-        active = iCallAdpt->IsUplActivated();
-        TmsCallMsgBufPckg p;
-        p().iInt = (gint) callType;
-        p().iBool = active;
-        aMessage.WriteL(0, p);
-        status = TMS_RESULT_SUCCESS;
-        }
-    aMessage.Complete(status);
-    }
-
+// End of file

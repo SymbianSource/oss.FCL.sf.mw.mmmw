@@ -1,0 +1,46 @@
+/*
+* Copyright (c) 2004 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  Project file for 3GPExtParser
+*
+*/
+
+
+#include <platform_paths.hrh>
+
+
+TARGET      3GPExtParser.dll
+TARGETTYPE  DLL
+UID         0x1000008D 0x10207B25
+VENDORID    VID_DEFAULT
+
+#if (defined EKA2)
+CAPABILITY ALL -Tcb
+#endif
+
+VERSION 10.0
+
+SOURCEPATH		../Src 
+SOURCE			3GPExtParserLib_stub.cpp
+
+//Need to add a path to  "3GPExtParser.h"
+USERINCLUDE     	../../Src
+
+MW_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE		/epoc32/include/libc
+
+LIBRARY         euser.lib
+
+SMPSAFE
+
+// End of file

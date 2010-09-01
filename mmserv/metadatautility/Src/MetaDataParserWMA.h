@@ -236,7 +236,6 @@ class CMetaDataParserWMA : public CMetaDataParser
 		TInt iSharedUserRatingOffset;
 		TInt iDateOffset;
 		TInt iLyricsOffset;
-        TInt iAlbumArtistOffset;
 	#ifdef __WINDOWS_MEDIA
 		TInt iProviderOffset;
 	#endif

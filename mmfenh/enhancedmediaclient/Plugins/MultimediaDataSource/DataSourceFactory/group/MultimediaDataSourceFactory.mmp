@@ -31,6 +31,7 @@ SOURCE          MultimediaDataSourceFactory.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE	    ../../../../../../inc
+USERINCLUDE     ../../../ProgDLSource/inc
 USERINCLUDE     ../../../MultimediaDataSource/inc
 USERINCLUDE     ../../../DataBufferSource/inc
 USERINCLUDE     ../../../FileSource/inc
@@ -51,6 +52,7 @@ LIBRARY         DataSourceConfigIntfc.lib
 LIBRARY         DataBufferSource.lib
 LIBRARY         DescriptorDataSource.lib
 LIBRARY         FileSource.lib
+LIBRARY         ProgDLSource.lib
 
 DEFFILE         MMDataSourceFactory.def
 NOSTRICTDEF

@@ -67,5 +67,4 @@ EXPORTS
 	?StationSeekByTP@RRadioSession@@QAEXH@Z @ 66 NONAME ; void RRadioSession::StationSeekByTP(int)
 	?Stop@RRadioSession@@QAEXH@Z @ 67 NONAME ; void RRadioSession::Stop(int)
 	?Version@RRadioSession@@QBE?AVTVersion@@XZ @ 68 NONAME ; class TVersion RRadioSession::Version(void) const
-	?NewL@RRadioSession@@SAPAV1@XZ @ 69 NONAME ; class RRadioSession * RRadioSession::NewL(void)
 

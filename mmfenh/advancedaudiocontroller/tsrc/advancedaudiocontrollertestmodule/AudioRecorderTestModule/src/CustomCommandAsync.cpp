@@ -28,7 +28,6 @@ CCustomCommandAsync::CCustomCommandAsync(CTestModuleIf *aConsole, CStifLogger *a
 {
 	console = aConsole;
 	logger = aLogger;
-	iCallBackErr = KErrNone;
 
 }
 
@@ -109,10 +108,7 @@ TInt CCustomCommandAsync::RunTestL(CTestModuleIf *aConsole, CStifLogger *aLogger
 
 	CActiveScheduler::Start();
 
-	if(selfObj->iCallBackErr != KErrNone)
-	        {
-	        error = selfObj->iCallBackErr;
-	        }
+
 	CleanupStack::PopAndDestroy(2); // schedule, selfObj
 
 	return error;
@@ -141,11 +137,12 @@ void CCustomCommandAsync::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrevio
 #ifdef _DEBUG
     RDebug::Print (_L ("CCustomCommandAsync::MoscoStateChangeEvent"));
 #endif
-	
+	TInt err = KErrNone;
 
 	logger->Log(_L("MoscoStateChangeEvent called, error: %d	prev: %d curr : %d"),aErrorCode,aPreviousState,aCurrentState);
 
-	iCallBackErr = aErrorCode;
+
+
 	if (recorder && aErrorCode == KErrNone && aCurrentState == CMdaAudioClipUtility::EOpen && aPreviousState == 0)
 	{
 		TBuf8<25> dataFrom;
@@ -207,12 +204,6 @@ void CCustomCommandAsync::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPrevio
 		CActiveScheduler::Stop();
 	}
 
-    if (aErrorCode != KErrNone)
-    {
-    
-    CActiveScheduler::Stop();
-    
-    }
 	return;
 
 }

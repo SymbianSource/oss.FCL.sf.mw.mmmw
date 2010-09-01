@@ -19,7 +19,6 @@
 #include "RadioRdsUtilityBody.h"
 #include "RadioServerData.h"
 #include "RadioSession.h"
-#include "trace.h"
 
 // ======== MEMBER FUNCTIONS ========
 
@@ -32,8 +31,9 @@ CRadioRdsUtility::CBody* CRadioRdsUtility::CBody::NewL(
     RRadioSession& aRadioSession,
     MRadioRdsObserver& aObserver )
     {
-    FUNC_LOG;
-    CRadioRdsUtility::CBody* s = new(ELeave) CRadioRdsUtility::CBody( aRadioSession, aObserver );
+    CRadioRdsUtility::CBody* s = new(ELeave) CRadioRdsUtility::CBody();
+    s->iRadioRdsUtilityClient = &aObserver;
+    s->iRadioSession = &aRadioSession;
     CleanupStack::PushL(s);
     s->ConstructL();
     CleanupStack::Pop();
@@ -47,20 +47,14 @@ CRadioRdsUtility::CBody* CRadioRdsUtility::CBody::NewL(
 //
 void CRadioRdsUtility::CBody::ConstructL()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
 // CRadioRdsUtility::CBody::CBody
 // -----------------------------------------------------------------------------
 //
-CRadioRdsUtility::CBody::CBody(
-        RRadioSession& aRadioSession,
-        MRadioRdsObserver& aObserver )
-    :iRadioSession(aRadioSession),
-    iRadioRdsUtilityClient(aObserver)
+CRadioRdsUtility::CBody::CBody()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -69,7 +63,6 @@ CRadioRdsUtility::CBody::CBody(
 //
 CRadioRdsUtility::CBody::~CBody()
     {
-    FUNC_LOG;
     }
 
 // -----------------------------------------------------------------------------
@@ -80,11 +73,10 @@ CRadioRdsUtility::CBody::~CBody()
 //
 void CRadioRdsUtility::CBody::Close()
     {
-    FUNC_LOG;
     if ( iRdsDataReq.iRdsFunctions || iRdsDataReq.iAdditionalFunctions1 ||
          iRdsDataReq.iAdditionalFunctions2 )
         {
-        iRadioSession.CancelNotifyRdsDataChange();
+        iRadioSession->CancelNotifyRdsDataChange();
         }
     }
 
@@ -96,9 +88,8 @@ void CRadioRdsUtility::CBody::Close()
 TInt CRadioRdsUtility::CBody::GetCapabilities(
     TRdsCapabilities& aCaps ) const
     {
-    FUNC_LOG;
     TRsRdsCapabilities Caps;
-    TInt error = iRadioSession.GetRdsCapabilities(Caps);
+    TInt error = iRadioSession->GetRdsCapabilities(Caps);
     if ( !error )
         {
         aCaps.iRdsFunctions = Caps.iRdsFunctions;
@@ -116,8 +107,7 @@ TInt CRadioRdsUtility::CBody::GetCapabilities(
 TInt CRadioRdsUtility::CBody::GetRdsSignalStatus(
     TBool& aRdsSignal ) const
     {
-    FUNC_LOG;
-    return iRadioSession.GetRdsSignalStatus( aRdsSignal );
+    return iRadioSession->GetRdsSignalStatus( aRdsSignal );
     }
 
 // -----------------------------------------------------------------------------
@@ -128,11 +118,10 @@ TInt CRadioRdsUtility::CBody::GetRdsSignalStatus(
 TInt CRadioRdsUtility::CBody::NotifyRdsDataChange(
     TRdsData aRdsData )
     {
-    FUNC_LOG;
     iRdsDataReq.iRdsFunctions = aRdsData.iRdsFunctions;
     iRdsDataReq.iAdditionalFunctions1 = aRdsData.iAdditionalFunctions1;
     iRdsDataReq.iAdditionalFunctions2 = aRdsData.iAdditionalFunctions2;
-    return iRadioSession.NotifyRdsDataChange( iRdsDataReq );
+    return iRadioSession->NotifyRdsDataChange( iRdsDataReq );
     }
 
 // -----------------------------------------------------------------------------
@@ -142,8 +131,7 @@ TInt CRadioRdsUtility::CBody::NotifyRdsDataChange(
 //
 void CRadioRdsUtility::CBody::CancelNotifyRdsDataChange()
     {
-    FUNC_LOG;
-    iRadioSession.CancelNotifyRdsDataChange();
+    iRadioSession->CancelNotifyRdsDataChange();
     }
 
 // -----------------------------------------------------------------------------
@@ -154,8 +142,7 @@ void CRadioRdsUtility::CBody::CancelNotifyRdsDataChange()
 TInt CRadioRdsUtility::CBody::SetAutomaticSwitching(
     TBool aAuto )
     {
-    FUNC_LOG;
-    return iRadioSession.SetAutomaticSwitching( aAuto );
+    return iRadioSession->SetAutomaticSwitching( aAuto );
     }
 
 // -----------------------------------------------------------------------------
@@ -166,8 +153,7 @@ TInt CRadioRdsUtility::CBody::SetAutomaticSwitching(
 TInt CRadioRdsUtility::CBody::GetAutomaticSwitching(
     TBool& aAuto )
     {
-    FUNC_LOG;
-    return iRadioSession.GetAutomaticSwitching( aAuto );
+    return iRadioSession->GetAutomaticSwitching( aAuto );
     }
 
 // -----------------------------------------------------------------------------
@@ -177,8 +163,7 @@ TInt CRadioRdsUtility::CBody::GetAutomaticSwitching(
 //
 void CRadioRdsUtility::CBody::CancelAFSearch()
     {
-    FUNC_LOG;
-    iRadioSession.CancelAFSearch();
+    iRadioSession->CancelAFSearch();
     }
 
 // -----------------------------------------------------------------------------
@@ -189,8 +174,7 @@ void CRadioRdsUtility::CBody::CancelAFSearch()
 TInt CRadioRdsUtility::CBody::SetAutomaticTrafficAnnouncement(
     TBool aAuto )
     {
-    FUNC_LOG;
-    return iRadioSession.SetAutomaticTrafficAnnouncement( aAuto );
+    return iRadioSession->SetAutomaticTrafficAnnouncement( aAuto );
     }
 
 // -----------------------------------------------------------------------------
@@ -201,8 +185,7 @@ TInt CRadioRdsUtility::CBody::SetAutomaticTrafficAnnouncement(
 TInt CRadioRdsUtility::CBody::GetAutomaticTrafficAnnouncement(
     TBool& aAuto )
     {
-    FUNC_LOG;
-    return iRadioSession.GetAutomaticTrafficAnnouncement( aAuto );
+    return iRadioSession->GetAutomaticTrafficAnnouncement( aAuto );
     }
 
 // -----------------------------------------------------------------------------
@@ -214,8 +197,7 @@ void CRadioRdsUtility::CBody::StationSeekByPTY(
     TRdsProgrammeType aPty,
     TBool aUpwards )
     {
-    FUNC_LOG;
-    iRadioSession.StationSeekByPTY( aPty, aUpwards );
+    iRadioSession->StationSeekByPTY( aPty, aUpwards );
     }
 
 // -----------------------------------------------------------------------------
@@ -226,8 +208,7 @@ void CRadioRdsUtility::CBody::StationSeekByPTY(
 void CRadioRdsUtility::CBody::StationSeekByTA(
     TBool aSeekUp )
     {
-    FUNC_LOG;
-    iRadioSession.StationSeekByTA( aSeekUp );
+    iRadioSession->StationSeekByTA( aSeekUp );
     }
 
 // -----------------------------------------------------------------------------
@@ -238,8 +219,7 @@ void CRadioRdsUtility::CBody::StationSeekByTA(
 void CRadioRdsUtility::CBody::StationSeekByTP(
     TBool aSeekUp )
     {
-    FUNC_LOG;
-    iRadioSession.StationSeekByTP( aSeekUp );
+    iRadioSession->StationSeekByTP( aSeekUp );
     }
 
 // -----------------------------------------------------------------------------
@@ -249,8 +229,7 @@ void CRadioRdsUtility::CBody::StationSeekByTP(
 //
 void CRadioRdsUtility::CBody::CancelRdsStationSeek()
     {
-    FUNC_LOG;
-    iRadioSession.CancelRdsStationSeek();
+    iRadioSession->CancelRdsStationSeek();
     }
 
 // -----------------------------------------------------------------------------
@@ -261,8 +240,7 @@ void CRadioRdsUtility::CBody::CancelRdsStationSeek()
 void CRadioRdsUtility::CBody::GetFreqByPTY(
     TRdsProgrammeType aPty )
     {
-    FUNC_LOG;
-    iRadioSession.GetFreqByPTY( aPty );
+    iRadioSession->GetFreqByPTY( aPty );
     }
 
 // -----------------------------------------------------------------------------
@@ -272,8 +250,7 @@ void CRadioRdsUtility::CBody::GetFreqByPTY(
 //
 void CRadioRdsUtility::CBody::CancelGetFreqByPTY()
     {
-    FUNC_LOG;
-    iRadioSession.CancelGetFreqByPTY();
+    iRadioSession->CancelGetFreqByPTY();
     }
 
 // -----------------------------------------------------------------------------
@@ -283,8 +260,7 @@ void CRadioRdsUtility::CBody::CancelGetFreqByPTY()
 //
 void CRadioRdsUtility::CBody::GetFreqByTA()
     {
-    FUNC_LOG;
-    iRadioSession.GetFreqByTA();
+    iRadioSession->GetFreqByTA();
     }
 
 // -----------------------------------------------------------------------------
@@ -294,8 +270,7 @@ void CRadioRdsUtility::CBody::GetFreqByTA()
 //
 void CRadioRdsUtility::CBody::CancelGetFreqByTA()
     {
-    FUNC_LOG;
-    iRadioSession.CancelGetFreqByTA();
+    iRadioSession->CancelGetFreqByTA();
     }
 
 // -----------------------------------------------------------------------------
@@ -306,8 +281,7 @@ void CRadioRdsUtility::CBody::CancelGetFreqByTA()
 void CRadioRdsUtility::CBody::GetPSByPTY(
     TRdsProgrammeType aPty )
     {
-    FUNC_LOG;
-    iRadioSession.GetPSByPTY( aPty );
+    iRadioSession->GetPSByPTY( aPty );
     }
 
 // -----------------------------------------------------------------------------
@@ -317,8 +291,7 @@ void CRadioRdsUtility::CBody::GetPSByPTY(
 //
 void CRadioRdsUtility::CBody::CancelGetPSByPTY()
     {
-    FUNC_LOG;
-    iRadioSession.CancelGetPSByPTY();
+    iRadioSession->CancelGetPSByPTY();
     }
 
 // -----------------------------------------------------------------------------
@@ -328,8 +301,7 @@ void CRadioRdsUtility::CBody::CancelGetPSByPTY()
 //
 void CRadioRdsUtility::CBody::GetPSByTA()
     {
-    FUNC_LOG;
-    iRadioSession.GetPSByTA();
+    iRadioSession->GetPSByTA();
     }
 
 // -----------------------------------------------------------------------------
@@ -339,8 +311,7 @@ void CRadioRdsUtility::CBody::GetPSByTA()
 //
 void CRadioRdsUtility::CBody::CancelGetPSByTA()
     {
-    FUNC_LOG;
-    iRadioSession.CancelGetPSByTA();
+    iRadioSession->CancelGetPSByTA();
     }
 
 // -----------------------------------------------------------------------------
@@ -351,8 +322,7 @@ void CRadioRdsUtility::CBody::CancelGetPSByTA()
 TInt CRadioRdsUtility::CBody::GetProgrammeIdentification(
     TInt& aPi )
     {
-    FUNC_LOG;
-    return iRadioSession.GetProgrammeIdentification( aPi );
+    return iRadioSession->GetProgrammeIdentification( aPi );
     }
 
 // -----------------------------------------------------------------------------
@@ -363,8 +333,7 @@ TInt CRadioRdsUtility::CBody::GetProgrammeIdentification(
 TInt CRadioRdsUtility::CBody::GetProgrammeType(
     TRdsProgrammeType& aPty )
     {
-    FUNC_LOG;
-    return iRadioSession.GetProgrammeType( aPty );
+    return iRadioSession->GetProgrammeType( aPty );
     }
 
 // -----------------------------------------------------------------------------
@@ -375,9 +344,8 @@ TInt CRadioRdsUtility::CBody::GetProgrammeType(
 TInt CRadioRdsUtility::CBody::GetProgrammeService(
     TRdsPSName& aPs )
     {
-    FUNC_LOG;
     TRsRdsPSName ps;
-    TInt error = iRadioSession.GetProgrammeService( ps );
+    TInt error = iRadioSession->GetProgrammeService( ps );
 
     if ( aPs.Length() )
         {
@@ -395,9 +363,8 @@ TInt CRadioRdsUtility::CBody::GetProgrammeService(
 TInt CRadioRdsUtility::CBody::GetRadioText(
     TRdsRadioText& aRt )
     {
-    FUNC_LOG;
     TRsRdsRadioText rt;
-    TInt error = iRadioSession.GetRadioText( rt );
+    TInt error = iRadioSession->GetRadioText( rt );
 
     if ( rt.Length() )
        {
@@ -416,11 +383,10 @@ TInt CRadioRdsUtility::CBody::GetRadioTextPlus(
     TRdsRTplusClass aRtPlusClass,
     TRdsRadioText& aRtPlusData )
     {
-    FUNC_LOG;
     aRtPlusClass = aRtPlusClass; // for compiler warning
     TRsRdsRadioText rt;
     TRsRdsRTplusClass rtPlusClass = ERsRTplusItemDummy;
-    TInt error = iRadioSession.GetRadioTextPlus( rtPlusClass, rt );
+    TInt error = iRadioSession->GetRadioTextPlus( rtPlusClass, rt );
 
     if ( rt.Length() )
         {
@@ -439,8 +405,7 @@ TInt CRadioRdsUtility::CBody::GetRadioTextPlus(
 TInt CRadioRdsUtility::CBody::GetClockTime(
     TDateTime& aCt )
     {
-    FUNC_LOG;
-    return iRadioSession.GetClockTime( aCt );
+    return iRadioSession->GetClockTime( aCt );
     }
 
 // -----------------------------------------------------------------------------
@@ -451,8 +416,7 @@ TInt CRadioRdsUtility::CBody::GetClockTime(
 TInt CRadioRdsUtility::CBody::GetTrafficAnnouncementStatus(
     TBool& aTaStatus )
     {
-    FUNC_LOG;
-    return iRadioSession.GetTrafficAnnouncementStatus( aTaStatus );
+    return iRadioSession->GetTrafficAnnouncementStatus( aTaStatus );
     }
 
 // -----------------------------------------------------------------------------
@@ -463,8 +427,7 @@ TInt CRadioRdsUtility::CBody::GetTrafficAnnouncementStatus(
 TInt CRadioRdsUtility::CBody::GetTrafficProgrammeStatus(
     TBool& aTpStatus )
     {
-    FUNC_LOG;
-    return iRadioSession.GetTrafficProgrammeStatus( aTpStatus );
+    return iRadioSession->GetTrafficProgrammeStatus( aTpStatus );
     }
 
 

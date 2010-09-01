@@ -24,15 +24,12 @@
 #define M_RADIOPRESETUTILITY_H
 
 #include <e32std.h>
-#include <presetutilityobserver.h>
-
-
-#warning This file is deprecated and will be removed in future releases. Please use the new API
 
 /** Preset name, 32 characters */
 typedef TBuf<32> TFmPresetName;
 /** Preset Url, 64 characters, the maximum number of characters in RDS RT string */
 typedef TBuf<64> TFmPresetUrl;
+
 
 
 /**
@@ -49,9 +46,9 @@ class MRadioPresetObserver
     /**  Preset event */
     enum TPresetChangeEvent
         {
-        EPresetAdded = MPresetUtilityObserver::EPresetAdded,
-        EPresetDeleted = MPresetUtilityObserver::EPresetDeleted,
-        EPresetUpdated = MPresetUtilityObserver::EPresetUpdated
+        EPresetAdded,
+        EPresetDeleted,
+        EPresetUpdated
         };
 
     /**

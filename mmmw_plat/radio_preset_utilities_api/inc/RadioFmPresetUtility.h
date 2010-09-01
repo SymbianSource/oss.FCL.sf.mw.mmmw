@@ -22,13 +22,9 @@
 #ifndef C_RADIOFMPRESETUTILITY_H
 #define C_RADIOFMPRESETUTILITY_H
 
-#warning This file is deprecated and will be removed in future releases. Please use the new API
-
 #include <RadioPresetUtility.h>
-#include <presetutilityobserver.h>
 #include <e32base.h>
 
-class CPresetUtilityBody;
 
 /**
  *  This class provides an interface for controlling the preset for an FM tuner.
@@ -40,8 +36,7 @@ class CPresetUtilityBody;
  */
 class CRadioFmPresetUtility : public CBase,
                               public MRadioPreset,
-                              public MRadioFmPreset,
-                              private MPresetUtilityObserver
+                              public MRadioFmPreset
     {
 public:
 
@@ -288,21 +283,7 @@ public:
      */
     IMPORT_C void DeletePresetL( TInt aIndex );
 
-
 private:
-
-    // from base class MPresetUtilityObserver
-    /**
-    * From MPresetUtilityObserver
-    * Called when a preset changes.
-    *
-    * NOTE: EPresetDeleted with aIndex == 0, indicates that all presets have been deleted.
-    *
-    * @since S60 10.1
-    * @param aChange Change event type
-    * @param aIndex Index to the preset that has changed. Zero means all presets.
-    */
-    virtual void PresetChanged( TPresetChangeEvent aChange, TInt aIndex );
 
     CRadioFmPresetUtility( MRadioPresetObserver& aObserver );
 
@@ -310,20 +291,13 @@ private:
 
 private: // data
 
-    class CBody; // Dummy body that exists only for BC compatibility purposes
+    class CBody;
 
     /**
      * Preset utility implementation body
      * Own.
      */
-    CPresetUtilityBody* iBody;
-    
-    /**
-     * Old observer
-     * Not owned.
-     */
-    MRadioPresetObserver& iObserver;
-    
+    CBody* iBody;
     };
 
 #endif // C_RADIOFMPRESETUTILITY_H

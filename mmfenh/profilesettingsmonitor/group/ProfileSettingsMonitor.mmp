@@ -41,7 +41,10 @@ SOURCE          ProfileSettingsMonitorServerImpl.cpp
 LIBRARY		    ProfileEngine.lib
 LIBRARY		centralrepository.lib
 LIBRARY         euser.lib
-LIBRARY         ProfileEng.lib
+
+#ifdef WINSCW
+EPOCHEAPSIZE 0x1000 0x40000
+#endif
 
 epocprocesspriority background
 

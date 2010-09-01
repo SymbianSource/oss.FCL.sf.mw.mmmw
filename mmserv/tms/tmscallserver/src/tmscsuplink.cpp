@@ -16,7 +16,6 @@
  */
 
 #include <AudioPreference.h>
-#include "tmsutility.h"
 #include "tmscsuplink.h"
 #include "tmscsdevsoundobserver.h"
 
@@ -35,21 +34,20 @@ TMSCSUplink::TMSCSUplink(TMSCSDevSoundObserver& observer) :
 // Second phase constructor
 // -----------------------------------------------------------------------------
 //
-void TMSCSUplink::ConstructL(const gint retrytime)
+void TMSCSUplink::ConstructL()
     {
-    TMSCSDevSound::ConstructL(TMS_STREAM_UPLINK, retrytime);
+    TMSCSDevSound::ConstructL(TMS_STREAM_UPLINK);
     }
 
 // -----------------------------------------------------------------------------
 // Static constructor
 // -----------------------------------------------------------------------------
 //
-TMSCSUplink* TMSCSUplink::NewL(TMSCSDevSoundObserver& observer,
-        const gint retrytime)
+TMSCSUplink* TMSCSUplink::NewL(TMSCSDevSoundObserver& observer)
     {
     TMSCSUplink* self = new (ELeave) TMSCSUplink(observer);
     CleanupStack::PushL(self);
-    self->ConstructL(retrytime);
+    self->ConstructL();
     CleanupStack::Pop(self);
     return self;
     }
@@ -124,7 +122,7 @@ gint TMSCSUplink::MaxGain()
 //
 void TMSCSUplink::BufferToBeEmptied(CMMFBuffer* /*aBuffer*/)
     {
-    TRACE_PRN_N(_L("TMSCSUplink::BufferToBeEmptied"));
+    //TRACE_PRN_N(_L("TMSCSUplink::BufferToBeEmptied"));
 
     // We dont react to devsound messages unless we are activating.
     if (iActivationOngoing)
@@ -142,22 +140,13 @@ void TMSCSUplink::BufferToBeEmptied(CMMFBuffer* /*aBuffer*/)
 //
 void TMSCSUplink::RecordError(TInt aError)
     {
-    TRACE_PRN_N1(_L("TMSCSUplink::RecordError[%d]"), aError);
+    //TRACE_PRN_N1(_L("TMSCSUplink::RecordError[%d]"), aError);
 
     // We dont react to devsound messages unless we are activating.
-    if (iActivationOngoing && (aError == KErrAccessDenied ||
-            aError == KErrInUse))
+    if (iActivationOngoing && aError == KErrAccessDenied)
         {
-        if (iStartRetryTime != 0)
-            {
-            StartTimer();
-            }
-        else
-            {
-            CancelTimer();
-            iActivationOngoing = EFalse;
-            iObserver.UplinkActivationCompleted(aError);
-            }
+        iActivationOngoing = EFalse;
+        iObserver.UplinkActivationCompleted(aError);
         }
     }
 
