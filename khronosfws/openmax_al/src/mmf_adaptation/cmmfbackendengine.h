@@ -31,7 +31,7 @@
 #include <videoplayer2.h>
 #include <e32std.h>
 #include <mmf/common/mmferrors.h>
-#include <mmf/common/Mmfbase.h>
+#include <mmf/common/mmfbase.h>
 #include <MMFMetadataEventConfigConstants.h>
 #include <mmf/common/mmfstandardcustomcommands.h>
 #ifdef ENABLE_GRAPHICS_SURFACE_INTEGRATION

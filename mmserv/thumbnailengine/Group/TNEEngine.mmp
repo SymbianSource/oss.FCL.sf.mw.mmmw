@@ -67,7 +67,7 @@ USERINCLUDE     ../ImaamiInc
 LIBRARY			euser.lib efsrv.lib
 LIBRARY			fbscli.lib
 LIBRARY			gdi.lib
-LIBRARY			3GPMP4Lib.lib
+LIBRARY			3gpmp4lib.lib
 LIBRARY			ecom.lib
 LIBRARY			devvideo.lib
 

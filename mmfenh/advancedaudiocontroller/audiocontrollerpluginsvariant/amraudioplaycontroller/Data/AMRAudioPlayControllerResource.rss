@@ -30,9 +30,9 @@
 //
 RESOURCE ADVANCED_AUDIO_CONTROLLER_RESOURCE amrDecoder
     {
-    shared_buffer_max_num = 1;
-    shared_buffer_max_size = 524288; // multiple of 1024
-    shared_buffer_max_size_non_seekable_source = 8192;
+    shared_buffer_max_num = 2;
+    shared_buffer_max_size = 8192;
+
     sampling_rate = EAapSampleRate8000Hz;
     stereo_support = 0;
     metadata_support = EAapMetadataSupportFalse;

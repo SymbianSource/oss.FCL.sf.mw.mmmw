@@ -208,7 +208,7 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
     /* Determine framework type that can handle recording */
     fwType = (FWMgrFwType) FWMgrMOUnknown;
     /**/
-    if (pDataSnk->pLocator)
+    if (pDataSnk && pDataSnk->pLocator)
         {
         XADataLocator_URI* dataLoc = (XADataLocator_URI*) pDataSnk->pLocator;
         if (dataLoc->locatorType == XA_DATALOCATOR_URI)

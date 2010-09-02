@@ -316,9 +316,9 @@ XAStreamInformationItfImpl* XAStreamInformationItfImpl_Create(
 void XAStreamInformationItfImpl_Free(XAStreamInformationItfImpl* self)
     {
     DEBUG_API("->XAStreamInformationItfImpl_Free");
-    assert(self==self->self);
     if(self)
         {
+        assert(self==self->self);
         free(self);
         }
     DEBUG_API("<-XAStreamInformationItfImpl_Free");

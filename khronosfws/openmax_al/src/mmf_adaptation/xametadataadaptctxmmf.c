@@ -28,43 +28,39 @@ XAAdaptationBaseCtx* XAMetadataAdaptCtxMMF_Create(XADataSource * pDataSrc)
     DEBUG_API("->XAMetadataAdaptCtxMMF_Create");
 
     pSelf = calloc(1, sizeof(XAMetadataAdaptationMMFCtx));
-    if (pSelf)
+    if(!pSelf)
         {
-
-        if (XAAdaptationBaseMMF_Init(&(pSelf->baseObj), XAMDAdaptation)
-                != XA_RESULT_SUCCESS)
-            {
-            DEBUG_ERR("Failed to init base context!!!");
-            free(pSelf);
-            pSelf = NULL;
-            }
-        else
-
-            {
-            pSelf->baseObj.baseObj.fwtype = FWMgrFWMMF;
-            pSelf->xaSource = pDataSrc;
-            }
-
-        if (pDataSrc)
-            {
-            pSelf->mmfContext
-                    = mmf_metadata_utility_init(
-                            (char *) (((XADataLocator_URI*) (pDataSrc->pLocator))->URI));
-            if (!pSelf->mmfContext)
-                {
-                DEBUG_ERR("Failed to init mmf context!!!");
-                free(pSelf);
-                pSelf = NULL;
-                }
-            }
-
-        }
-    else
-        {
-        DEBUG_ERR("Failed to create XAMetadataAdaptationMMFCtx !!!");
+        /* memory allocation failed */
+        DEBUG_ERR("Failed to allocate memory");
+        DEBUG_API("<-XAMetadataAdaptCtxMMF_Create");
         return NULL;
         }
-       
+
+    if (XAAdaptationBaseMMF_Init(&(pSelf->baseObj), XAMDAdaptation)
+            != XA_RESULT_SUCCESS)
+        {
+        free(pSelf);
+        DEBUG_ERR("Failed to init base context!!!");
+        DEBUG_API("<-XAMetadataAdaptCtxMMF_Create");
+        return NULL;
+        }
+
+    pSelf->baseObj.baseObj.fwtype = FWMgrFWMMF;
+    pSelf->xaSource = pDataSrc;
+
+    if (pDataSrc)
+        {
+        pSelf->mmfContext
+                = mmf_metadata_utility_init(
+                        (char *) (((XADataLocator_URI*) (pDataSrc->pLocator))->URI));
+        if (!pSelf->mmfContext)
+            {
+            free(pSelf);
+            DEBUG_ERR("Failed to init mmf context!!!");
+            DEBUG_API("<-XAMetadataAdaptCtxMMF_Create");
+            return NULL;
+            }
+        }
 
     DEBUG_API("<- XAMetadataAdaptCtxMMF_Create");
     return (XAAdaptationBaseCtx*) (&pSelf->baseObj.baseObj);

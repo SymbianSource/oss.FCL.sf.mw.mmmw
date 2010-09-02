@@ -23,9 +23,13 @@
 
 enum TOperations
     {
-    EOperation_PlayDefaultBeep = KOperation_FirstCustomIndex,
-    EOperation_PlayClockAlarm,
-    EOperation_StopClockAlarm
+    EOperation_StopCurrentAlarm = KOperation_FirstCustomIndex,
+    EOperation_PlayDefaultBeep,
+    EOperation_PlayDefaultAlarm,
+    EOperation_StopClockAlarm,
+    EOperation_PlayDefaultasAlarm,
+    EOperation_PlayIncomingCallAlarm,
+    EOperation_PlayWarningBeep
     };
 
 class CStsTester : public CTestAppBase, MStsPlayAlarmObserver

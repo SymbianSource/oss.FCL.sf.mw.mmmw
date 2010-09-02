@@ -47,8 +47,8 @@ XAresult XAEngineItfImpl_CreateCameraDevice(XAEngineItf self,
         const XAInterfaceID *pInterfaceIds,
         const XAboolean *pInterfaceRequired)
     {
-    XAEngineItfImpl* impl = GetImpl(self);
 #ifdef OMAX_CAMERABIN
+    XAEngineItfImpl* impl = GetImpl(self);
     return XACameraDeviceImpl_CreateCameraDevice( impl->mapper,impl->capabilities,
             pDevice, deviceID,numInterfaces,
             pInterfaceIds, pInterfaceRequired );
@@ -423,9 +423,9 @@ XAEngineItfImpl* XAEngineItfImpl_Create(FrameworkMap* fwkmapper,
 void XAEngineItfImpl_Free(XAEngineItfImpl* self)
     {
     DEBUG_API("->XAEngineItfImpl_Free");
-    assert(self==self->self);
     if(self)
         {
+        assert(self==self->self);
         free(self);
         }
     DEBUG_API("<-XAEngineItfImpl_Free");

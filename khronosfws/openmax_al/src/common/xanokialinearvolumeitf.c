@@ -294,15 +294,13 @@ void XANokiaLinearVolumeItfImpl_AdaptCb(void *pHandlerCtx,
 
     DEBUG_API("->XANokiaLinearVolumeItfimpl_AdaptCb");
 
-    if (!impl && !event)
+    if (!impl || !event)
         {
         DEBUG_ERR("XANokiaLinearVolumeItfImpl_AdaptCb, invalid context pointer!");
         DEBUG_API("<-XANokiaLinearVolumeItfImpl_AdaptCb");
         return;
         }
     
-    assert(event);
-
     if (event->eventid == XA_ADAPT_VOLUME_VOLUME_CHANGED && impl->callback)
         {
         if (XA_NOKIALINEARVOLUME_EVENT_VOLUME_CHANGED & impl->eventFlags)
@@ -311,10 +309,6 @@ void XANokiaLinearVolumeItfImpl_AdaptCb(void *pHandlerCtx,
             impl->callback(impl->cbPtrToSelf, impl->context,
                     XA_NOKIALINEARVOLUME_EVENT_VOLUME_CHANGED, eventBoolean);
             }
-        }
-    else
-        {
-        /* do nothing */
         }
     DEBUG_API("<-XANokiaLinearVolumeItfimpl_AdaptCb");
     }

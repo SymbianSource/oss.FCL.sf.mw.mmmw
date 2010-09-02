@@ -15,7 +15,6 @@
  * This file defines common types and constants used by the STS server
  * and sessions.
  */
-
 #ifndef STSCLIENTSERVERCOMMON_H_
 #define STSCLIENTSERVERCOMMON_H_
 
@@ -38,7 +37,7 @@ enum TStsServerCommandType
     StsMsg_StopAlarm,
     StsMsg_PlayTone,
     StsMsg_PlayAlarm,
-    StsMsg_PlayToneStop,
+    StsMsg_PlayToneAlarm,
     StsMsg_ENDMARKER
     };
 
@@ -47,8 +46,7 @@ const TStsServerCommandType KStsCmdLast =
 
 enum TStsCallBackType
     {
-    EStsShutdown,
-    EStsPlayAlarmComplete
+    EStsShutdown, EStsPlayAlarmComplete
     };
 
 struct TStsCallBack

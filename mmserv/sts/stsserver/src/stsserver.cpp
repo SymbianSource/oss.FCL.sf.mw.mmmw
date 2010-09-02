@@ -18,6 +18,7 @@
  * functionality is handled in the STS class.
  */
 
+//  Include Files  
 #include "stsserver.h"
 #include "stsserversession.h"
 #include "sts.h"
@@ -89,6 +90,7 @@ CPolicyServer::TCustomResult CStsServer::CustomSecurityCheckL(
     switch (aMsg.Function())
         {
         case StsMsg_PlayTone:
+        case StsMsg_PlayToneAlarm:
             {
             CSystemToneService::TToneType tone =
                     (CSystemToneService::TToneType) aMsg.Int0();
@@ -114,7 +116,7 @@ CPolicyServer::TCustomResult CStsServer::SecurityCheckAlarm(
         TSecurityInfo& /*aMissing*/)
     {
     CPolicyServer::TCustomResult result;
-    switch(aAlarm)
+    switch (aAlarm)
         {
         default:
             result = CPolicyServer::EPass;
@@ -127,7 +129,7 @@ CPolicyServer::TCustomResult CStsServer::SecurityCheckTone(
         TSecurityInfo& /*aMissing*/)
     {
     CPolicyServer::TCustomResult result;
-    switch(aTone)
+    switch (aTone)
         {
         default:
             result = CPolicyServer::EPass;

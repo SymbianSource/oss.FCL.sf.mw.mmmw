@@ -242,9 +242,9 @@ XASeekItfImpl* XASeekItfImpl_Create(XAMediaPlayerImpl* impl)
 void XASeekItfImpl_Free(XASeekItfImpl* self)
     {
     DEBUG_API("->XASeekItfImpl_Free");
-    assert(self==self->self);
     if(self)
         {
+        assert(self==self->self);
         free(self);
         }
     DEBUG_API("<-XASeekItfImpl_Free");

@@ -21,6 +21,7 @@
 #include <AudioClientsListPSKeys.h>
 #include <AudioClientsListPSData.h>
 #include <MediaStreamPropertiesPSKeys.h>
+#include <MProfileExtended.h>
 
 #ifdef _DEBUG
 #define DEB_TRACE0(str)             RDebug::Print(str)
@@ -99,6 +100,11 @@ CProfileSettingsMonitorServerImpl::~CProfileSettingsMonitorServerImpl()
 	   delete iRingingTone2Name;
 	   iRingingTone2Name=NULL;
 	   }
+	if(iProfileEngineExtended)
+	    {
+	    iProfileEngineExtended->Release();
+	    }
+	//delete iProfileEngineExtended;
 	// Release profile engine resources
 	if ( iEngine )
 	    {
@@ -158,6 +164,10 @@ void CProfileSettingsMonitorServerImpl::ConstructL()
   
     CMapGASKeypadVolume(settings.KeypadVolume());
     
+    iProfileEngineExtended =::CreateProfileEngineExtended2L();
+   
+     iSilenceMode = iProfileEngineExtended->SilenceModeL();
+     RDebug::Printf("value of silence mode %d",iSilenceMode);
     // Get PublicSilence from CenRep
     TInt featureBitmask( 0 );     
     CRepository* profileCenRep = CRepository::NewL( KCRUidProfilesLV );
@@ -343,6 +353,20 @@ void CProfileSettingsMonitorServerImpl::ConstructL()
                                                KGASPSUidGlobalAudioSettings,
                                                KGASKeypadToneVolume,
                                                iGASKeypadVolume));
+    
+    User::LeaveIfError(RProperty::Define(
+                                        KGASPSUidGlobalAudioSettings,
+                                        KGASSilenceMode,
+                                        RProperty::EInt,
+                                        read,
+                                        write));
+        User::LeaveIfError(iSilenceModeProperty.Attach(
+                                                   KGASPSUidGlobalAudioSettings,
+                                                   KGASSilenceMode));
+        User::LeaveIfError(iSilenceModeProperty.Set(
+                                                   KGASPSUidGlobalAudioSettings,
+                                                   KGASSilenceMode,
+                                                   iSilenceMode));
 
     //Stream Gain Control
     TInt status = RProperty::Define(
@@ -550,6 +574,16 @@ void CProfileSettingsMonitorServerImpl::HandleProfileActivatedL( TInt aProfileId
               
               
             }
+        if(iSilenceMode != iProfileEngineExtended->SilenceModeL())
+            {
+             RDebug::Printf("silence mode changed");
+             iSilenceMode = iProfileEngineExtended->SilenceModeL();
+             User::LeaveIfError(iSilenceModeProperty.Set(
+                                                        KGASPSUidGlobalAudioSettings,
+                                                        KGASSilenceMode,
+                                                        iSilenceMode));
+            }
+        
         CleanupStack::PopAndDestroy(currentProfile);
         }
 #ifdef _DEBUG
@@ -671,6 +705,15 @@ void CProfileSettingsMonitorServerImpl::HandleActiveProfileModifiedL()
           
           
         }
+    if(iSilenceMode != iProfileEngineExtended ->SilenceModeL())
+        {
+    RDebug::Printf("silence mode changed");
+         iSilenceMode = iProfileEngineExtended ->SilenceModeL();
+         User::LeaveIfError(iSilenceModeProperty.Set(KGASPSUidGlobalAudioSettings,
+                                                                                KGASSilenceMode,
+                                                                                iSilenceMode));
+         }
+   
     CleanupStack::PopAndDestroy(currentProfile);
     }
 

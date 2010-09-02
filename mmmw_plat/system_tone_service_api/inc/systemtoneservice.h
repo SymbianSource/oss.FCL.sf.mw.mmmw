@@ -15,13 +15,10 @@
  * This file defines the API for System Tone Service which is
  * implemented in the systemtoneservice.dll.
  */
-
 #ifndef SYSTEMTONESERVICE_H_
 #define SYSTEMTONESERVICE_H_
-
 // System includes
 #include <e32base.h>
-
 // Forward declarations
 NONSHARABLE_CLASS( CStsImplementation);
 
@@ -202,7 +199,7 @@ public:
      * when an alarm playback completes if it is not manually stopped by the client.
      *
      * @param[in]  aAlarm        The system alarm type to play.
-     * @param[out] aAlarmContext A guaranteed globablly unique context representing this
+     * @param[out] aAlarmContext A guaranteed globally unique context representing this
      *                           specific alarm playback that can be used for stopping the
      *                           alarm or used to indicate to the observer which alarm playback
      *                           has completed.
@@ -214,7 +211,29 @@ public:
      *                           all alarms the observer is associated with are either completed
      *                           or stopped.
      */
-    IMPORT_C void PlayAlarm(TAlarmType aAlarm, unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
+    IMPORT_C void PlayAlarm(TAlarmType aAlarm, unsigned int& aAlarmContext,
+            MStsPlayAlarmObserver& aObserver);
+
+    /**
+     * Plays the specified system tone as an alarm.  If the tone type is not recognized, a default
+     * default tone will be played.  Using this method allows the clients to stop the tone or get
+     * a callback when the tone playback completes.
+     *
+     * @param[in]  aTone         The system tone type to play.
+     * @param[out] aAlarmContext A guaranteed globally unique context representing this
+     *                           specific tone playback that can be used for stopping the
+     *                           tone or used to indicate to the observer which playback
+     *                           has completed.
+     * @param[in] aObserver      A reference to the observer that is to be notified if this alarm
+     *                           playback completes before StopAlarm is called.  The same observer
+     *                           can be used for multiple PlayAlarms, even for ones playing at the
+     *                           same time.  It is the responsibility of the client to manage the
+     *                           life cycle of the observer.  However the observer must exist until
+     *                           all alarms the observer is associated with are either completed
+     *                           or stopped.
+     */
+    IMPORT_C void PlayAlarm(TToneType aTone, unsigned int& aAlarmContext,
+            MStsPlayAlarmObserver& aObserver);
 
     /**
      * Stops the specified system alarm playback.  If the playback has already completed or the
@@ -223,8 +242,6 @@ public:
      * @param[in] aAlarmContext The context to the specific alarm that is to be stopped.
      */
     IMPORT_C void StopAlarm(unsigned int aAlarmContext);
-    
-    IMPORT_C void PlayAlarm(TToneType aTone, unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver);
 
 protected:
     // Protected constructors and destructors

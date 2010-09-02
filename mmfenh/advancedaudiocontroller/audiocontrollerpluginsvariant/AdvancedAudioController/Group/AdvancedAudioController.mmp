@@ -61,11 +61,17 @@ LIBRARY         bafl.lib                        // Resource file
 LIBRARY         sysutil.lib
 LIBRARY         mmfdevsound.lib
 LIBRARY         mmfstandardcustomcommands.lib
-LIBRARY         custominterfacebuilder.lib
-LIBRARY         MetaDataUtility.lib
+LIBRARY         CustomInterfaceBuilder.lib
+LIBRARY         metadatautility.lib
 LIBRARY         AudioOutputRouting.lib
 LIBRARY         DrmDcf.lib
-LIBRARY         FrameTable.lib		            // for CFrameTable
+
+#ifndef WINSCW						//to support build on Linux
+LIBRARY		FrameTable.lib			// for CFrameTable
+#else
+LIBRARY		frametable.lib
+#endif 
+
 LIBRARY         MMDataSourceFactory.lib         // for MMultimediaDataSourceObserver
 LIBRARY         StreamControlCustomCommands.lib // for MStreamControlCustomCommandImplementor
 LIBRARY			DataSourceAdapter.lib

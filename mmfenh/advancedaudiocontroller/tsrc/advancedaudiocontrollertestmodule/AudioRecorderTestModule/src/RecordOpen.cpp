@@ -259,7 +259,7 @@ void CRecordOpen::OpenTarget(CMdaAudioRecorderUtility* rec, TPtrC fileName, TInt
 	//File with controller
 	if (type == KOpenFile2)
 	{
-		TInt aUid = 1;
+		//TInt aUid = 1;
 		//TUid aRecordControllerUid = TUid::Uid(aUid);
 		TUid aRecordControllerUid = KNullUid;//KUidInterfaceMMFController;//TUid::Uid(KMmfUidPluginInterfaceFormatDecode);//KMmfUidPluginInterfaceController;//{0x10203827};
 		//const TUid KUidBassBoostEffect = {0x10203827};

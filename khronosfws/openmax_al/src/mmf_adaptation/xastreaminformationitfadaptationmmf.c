@@ -39,7 +39,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryMediaContainerInformation(
     if (!adaptCtx || (adaptCtx->ctxId != XAMediaPlayerAdaptation))
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryMediaContainerInformation");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryMediaContainerInformation");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -70,7 +70,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryMediaContainerInformation(
             ((XAMediaPlayerAdaptationMMFCtx*) adaptCtx)->mmfContext,
             numStreams);
 
-    DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryMediaContainerInformation");
+    DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryMediaContainerInformation");
     return ret;
     }
 
@@ -102,7 +102,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamType(
     if (ret != XA_RESULT_SUCCESS)
         {
         DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamType");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamType");
         return ret;
         }
 
@@ -110,7 +110,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamType(
     if (streamIndex > numStreams)
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamType");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamType");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -130,7 +130,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamType(
                 streamIndex, domain);
         }
 
-    DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamType");
+    DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamType");
     return ret;
     }
 
@@ -173,7 +173,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamInformation(
     if (ret != XA_RESULT_SUCCESS)
         {
         DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamInformation");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamInformation");
         return ret;
         }
 
@@ -194,83 +194,92 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamInformation(
                     &height, &width, &frameRate);
             break;
         case XA_DOMAINTYPE_IMAGE:
-            DEBUG_INFO("Getting Image Stream Info from SrcPad");
-            break;
+        case XA_DOMAINTYPE_MIDI:
         default:
             DEBUG_ERR("XA_RESULT_CONTENT_UNSUPPORTED");
-            DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamInformation");
             ret = XA_RESULT_CONTENT_UNSUPPORTED;
             break;
         };
 
-    if (ret == XA_RESULT_SUCCESS)
+    if (ret != XA_RESULT_SUCCESS)
         {
-        DEBUG_INFO("Getting media duration");
-        ret = XAPlayItfAdaptMMF_GetDuration(adaptCtx, &duration);
+        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamInformation");
+        return ret;
+        }
+
+    DEBUG_INFO("Getting media duration");
+    ret = XAPlayItfAdaptMMF_GetDuration(adaptCtx, &duration);
+
+    if (ret != XA_RESULT_SUCCESS)
+        {
+        DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamInformation");
+        return ret;
         }
 
     /* Now assign properties to data structure */
-    if (ret == XA_RESULT_SUCCESS)
+    switch (domain)
         {
-        switch (domain)
+        case XA_DOMAINTYPE_AUDIO:
             {
-            case XA_DOMAINTYPE_AUDIO:
-                {
-                XAAudioStreamInformation* streamInfo =
-                        (XAAudioStreamInformation*) info;
-                DEBUG_INFO("Assigning values for XAAudioStreamInformation");
-                streamInfo->codecId = codecId;
-                streamInfo->channels = channels;
-                streamInfo->sampleRate = sampleRate;
-                streamInfo->bitRate = bitRate;
-                streamInfo->langCountry[0] = '\0';
-                streamInfo->duration = duration;
-                }
-                break;
-            case XA_DOMAINTYPE_MIDI:
-                {
-                XAMIDIStreamInformation* streamInfo =
-                        (XAMIDIStreamInformation*) info;
-                DEBUG_INFO("Assigning values for XAMIDIStreamInformation");
-                /*currently there is no way to get these information from gstreamer*/
-                streamInfo->channels = XA_MIDI_UNKNOWN;
-                streamInfo->tracks = XA_MIDI_UNKNOWN;
-                streamInfo->bankType = XA_MIDIBANK_DEVICE;
-                /*streamInfo->bitRate = 0;*/
-                streamInfo->langCountry[0] = '\0';
-                streamInfo->duration = duration;
-                }
-                break;
-            case XA_DOMAINTYPE_VIDEO:
-                {
-                XAVideoStreamInformation* streamInfo =
-                        (XAVideoStreamInformation*) info;
-                DEBUG_INFO("Assigning values for XAVideoStreamInformation");
-                streamInfo->codecId = codecId;
-                streamInfo->width = width;
-                streamInfo->height = height;
-                streamInfo->bitRate = bitRate;
-                streamInfo->duration = duration;
-                streamInfo->frameRate = frameRate;
-                }
-                break;
-            case XA_DOMAINTYPE_IMAGE:
-                {
-                XAImageStreamInformation* streamInfo =
-                        (XAImageStreamInformation*) info;
-                DEBUG_INFO("Assigning values for XAImageStreamInformation");
-                streamInfo->codecId = codecId;
-                streamInfo->width = width;
-                streamInfo->height = height;
-                streamInfo->presentationDuration = duration;
-                }
-                break;
-            default:
-                break;
-            };
-        } /*if ( ret == XA_RESULT_SUCCESS)*/
-
-    DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamInformation");
+            XAAudioStreamInformation* streamInfo =
+                    (XAAudioStreamInformation*) info;
+            DEBUG_INFO("Assigning values for XAAudioStreamInformation");
+            streamInfo->codecId = codecId;
+            streamInfo->channels = channels;
+            streamInfo->sampleRate = sampleRate;
+            streamInfo->bitRate = bitRate;
+            streamInfo->langCountry[0] = '\0';
+            streamInfo->duration = duration;
+            }
+            break;
+/*
+        case XA_DOMAINTYPE_MIDI:
+            {
+            XAMIDIStreamInformation* streamInfo =
+                    (XAMIDIStreamInformation*) info;
+            DEBUG_INFO("Assigning values for XAMIDIStreamInformation");*/
+            /*currently there is no way to get these information from gstreamer*/
+/*            streamInfo->channels = XA_MIDI_UNKNOWN;
+            streamInfo->tracks = XA_MIDI_UNKNOWN;
+            streamInfo->bankType = XA_MIDIBANK_DEVICE;*/
+            /*streamInfo->bitRate = 0;*/
+/*            streamInfo->langCountry[0] = '\0';
+            streamInfo->duration = duration;
+            }
+            break;
+*/
+        case XA_DOMAINTYPE_VIDEO:
+            {
+            XAVideoStreamInformation* streamInfo =
+                    (XAVideoStreamInformation*) info;
+            DEBUG_INFO("Assigning values for XAVideoStreamInformation");
+            streamInfo->codecId = codecId;
+            streamInfo->width = width;
+            streamInfo->height = height;
+            streamInfo->bitRate = bitRate;
+            streamInfo->duration = duration;
+            streamInfo->frameRate = frameRate;
+            }
+            break;
+/*
+        case XA_DOMAINTYPE_IMAGE:
+            {
+            XAImageStreamInformation* streamInfo =
+                    (XAImageStreamInformation*) info;
+            DEBUG_INFO("Assigning values for XAImageStreamInformation");
+            streamInfo->codecId = codecId;
+            streamInfo->width = width;
+            streamInfo->height = height;
+            streamInfo->presentationDuration = duration;
+            }
+            break;
+        default:
+            break;
+*/
+        };
+    DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamInformation");
     return ret;
     }
 
@@ -295,7 +304,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamName(
             != XAMediaPlayerAdaptation))
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamName");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -306,7 +315,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamName(
     if (ret != XA_RESULT_SUCCESS)
         {
         DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamName");
         return ret;
         }
 
@@ -314,7 +323,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamName(
     if (streamIndex > numStreams)
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamName");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -326,7 +335,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamName(
         /* TODO copy stream name into pName taking into account inputNameSize */
         }
 
-    DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryStreamName");
+    DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamName");
     return ret;
     }
 
@@ -351,14 +360,14 @@ XAresult XAStreamInformationItfAdaptMMF_QueryActiveStreams(
             != XAMediaPlayerAdaptation))
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryActiveStreams");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
     if (adaptCtx->ctxId == XAMDAdaptation)
         {
         DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryActiveStreams");
         return XA_RESULT_PRECONDITIONS_VIOLATED;
         }
 
@@ -369,7 +378,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryActiveStreams(
     if (ret != XA_RESULT_SUCCESS)
         {
         DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryActiveStreams");
         return ret;
         }
 
@@ -379,7 +388,7 @@ XAresult XAStreamInformationItfAdaptMMF_QueryActiveStreams(
         if (*numStreams < inputNumStreams)
             {
             DEBUG_INFO("numStreams param value is smaller than number of streams");
-            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryActiveStreams");
             return XA_RESULT_PARAMETER_INVALID;
             }
         for (loopIndex = 0; loopIndex < inputNumStreams; loopIndex++)
@@ -411,14 +420,14 @@ XAresult XAStreamInformationItfAdaptMMF_SetActiveStream(
     if (!adaptCtx || (adaptCtx->ctxId != XAMediaPlayerAdaptation))
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_SetActiveStream");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_SetActiveStream");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
     if (adaptCtx->ctxId == XAMDAdaptation)
         {
         DEBUG_ERR("XA_RESULT_PRECONDITIONS_VIOLATED");
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_SetActiveStream");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_SetActiveStream");
         return XA_RESULT_PRECONDITIONS_VIOLATED;
         }
 
@@ -429,7 +438,7 @@ XAresult XAStreamInformationItfAdaptMMF_SetActiveStream(
     if (ret != XA_RESULT_SUCCESS)
         {
         DEBUG_ERR_A1("XA_RESULT_[0x%x]", (unsigned int)ret);
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_QueryActiveStreams");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryActiveStreams");
         return ret;
         }
 
@@ -437,7 +446,7 @@ XAresult XAStreamInformationItfAdaptMMF_SetActiveStream(
     if (streamNum > numStreams)
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        DEBUG_API("-<XAStreamInformationItfAdaptMMF_SetActiveStream");
+        DEBUG_API("<-XAStreamInformationItfAdaptMMF_SetActiveStream");
         return XA_RESULT_PARAMETER_INVALID;
         }
 
@@ -451,4 +460,3 @@ XAresult XAStreamInformationItfAdaptMMF_SetActiveStream(
     DEBUG_API("->XAStreamInformationItfAdaptMMF_SetActiveStream");
     return ret;
     }
-

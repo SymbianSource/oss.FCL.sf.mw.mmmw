@@ -28,7 +28,6 @@
 
 #include "RadioServerData.h"
 #include "mradioheadseteventobserver.h"
-#include "RadioStubManager.h"
 
 _LIT(KRadioStubManagerLocalChunkName, "RadioStubManagerLocalChunkName");
 
@@ -258,6 +257,6 @@ const TUid KStub_KPSUidCtsyCallInformation = {SRadioStubManager::EStub_KPSUidCts
 const TUid KStub_KPSUidVoiceUiAccMonitor = {SRadioStubManager::EStub_KPSUidVoiceUiAccMonitor};
 const TUid KStub_KPSUidMMFAudioServer = {SRadioStubManager::EStub_KPSUidMMFAudioServer};
 const TUid KStub_KRadioPSUid = {SRadioStubManager::EStub_KRadioPSUid};
-const TUid KStub_KRadioCRUid = {0x101FF976}; // tried with this {SRadioStubManager::EStub_KRadioPSUid} but failed
+const TUid KStub_KRadioCRUid = {0x2002FF52};
 
 #endif /* RADIOSTUBMANAGER_H_ */

@@ -15,94 +15,88 @@
  * This file provides the implementation for creating and deleting a
  * an MMF based player for playing and stopping a tone playback.
  */
+
+//  Include Files  
 #include "stsplayer.h"
 #include <AudioPreference.h>
 #include <systemtoneservice.h>
+#include "stsplayersettings.h"
+#include "stssettingsmanager.h"
 
-
-
-/*static*/CStsPlayer* CStsPlayer::CreateTonePlayer(
-        MStsPlayerObserver& aObserver,CSystemToneService::TToneType aTone,
-       	unsigned int aContext, const TDesC& aFileName, TInt aVolume,
-       	TUint aAudioPreference, TUint  aAudioPriority)
+/*static*/CStsPlayer* CStsPlayer::Create(MStsPlayerObserver& aObserver,
+        CStsSettingsManager& aSettingsManager, unsigned int aContext,
+        CSystemToneService::TAlarmType aAlarm)
     {
     CStsPlayer* self = 0;
-    
-    self = new CStsPlayer(aObserver, aFileName, 0, aContext, aVolume, aAudioPreference, aAudioPriority);
-    
-           	        
-    		if (self != 0)
-         {
-            bool successful = self->Init();
-            if (!successful)
+    CStsSettingsManager::MPlayerSettings& playerSettings =
+            aSettingsManager.GetPlayerSettings(aAlarm);
+    TUint audioPreference;
+    TUint audioPriority;
+    aSettingsManager.GetAudioPriorityPref(aAlarm, audioPriority,
+            audioPreference);
+    self = new CStsPlayer(aObserver, playerSettings, aContext,
+            audioPreference, audioPriority);
+    if (self != 0)
+        {
+        bool successful = self->Init();
+        if (!successful)
             {
-               delete self;
-               self = 0;
+            delete self;
+            self = 0;
             }
-          }
-        
+        }
     return self;
     }
 
-/*static*/CStsPlayer* CStsPlayer::CreateAlarmPlayer(
-        MStsPlayerObserver& aObserver, CSystemToneService::TAlarmType aAlarm,
-        unsigned int aContext, const TDesC& aFileName, TInt aVolume,
-       	TUint aAudioPreference, TUint  aAudioPriority)
+/*static*/CStsPlayer* CStsPlayer::Create(MStsPlayerObserver& aObserver,
+        CStsSettingsManager& aSettingsManager, unsigned int aContext,
+        CSystemToneService::TToneType aTone)
     {
     CStsPlayer* self = 0;
-   
-   	
-   	self = new CStsPlayer(aObserver, aFileName, 10, aContext, aVolume, aAudioPreference, aAudioPriority);
-   	
-     
-    	if (self != 0)
-      	  {
-        	  bool successful = self->Init();
-          	if (!successful)
+    CStsSettingsManager::MPlayerSettings& playerSettings =
+            aSettingsManager.GetPlayerSettings(aTone);
+    TUint audioPreference;
+    TUint audioPriority;
+    aSettingsManager.GetAudioPriorityPref(aTone, audioPriority,
+            audioPreference);
+    self = new CStsPlayer(aObserver, playerSettings, aContext,
+            audioPreference, audioPriority);
+    if (self != 0)
+        {
+        bool successful = self->Init();
+        if (!successful)
             {
-             	  delete self;
-               	self = 0;
-            }	
-        	}
-        
+            delete self;
+            self = 0;
+            }
+        }
     return self;
     }
 
-
-
-
-
-CStsPlayer::CStsPlayer(MStsPlayerObserver& aObserver, const TDesC& aFileName,
-        int aRepeatNumberOfTimes, unsigned int aContext, TInt aVolume, TUint aAudioPreference, TUint aAudioPriority ) :
-    iObserver(aObserver), iPlayer(0), iFileName(aFileName),
-            iRepeatNumberOfTimes(aRepeatNumberOfTimes), iContext(aContext), iVolume(aVolume),
-            iAudioPreference(aAudioPreference), iAudioPriority(aAudioPriority)
+CStsPlayer::CStsPlayer(MStsPlayerObserver& aObserver,
+        CStsSettingsManager::MPlayerSettings& aPlayerSettings,
+        unsigned int aContext, TUint aAudioPreference, TUint aAudioPriority) :
+    iObserver(aObserver), iPlayerSettings(aPlayerSettings),
+            iContext(aContext), iAudioPreference(aAudioPreference),
+            iAudioPriority(aAudioPriority), iPlayer(0)
     {
-    	
     }
 
 bool CStsPlayer::Init()
     {
-
-    
-        TRAPD(result, iPlayer = CMdaAudioPlayerUtility::NewL(*this));
-        return result == KErrNone;
-    
+    TRAPD(result, iPlayer = CMdaAudioPlayerUtility::NewL(*this));
+    return result == KErrNone;
     }
-
 
 CStsPlayer::~CStsPlayer()
     {
-    	
-    delete iPlayer; 
-    
+    delete iPlayer;
     }
 
 void CStsPlayer::Play()
     {
     // Play the tone
-    TRAPD(err, iPlayer->OpenFileL(iFileName));
-
+    TRAPD( err, iPlayer->OpenFileL(iPlayerSettings.GetFileName()) );
     // If there is an error, indicate that the playback is complete. 
     if (err)
         {
@@ -121,10 +115,15 @@ void CStsPlayer::MapcInitComplete(TInt aError,
     {
     if (aError == KErrNone)
         {
-        TTimeIntervalMicroSeconds delay = 0;
+        TInt64 volumex100 = iPlayer->MaxVolume()
+                * iPlayerSettings.GetVolumePercentage();
+        TInt volume = volumex100 / 100;
         // Set PriorityPref
-        iPlayer->SetPriority(iAudioPriority,iAudioPreference);
-        iPlayer->SetRepeats(iRepeatNumberOfTimes, delay);
+        iPlayer->SetPriority(iAudioPriority, iAudioPreference);
+        iPlayer->SetRepeats(iPlayerSettings.GetNumberOfRepeats(),
+                iPlayerSettings.GetRepeatDelay());
+        iPlayer->SetVolume(volume);
+        iPlayer->SetVolumeRamp(iPlayerSettings.GetVolumeRamp());
         iPlayer->Play();
         }
     else

@@ -46,5 +46,5 @@ LIBRARY 	mmfcontrollerframework.lib
 LIBRARY 	mmfdevsound.lib
 #ifdef EABI
 // modified by BuildTeam
-LIBRARY     ECOM.LIB
+LIBRARY     ecom.lib
 #endif

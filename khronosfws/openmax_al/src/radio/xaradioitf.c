@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -159,11 +159,8 @@ XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
                                                XAuint32 * pFreqInterval)
 {
     XAresult ret = XA_RESULT_SUCCESS;
-    XAboolean isSupported = XA_BOOLEAN_FALSE;
     XARadioItfImpl* impl = GetImpl(self);
 
-   *pFreqInterval = FREQINTERVAL;   
-		    
     DEBUG_API("->XARadioItfImpl_GetFreqRangeProperties");
 
     if(!impl || !pMinFreq || !pMaxFreq || !pFreqInterval)
@@ -173,9 +170,13 @@ XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
         DEBUG_API("<-XARadioItfImpl_GetFreqRangeProperties");
         return XA_RESULT_PARAMETER_INVALID;
     }
-		
+
     ret = XARadioItfAdapt_GetFreqRangeProperties( (XAAdaptationMMFCtx*)impl->adapCtx,
             range, pMinFreq, pMaxFreq );
+    if (ret == XA_RESULT_SUCCESS)
+    {
+        *pFreqInterval = FREQINTERVAL;
+    }
 
     DEBUG_API("<-XARadioItfImpl_GetFreqRangeProperties");
     return ret;
@@ -196,7 +197,7 @@ XAresult XARadioItfImpl_SetFrequency(XARadioItf self, XAuint32 freq)
     XAuint32 minFreq;
     XAuint32 maxFreq;
    	XAuint32 freqInterval;
-        
+
     XARadioItfImpl* impl = GetImpl(self);
     DEBUG_API("->XARadioItfImpl_SetFrequency");
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSRadio);
@@ -208,23 +209,23 @@ XAresult XARadioItfImpl_SetFrequency(XARadioItf self, XAuint32 freq)
         DEBUG_API("<-XARadioItfImpl_SetFrequency");
         return XA_RESULT_PARAMETER_INVALID;
     }
-    
-    // Check for valid entries: 
- 		ret = XARadioItfImpl_GetFreqRangeProperties(self, range, &minFreq, &maxFreq, &freqInterval);   
+
+    // Check for valid entries:
+ 		ret = XARadioItfImpl_GetFreqRangeProperties(self, range, &minFreq, &maxFreq, &freqInterval);
     if (ret != XA_RESULT_SUCCESS)
     {
     	XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
-    	DEBUG_API("<-XARadioItfImpl_SetFrequency");    	
+    	DEBUG_API("<-XARadioItfImpl_SetFrequency");
     	return ret;
-    }		
-    
+    }
+
     if ( (freq < minFreq) || (freq > maxFreq) )
     {
     	XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
-    	DEBUG_API("<-XARadioItfImpl_SetFrequency");    	
+    	DEBUG_API("<-XARadioItfImpl_SetFrequency");
     	return XA_RESULT_PARAMETER_INVALID;
-    }	  
-           
+    }
+
    	ret = XARadioItfAdapt_SetFrequency( (XAAdaptationMMFCtx*)impl->adapCtx, freq );
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
@@ -372,7 +373,7 @@ XAresult XARadioItfImpl_SetStereoMode(XARadioItf self, XAuint32 mode)
         {
          	  impl->stereoMode = mode;
         }
-    }    
+    }
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_SetStereoMode");
     return ret;
@@ -541,7 +542,7 @@ XAresult XARadioItfImpl_GetPreset(XARadioItf self,
                                   XAchar * pName,
                                   XAuint16 * pNameLength)
 {
- 
+
     XAresult ret = XA_RESULT_FEATURE_UNSUPPORTED;
 
     DEBUG_API("<-XARadioItfImpl_GetPreset");
@@ -657,7 +658,7 @@ void XARadioItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
     XARadioItfImpl* impl =(XARadioItfImpl*)pHandlerCtx;
     XAuint32 eventData = 0;
     XAboolean eventBoolean = XA_BOOLEAN_FALSE;
-    
+
     DEBUG_API("->XARadioItfimpl_AdaptCb");
 
     if(!impl)
@@ -670,37 +671,37 @@ void XARadioItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
 
     if( event->eventid == XA_ADAPT_RADIO_FREQUENCY_CHANGED && impl->callback )
     {
-        DEBUG_API("Frequency changed in adaptation"); 
+        DEBUG_API("Frequency changed in adaptation");
         eventData = *(XAuint32*)event->data;
         impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_FREQUENCY_CHANGED, eventData, eventBoolean );
     }
-    
+
     else if( event->eventid == XA_ADAPT_RADIO_FREQUENCY_RANGE_CHANGED && impl->callback )
     {
         DEBUG_API("Frequency range changed in adaptation");
 
         impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_FREQUENCY_RANGE_CHANGED, eventData, eventBoolean  );
     }
-    
+
     else if( event->eventid == XA_ADAPT_RADIO_SEEK_COMPLETE && impl->callback )
     {
         DEBUG_API("Seek complete in adaptation");
-       	eventBoolean = *(XAboolean*)event->data;        
-        impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_SEEK_COMPLETED, eventData, eventBoolean  );     
+       	eventBoolean = *(XAboolean*)event->data;
+        impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_SEEK_COMPLETED, eventData, eventBoolean  );
     }
-    
+
     else if( event->eventid == XA_ADAPT_RADIO_STEREO_STATUS_CHANGED && impl->callback )
     {
         DEBUG_API("Stereo status change in adaptation");
-      	eventBoolean = *(XAboolean*)event->data;          
+      	eventBoolean = *(XAboolean*)event->data;
         impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_STEREO_STATUS_CHANGED, eventData, eventBoolean  );
-    } 
-        
+    }
+
     else if( event->eventid == XA_ADAPT_RADIO_SIGNAL_STRENGTH_CHANGED && impl->callback )
     {
         DEBUG_API("Signal Strength Change in adaptation");
         impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_SIGNAL_STRENGTH_CHANGED, eventData, eventBoolean  );
-    }      
+    }
     else
     {
         /* do nothing */

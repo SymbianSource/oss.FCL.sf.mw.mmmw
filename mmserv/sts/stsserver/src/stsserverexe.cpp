@@ -15,6 +15,7 @@
  * The file containt the main method of the STS Server.
  */
 
+//  Include Files  
 #include <ecom/ecom.h>
 #include "stsserver.h"
 
@@ -26,7 +27,7 @@ TInt E32Main()
     RThread myThread;
     myThread.SetPriority(EPriorityAbsoluteRealTime1);
     myThread.Close();
-    
+
     CTrapCleanup* cleanup = CTrapCleanup::New();
 
     if (cleanup)

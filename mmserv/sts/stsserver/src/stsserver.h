@@ -14,7 +14,6 @@
  * Description:
  * This file defines the interface into the STS server.
  */
-
 #ifndef STSSERVER_H_
 #define STSSERVER_H_
 

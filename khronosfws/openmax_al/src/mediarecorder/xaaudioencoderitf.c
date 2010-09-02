@@ -304,9 +304,9 @@ XAAudioEncoderItfImpl* XAAudioEncoderItfImpl_Create(XAMediaRecorderImpl* impl)
 void XAAudioEncoderItfImpl_Free(XAAudioEncoderItfImpl* self)
     {
     DEBUG_API("->XAAudioEncoderItfImpl_Free");
-    assert( self==self->self );
     if(self)
         {
+        assert( self==self->self );
         free(self);
         }
     DEBUG_API("<-XAAudioEncoderItfImpl_Free");

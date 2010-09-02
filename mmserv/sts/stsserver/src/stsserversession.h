@@ -14,7 +14,6 @@
  * Description:
  * This file defines the interface for the STS server side session.
  */
-
 #ifndef STSSERVERSESSION_H_
 #define STSSERVERSESSION_H_
 
@@ -46,11 +45,11 @@ private:
     void DoRegisterMsgQueueL(const RMessage2& aMessage);
     void DoPlayToneL(const RMessage2& aMessage);
     void DoPlayAlarmL(const RMessage2& aMessage);
+    void DoPlayToneAlarmL(const RMessage2& aMessage);
     void DoStopAlarmL(const RMessage2& aMessage);
-    void DoPlayToneStopL(const RMessage2& aMessage);
 
     void CleanUpObservers();
-    
+
     // inherited from MPlayAlarmObserver
     virtual void PlayAlarmComplete(unsigned int aAlarmContext);
 

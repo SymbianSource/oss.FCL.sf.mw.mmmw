@@ -38,6 +38,7 @@
 #include <ProfilesVariant.hrh>
 #include <e32capability.h>
 #include <GlobalAudioSettings.h>
+#include <MProfileEngineExtended2.h>
 class CProfileSettingsMonitorServerImpl : 
 public CBase, 
 public MProEngProfileActivationObserver, 
@@ -70,6 +71,7 @@ private:
 private:
     MProEngEngine* iEngine;
     MProEngNotifyHandler* iNotifyHandler;
+    MProfileEngineExtended2* iProfileEngineExtended;
     TInt iActiveProfileId;
     TBool iWarningTones;
     TBool iMessagingTones;
@@ -85,6 +87,7 @@ private:
     CGlobalAudioSettings::TGASRingingType iGASRingingType;
   
     CGlobalAudioSettings::TGASKeypadVolume iGASKeypadVolume;
+    TBool iSilenceMode;
     RProperty iWarningTonesProperty;
     RProperty iMessagingTonesProperty;
     RProperty iSilentProfileProperty;
@@ -97,6 +100,7 @@ private:
     RProperty iRingingTone1NameProperty;
     RProperty iRingingTone2NameProperty;
     RProperty iKeypadVolumeProperty;
+    RProperty iSilenceModeProperty;
 	};
 
 #endif

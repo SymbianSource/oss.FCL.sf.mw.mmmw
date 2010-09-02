@@ -421,6 +421,14 @@ void CHXTNEVideoClipInfoImp::GenerateThumbNail()
     
     if ( !iRgbBuf )
     {
+        //we only support even frame width & height. Ignore and return error
+        if ( (iMetaData.iWidth & 0x01) || (iMetaData.iHeight & 0x01) )
+        {
+             FLOG(_L("CHXTNEVideoClipInfoImp::GenerateThumbNail non-even frame size returning error iMetaData.iWidth=%d iMetaData.iHeight=%d "),iMetaData.iWidth,iMetaData.iHeight);
+             HandleThumbnailError(KErrNotSupported);
+             return;
+        }
+        
         TSize inputFrameResolution(iMetaData.iWidth,iMetaData.iHeight);
                        
         // rgb specs
