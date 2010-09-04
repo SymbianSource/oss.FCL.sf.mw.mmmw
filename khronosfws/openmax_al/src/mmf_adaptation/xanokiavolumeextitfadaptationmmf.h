@@ -37,7 +37,4 @@ XAresult XANokiaVolumeExtItfAdapt_EnableStereoPosition(
 XAresult XANokiaVolumeExtItfAdapt_SetStereoPosition(XAAdaptationMMFCtx *ctx,
         XApermille stereoPosition);
 
-void XANokiaVolumeExtItfAdapt_MuteChange(XAAdaptationBaseCtx* ctx,
-        XAboolean aMute);
-
 #endif /* XANOKIAVOLUMEEXTITFADAPTATIONMMF_H */

@@ -82,6 +82,7 @@ EXPORT_C C3gpDataSourceAdapter* C3gpDataSourceAdapter::NewL()
 EXPORT_C C3gpDataSourceAdapter::~C3gpDataSourceAdapter()
     {
     DP0(_L("C3gpDataSourceAdapter::~C3gpDataSourceAdapter"));
+	TRAP_IGNORE(SourceStopL());
 	MP4ParseClose(iMP4Handle);
 	delete iParserBuf;
 	delete iSrcBuf;
@@ -143,11 +144,14 @@ EXPORT_C void C3gpDataSourceAdapter::FillBufferL(CMMFBuffer* aBuffer, MDataSink*
 EXPORT_C void C3gpDataSourceAdapter::SourcePrimeL()
 	{
 	DP0(_L("C3gpDataSourceAdapter::SourcePrimeL"));
-	iDataSource->SourcePrimeL();
-   	if (!iMP4Handle)
-   		{
-   		PrepareMP4ParserL();
-   		}
+	if(iDataSource)
+		{
+		iDataSource->SourcePrimeL();
+		if (!iMP4Handle)
+			{
+			PrepareMP4ParserL();
+			}
+		}	
 	}
 	
 EXPORT_C void C3gpDataSourceAdapter::SourceStopL()
@@ -156,7 +160,10 @@ EXPORT_C void C3gpDataSourceAdapter::SourceStopL()
 	ResetVariables();
 	MP4ParseClose(iMP4Handle);
 	iMP4Handle = NULL;
-	iDataSource->SourceStopL();
+	if(iDataSource)
+		{
+		iDataSource->SourceStopL();
+		}
 	// Clear previously read Audio Frames  
 	iParserBuf->Data().SetLength(0);
 	iParserBuf->SetPosition(0);	

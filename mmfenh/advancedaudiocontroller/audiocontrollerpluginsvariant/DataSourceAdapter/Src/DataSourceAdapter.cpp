@@ -72,11 +72,13 @@ EXPORT_C CDataSourceAdapter* CDataSourceAdapter::NewL()
 EXPORT_C CDataSourceAdapter::~CDataSourceAdapter()
     {
 	DP0(_L("CDataSourceAdapter::~CDataSourceAdapter"));
+	TRAP_IGNORE(SourceStopL());
 	delete iAsyncProxyFillBuffer;
     delete iZeroBuffer;
     delete iHdrBuffer;
     if (iMMDataSource)
     	{
+		iMMDataSource->Stop();
     	iMMDataSource->Close();
 	    delete iMMDataSource;	
     	}
@@ -143,7 +145,15 @@ EXPORT_C void CDataSourceAdapter::SetDataSourceL(MDataSource* aDataSource,
 EXPORT_C TUid CDataSourceAdapter::DataSourceType() 
 	{
 	DP0(_L("CDataSourceAdapter::DataSourceType"));
-	return iDataSource->DataSourceType();
+	if(iDataSource)
+	    {
+	    return iDataSource->DataSourceType();
+	    }
+	else
+	    {
+	    TUid uid={KNullUidValue};
+        return uid;
+	    }
 	}
 
 EXPORT_C void CDataSourceAdapter::FillBufferL( CMMFBuffer* aBuffer, MDataSink* aConsumer, TMediaId aMediaId)
@@ -155,50 +165,86 @@ EXPORT_C void CDataSourceAdapter::FillBufferL( CMMFBuffer* aBuffer, MDataSink* a
 		}
 	else
 		{
-		iDataSource->FillBufferL(aBuffer, aConsumer, aMediaId);
+		if(iDataSource)
+	        {
+			iDataSource->FillBufferL(aBuffer, aConsumer, aMediaId);
+			}
 		}	
 	}
 
 EXPORT_C void CDataSourceAdapter::BufferEmptiedL(CMMFBuffer* aBuffer)
 	{
 	DP0(_L("CDataSourceAdapter::BufferEmptiedL"));
-	iDataSource->BufferEmptiedL(aBuffer);
+		if(iDataSource)
+	        {
+			iDataSource->BufferEmptiedL(aBuffer);
+			}
 	}
 
 EXPORT_C TBool CDataSourceAdapter::CanCreateSourceBuffer()
 	{
 	DP0(_L("CDataSourceAdapter::CanCreateSourceBuffer"));
-	return iDataSource->CanCreateSourceBuffer();
+    if(iDataSource)
+		{	
+		return iDataSource->CanCreateSourceBuffer();
+		}
+	else
+	{
+		return EFalse;
+	}
 	}
 	
 EXPORT_C CMMFBuffer* CDataSourceAdapter::CreateSourceBufferL(TMediaId aMediaId, TBool& aReference)
 	{
 	DP0(_L("CDataSourceAdapter::CreateSourceBufferL"));
-	return iDataSource->CreateSourceBufferL(aMediaId, aReference);
+	if(iDataSource)
+	    {	
+		return iDataSource->CreateSourceBufferL(aMediaId, aReference);
+		}
+	else
+		{
+		return NULL;
+		}
 	}
 
 EXPORT_C TInt CDataSourceAdapter::SourceThreadLogon(MAsyncEventHandler& aEventHandler)
 	{
 	DP0(_L("CDataSourceAdapter::SourceThreadLogon"));
-	return iDataSource->SourceThreadLogon(aEventHandler);
+	if(iDataSource)
+	    {
+	    return iDataSource->SourceThreadLogon(aEventHandler);
+	    }
+	else
+	    {
+	    return KErrGeneral;
+	    }
 	}
 
 EXPORT_C void CDataSourceAdapter::SourceThreadLogoff()
 	{
 	DP0(_L("CDataSourceAdapter::SourceThreadLogoff"));
-	iDataSource->SourceThreadLogoff();
+	if(iDataSource)
+	    {
+	    iDataSource->SourceThreadLogoff();
+	    }
 	}
 
 EXPORT_C void CDataSourceAdapter::SourcePrimeL()
 	{
 	DP0(_L("CDataSourceAdapter::SourcePrimeL"));
-	iDataSource->SourcePrimeL();
+	if(iDataSource)
+	    {
+	    iDataSource->SourcePrimeL();
+	    }
 	}
 	
 EXPORT_C void CDataSourceAdapter::SourceStopL()
 	{
 	DP0(_L("CDataSourceAdapter::SourceStopL"));
-	iDataSource->SourceStopL();
+		if(iDataSource)
+		{
+		iDataSource->SourceStopL();
+	  }
 	if (iAsyncProxyFillBuffer)
 		{
 		iAsyncProxyFillBuffer->Cancel();
@@ -209,7 +255,10 @@ EXPORT_C void CDataSourceAdapter::SourceStopL()
 EXPORT_C void CDataSourceAdapter::SourcePlayL()
 	{
 	DP0(_L("CDataSourceAdapter::SourcePlayL"));
-	iDataSource->SourcePlayL();
+	if(iDataSource)
+	    {
+	    iDataSource->SourcePlayL();
+	    }
 	}
 
 EXPORT_C TInt CDataSourceAdapter::SeekToPosition(TUint aPosition)
@@ -269,8 +318,10 @@ EXPORT_C TInt CDataSourceAdapter::SourceSize()
 	DP0(_L("CDataSourceAdapter::SourceSize"));
 	iSourceSize = KErrUnknown;
     if ((iSourceType == KUidMmfFileSource) ||(iSourceType == KUidMmfDescriptorSource))
-    	{
-   		iSourceSize  = static_cast<CMMFClip*>(iDataSource)->Size();
+    	{       if(iDataSource)
+                 {
+   		  iSourceSize  = static_cast<CMMFClip*>(iDataSource)->Size();
+                 }
     	}
 	else if (iMMDataSource)
         {
@@ -293,7 +344,10 @@ EXPORT_C TInt CDataSourceAdapter::IsProtectedL()
 EXPORT_C void CDataSourceAdapter::SetSourcePrioritySettings(const TMMFPrioritySettings& aPrioritySettings)
 	{
 	DP0(_L("CDataSourceAdapter::SetSourcePrioritySettings"));
-	iDataSource->SetSourcePrioritySettings(aPrioritySettings);
+	if(iDataSource)
+         {
+	  iDataSource->SetSourcePrioritySettings(aPrioritySettings);
+         }
 	}
 
 EXPORT_C TBool CDataSourceAdapter::OnlyHeaderPresent()
@@ -405,6 +459,12 @@ EXPORT_C void CDataSourceAdapter::Event(TUid aEvent)
 		}
 	}
 
+EXPORT_C void CDataSourceAdapter::ResetDataSource()
+    {
+	DP0(_L("CDataSourceAdapter::ReSetDataSource"));
+    iDataSource = NULL;
+    }
+	
 EXPORT_C TBool CDataSourceAdapter::IsLocalPlayback()
 	{
 	DP1(_L("CDataSourceAdapter::iIsLocalPlayback[%d]"), iIsLocalPlayback);
@@ -482,6 +542,8 @@ void CDataSourceAdapter::CAsyncProxyFillBuffer::FillBuffer(CMMFBuffer* aBuffer, 
 void CDataSourceAdapter::CAsyncProxyFillBuffer::RunL()
 	{
     DP0(_L("CDataSourceAdapter::CAsyncProxyFillBuffer::RunL"));
+  if(iDataSource)
+    {
     if (iDataSource->DataSourceType() == KUidMmfDescriptorSource)
     	{ 
     	// descriptor has no way to set read position back to 0
@@ -496,6 +558,7 @@ void CDataSourceAdapter::CAsyncProxyFillBuffer::RunL()
     	{
         iDataSource->FillBufferL(iBuffer,iConsumer,iMediaId);
     	}
+    }
 	if (iQueuedAsyncBuffers.Count() > 0)
 		{
 	    DP1(_L("CDataSourceAdapter::CAsyncProxyFillBuffer::RunL que count [%d]"),iQueuedAsyncBuffers.Count());

@@ -52,10 +52,10 @@ typedef struct XARadioItfImpl_
     XARadioItf         cbPtrToSelf;
     xaRadioCallback    callback;
     void               *context;
-   	XAuint32    preset;
-   	XAuint32    numOfPresets;
+    XAuint32    preset;
+    XAuint32    numOfPresets;
 
-    RadioPreset presets[RADIO_NUM_OF_PRESETS];    
+    RadioPreset presets[RADIO_NUM_OF_PRESETS];
 
     /*Adaptation variables*/
     XAAdaptationBaseCtx *adapCtx;
@@ -102,7 +102,7 @@ XAresult XARadioItfImpl_RegisterRadioCallback(XARadioItf self,
                                               xaRadioCallback callback,
                                               void * pContext);
                                               
-XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32 * pNumPresets);
+XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32* pNumPresets);
 
 XAresult XARadioItfImpl_SetPreset(XARadioItf self,
                                   XAuint32 preset,
@@ -117,7 +117,7 @@ XAresult XARadioItfImpl_GetPreset(XARadioItf self,
                                   XAuint8 * pRange,
                                   XAuint32 * pMode,
                                   XAchar * pName,
-                                  XAuint16 * pNameLength);                                              
+                                  XAuint16 * pNameLength);
 
 /* XARadioItfImpl -specific methods */
 XARadioItfImpl* XARadioItfImpl_Create(XAAdaptationBaseCtx *adapCtx);

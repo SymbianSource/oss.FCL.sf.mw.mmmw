@@ -47,7 +47,7 @@ XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseCtx *bCtx,
     mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
 
 
-    DEBUG_API_A1("->XAPlayItfAdaptMMF_SetPlayState %s",PLAYSTATENAME(state));
+//    DEBUG_API_A1_STR("->XAPlayItfAdaptMMF_SetPlayState %s",PLAYSTATENAME(state));
 
     /* bCtx and parameter pointer validation happens in the calling function.
      * We don't need to repeat it here*/
@@ -57,9 +57,7 @@ XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseCtx *bCtx,
             {
             if (bCtx->ctxId == XARadioAdaptation)
                 {
-                mmf_set_player_adapt_context(cmmfradiobackendengine_init(),
-                        bCtx);
-                stop_radio(cmmfradiobackendengine_init());
+                stop_radio(cmmfradiobackendengine_init(), bCtx);
                 }
             else
                 {
@@ -74,9 +72,7 @@ XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseCtx *bCtx,
             {
             if (bCtx->ctxId == XARadioAdaptation)
                 {
-                mmf_set_player_adapt_context(cmmfradiobackendengine_init(),
-                        bCtx);
-                play_radio(cmmfradiobackendengine_init());
+                play_radio(cmmfradiobackendengine_init(), bCtx);
                 }
             else
                 {
@@ -300,28 +296,4 @@ XAresult XAPlayItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationBaseCtx *bCtx,
     DEBUG_API("<-XAPlayItfAdaptMMF_SetPositionUpdatePeriod");
     return ret;
     }
-/*
- * XAresult XAPlayItfAdapt_StateChange
- * Handle callback from Radio utility 
- */
-void XAPlayItfAdaptMMF_StateChange(XAAdaptationBaseCtx *bCtx,
-        XAboolean playing)
-    {
-    if (playing)
-        {
-        XAAdaptEvent event =
-            {
-            XA_PLAYITFEVENTS, XA_PLAYEVENT_HEADMOVING, 1, 0
-            };
-        XAAdaptationBase_SendAdaptEvents(bCtx, &event);
-        }
-    else
-        {
-        XAAdaptEvent event =
-            {
-            XA_PLAYITFEVENTS, XA_PLAYEVENT_HEADSTALLED, 1, 0
-            };
-        XAAdaptationBase_SendAdaptEvents(bCtx, &event);
-        }
 
-    }

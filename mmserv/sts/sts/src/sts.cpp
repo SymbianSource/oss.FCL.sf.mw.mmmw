@@ -18,6 +18,7 @@
 //  Include Files  
 #include "sts.h"
 #include "stssettingsmanager.h"
+#include "stsdebug.h"
 
 class CSts::CPlayerNode
     {
@@ -110,6 +111,8 @@ CSts::~CSts()
 
 void CSts::PlayTone(CSystemToneService::TToneType aTone)
     {
+    TRACE_FUNCTION_ENTRY;
+    TRACE_LOG((_L("TToneType[0x%x]"), aTone));
     CStsPlayer* player = CStsPlayer::Create(*this, *iSettingsManager,
             iNextContext, aTone);
     if (player != 0)
@@ -124,11 +127,14 @@ void CSts::PlayTone(CSystemToneService::TToneType aTone)
         {
         //TODO: Add trace here
         }
+    TRACE_FUNCTION_EXIT;
     }
 
 void CSts::PlayAlarm(CSystemToneService::TAlarmType aAlarm,
         unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
     {
+    TRACE_FUNCTION_ENTRY;
+    TRACE_LOG((_L("TAlarmType[0x%x]"), aAlarm));
     CStsPlayer* player = CStsPlayer::Create(*this, *iSettingsManager,
             iNextContext, aAlarm);
     if (player != 0)
@@ -145,11 +151,15 @@ void CSts::PlayAlarm(CSystemToneService::TAlarmType aAlarm,
         //TODO: Add trace here
         aAlarmContext = 0;
         }
+    TRACE_LOG((_L("AlarmContext[%u]"), aAlarmContext));
+    TRACE_FUNCTION_EXIT;
     }
 
 void CSts::PlayAlarm(CSystemToneService::TToneType aTone,
         unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
     {
+    TRACE_FUNCTION_ENTRY;
+    TRACE_LOG((_L("TToneType[0x%x]"), aTone));
     CStsPlayer* player = CStsPlayer::Create(*this, *iSettingsManager,
             iNextContext, aTone);
     if (player != 0)
@@ -166,10 +176,14 @@ void CSts::PlayAlarm(CSystemToneService::TToneType aTone,
         //TODO: Add trace here
         aAlarmContext = 0;
         }
+    TRACE_LOG((_L("AlarmContext[%u]"), aAlarmContext));
+    TRACE_FUNCTION_EXIT;
     }
 
 void CSts::StopAlarm(unsigned int aAlarmContext)
     {
+    TRACE_FUNCTION_ENTRY;
+    TRACE_LOG((_L("AlarmContext[%u]"), aAlarmContext));
     CPlayerNode* node = iPlayerMap[aAlarmContext];
     iPlayerMap.erase(aAlarmContext);
     if (node)
@@ -181,6 +195,7 @@ void CSts::StopAlarm(unsigned int aAlarmContext)
         {
         //TODO: Add trace here
         }
+    TRACE_FUNCTION_EXIT;
     }
 
 void CSts::CleanUpPlayers()
@@ -194,6 +209,8 @@ void CSts::CleanUpPlayers()
 
 void CSts::PlayComplete(unsigned int aContext)
     {
+    TRACE_FUNCTION_ENTRY;
+    TRACE_LOG((_L("Context[%u]"), aContext));
     CPlayerNode* node = iPlayerMap[aContext];
     iPlayerMap.erase(aContext);
     if (node)
@@ -209,4 +226,5 @@ void CSts::PlayComplete(unsigned int aContext)
         {
         // TODO: log unexpected error
         }
+    TRACE_FUNCTION_EXIT;
     }

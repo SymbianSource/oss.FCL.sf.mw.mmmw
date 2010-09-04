@@ -24,22 +24,23 @@
 
 XAresult XARadioItfAdapt_SetFreqRange(XAAdaptationMMFCtx *bCtx, XAuint8 range);
 
-XAresult XARadioItfAdapt_GetFreqRange(XAuint8 * pFreqRange);
+XAresult XARadioItfAdapt_GetFreqRange(XAuint8* pFreqRange);
 
 XAresult XARadioItfAdapt_IsFreqRangeSupported(XAuint8 range,
                                              XAboolean * pSupported);
 
 XAresult XARadioItfAdapt_GetFreqRangeProperties(XAAdaptationMMFCtx *bCtx,
-                                               XAuint8 		range,
-                                               XAuint32 * pMinFreq,
-                                               XAuint32 * pMaxFreq);
+                                               XAuint8  range,
+                                               XAuint32* pMinFreq,
+                                               XAuint32* pMaxFreq);
 
 XAresult XARadioItfAdapt_SetFrequency(XAAdaptationMMFCtx *bCtx, XAuint32 freq);
 
 XAresult XARadioItfAdapt_GetFrequency(XAuint32 * pFrequency);
 
 XAresult XARadioItfAdapt_CancelSetFrequency(void);
-XAresult XARadioItfAdapt_SetSquelch(XAboolean squelch);
+
+XAresult XARadioItfAdapt_SetSquelch(XAAdaptationMMFCtx *bCtx, XAboolean squelch);
 
 XAresult XARadioItfAdapt_GetSquelch(XAboolean* squelch);
 
@@ -68,5 +69,11 @@ XAresult XARadioItfAdapt_GetStereoMode(XAuint32 * pMode);
 void XARadioItfAdapt_StereoStatusChange(XAAdaptationBaseCtx *ctx, XAboolean aStereoStatus);
 
 void XARadioItfAdapt_SignalStrengthChange(XAAdaptationBaseCtx *ctx, TInt aSignalStrength);
+
+void XARadioItfAdapt_StateChange(XAAdaptationBaseCtx *ctx, XAboolean aState);
+
+void XARadioItfAdapt_VolumeChange(XAAdaptationBaseCtx *ctx, TInt aVolume);
+
+void XARadioItfAdapt_MuteChange(XAAdaptationBaseCtx* ctx, XAboolean aMute);
 
 #endif /* XARADIOITFADAPTATION_H */

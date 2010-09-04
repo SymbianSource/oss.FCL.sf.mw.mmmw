@@ -19,9 +19,8 @@
 
 extern "C" {
 #include "xaradioitfadaptation.h"
-#include "xanokiavolumeextitfadaptationmmf.h"
-#include "xanokialinearvolumeitfadaptationmmf.h"
-#include "xaplayitfadaptationmmf.h"
+#include "xaadaptationmmf.h"
+#include "xaadptbasectx.h"
 }
 
 CMMFRadioBackendEngine *CMMFRadioBackendEngine::s_instance = 0;
@@ -42,22 +41,21 @@ CMMFRadioBackendEngine* CMMFRadioBackendEngine::Instance()
 void CMMFRadioBackendEngine::DeleteInstance()
 {
     if (iFmTunerUtility)
-  {
-    iFmTunerUtility->Close();
-    iFmTunerUtility = NULL;
-  }
-  if (iRadioPlayerUtility)
-  {
-    iRadioPlayerUtility->Close();
-    iRadioPlayerUtility = NULL;
-  }
+    {
+        iFmTunerUtility->Close();
+        iFmTunerUtility = NULL;
+    }
+    if (iRadioPlayerUtility)
+    {
+        iRadioPlayerUtility->Close();
+        iRadioPlayerUtility = NULL;
+    }
 
-  if (iRadioUtility)
-  {
+    if (iRadioUtility)
+    {
         delete iRadioUtility;
         iRadioUtility = NULL;
     }
-
 }
 
 CMMFRadioBackendEngine::~CMMFRadioBackendEngine()
@@ -79,10 +77,10 @@ void CMMFRadioBackendEngine::ConstructL()
     if (iFmTunerUtility)
     {
         iFmTunerUtility->EnableTunerInOfflineMode( ETrue );
-        iFmTunerUtility->RequestTunerControl();
+        iFmTunerUtility->RequestTunerControl();  
     }
-  if (iRadioUtility)
-  {
+    if (iRadioUtility)
+    {
         iRadioPlayerUtility = &iRadioUtility->RadioPlayerUtilityL( *this );
     }
 
@@ -92,40 +90,41 @@ void CMMFRadioBackendEngine::ConstructL()
     iDefaultMinFreq = RADIO_DEFAULT_MIN_FREQ;
     iDefaultMaxFreq = RADIO_DEFAULT_MAX_FREQ;
 
+    iAdaptContext = (XAAdaptationBaseCtx*)CMMFRadioBackendEngine::Instance();
+
 }
-void CMMFRadioBackendEngine::StationSeek(XAboolean aUpwards)
+void CMMFRadioBackendEngine::StationSeek(TBool aUpwards)
 {
     if (iFmTunerUtility)
     {
-    iFmTunerUtility->StationSeek(aUpwards);
+        iFmTunerUtility->StationSeek(aUpwards);
     }
 }
 
 void CMMFRadioBackendEngine::SetFrequency(TInt aFreq)
 {
-  DEBUG_API_A1("CMMFRadioBackendEngine::SetFrequency: %d", aFreq);
+//  DEBUG_CPP_API_A1("CMMFRadioBackendEngine::SetFrequency: %d", aFreq);
 
     if (iFmTunerUtility)
     {
-    iFmTunerUtility->SetFrequency(aFreq);
+        iFmTunerUtility->SetFrequency(aFreq);
     }
 }
 
 TInt CMMFRadioBackendEngine::GetFrequency(TInt& aFreq)
 {
-  DEBUG_API("CMMFRadioBackendEngine::GetFrequency");
+//    DEBUG_CPP_API("CMMFRadioBackendEngine::GetFrequency");
     TInt ret = KErrNotFound;
     if (iFmTunerUtility)
     {
-    ret = iFmTunerUtility->GetFrequency(aFreq);
-    if (ret != KErrNone)
-    {
-        aFreq = iDefaultFrequency;
-        ret = KErrNone;
+        ret = iFmTunerUtility->GetFrequency(aFreq);
+        if (ret != KErrNone)
+        {
+            aFreq = iDefaultFrequency;
+            ret = KErrNone;
+        }
     }
-    }
-  DEBUG_API_A1("CMMFRadioBackendEngine::GetFrequency RET: %d", ret);
-//  RDebug::Print(_L("CMMFRadioBackendEngine::GetFrequency RET: %d"), ret);
+//  DEBUG_CPP_API_A1("CMMFRadioBackendEngine::GetFrequency RET: %d", ret);
     return ret;
 }
 
@@ -134,9 +133,9 @@ TInt CMMFRadioBackendEngine::GetSignalStrength(TInt& aSignalStrength)
     TInt ret = KErrNotFound;
     if (iFmTunerUtility)
     {
-    ret = iFmTunerUtility->GetSignalStrength(aSignalStrength);
+        ret = iFmTunerUtility->GetSignalStrength(aSignalStrength);
     }
-  DEBUG_API_A1("CMMFRadioBackendEngine::GetSignalStrength RET: %d", ret);
+//    DEBUG_CPP_API_A1("CMMFRadioBackendEngine::GetSignalStrength RET: %d", ret);
 //  RDebug::Print(_L("CMMFRadioBackendEngine::GetSignalStrength RET: %d"), ret);
     return ret;
 }
@@ -182,15 +181,13 @@ TInt CMMFRadioBackendEngine::GetFreqRange(TFmRadioFrequencyRange& aRange)
             ret = KErrNone;
         }
     }
-  DEBUG_API_A1("CMMFRadioBackendEngine::GetFreqRange RET: %d", ret);
-//  RDebug::Print(_L("CMMFRadioBackendEngine::GetFreqRange RET: %d"), ret);
-  return ret;
+ //   DEBUG_CPP_API_A1("CMMFRadioBackendEngine::GetFreqRange RET: %d", ret);
+    return ret;
 }
 
 TInt CMMFRadioBackendEngine::GetFreqRangeProperties(TFmRadioFrequencyRange& aRange, TInt& aMinFreq, TInt& aMaxFreq)
 {
     TInt ret = KErrNotFound;
-
     if (iFmTunerUtility)
     {
         ret = iFmTunerUtility->GetFrequencyRange((TFmRadioFrequencyRange&)aRange, (TInt&)aMinFreq, (TInt&)aMaxFreq);
@@ -202,55 +199,50 @@ TInt CMMFRadioBackendEngine::GetFreqRangeProperties(TFmRadioFrequencyRange& aRan
             ret = KErrNone;
         }
     }
-  DEBUG_API_A1("CMMFRadioBackendEngine::GetFreqRangeProperties RET: %d", ret);
-//  RDebug::Print(_L("CMMFRadioBackendEngine::GetFreqRangeProperties RET: %d"), ret);
-  return ret;
+//    DEBUG_CPP_API_A1("CMMFRadioBackendEngine::GetFreqRangeProperties RET: %d", ret);
+    return ret;
 }
 TInt CMMFRadioBackendEngine::GetMaxVolume(TInt& aMaxVol)
 {
     TInt ret = KErrNotFound;
-
     if (iRadioPlayerUtility)
     {
         ret = iRadioPlayerUtility->GetMaxVolume(aMaxVol);
     }
-  return ret;
+    return ret;
 }
 
 TInt CMMFRadioBackendEngine::SetVolume(TInt aVol)
 {
-    TInt ret = KErrNotFound;
-
+    TInt ret = KErrNotFound; 
     if (iRadioPlayerUtility)
     {
         ret = iRadioPlayerUtility->SetVolume(aVol);
     }
-  return ret;
+    return ret;
 }
 
-TInt CMMFRadioBackendEngine::SetMute(XAboolean aMute)
+TInt CMMFRadioBackendEngine::SetMute(TBool aMute)
 {
     TInt ret = KErrNotFound;
-
     if (iRadioPlayerUtility)
     {
         ret = iRadioPlayerUtility->Mute(aMute);
     }
-  return ret;
+    return ret;
 }
 
 TInt CMMFRadioBackendEngine::GetVolume(TInt& aVol)
 {
     TInt ret = KErrNotFound;
-
     if (iRadioPlayerUtility)
     {
         ret = iRadioPlayerUtility->GetVolume(aVol);
     }
-  return ret;
+    return ret;
 }
 
-TInt CMMFRadioBackendEngine::GetForcedMonoReception(XAuint32& aForcedMono)
+TInt CMMFRadioBackendEngine::GetForcedMonoReception(TUint& aForcedMono)
 {
     TInt ret = KErrNotFound;
     TBool forceMono(EFalse);
@@ -265,7 +257,6 @@ TInt CMMFRadioBackendEngine::GetForcedMonoReception(XAuint32& aForcedMono)
         }
     }
 
-
     if (forceMono)
     {
         aForcedMono = XA_STEREOMODE_MONO;
@@ -277,7 +268,7 @@ TInt CMMFRadioBackendEngine::GetForcedMonoReception(XAuint32& aForcedMono)
         else
             aForcedMono = XA_STEREOMODE_AUTO;
     }
-  return ret;
+    return ret;
 }
 
 void CMMFRadioBackendEngine::PlayRadio()
@@ -296,10 +287,10 @@ void CMMFRadioBackendEngine::StopRadio()
     }
 }
 
-TInt CMMFRadioBackendEngine::ForceMonoReception(XAuint32 aForcedMono)
+TInt CMMFRadioBackendEngine::ForceMonoReception(TUint aForcedMono)
 {
     TInt ret = KErrNotFound;
-    XAuint32 currentMode;
+    TUint currentMode;
 
     ret = GetForcedMonoReception(currentMode);
     if (ret != XA_RESULT_SUCCESS)
@@ -337,15 +328,14 @@ TInt CMMFRadioBackendEngine::ForceMonoReception(XAuint32 aForcedMono)
             }
         }
     }
-  DEBUG_API_A1("CMMFRadioBackendEngine::ForceMonoReception RET: %d", ret);
- // RDebug::Print(_L("CMMFRadioBackendEngine::ForceMonoReception RET: %d"), ret);
-  return ret;
+ //   DEBUG_CPP_API_A1("CMMFRadioBackendEngine::ForceMonoReception RET: %d", ret);
+    return ret;
 }
 
-XAresult CMMFRadioBackendEngine::SetForceMonoFlag()
+XAresult CMMFRadioBackendEngine::SetForceMonoFlag() 
 {
     TInt ret = KErrNotFound;
-    TBool forceMono(EFalse);
+    TBool forceMono;
 
     if (iFmTunerUtility)
     {
@@ -356,9 +346,7 @@ XAresult CMMFRadioBackendEngine::SetForceMonoFlag()
             iForceStereo = ETrue;
             return KErrNone;
         }
-
     }
-
     if (forceMono == XA_STEREOMODE_MONO)
     {
         iForceStereo = EFalse;
@@ -369,16 +357,30 @@ XAresult CMMFRadioBackendEngine::SetForceMonoFlag()
     }
   return ret;
 }
-XAresult CMMFRadioBackendEngine::SetRadioAdaptContext(void * adaptcontext)
+
+TInt CMMFRadioBackendEngine::GetSquelch(TBool& aSquelch)
 {
-    iRadioAdaptContext = adaptcontext;
-    return XA_RESULT_SUCCESS;
+    TInt ret = KErrNotFound;
+    if (iFmTunerUtility)
+    {
+        ret = iFmTunerUtility->GetSquelch(aSquelch);
+    }
+    return ret;
 }
 
-XAresult CMMFRadioBackendEngine::SetPlayerAdaptContext(void * adaptcontext)
+TInt CMMFRadioBackendEngine::SetSquelch(TBool aSquelch)
 {
-    iPlayerAdaptContext = adaptcontext;
-    return XA_RESULT_SUCCESS;
+    TInt ret = KErrNotFound;
+    if (iFmTunerUtility)
+    {
+        ret = iFmTunerUtility->SetSquelch(aSquelch);
+    }
+    return ret;
+}
+
+void CMMFRadioBackendEngine::SetAdaptContext(void * adaptcontext)
+{
+    iAdaptContext = (XAAdaptationBaseCtx*)adaptcontext;
 }
 
 XAresult TranslateError(TInt error)
@@ -390,9 +392,9 @@ XAresult TranslateError(TInt error)
             status = XA_RESULT_SUCCESS;
             break;
         // to do: investigate and add other possible errors:
-
+            
        /* case XA_RESULT_PRECONDITIONS_VIOLATED:
-
+ 
             break;
         case XA_RESULT_PARAMETER_INVALID:
 
@@ -404,7 +406,7 @@ XAresult TranslateError(TInt error)
 
             break;
         case XA_RESULT_RESOURCE_LOST:
-
+ 
             break;
         case XA_RESULT_IO_ERROR:
 
@@ -416,7 +418,7 @@ XAresult TranslateError(TInt error)
 
             break;
         case XA_RESULT_CONTENT_UNSUPPORTED:
-
+ 
             break;
         case XA_RESULT_CONTENT_NOT_FOUND:
 
@@ -441,7 +443,7 @@ XAresult TranslateError(TInt error)
             break;
             */
         default:
-            break;
+        	break;
         } // end switch
     return status;
     }
@@ -462,9 +464,10 @@ void CMMFRadioBackendEngine::MrpeoPresetChanged(
 // ----------------------------------------------------
 //
 void CMMFRadioBackendEngine::MrftoSquelchChange(
-    TBool /*aSquelch*/ )
+    TBool aSquelch)
 {
-
+//    DEBUG_CPP_API_A1("CMMFRadioBackendEngine::MrftoSquelchChange: aSquelch =  %d", aSquelch);
+// Currently, Openmaxal doesn't have event defined to handle this callback
 }
 
 // ----------------------------------------------------
@@ -475,9 +478,8 @@ void CMMFRadioBackendEngine::MrftoSquelchChange(
 void CMMFRadioBackendEngine::MrftoForcedMonoChange(
     TBool aForcedMono )
 {
-  DEBUG_API_A1("CMMFRadioBackendEngine::MrftoForcedMonoChange: aForcedMono =  %d", aForcedMono);
-//  RDebug::Print(_L("CMMFRadioBackendEngine::MrftoForcedMonoChange: aForcedMono = %d"), aForcedMono);
-    XARadioItfAdapt_StereoStatusChange((XAAdaptationBaseCtx*)iRadioAdaptContext, aForcedMono);
+//    DEBUG_CPP_API_A1("CMMFRadioBackendEngine::MrftoForcedMonoChange: aForcedMono =  %d", aForcedMono);
+    XARadioItfAdapt_StereoStatusChange((XAAdaptationBaseCtx*)iAdaptContext, aForcedMono);
 }
 
  // ----------------------------------------------------
@@ -488,9 +490,8 @@ void CMMFRadioBackendEngine::MrftoForcedMonoChange(
 void CMMFRadioBackendEngine::MrftoFrequencyChange(
     TInt aNewFrequency)
 {
-    DEBUG_API_A1("CMMFRadioBackendEngine::MrftoFrequencyChange: aNewFrequency =  %d", aNewFrequency);
- // RDebug::Print(_L("CMMFRadioBackendEngine::MrftoFrequencyChange aNewFrequency = %d"), aNewFrequency);
-    XARadioItfAdapt_FrequencyChange((XAAdaptationBaseCtx*)iRadioAdaptContext, aNewFrequency);
+//    DEBUG_CPP_API_A1("CMMFRadioBackendEngine::MrftoFrequencyChange: aNewFrequency =  %d", aNewFrequency);
+    XARadioItfAdapt_FrequencyChange((XAAdaptationBaseCtx*)iAdaptContext, aNewFrequency);
 }
 
 // ----------------------------------------------------
@@ -501,9 +502,8 @@ void CMMFRadioBackendEngine::MrftoFrequencyChange(
 void CMMFRadioBackendEngine::MrftoFrequencyRangeChange(
     TFmRadioFrequencyRange aNewRange )
 {
-    DEBUG_API_A1("CMMFRadioBackendEngine::MrftoFrequencyRangeChange: aNewRange =  %d", aNewRange);
-//  RDebug::Print(_L("CMMFRadioBackendEngine::MrftoFrequencyRangeChange: aNewRange = %d"), aNewRange);
-    XARadioItfAdapt_FrequencyRangeChange((XAAdaptationBaseCtx*)iRadioAdaptContext, aNewRange);
+ //   DEBUG_CPP_API_A1("CMMFRadioBackendEngine::MrftoFrequencyRangeChange: aNewRange =  %d", aNewRange);
+    XARadioItfAdapt_FrequencyRangeChange((XAAdaptationBaseCtx*)iAdaptContext, aNewRange);
 }
 
 // ----------------------------------------------------
@@ -548,9 +548,9 @@ void CMMFRadioBackendEngine::MrftoStationSeekComplete(
     TInt aError,
     TInt aFrequency )
 {
-    XARadioItfAdapt_SeekComplete((XAAdaptationBaseCtx*)iRadioAdaptContext, aError, aFrequency);
+    XARadioItfAdapt_SeekComplete((XAAdaptationBaseCtx*)iAdaptContext, aError, aFrequency);
 }
-
+ 
 // ----------------------------------------------------
 // CMMFRadioBackendEngine::MrftoSetFrequencyComplete
 // ----------------------------------------------------
@@ -558,16 +558,15 @@ void CMMFRadioBackendEngine::MrftoStationSeekComplete(
 void CMMFRadioBackendEngine::MrftoSetFrequencyComplete(
     TInt aError )
 {
-    DEBUG_API_A1("CMMFRadioBackendEngine::MrftoSetFrequencyComplete: aError =  %d", aError);
+//    DEBUG_CPP_API_A1("CMMFRadioBackendEngine::MrftoSetFrequencyComplete: aError =  %d", aError);
 //  RDebug::Print(_L("CMMFRadioBackendEngine::MrftoFrrequencyComplete: aError = %d"), aError);
     TInt freq = 0;
-  if (!aError)
+    if (!aError)
     {
         iFmTunerUtility->GetFrequency(freq);
     }
-    DEBUG_API_A1("CMMFRadioBackendEngine::MrftoSetFrequencyComplete: new freq is: %d", freq);
-//  RDebug::Print(_L("CMMFRadioBackendEngine::MrftoSetFrequencyComplete: new freq is: %d"), freq);
-    XARadioItfAdapt_SetFrequencyComplete((XAAdaptationBaseCtx*)iRadioAdaptContext, aError, freq);
+//    DEBUG_CPP_API_A1("CMMFRadioBackendEngine::MrftoSetFrequencyComplete: new freq is: %d", freq);
+    XARadioItfAdapt_SetFrequencyComplete((XAAdaptationBaseCtx*)iAdaptContext, aError, freq);
 }
 
 // ----------------------------------------------------
@@ -578,9 +577,8 @@ void CMMFRadioBackendEngine::MrftoSetFrequencyComplete(
 void CMMFRadioBackendEngine::MrftoSetFrequencyRangeComplete(
     TInt aError )
 {
-    DEBUG_API_A1("CMMFRadioBackendEngine::MrftoSetFrequencyRangeComplete: aError =  %d", aError);
-//  RDebug::Print(_L("CMMFRadioBackendEngine::MrftoSetFrequencyRangeComplete: aError = %d"), aError);
-    XARadioItfAdapt_SetFrequencyRangeComplete((XAAdaptationBaseCtx*)iRadioAdaptContext, aError);
+//    DEBUG_CPP_API_A1("CMMFRadioBackendEngine::MrftoSetFrequencyRangeComplete: aError =  %d", aError);
+    XARadioItfAdapt_SetFrequencyRangeComplete((XAAdaptationBaseCtx*)iAdaptContext, aError);
 }
 
 // ----------------------------------------------------
@@ -590,7 +588,7 @@ void CMMFRadioBackendEngine::MrftoSetFrequencyRangeComplete(
 void CMMFRadioBackendEngine::MrftoRequestTunerControlComplete(
     TInt aError)
 {
-//  RDebug::Print(_L("CMMFRadioBackendEngine::MrftoRequestTunerControlComplete: aError = %d"), aError);
+
 }
 
 // ----------------------------------------------------
@@ -613,7 +611,7 @@ void CMMFRadioBackendEngine::MrpoBalanceChange(
 void CMMFRadioBackendEngine::MrpoMuteChange(
     TBool aMute )
 {
-    XANokiaVolumeExtItfAdapt_MuteChange((XAAdaptationBaseCtx*)iPlayerAdaptContext, aMute);
+    XARadioItfAdapt_MuteChange((XAAdaptationBaseCtx*)iAdaptContext, aMute);
 }
 
 // ----------------------------------------------------
@@ -624,7 +622,7 @@ void CMMFRadioBackendEngine::MrpoMuteChange(
 void CMMFRadioBackendEngine::MrpoVolumeChange(
     TInt aVolume )
 {
-    XANokiaLinearVolumeItfAdapt_VolumeChange((XAAdaptationBaseCtx*)iPlayerAdaptContext, aVolume);
+    XARadioItfAdapt_VolumeChange((XAAdaptationBaseCtx*)iAdaptContext, aVolume);
 }
 
 // ----------------------------------------------------
@@ -636,129 +634,135 @@ void CMMFRadioBackendEngine::MrpoStateChange(
     TPlayerState aState,
     TInt aError )
 {
-    if ( aError )
-    {
-        DEBUG_API_A1("CMMFRadioBackendEngine::MrpoStateChange: aError =  %d", aError);
- //     RDebug::Print(_L("CMMFRadioBackendEngine::MrpoStateChange: aError = %d"), aError);
-    }
+//    if ( aError )
+//    {
+ //       DEBUG_CPP_API_A1("CMMFRadioBackendEngine::MrpoStateChange: aError =  %d", aError);
+//    }
 
-    DEBUG_API_A1("CMMFRadioBackendEngine::MrpoStateChange: new state =  %d", aState);
-//  RDebug::Print(_L("CMMFRadioBackendEngine::MrpoStateChange: new state = %d"), aState);
+//    DEBUG_CPP_API_A1("CMMFRadioBackendEngine::MrpoStateChange: new state =  %d", aState);
 
     if ( aState == ERadioPlayerPlaying )
     {
-    XAPlayItfAdaptMMF_StateChange((XAAdaptationBaseCtx*)iPlayerAdaptContext, ETrue);
-    }
+        XARadioItfAdapt_StateChange((XAAdaptationBaseCtx*)iAdaptContext, ETrue);
+    }  
     else  // ERadioPlayerIdle
     {
-    XAPlayItfAdaptMMF_StateChange((XAAdaptationBaseCtx*)iPlayerAdaptContext, EFalse);
+        XARadioItfAdapt_StateChange((XAAdaptationBaseCtx*)iAdaptContext, EFalse);
     }
+
 }
 
 extern "C" {
 
     void* cmmfradiobackendengine_init()
     {
-        return CMMFRadioBackendEngine::Instance();
+    return CMMFRadioBackendEngine::Instance();
     }
 
-    void cmmfradiobackendengine_delete(void* context)
-    {
-        ((CMMFRadioBackendEngine*)(context))->DeleteInstance();
+    void cmmfradiobackendengine_delete(void* pContext)
+    { 
+        ((CMMFRadioBackendEngine*)(pContext))->DeleteInstance();
     }
 
-    void  set_frequency(void* context, XAuint32 freq)
+    void  set_frequency(void* pContext, void* pAdaptcontext, XAuint32 freq)
     {
-        ((CMMFRadioBackendEngine*)(context))->SetFrequency((TInt)freq);
+        ((CMMFRadioBackendEngine*)(pContext))->SetAdaptContext(pAdaptcontext);
+        ((CMMFRadioBackendEngine*)(pContext))->SetFrequency((TInt)freq);
     }
 
-    XAresult  get_frequency(void* context, XAuint32* freq)
+    XAresult  get_frequency(void* pContext, XAuint32* pFreq)
     {
-        return ((CMMFRadioBackendEngine*)(context))->GetFrequency((TInt&)*freq);
+        return ((CMMFRadioBackendEngine*)(pContext))->GetFrequency((TInt&)*pFreq);
     }
 
-    XAresult  get_signal_strength(void* context, XAuint32* signalStrength)
+    XAresult  get_signal_strength(void* pContext, XAuint32* pSignalStrength)
     {
-        return ((CMMFRadioBackendEngine*)(context))->GetSignalStrength((TInt&)*signalStrength);
+        return ((CMMFRadioBackendEngine*)(pContext))->GetSignalStrength((TInt&)*pSignalStrength);
     }
 
-    void station_seek(void* context, XAboolean upwards)
+    void station_seek(void* pContext, XAboolean upwards)
     {
-        ((CMMFRadioBackendEngine*)(context))->StationSeek(upwards);
+        ((CMMFRadioBackendEngine*)(pContext))->StationSeek(upwards);
     }
 
-    void cancel_set_frequency(void* context)
+    void cancel_set_frequency(void* pContext, void* pAdaptcontext)
     {
-        ((CMMFRadioBackendEngine*)(context))->CancelSetFrequency();
+        ((CMMFRadioBackendEngine*)(pContext))->SetAdaptContext(pAdaptcontext);
+        ((CMMFRadioBackendEngine*)(pContext))->CancelSetFrequency();
     }
 
-    void cancel_station_seek(void* context)
+    void cancel_station_seek(void* pContext)
     {
-        ((CMMFRadioBackendEngine*)(context))->CancelStationSeek();
+        ((CMMFRadioBackendEngine*)(pContext))->CancelStationSeek();
     }
 
-    void set_freq_range(void* context, XAuint8 range)
+    void set_freq_range(void* pContext, void* pAdaptcontext, XAuint8 range)
     {
-        ((CMMFRadioBackendEngine*)(context))->SetFreqRange((TFmRadioFrequencyRange)range);
+        ((CMMFRadioBackendEngine*)(pContext))->SetAdaptContext(pAdaptcontext);
+        ((CMMFRadioBackendEngine*)(pContext))->SetFreqRange((TFmRadioFrequencyRange)range);
     }
 
-    XAresult  get_freq_range(void* context, XAuint8* range)
+    XAresult  get_freq_range(void* pContext, XAuint8* pRange)
     {
-        return ((CMMFRadioBackendEngine*)(context))->GetFreqRange((TFmRadioFrequencyRange&)*range);
+        return ((CMMFRadioBackendEngine*)(pContext))->GetFreqRange((TFmRadioFrequencyRange&)*pRange);
     }
 
-    XAresult  get_freq_range_properties(void* context, XAuint8 aRange, XAuint32* aMinFreq, XAuint32* aMaxFreq)
+    XAresult  get_freq_range_properties(void* pContext, XAuint8 aRange, XAuint32* pMinFreq, XAuint32* pMaxFreq)
     {
-        return ((CMMFRadioBackendEngine*)(context))->GetFreqRangeProperties((TFmRadioFrequencyRange&) aRange, (TInt&) *aMinFreq, (TInt&) *aMaxFreq);
+        return ((CMMFRadioBackendEngine*)(pContext))->GetFreqRangeProperties((TFmRadioFrequencyRange&) aRange, (TInt&) *pMinFreq, (TInt&) *pMaxFreq);
     }
 
-    XAresult  get_max_volume(void* context, XAmillibel* maxVol)
+    XAresult  get_max_volume(void* pContext, XAmillibel* pMaxVol)
     {
-        return  ((CMMFRadioBackendEngine*)(context))->GetMaxVolume((TInt&)*maxVol);
+        return  ((CMMFRadioBackendEngine*)(pContext))->GetMaxVolume((TInt&)*pMaxVol);
     }
 
-    XAresult  set_volume(void* context, XAuint32 vol)
+    XAresult  set_volume(void* pContext, void* pAdaptcontext, XAuint32 vol)
     {
-        return ((CMMFRadioBackendEngine*)(context))->SetVolume((TInt)vol);
+        ((CMMFRadioBackendEngine*)(pContext))->SetAdaptContext(pAdaptcontext);
+        return ((CMMFRadioBackendEngine*)(pContext))->SetVolume((TInt)vol);
     }
 
-    XAresult  get_volume(void* context, XAuint32* vol)
+    XAresult  get_volume(void* pContext, XAuint32* pVol)
     {
-        return ((CMMFRadioBackendEngine*)(context))->GetVolume((TInt&)*vol);
+        return ((CMMFRadioBackendEngine*)(pContext))->GetVolume((TInt&)*pVol);
     }
 
-    XAresult  set_mute(void* context, XAboolean mute)
+    XAresult  set_mute(void* pContext, void* pAdaptcontext, XAboolean mute)
     {
-        return ((CMMFRadioBackendEngine*)(context))->SetMute(mute);
+        ((CMMFRadioBackendEngine*)(pContext))->SetAdaptContext(pAdaptcontext);
+        return ((CMMFRadioBackendEngine*)(pContext))->SetMute(mute);
     }
 
-    XAresult  get_stereo_mode(void* context, XAuint32* mode)
+    XAresult  get_stereo_mode(void* pContext, XAuint32* pMode)
     {
-        return ((CMMFRadioBackendEngine*)(context))->GetForcedMonoReception(*mode);
+        return ((CMMFRadioBackendEngine*)(pContext))->GetForcedMonoReception((TUint&)*pMode);
     }
 
-    XAresult  set_stereo_mode(void* context, XAuint32 mode)
+    XAresult  set_stereo_mode(void* pContext, void* pAdaptcontext, XAuint32 mode)
     {
-        return ((CMMFRadioBackendEngine*)(context))->ForceMonoReception(mode);
+        ((CMMFRadioBackendEngine*)(pContext))->SetAdaptContext(pAdaptcontext);
+        return ((CMMFRadioBackendEngine*)(pContext))->ForceMonoReception(mode);
     }
 
-    void play_radio(void* context)
+    void play_radio(void* pContext, void* pAdaptcontext)
     {
-        ((CMMFRadioBackendEngine*)(context))->PlayRadio();
+        ((CMMFRadioBackendEngine*)(pContext))->SetAdaptContext(pAdaptcontext);
+        ((CMMFRadioBackendEngine*)(pContext))->PlayRadio();
     }
 
-    void stop_radio(void* context)
+    void stop_radio(void* pContext, void* pAdaptcontext)
     {
-        ((CMMFRadioBackendEngine*)(context))->StopRadio();
+        ((CMMFRadioBackendEngine*)(pContext))->SetAdaptContext(pAdaptcontext);
+        ((CMMFRadioBackendEngine*)(pContext))->StopRadio();
     }
-
-    XAresult mmf_set_radio_adapt_context(void * context, void * adaptcontext)
+    void get_squelch(void* pContext, XAboolean* pSquelch)
     {
-        return ((CMMFRadioBackendEngine*)(context))->SetRadioAdaptContext(adaptcontext);
+        ((CMMFRadioBackendEngine*)(pContext))->GetSquelch((TBool&)*pSquelch);
     }
-
-    XAresult mmf_set_player_adapt_context(void * context, void * adaptcontext)
+    void set_squelch(void* pContext, void* pAdaptcontext, XAboolean squelch)
     {
-        return ((CMMFRadioBackendEngine*)(context))->SetPlayerAdaptContext(adaptcontext);
+        ((CMMFRadioBackendEngine*)(pContext))->SetAdaptContext(pAdaptcontext);
+        ((CMMFRadioBackendEngine*)(pContext))->SetSquelch((TBool)squelch);
     }
 }

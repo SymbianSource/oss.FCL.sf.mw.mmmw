@@ -724,9 +724,7 @@ void CMMFAudioToneController::ToneFinished(TInt aError)
 	// NB KErrInUse, KErrDied OR KErrAccessDenied may be returned 
 	// to indicate that the sound device is in use  by another higher 
 	// priority client.
-	if (aError == KErrCancel || aError == KErrInUse || 
-	    aError == KErrDied || aError == KErrAccessDenied)
-		return;
+	
 
 	if (aError == KErrUnderflow)
 		aError = KErrNone;

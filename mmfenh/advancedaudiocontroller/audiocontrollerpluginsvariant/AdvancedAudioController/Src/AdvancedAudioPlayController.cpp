@@ -824,7 +824,13 @@ EXPORT_C void CAdvancedAudioPlayController::AddDataSourceL(
 		{
 		iDataSourceAdapter = CDataSourceAdapter::NewL();
 		}
-	iDataSourceAdapter->SetDataSourceL(&aSource, this, this);
+	TRAPD(err,iDataSourceAdapter->SetDataSourceL(&aSource, this, this));
+	if(err)
+		{
+	    DP1(_L("setdatasource left for reason %d"),err);
+	    iDataSourceAdapter->ResetDataSource();
+	    User::Leave(err);
+		}
 	
     iDataSource = &aSource; // remove this eventually when all the references are removed
 	
@@ -856,7 +862,12 @@ EXPORT_C void CAdvancedAudioPlayController::AddDataSourceL(
         // we don't want to prime in this case
         DP0(_L("CAdvancedAudioPlayController::AddDataSourceL() Prime to get duration"));
         iBlockDuration = ETrue;
-        DoInitializeL(); // to get data from the source to calculate bitrate and duration
+        TRAPD(err,DoInitializeL());// to get data from the source to calculate bitrate and duration
+        if(err)
+            {
+            iDataSourceAdapter->ResetDataSource();
+            User::Leave(err);
+            }
         }
     if ((!iEventsEnabled) && (iDataSourceAdapter->OnlyHeaderPresent()))
         {
@@ -864,7 +875,12 @@ EXPORT_C void CAdvancedAudioPlayController::AddDataSourceL(
         // the recorder might have to open this file again - and if we keep it open
         // with shared read access, he won't be able to open it for writing.
         // So we will close the file here.
-        iDataSourceAdapter->SourceStopL();
+        TRAPD(err,iDataSourceAdapter->SourceStopL());
+        if(err)
+            {
+            iDataSourceAdapter->ResetDataSource();
+            User::Leave(err);
+            }
         }
     }
 

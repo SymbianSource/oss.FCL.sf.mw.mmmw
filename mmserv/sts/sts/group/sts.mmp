@@ -28,6 +28,7 @@ OS_LAYER_STDCPP_SYSTEMINCLUDE
 
 USERINCLUDE     ../src
 USERINCLUDE     ../inc
+USERINCLUDE     ../../inc
 
 SOURCEPATH      ../src
 

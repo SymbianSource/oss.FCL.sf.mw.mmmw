@@ -49,12 +49,11 @@ XAresult XANokiaLinearVolumeItfAdapt_GetVolumeLevel(XAAdaptationMMFCtx *ctx, XAu
         }
     else if (ctx->baseObj.ctxId == XARadioAdaptation)
         {
-        mmf_set_player_adapt_context(cmmfradiobackendengine_init(), ctx);
         res = get_volume(cmmfradiobackendengine_init(), &vol);
         *percentage = vol;
         }      
 
-    DEBUG_API_A1("<-XANokiaLinearVolumeItfAdapt_GetVolumeLevel %d", percentage);
+    DEBUG_API_A1("<-XANokiaLinearVolumeItfAdapt_GetVolumeLevel %d", (int)percentage);
     return res;
 }
 
@@ -98,8 +97,7 @@ XAresult XANokiaLinearVolumeItfAdapt_SetVolumeLevel(XAAdaptationMMFCtx *ctx,
         }
     else if (ctx->baseObj.ctxId == XARadioAdaptation)
         {
-        mmf_set_player_adapt_context(cmmfradiobackendengine_init(), ctx);
-        res = set_volume(cmmfradiobackendengine_init(), percentage);
+        res = set_volume(cmmfradiobackendengine_init(), ctx, percentage);
         }
     DEBUG_API("<-XANokiaLinearVolumeItfAdapt_SetVolumeLevel");
     return res;
@@ -130,17 +128,5 @@ XAresult XANokiaLinearVolumeItfAdapt_GetStepCount(XAAdaptationMMFCtx *ctx,
     return res;
     }
 
-void XANokiaLinearVolumeItfAdapt_VolumeChange(XAAdaptationBaseCtx *ctx,
-        TInt aVolume)
-    {
-    XAAdaptEvent event =
-        {
-        XA_NOKIALINEARVOLITFEVENTS, XA_ADAPT_VOLUME_VOLUME_CHANGED, 1, 0
-        };
-    if (ctx)
-        {
-        event.data = &aVolume;
-        XAAdaptationBase_SendAdaptEvents(ctx, &event);
-        }
-    }
+
 

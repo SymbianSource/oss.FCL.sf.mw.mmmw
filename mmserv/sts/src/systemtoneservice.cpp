@@ -20,10 +20,12 @@
 //  Include Files  
 #include <systemtoneservice.h>	// CSystemToneService
 #include "stsimplementation.h"
+#include "stsdebug.h"
 
 //  Member Functions
 EXPORT_C /*static*/CSystemToneService* CSystemToneService::Create()
     {
+    TRACE_FUNCTION_ENTRY;
     CSystemToneService* self = 0;
     CStsImplementation* implementation = CStsImplementation::Create();
     if (implementation != 0)
@@ -31,46 +33,66 @@ EXPORT_C /*static*/CSystemToneService* CSystemToneService::Create()
         self = new CSystemToneService(*implementation);
         if (self == 0)
             {
+            TRACE_LOG(_L(" Unable to instantiate CSystemToneService"));
             delete implementation;
             }
         }
+    TRACE_FUNCTION_EXIT;
     return self;
     }
 
 EXPORT_C /*static*/void CSystemToneService::Delete(
         CSystemToneService* aSystemToneService)
     {
+    TRACE_FUNCTION_ENTRY;
     delete &(aSystemToneService->iImplementation);
     delete aSystemToneService;
+    TRACE_FUNCTION_EXIT;
     }
 
 CSystemToneService::CSystemToneService(CStsImplementation& aImplementation) :
     iImplementation(aImplementation)
     {
+    TRACE_FUNCTION_ENTRY_EXIT;
     }
 
 CSystemToneService::~CSystemToneService()
     {
+    TRACE_FUNCTION_ENTRY_EXIT;
     }
 
 EXPORT_C void CSystemToneService::PlayTone(TToneType aTone)
     {
+    TRACE_FUNCTION_ENTRY;
+    TRACE_LOG((_L("TToneType[0x%x]"), aTone));
     iImplementation.PlayTone(aTone);
+    TRACE_FUNCTION_EXIT;
     }
 
 EXPORT_C void CSystemToneService::PlayAlarm(TAlarmType aAlarm,
         unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
     {
+    TRACE_FUNCTION_ENTRY;
+    TRACE_LOG((_L("TAlarmType[0x%x]"), aAlarm));
     iImplementation.PlayAlarm(aAlarm, aAlarmContext, aObserver);
+    TRACE_LOG((_L("AlarmContext[%u]"), aAlarmContext));
+    TRACE_FUNCTION_EXIT;
     }
 
 EXPORT_C void CSystemToneService::PlayAlarm(TToneType aTone,
         unsigned int& aAlarmContext, MStsPlayAlarmObserver& aObserver)
     {
+    TRACE_FUNCTION_ENTRY;
+    TRACE_LOG((_L("TToneType[0x%x]"), aTone));
     iImplementation.PlayAlarm(aTone, aAlarmContext, aObserver);
+    TRACE_LOG((_L("AlarmContext[%u]"), aAlarmContext));
+    TRACE_FUNCTION_EXIT;
     }
 
 EXPORT_C void CSystemToneService::StopAlarm(unsigned int aAlarmContext)
     {
+    TRACE_FUNCTION_ENTRY;
+    TRACE_LOG((_L("AlarmContext[%u]"), aAlarmContext));
     iImplementation.StopAlarm(aAlarmContext);
+    TRACE_FUNCTION_EXIT;
     }

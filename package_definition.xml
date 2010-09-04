@@ -91,7 +91,7 @@
     <unit bldFile="mmmw_plat/stream_control_custom_command_api/group"/>
    </component>
    <component id="system_tone_service_api" name="System Tone Service API" class="api" filter="s60" introduced="^4">
-      <unit bldFile="mmmw_plat/system_tone_service_api/group"/>
+      <unit bldFile="mmmw_plat/system_tone_service_api/group" filter="!test"/>
       <unit bldFile="mmmw_plat/system_tone_service_api/tsrc/group" filter="test,api_test,pref_test,TA_MMMW"/>
    </component>
    <component id="telephony_multimedia_service_api" name="Telephony Multimedia Service API" class="api" filter="s60">
