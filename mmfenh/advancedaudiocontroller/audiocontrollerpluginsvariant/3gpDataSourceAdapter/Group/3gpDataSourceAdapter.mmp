@@ -49,7 +49,7 @@ LIBRARY     DataSourceAdapter.lib
 
 LIBRARY         ecom.lib
 
-LIBRARY		3GPMP4Lib.lib
+LIBRARY		3gpmp4lib.lib
 LIBRARY         efsrv.lib				// File server session
 LIBRARY		bafl.lib				// Resource file
 LIBRARY         caf.lib

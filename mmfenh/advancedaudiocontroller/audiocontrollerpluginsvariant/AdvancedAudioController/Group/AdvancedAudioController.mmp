@@ -61,7 +61,7 @@ LIBRARY         bafl.lib                        // Resource file
 LIBRARY         sysutil.lib
 LIBRARY         mmfdevsound.lib
 LIBRARY         mmfstandardcustomcommands.lib
-LIBRARY         custominterfacebuilder.lib
+LIBRARY         CustomInterfaceBuilder.lib
 LIBRARY         MetaDataUtility.lib
 LIBRARY         AudioOutputRouting.lib
 LIBRARY         DrmDcf.lib

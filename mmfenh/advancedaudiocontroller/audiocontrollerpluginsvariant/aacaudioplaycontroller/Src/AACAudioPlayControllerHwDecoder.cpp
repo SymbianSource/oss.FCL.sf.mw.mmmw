@@ -21,7 +21,7 @@
 // INCLUDE FILES
 #include "AACAudioPlayControllerDecoder.h"
 #include "DebugMacros.h"
-#include <Mmfcodec.h>
+#include <mmfcodec.h>
 
 #include <mmfpaniccodes.h>
 

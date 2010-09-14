@@ -134,15 +134,15 @@ LIBRARY 	mmfserverbaseclasses.lib
 LIBRARY 	AdvancedAudioController.lib
 LIBRARY         DevSoundAudioOutput.lib
 LIBRARY		FileAudioOutput.lib
-LIBRARY		3GPMP4Lib.lib
+LIBRARY		3gpmp4lib.lib
 LIBRARY         efsrv.lib				// File server session
 LIBRARY		bafl.lib				// Resource file
-LIBRARY		MMFDevSound.lib
+LIBRARY		mmfdevsound.lib
 LIBRARY         caf.lib
 LIBRARY         cafutils.lib
 LIBRARY			3gpDataSourceAdapter.lib
 LIBRARY         FrameTable.lib             // for CFrameTable
-LIBRARY EAacPlusAudioControllerUtility.lib
+LIBRARY EAACPlusAudioControllerUtility.lib
 
 LIBRARY AMRAudioControllerUtility.lib
 LIBRARY AWBAudioControllerUtility.lib

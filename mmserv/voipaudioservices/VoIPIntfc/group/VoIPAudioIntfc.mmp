@@ -73,15 +73,15 @@ LIBRARY         voipaudiosession.lib
 LIBRARY         euser.lib
 LIBRARY         mediaclientaudioinputstream.lib
 LIBRARY         mediaclientaudiostream.lib
-LIBRARY         audiooutputrouting.lib
+LIBRARY         AudioOutputRouting.lib
 LIBRARY         mediaclientaudio.lib
-LIBRARY         errorconcealmentintfc.lib
-LIBRARY         g711decoderintfc.lib
-LIBRARY         g711encoderintfc.lib
-LIBRARY         g729decoderintfc.lib
-LIBRARY         g729encoderintfc.lib
-LIBRARY         ilbcdecoderintfc.lib
-LIBRARY         ilbcencoderintfc.lib
+LIBRARY         ErrorConcealmentIntfc.lib
+LIBRARY         G711DecoderIntfc.lib
+LIBRARY         G711EncoderIntfc.lib
+LIBRARY         G729DecoderIntfc.lib
+LIBRARY         G729EncoderIntfc.lib
+LIBRARY         IlbcDecoderIntfc.lib
+LIBRARY         IlbcEncoderIntfc.lib
 
 SMPSAFE
 

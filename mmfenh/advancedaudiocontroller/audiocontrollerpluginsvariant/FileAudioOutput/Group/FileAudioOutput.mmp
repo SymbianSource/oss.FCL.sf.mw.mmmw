@@ -44,5 +44,5 @@ LIBRARY 	euser.lib
 LIBRARY 	mmfcontrollerframework.lib
 LIBRARY 	mmfserverbaseclasses.lib
 #ifdef EABI
-LIBRARY     ECOM.LIB
+LIBRARY     ecom.lib
 #endif

@@ -227,6 +227,10 @@ void CPlayWindow::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousState,
 
 		CActiveScheduler::Stop();
 	}
+	   if (aErrorCode != KErrNone)
+	    {
+	    CActiveScheduler::Stop();   
+	    }
 	return;
 
 }

@@ -46,6 +46,7 @@ public:
 
 private:
 	void ConstructL(TFileName* fileName);
+	TInt iCallBackErr;
 };
 
 #endif // !defined(AFX_RECORDFORMATS_H__3EDE1ACC_939F_49BE_B0B1_55C01807632D__INCLUDED_)

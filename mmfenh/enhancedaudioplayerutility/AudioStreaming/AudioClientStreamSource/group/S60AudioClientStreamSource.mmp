@@ -50,5 +50,5 @@ LIBRARY		euser.lib
 LIBRARY 	efsrv.lib  
 LIBRARY		mmfcontrollerframework.lib 
 LIBRARY		mmfstandardcustomcommands.lib 
-LIBRARY 	ECom.lib
+LIBRARY 	ecom.lib
 LIBRARY		S60AudioSource.lib

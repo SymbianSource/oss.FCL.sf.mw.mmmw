@@ -46,5 +46,5 @@ LIBRARY         EAacPlusUtil.lib																// MMF eAAC+ Utility - Kirit
 LIBRARY         mmfserverbaseclasses.lib
 
 #ifdef EABI
-LIBRARY         ECOM.LIB
+LIBRARY         ecom.lib
 #endif

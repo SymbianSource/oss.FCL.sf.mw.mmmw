@@ -46,6 +46,8 @@ private:
 	CMdaAudioRecorderUtility* recorder;
 
 	void ConstructL(TFileName* fileName);
+	
+	TInt iCallbackErr;
 
 
 };

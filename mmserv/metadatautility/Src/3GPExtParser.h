@@ -143,9 +143,12 @@ class C3GPExtParser : public CBase
  		TUint32 iTrackNumberSize;
  		TUint32 iCoverOffset;
  		TUint32 iCoverSize;
+        TUint32 iAlbumArtistOffset;  
+        TUint32 iAlbumArtistSize;
  		
  	public:
  				// constants
+        // for converting from %xxxx to @xxxx
 		TBuf8<4> K3GPExtMetaTitle;
 		TBuf8<4> K3GPExtMetaArtist;
 		TBuf8<4> K3GPExtMetaComposer;
@@ -153,6 +156,7 @@ class C3GPExtParser : public CBase
 		TBuf8<4> K3GPExtMetaComment;
 		TBuf8<4> K3GPExtMetaCustomGenre;
 		TBuf8<4> K3GPExtMetaYear;
+        TBuf8<4> K3GPExtMetaArtistLower;
     };
 
 #endif      // C3GPEXTPARSER_H

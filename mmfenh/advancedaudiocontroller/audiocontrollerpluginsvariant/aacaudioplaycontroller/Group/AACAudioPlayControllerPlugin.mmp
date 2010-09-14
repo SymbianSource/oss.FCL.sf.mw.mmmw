@@ -85,7 +85,7 @@ LIBRARY         AdvancedAudioController.lib
 LIBRARY         DevSoundAudioOutput.lib
 LIBRARY         FileAudioOutput.lib
 LIBRARY         bafl.lib                        // Resource file
-LIBRARY         MMFDevSound.lib
+LIBRARY         mmfdevsound.lib
 LIBRARY         efsrv.lib
 LIBRARY         FrameTable.lib             // for CFrameTable
 
@@ -94,20 +94,20 @@ LIBRARY         FrameTable.lib             // for CFrameTable
         #ifndef __AAC_PLUS_DECODER_PLUGIN
 // only EAACPlusAudioControllerUtility support AAC optimization
 //            LIBRARY AACAudioControllerUtility.lib
-            LIBRARY EAacPlusAudioControllerUtility.lib
+            LIBRARY EAACPlusAudioControllerUtility.lib
             LIBRARY AacDecoderConfig.lib   
         #else
-            LIBRARY EAacPlusAudioControllerUtility.lib
+            LIBRARY EAACPlusAudioControllerUtility.lib
             LIBRARY EAacPlusDecoderIntfc.lib
 //            LIBRARY EAacPlusFrameParser.lib
 						LIBRARY EAacPlusUtil.lib
         #endif
     #else
-        LIBRARY EAacPlusAudioControllerUtility.lib    
+        LIBRARY EAACPlusAudioControllerUtility.lib    
         LIBRARY AacDecoderConfig.lib   
     #endif
 #else    
-    LIBRARY EAacPlusAudioControllerUtility.lib    
+    LIBRARY EAACPlusAudioControllerUtility.lib    
     LIBRARY AacDecoderConfig.lib   
 #endif
 
