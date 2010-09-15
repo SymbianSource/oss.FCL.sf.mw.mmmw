@@ -685,8 +685,10 @@ void CMMFAudioController::StopL(TMMFMessage& aMessage)
 					file->ExecuteIntent(ContentAccess::EStop);
 					}
 			//  datapath propogates stop to sink & source
+			iStoppingPlaying = ETrue;
 			iDataPath->Stop();
 			SetState(EStopped);
+			iStoppingPlaying = EFalse;
 			}
 		else
 			{

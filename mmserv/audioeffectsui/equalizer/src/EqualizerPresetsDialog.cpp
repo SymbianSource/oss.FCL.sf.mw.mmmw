@@ -1028,7 +1028,8 @@ TKeyResponse CEqualizerPresetsDialog::OfferKeyEventL(
                 }
             return EKeyWasConsumed;
             }
-        else if ( aKeyEvent.iCode == EKeyEnter )
+        else if ( aKeyEvent.iCode == EKeyEnter ||
+        	        aKeyEvent.iCode == EKeyDevice3 ) //Rocker Key pressed
             {
             const TInt index = iListBox->CurrentItemIndex();
             TPresetName preset = GetHighlightedPresetInListBox();
