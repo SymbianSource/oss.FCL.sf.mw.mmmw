@@ -32,7 +32,7 @@
 NONSHARABLE_CLASS(CMMFRadioBackendEngine) : public CBase,
                      public MRadioPlayerObserver,
                      public MRadioFmTunerObserver,
-                     public MRadioPresetObserver          
+                     public MRadioPresetObserver
     {
 public:
 
@@ -40,26 +40,27 @@ public:
     void DeleteInstance();
     ~CMMFRadioBackendEngine();
     
-		void SetFrequency(TInt aFreq);		   
-		TInt GetFrequency(TInt& aFreq);
-		TInt GetSignalStrength(TInt& aFreq);		
-		void StationSeek(XAboolean aUpwards);
-		void CancelSetFrequency();	
-		void CancelStationSeek();	
-		void SetFreqRange(TFmRadioFrequencyRange aRange);	
-		TInt GetFreqRange(TFmRadioFrequencyRange& aRange);
-		TInt GetFreqRangeProperties(TFmRadioFrequencyRange& aRange, TInt& aMinFreq, TInt& aMaxFreq);			
-		TInt GetMaxVolume(TInt& aMaxVol);									
-		TInt SetVolume(TInt aVol);		
-		TInt GetVolume(TInt& aVol);
-		TInt SetMute(XAboolean aMute);	
-		TInt GetForcedMonoReception(XAuint32& aForcedMono);
-		TInt ForceMonoReception(XAuint32 aForcedMono);
-		void PlayRadio();		
-		void StopRadio();		
-        XAresult SetRadioAdaptContext(void * adaptcontext);  	
-		XAresult SetPlayerAdaptContext(void * adaptcontext);    					
-						
+    void SetFrequency(TInt aFreq);
+    TInt GetFrequency(TInt& aFreq);
+    TInt GetSignalStrength(TInt& aFreq);
+    void StationSeek(TBool aUpwards);
+    void CancelSetFrequency();
+    void CancelStationSeek();
+    void SetFreqRange(TFmRadioFrequencyRange aRange);
+    TInt GetFreqRange(TFmRadioFrequencyRange& aRange);
+    TInt GetFreqRangeProperties(TFmRadioFrequencyRange& aRange, TInt& aMinFreq, TInt& aMaxFreq);
+    TInt GetMaxVolume(TInt& aMaxVol);
+    TInt SetVolume(TInt aVol);
+    TInt GetVolume(TInt& aVol);
+    TInt SetMute(TBool aMute);
+    TInt GetForcedMonoReception(TUint& aForcedMono);
+    TInt ForceMonoReception(TUint aForcedMono);
+    void PlayRadio();
+    void StopRadio();
+    TInt GetSquelch(TBool& aSquelch);
+    TInt SetSquelch(TBool aSquelch);
+    void SetAdaptContext(void* adaptcontext);
+
     /**
      * From MRadioPlayerObserver.
      * Called when Radio state changed.
@@ -220,52 +221,50 @@ public:
      * @param aChange Change event type
      * @param aIndex Index to the preset that has changed. Zero means all presets.
      */
-    void MrpeoPresetChanged( TPresetChangeEvent aChange, TInt aIndex ); 
+    void MrpeoPresetChanged( TPresetChangeEvent aChange, TInt aIndex );
        
 private:
     static CMMFRadioBackendEngine* s_instance;
     CMMFRadioBackendEngine();
     void ConstructL();
-	XAresult TranslateError(TInt error);    
-	XAresult SetForceMonoFlag();		 
+    XAresult TranslateError(TInt error);
+    XAresult SetForceMonoFlag();
 
-private:      
-    CRadioUtility* 				iRadioUtility; 
-    CRadioFmTunerUtility* 	    iFmTunerUtility;
-    CRadioPlayerUtility* 		iRadioPlayerUtility;
-    TBool						iForceStereo;
-    void* 						iRadioAdaptContext;
-    void* 						iPlayerAdaptContext;    
-    TFmRadioFrequencyRange 		iDefaultFreqRange;
-    XAuint32 					iDefaultFrequency; 
-    TInt 						iDefaultMinFreq;
-    TInt 						iDefaultMaxFreq; 
+private:
+    CRadioUtility*          iRadioUtility; 
+    CRadioFmTunerUtility*   iFmTunerUtility;
+    CRadioPlayerUtility*    iRadioPlayerUtility;
+    TBool                   iForceStereo;
+    void*                   iAdaptContext;
+    TFmRadioFrequencyRange  iDefaultFreqRange;
+    TUint                   iDefaultFrequency;     
+    TInt                    iDefaultMinFreq;
+    TInt                    iDefaultMaxFreq; 
        
     };
-    
+
 #else  /* __cplusplus */
 
-extern void*     	cmmfradiobackendengine_init(void);
-extern void      	cmmfradiobackendengine_delete(void* context);
-extern void      	set_frequency(void* context, XAuint32 freq);
-extern void  			cancel_set_frequency(void* context);
-extern void 			station_seek(void* context, XAboolean upwards);    
-extern void 			cancel_station_seek(void* context);        
-extern XAresult  	get_frequency(void* context, XAuint32* freq);
-extern XAresult 	get_signal_strength(void* context, XAuint32* signalStrength);
-extern void 		 	set_freq_range(void* context, XAuint8 range);
-extern XAresult  	get_freq_range(void* context, XAuint8* range);   
-extern XAresult  	get_freq_range_properties(void* context, XAuint8 range, XAuint32* aMinFreq, XAuint32* aMaxFreq);
-extern XAresult  	set_stereo_mode(void* context, XAuint32 mode);
-extern XAresult  	get_stereo_mode(void* context, XAuint32* mode);
-extern XAresult  	mmf_set_radio_adapt_context(void * context, void * adaptcontext);
-extern XAresult  	mmf_set_player_adapt_context(void * context, void * adaptcontext);
-extern void         stop_radio(void * context);
-extern void         play_radio(void* context);
-extern XAresult     set_volume(void* context, XAuint32 vol);
-extern XAresult     get_volume(void* context, XAuint32* vol);
-extern XAresult     mmf_set_player_adapt_context(void * context, void * adaptcontext);
-extern XAresult     set_mute(void* context, XAboolean mute);
+extern void*        cmmfradiobackendengine_init(void);
+extern void         cmmfradiobackendengine_delete(void* pContext);
+extern void         set_frequency(void* pContext, void* pAdaptcontext, XAuint32 freq);
+extern void         cancel_set_frequency(void* pContext);
+extern void         station_seek(void* pContext, void* pAdaptcontext, XAboolean upwards);
+extern void         cancel_station_seek(void* pContext);
+extern XAresult     get_frequency(void* pContext, XAuint32* pFreq);
+extern XAresult     get_signal_strength(void* pContext, XAuint32* pSignalStrength);
+extern void         set_freq_range(void* pContext, void* pAdaptcontext, XAuint8 range);
+extern XAresult     get_freq_range(void* pContext, XAuint8* pRange);
+extern XAresult     get_freq_range_properties(void* pContext, XAuint8 range, XAuint32* pMinFreq, XAuint32* pMaxFreq);
+extern XAresult     set_stereo_mode(void* pContext, void* pAdaptcontext, XAuint32 mode);
+extern XAresult     get_stereo_mode(void* pContext, XAuint32* pMode);
+extern void         stop_radio(void* pContext, void* pAdaptcontext);
+extern void         play_radio(void* pContext, void* pAdaptcontext);
+extern XAresult     set_volume(void* pContext, void* pAdaptcontext, XAuint32 vol);
+extern XAresult     get_volume(void* pContext, XAuint32* pVol);
+extern XAresult     set_mute(void* pContext, void* pAdaptcontext, XAboolean mute);
+extern XAresult     get_squelch(void* pContext, XAboolean* pSquelch);
+extern XAresult     set_squelch(void* pContext, void* pAdaptcontext, XAboolean squelch);
 #endif /* __cplusplus */
 
 #endif /* CMMFRADIOBACKENDENGINE_H */

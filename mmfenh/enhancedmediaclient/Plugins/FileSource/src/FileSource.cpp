@@ -12,7 +12,7 @@
 * Contributors:
 *
 * Description:  Implementation of FileSource.
-*  Version     : %version: bh1mmcf#5.1.7 %
+*  Version     : %version: bh1mmcf#5.1.8 %
 *
 */
 
@@ -702,9 +702,12 @@ void CFileMultimediaSource::CancelRequests()
     for ( TInt ii = 0 ; ii < iRequests.Count() ; ii++ )
         {
         CReadWriteRequest* request = iRequests[ii];
-        delete request;
-        iRequests.Remove(ii);
-        ii--;
+        if(!request->Processing())
+            {
+            delete request;
+            iRequests.Remove(ii);
+            ii--;
+            }
         }
     }
             
@@ -800,20 +803,6 @@ TInt CFileMultimediaSource::Seek(TUint aPosInBytes)
     return iFile->Seek(ESeekStart, aPosInBytes);
     };
             
-/*
-*	Returns ETrue if the request can safely be deleted.
-*/
-
-TBool CReadWriteRequest::Completed() 
-    {
-    return iCompleted ;
-    }
-            
-TInt CReadWriteRequest::SetStatus(TBool aStatus)
-    {
-    iCompleted = aStatus;
-    return KErrNone;
-    }
 
 TBool CReadWriteRequest::SourceType() 
     {
@@ -878,7 +867,7 @@ void CReadWriteRequest::SetActive()
 */
 void CReadWriteRequest::DoCancel() 
     {
-    iCompleted = ETrue ;
+    iState = ECompleted;
     }
             
 /*
@@ -887,7 +876,7 @@ void CReadWriteRequest::DoCancel()
 TInt CReadWriteRequest::RunError( TInt aError ) 
     {
     //RunL can leave.
-    iCompleted = ETrue ;
+    iState = ECompleted;
     iError = aError; //keep this error internally for now
     return KErrNone ;
     }
@@ -897,6 +886,7 @@ TInt CReadWriteRequest::RunError( TInt aError )
 */
 void CReadRequest::RunL() 
     {
+    iState = EProcessing;
     //Copy the data from the normal buffer into the Transfer buffer
     if(iTransferBufferCopy)
         {
@@ -908,6 +898,7 @@ void CReadRequest::RunL()
         }
 
         STATIC_CAST(CFileMultimediaSource*,iParent)->ReadRequestStatus(STATIC_CAST(CReadWriteRequest*,this),iStatus);
+    iState = ECompleted;
     }
 
         // From CMultimediaDataSource begins
@@ -1372,7 +1363,6 @@ TInt CFileMultimediaSource::ReadRequestStatus(CReadWriteRequest* aRequest, TRequ
                 
             }
             
-            aRequest->SetStatus(ETrue);
             return KErrNone;		
         }
     }

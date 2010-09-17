@@ -92,8 +92,7 @@ XAresult XANokiaVolumeExtItfAdapt_SetMute(XAAdaptationMMFCtx *ctx,
         }
     else if (ctx->baseObj.ctxId == XARadioAdaptation)
         {
-        mmf_set_player_adapt_context(cmmfradiobackendengine_init(), ctx);
-        res = set_mute(cmmfradiobackendengine_init(), mute);
+        res = set_mute(cmmfradiobackendengine_init(), ctx, mute);
         }
 
     DEBUG_API("<-XANokiaVolumeExtItfAdapt_SetMute");
@@ -173,19 +172,5 @@ XAresult XANokiaVolumeExtItfAdapt_SetStereoPosition(XAAdaptationMMFCtx *ctx,
 
     DEBUG_API("<-XANokiaVolumeExtItfAdapt_SetStereoPosition");
     return res;
-    }
-
-void XANokiaVolumeExtItfAdapt_MuteChange(XAAdaptationBaseCtx* ctx,
-        XAboolean aMute)
-    {
-    XAAdaptEvent event =
-        {
-        XA_NOKIAEXTVOLITFEVENTS, XA_ADAPT_VOLUME_MUTE_CHANGED, 1, 0
-        };
-    if (ctx)
-        {
-        event.data = &aMute;
-        XAAdaptationBase_SendAdaptEvents(ctx, &event);
-        }
     }
 

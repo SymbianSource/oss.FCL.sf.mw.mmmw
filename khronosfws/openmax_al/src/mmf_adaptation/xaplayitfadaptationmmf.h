@@ -48,6 +48,4 @@ XAresult XAPlayItfAdaptMMF_SetMarkerPosition(XAAdaptationBaseCtx *bCtx,
 XAresult XAPlayItfAdaptMMF_ClearMarkerPosition(XAAdaptationBaseCtx *bCtx);
 XAresult XAPlayItfAdaptMMF_SetPositionUpdatePeriod(XAAdaptationBaseCtx *bCtx,
         XAmillisecond mSec);
-void XAPlayItfAdaptMMF_StateChange(XAAdaptationBaseCtx *bCtx,
-        XAboolean playing);
 #endif /* XAPLAYITFADAPTATIONMMF_H */

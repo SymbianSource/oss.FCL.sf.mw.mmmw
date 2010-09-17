@@ -29,4 +29,5 @@ EXPORTS
 	?SourcePlayL@CDataSourceAdapter@@UAEXXZ @ 28 NONAME ; void CDataSourceAdapter::SourcePlayL(void)
 	?SourceThreadLogoff@CDataSourceAdapter@@UAEXXZ @ 29 NONAME ; void CDataSourceAdapter::SourceThreadLogoff(void)
 	??0CDataSourceAdapter@@IAE@XZ @ 30 NONAME ; CDataSourceAdapter::CDataSourceAdapter(void)
+	?ResetDataSource@CDataSourceAdapter@@UAEXXZ @ 31 NONAME ; void CDataSourceAdapter::ResetDataSource(void)
 

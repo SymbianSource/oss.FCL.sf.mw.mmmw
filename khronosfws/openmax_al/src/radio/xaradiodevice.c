@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "xaradiodevice.h"
 #include "xaradioitf.h"
 #include "xaconfigextensionsitf.h"
@@ -119,10 +118,14 @@ XAresult XARadioDeviceImpl_CreateRadioDevice(XAObjectItf* pDevice,
     }
 
     *pDevice = (XAObjectItf)&(pBaseObj->self);
-    pImpl->adaptationCtx = XARadioAdapt_Create();   
-
+    pImpl->adaptationCtx = XARadioAdapt_Create();
+    if (pImpl->adaptationCtx == NULL)
+    {
+        XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
+        DEBUG_API("<-XARadioDeviceImpl_Create With ERROR");
+        return XA_RESULT_RESOURCE_ERROR;
+    }
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
-
     DEBUG_API("<-XARadioDeviceImpl_Create");
     return XA_RESULT_SUCCESS;
 }
@@ -276,10 +279,6 @@ void XARadioDeviceImpl_FreeResources(XAObjectItf self)
     XAuint8 itfIdx = 0;
     DEBUG_API("->XARadioDeviceImpl_FreeResources");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS(XATSRadio);
-
-    
-    assert( pObj && pImpl && pObj == pObj->self );
-
 
     /* free all allocated interfaces */
     for(itfIdx = 0; itfIdx < RADIO_ITFCOUNT; itfIdx++)

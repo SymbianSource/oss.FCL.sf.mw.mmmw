@@ -36,4 +36,5 @@ EXPORTS
 	_ZTIN18CDataSourceAdapter21CAsyncProxyFillBufferE @ 35 NONAME
 	_ZTV18CDataSourceAdapter @ 36 NONAME
 	_ZTVN18CDataSourceAdapter21CAsyncProxyFillBufferE @ 37 NONAME
+	_ZN18CDataSourceAdapter15ResetDataSourceEv @ 38 NONAME
 

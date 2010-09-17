@@ -11,13 +11,12 @@
 *
 * Contributors:
 *
-* Description:
+* Description: 
 *
 */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 #include "xaradioitf.h"
 #include "xaradioitfadaptation.h"
@@ -197,7 +196,7 @@ XAresult XARadioItfImpl_SetFrequency(XARadioItf self, XAuint32 freq)
     XAuint32 minFreq;
     XAuint32 maxFreq;
    	XAuint32 freqInterval;
-
+        
     XARadioItfImpl* impl = GetImpl(self);
     DEBUG_API("->XARadioItfImpl_SetFrequency");
     XA_IMPL_THREAD_SAFETY_ENTRY(XATSRadio);
@@ -209,23 +208,23 @@ XAresult XARadioItfImpl_SetFrequency(XARadioItf self, XAuint32 freq)
         DEBUG_API("<-XARadioItfImpl_SetFrequency");
         return XA_RESULT_PARAMETER_INVALID;
     }
-
-    // Check for valid entries:
- 		ret = XARadioItfImpl_GetFreqRangeProperties(self, range, &minFreq, &maxFreq, &freqInterval);
+    
+    // Check for valid entries: 
+ 		ret = XARadioItfImpl_GetFreqRangeProperties(self, range, &minFreq, &maxFreq, &freqInterval);   
     if (ret != XA_RESULT_SUCCESS)
     {
     	XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
-    	DEBUG_API("<-XARadioItfImpl_SetFrequency");
+    	DEBUG_API("<-XARadioItfImpl_SetFrequency");    	
     	return ret;
-    }
-
+    }		
+    
     if ( (freq < minFreq) || (freq > maxFreq) )
     {
     	XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
-    	DEBUG_API("<-XARadioItfImpl_SetFrequency");
+    	DEBUG_API("<-XARadioItfImpl_SetFrequency");    	
     	return XA_RESULT_PARAMETER_INVALID;
-    }
-
+    }	  
+           
    	ret = XARadioItfAdapt_SetFrequency( (XAAdaptationMMFCtx*)impl->adapCtx, freq );
 
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
@@ -312,7 +311,7 @@ XAresult XARadioItfImpl_SetSquelch(XARadioItf self, XAboolean squelch)
 
     if (impl->squelch != squelch)
     {
-        ret = XARadioItfAdapt_SetSquelch( squelch );
+        ret = XARadioItfAdapt_SetSquelch( (XAAdaptationMMFCtx*)impl->adapCtx, squelch );
         if ( ret == XA_RESULT_SUCCESS )
         {
             impl->squelch = squelch;
@@ -373,7 +372,7 @@ XAresult XARadioItfImpl_SetStereoMode(XARadioItf self, XAuint32 mode)
         {
          	  impl->stereoMode = mode;
         }
-    }
+    }    
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioItfImpl_SetStereoMode");
     return ret;
@@ -494,10 +493,11 @@ XAresult XARadioItfImpl_StopSeeking(XARadioItf self)
  * XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32 * pNumPresets)
  * Description: Returns the number of preset slots the device has for storing the presets.
  **/
-XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32 * pNumPresets)
+XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32* pNumPresets)
 {
-    XAresult ret = XA_RESULT_FEATURE_UNSUPPORTED;
-
+    XAresult ret = XA_RESULT_SUCCESS;
+    XAuint32 presetValue = 0;
+    pNumPresets = &presetValue;
     DEBUG_API("->XARadioItfImpl_GetNumberOfPresets");
 
     return ret;
@@ -519,7 +519,9 @@ XAresult XARadioItfImpl_SetPreset(XARadioItf self,
                                   XAuint32 mode,
                                   const XAchar * name)
 {
-    XAresult ret = XA_RESULT_FEATURE_UNSUPPORTED;
+  //  XAresult ret = XA_RESULT_FEATURE_UNSUPPORTED; Currently, this is not a valid error code for OpenMaxAL. Is proposed to be added.
+  
+    XAresult ret = XA_RESULT_PARAMETER_INVALID; // For now, use this error code.
 
     return ret;
 }
@@ -542,9 +544,11 @@ XAresult XARadioItfImpl_GetPreset(XARadioItf self,
                                   XAchar * pName,
                                   XAuint16 * pNameLength)
 {
-
-    XAresult ret = XA_RESULT_FEATURE_UNSUPPORTED;
-
+ 
+    XAresult ret = XA_RESULT_SUCCESS;
+    if (preset != 0)
+        ret = XA_RESULT_PARAMETER_INVALID;
+        
     DEBUG_API("<-XARadioItfImpl_GetPreset");
     return ret;
 }
@@ -612,6 +616,9 @@ XARadioItfImpl* XARadioItfImpl_Create(XAAdaptationBaseCtx *adapCtx)
         self->itf.GetSignalStrength = XARadioItfImpl_GetSignalStrength;
         self->itf.Seek = XARadioItfImpl_Seek;
         self->itf.StopSeeking = XARadioItfImpl_StopSeeking;
+        self->itf.GetNumberOfPresets = XARadioItfImpl_GetNumberOfPresets;
+        self->itf.SetPreset = XARadioItfImpl_SetPreset;
+        self->itf.GetPreset = XARadioItfImpl_GetPreset;
         self->itf.RegisterRadioCallback = XARadioItfImpl_RegisterRadioCallback;
 
         /* init variables */
@@ -643,7 +650,6 @@ void XARadioItfImpl_Free(XARadioItfImpl* self)
     XAAdaptationBase_RemoveEventHandler( self->adapCtx, &XARadioItfImpl_AdaptCb );
 
     XARadioItfAdapt_Free();
-    assert(self==self->self);
     free(self);
 
     XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS(XATSRadio);
@@ -658,7 +664,7 @@ void XARadioItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
     XARadioItfImpl* impl =(XARadioItfImpl*)pHandlerCtx;
     XAuint32 eventData = 0;
     XAboolean eventBoolean = XA_BOOLEAN_FALSE;
-
+    
     DEBUG_API("->XARadioItfimpl_AdaptCb");
 
     if(!impl)
@@ -667,41 +673,38 @@ void XARadioItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
         DEBUG_API("<-XARadioItfImpl_AdaptCb");
         return;
     }
-    assert(event);
-
-    if( event->eventid == XA_ADAPT_RADIO_FREQUENCY_CHANGED && impl->callback )
+    
+    if (event)
     {
-        DEBUG_API("Frequency changed in adaptation");
-        eventData = *(XAuint32*)event->data;
-        impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_FREQUENCY_CHANGED, eventData, eventBoolean );
-    }
-
-    else if( event->eventid == XA_ADAPT_RADIO_FREQUENCY_RANGE_CHANGED && impl->callback )
-    {
-        DEBUG_API("Frequency range changed in adaptation");
-
-        impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_FREQUENCY_RANGE_CHANGED, eventData, eventBoolean  );
-    }
-
-    else if( event->eventid == XA_ADAPT_RADIO_SEEK_COMPLETE && impl->callback )
-    {
-        DEBUG_API("Seek complete in adaptation");
-       	eventBoolean = *(XAboolean*)event->data;
-        impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_SEEK_COMPLETED, eventData, eventBoolean  );
-    }
-
-    else if( event->eventid == XA_ADAPT_RADIO_STEREO_STATUS_CHANGED && impl->callback )
-    {
-        DEBUG_API("Stereo status change in adaptation");
-      	eventBoolean = *(XAboolean*)event->data;
-        impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_STEREO_STATUS_CHANGED, eventData, eventBoolean  );
-    }
-
-    else if( event->eventid == XA_ADAPT_RADIO_SIGNAL_STRENGTH_CHANGED && impl->callback )
-    {
-        DEBUG_API("Signal Strength Change in adaptation");
-        impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_SIGNAL_STRENGTH_CHANGED, eventData, eventBoolean  );
-    }
+        if( event->eventid == XA_ADAPT_RADIO_FREQUENCY_CHANGED && impl->callback )
+        {
+            DEBUG_API("Frequency changed in adaptation"); 
+            eventData = *(XAuint32*)event->data;
+            impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_FREQUENCY_CHANGED, eventData, eventBoolean );
+        }
+        else if( event->eventid == XA_ADAPT_RADIO_FREQUENCY_RANGE_CHANGED && impl->callback )
+        {
+            DEBUG_API("Frequency range changed in adaptation");
+            impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_FREQUENCY_RANGE_CHANGED, eventData, eventBoolean  );
+        }
+        else if( event->eventid == XA_ADAPT_RADIO_SEEK_COMPLETE && impl->callback )
+        {
+            DEBUG_API("Seek complete in adaptation");
+       	    eventBoolean = *(XAboolean*)event->data;        
+            impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_SEEK_COMPLETED, eventData, eventBoolean  );     
+        }
+        else if( event->eventid == XA_ADAPT_RADIO_STEREO_STATUS_CHANGED && impl->callback )
+        {
+            DEBUG_API("Stereo status change in adaptation");
+            eventBoolean = *(XAboolean*)event->data;          
+            impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_STEREO_STATUS_CHANGED, eventData, eventBoolean  );
+        } 
+        else if( event->eventid == XA_ADAPT_RADIO_SIGNAL_STRENGTH_CHANGED && impl->callback )
+        {
+            DEBUG_API("Signal Strength Change in adaptation");
+            impl->callback( impl->cbPtrToSelf, impl->context, XA_RADIO_EVENT_SIGNAL_STRENGTH_CHANGED, eventData, eventBoolean  );
+        }
+    }      
     else
     {
         /* do nothing */

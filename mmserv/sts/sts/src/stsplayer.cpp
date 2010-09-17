@@ -22,6 +22,7 @@
 #include <systemtoneservice.h>
 #include "stsplayersettings.h"
 #include "stssettingsmanager.h"
+#include "stsdebug.h"
 
 /*static*/CStsPlayer* CStsPlayer::Create(MStsPlayerObserver& aObserver,
         CStsSettingsManager& aSettingsManager, unsigned int aContext,
@@ -85,18 +86,22 @@ CStsPlayer::CStsPlayer(MStsPlayerObserver& aObserver,
 bool CStsPlayer::Init()
     {
     TRAPD(result, iPlayer = CMdaAudioPlayerUtility::NewL(*this));
+    TRACE_LOG((_L("CStsPlayer::Init() : CMdaAudioPlayerUtility::NewL result[%d]"), result));
     return result == KErrNone;
     }
 
 CStsPlayer::~CStsPlayer()
     {
+    TRACE_FUNCTION_ENTRY;
     delete iPlayer;
+    TRACE_FUNCTION_EXIT;
     }
 
 void CStsPlayer::Play()
     {
     // Play the tone
     TRAPD( err, iPlayer->OpenFileL(iPlayerSettings.GetFileName()) );
+    TRACE_LOG((_L("CStsPlayer::Play() : CMdaAudioPlayerUtility::OpenFileL result[%d]"), err));
     // If there is an error, indicate that the playback is complete. 
     if (err)
         {
@@ -107,7 +112,9 @@ void CStsPlayer::Play()
 
 void CStsPlayer::Stop()
     {
+    TRACE_FUNCTION_ENTRY;
     iPlayer->Stop();
+    TRACE_FUNCTION_EXIT;
     }
 
 void CStsPlayer::MapcInitComplete(TInt aError,
@@ -124,19 +131,29 @@ void CStsPlayer::MapcInitComplete(TInt aError,
                 iPlayerSettings.GetRepeatDelay());
         iPlayer->SetVolume(volume);
         iPlayer->SetVolumeRamp(iPlayerSettings.GetVolumeRamp());
+        TRACE_LOG((_L("CStsPlayer::Play() Settings-Priority[%d]Preference[0x%x]Repeats[%d]Volume[%d]"), 
+                iAudioPriority,
+                iAudioPreference,
+                iPlayerSettings.GetNumberOfRepeats(),
+                volume));
+        TRACE_LOG((_L("CStsPlayer::Play() Settings-RepeatDelay[%d]VolumeRamp[0x%x]"), 
+                iPlayerSettings.GetRepeatDelay().Int64(),
+                iPlayerSettings.GetVolumeRamp().Int64()));
         iPlayer->Play();
         }
     else
         {
         //TODO: add trace
         // Since there is an error, indicate that the playback is complete
-        RDebug::Print(_L("InitCompleteReturned"), aError);
+        //RDebug::Print(_L("InitCompleteReturned"), aError);
+        TRACE_LOG((_L("CStsPlayer::MapcInitComplete() Error[%d]"), aError));
         iObserver.PlayComplete(iContext);
         }
     }
 
 void CStsPlayer::MapcPlayComplete(TInt aError)
     {
+    TRACE_LOG((_L("CStsPlayer::MapcPlayComplete() Error[%d]"), aError));
     if (aError != KErrNone)
         {
         //TODO: add trace

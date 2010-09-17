@@ -20,7 +20,7 @@
 &EN
 
 ; Provide value for uid
-#{"STIF"},(0x00000000),1,1,0,TYPE=SA
+#{"STS STIF"},(0x101FB3E3),1,1,0, TYPE=SA, RU
 
 ; Series60 product id for S60 3.0
 [0x101F7961], 0, 0, 0, {"Series60ProductID"}
@@ -47,7 +47,9 @@
 
 ; Install files
 "\epoc32\release\armv5\udeb\systemtoneservicestif.dll"   -   "!:\Sys\Bin\systemtoneservicestif.dll"
-"..\conf\systemtoneservicestif.cfg"                      -   "C:\testframework\systemtoneservicestif.cfg" 
+"..\conf\systemtoneservicestif_common.cfg"               -   "C:\testframework\systemtoneservicestif_common.cfg"
+"..\conf\systemtoneservicestif.cfg"                      -   "C:\testframework\systemtoneservicestif.cfg"
+"..\conf\systemtoneservicestif_calendaralarm.cfg"        -   "C:\testframework\systemtoneservicestif_calendaralarm.cfg" 
 "..\init\TestFramework.ini"                              -   "C:\TestFramework\TestFramework.ini"
  
 ; Embedded SIS 

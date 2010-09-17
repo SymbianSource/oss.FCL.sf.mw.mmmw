@@ -370,8 +370,9 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         virtual TInt al_radioitf_Seek(CStifItemParser& aItem );
         virtual TInt al_radioitf_StopSeeking(CStifItemParser& aItem ); 
        	virtual TInt al_radioitf_RegisterRadioCallback(CStifItemParser& aItem ); 
-        virtual TInt al_radioitf_GetFrequencyDefault( CStifItemParser& aItem);
-        virtual TInt al_radioitf_GetFreqRangeDefault( CStifItemParser& aItem );
+        virtual TInt al_radioitf_GetNumberOfPresets( CStifItemParser& aItem);
+        virtual TInt al_radioitf_SetPreset( CStifItemParser& aItem);
+        virtual TInt al_radioitf_GetPreset( CStifItemParser& aItem);
 
         virtual TInt al_strminfoitf_QueryMediaContainerInformation( CStifItemParser& aItem );
         virtual TInt al_strminfoitf_QueryStreamType( CStifItemParser& aItem );

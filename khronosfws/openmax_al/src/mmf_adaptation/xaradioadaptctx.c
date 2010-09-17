@@ -18,7 +18,6 @@
 #include "xaradioadaptctx.h"
 #include "xaadaptationmmf.h"
 #include "cmmfradiobackendengine.h"
-#include "assert.h"
 
 /*
  * XAAdaptationMMFCtx* XARadioAdapt_Create()
@@ -32,21 +31,20 @@ XAAdaptationBaseCtx* XARadioAdapt_Create()
 
     if ( pSelf)
     {
-        if( XAAdaptationBase_Init(&(pSelf->baseObj.baseObj),XARadioAdaptation)
-                    != XA_RESULT_SUCCESS )
-      	{
-        	DEBUG_ERR("Failed to init base context!!!");
-         	free(pSelf);
-        	pSelf = NULL;
-        	return (XAAdaptationBaseCtx*)pSelf;
-      	}
-     		else
-       	{
-       		pSelf->range = RADIO_DEFAULT_FREQ_RANGE;
-        	pSelf->frequency = RADIO_DEFAULT_FREQ;
-        	pSelf->rdsEmulationThread = 0;
-       		pSelf->emulationThread = 0;
-       	}
+        if( XAAdaptationBase_Init(&(pSelf->baseObj.baseObj),XARadioAdaptation) != XA_RESULT_SUCCESS )
+        {
+            DEBUG_ERR("Failed to init base context!!!");
+            free(pSelf);
+            pSelf = NULL;
+            return (XAAdaptationBaseCtx*)pSelf;
+        }
+        else
+        {
+            pSelf->range = RADIO_DEFAULT_FREQ_RANGE;
+            pSelf->frequency = RADIO_DEFAULT_FREQ;
+            pSelf->rdsEmulationThread = 0;
+            pSelf->emulationThread = 0;
+        }
     }
 
     DEBUG_API("<-XARadioAdapt_Create");
@@ -69,8 +67,6 @@ XAresult XARadioAdapt_PostInit(XAAdaptationBaseCtx* bCtx)
         return XA_RESULT_PARAMETER_INVALID;
     }
     ctx = (XARadioAdaptationCtx*)bCtx;
-    assert(ctx);
-
     ret = XAAdaptationBase_PostInit( &ctx->baseObj.baseObj );
     if( ret!=XA_RESULT_SUCCESS )
     {
@@ -79,7 +75,12 @@ XAresult XARadioAdapt_PostInit(XAAdaptationBaseCtx* bCtx)
         return ret;
     }
 
-		cmmfradiobackendengine_init(); 
+    if (cmmfradiobackendengine_init() == NULL)
+    {
+        DEBUG_ERR("Creation of Radio Backend Engine failed!!");
+        DEBUG_API("<-XARadioAdapt_PostInit");
+        return XA_RESULT_RESOURCE_ERROR;
+    }
 
     DEBUG_API("<-XARadioAdapt_PostInit");
     return ret;
@@ -92,10 +93,10 @@ XAresult XARadioAdapt_PostInit(XAAdaptationBaseCtx* bCtx)
  */
 void XARadioAdapt_Destroy(XAAdaptationBaseCtx* bCtx)
 {
-		XARadioAdaptationCtx* ctx = NULL;
+    XARadioAdaptationCtx* ctx = NULL;
     DEBUG_API("->XARadioAdapt_Destroy");
-    
-		cmmfradiobackendengine_delete(cmmfradiobackendengine_init());    
+
+    cmmfradiobackendengine_delete(cmmfradiobackendengine_init());
 
     if(bCtx == NULL || bCtx->ctxId != XARadioAdaptation )
     {

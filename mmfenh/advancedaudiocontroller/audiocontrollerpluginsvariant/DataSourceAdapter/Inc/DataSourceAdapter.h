@@ -103,6 +103,7 @@ class CDataSourceAdapter : public CBase
 		IMPORT_C virtual TInt EvaluateIntent(ContentAccess::TIntent aIntent);
         IMPORT_C virtual TInt GetInterface(TUid aInterfaceId, TVersion& aVer, TAny*& aInterfaceImpl);
 		IMPORT_C virtual TBool OnlyHeaderPresent();
+		IMPORT_C virtual void ResetDataSource();
 		
 		//sets the AudioOutputControlUtitlity reference and sets Datasource to AudioOutputContolUtility
 		IMPORT_C TInt SetAudioOutputControlUtil(CAudioOutputControlUtility* aAudioOutputControlUtility);

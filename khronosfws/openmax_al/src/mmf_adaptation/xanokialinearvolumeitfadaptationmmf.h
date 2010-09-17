@@ -36,7 +36,4 @@ XAresult XANokiaLinearVolumeItfAdapt_GetMaxVolumeLevel(
 XAresult XANokiaLinearVolumeItfAdapt_GetStepCount(XAAdaptationMMFCtx *ctx,
         XAuint32 * pStepCount);
 
-void XANokiaLinearVolumeItfAdapt_VolumeChange(XAAdaptationBaseCtx *ctx,
-        TInt volume);
-
 #endif /* XANOKIALINEARVOLUMEITFADAPTATIONMMF_H */

@@ -25,6 +25,7 @@
 #include <MProEngToneSettings.h>
 #include <ProEngFactory.h>
 #include "stsplayersettings.h"
+#include <NokiaAudioPreference.h>
 _LIT(KDefaultFile,"z:\\data\\sounds\\digital\\clock.aac");
 
 // Data types
@@ -214,6 +215,12 @@ void CStsSettingsManager::GetAudioPriorityPref(
             {
             aPriority = KAudioPriorityRecvMsg;
             aPreference = KAudioPrefNewSMS;
+            break;
+            }
+        case CSystemToneService::EErrorBeep:
+            {
+            aPriority = KAudioPriorityHighLevel;
+            aPreference = KAudioPrefError;
             break;
             }
         case CSystemToneService::EWarningBeep:
