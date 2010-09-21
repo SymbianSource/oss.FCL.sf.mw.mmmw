@@ -114,6 +114,8 @@ public:
     IMPORT_C gint RemoveMsgQueueNotifier(TMSMsgQueueNotifierType type,
             gpointer obsrvr);
 
+    IMPORT_C void TermSrv();
+
     // From MQueueHandlerObserver
     virtual void QueueEvent(gint aEventType, gint aError, void* event_data);
 

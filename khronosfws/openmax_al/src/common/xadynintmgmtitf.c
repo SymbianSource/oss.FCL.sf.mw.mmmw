@@ -16,8 +16,6 @@
  */
 
 #include <stdlib.h>
-#include <assert.h>
-
 #include "openmaxalwrapper.h"
 #include "xadynintmgmtitf.h"
 #include "xadebug.h"
@@ -256,7 +254,6 @@ XADIMItfImpl* XADIMItfImpl_Create()
 void XADIMItfImpl_Free(XADIMItfImpl* self)
     {
     DEBUG_API("->XADIMItfImpl_Free");
-    assert(self==self->self);
     XAImpl_DeleteThreadHandle(self->asyncThr);
     free(self);
     DEBUG_API("<-XADIMItfImpl_Free");
@@ -271,8 +268,6 @@ void XADIMItfImpl_Init(XADIMItfImpl* self, XAObjectItf parent,
         xaDoRemoveItfImpl doRemove)
     {
     DEBUG_API("->XADIMItfImpl_Init");
-
-    assert(self==self->self && parent && doAdd && doResume && doRemove);
     self->parent = parent;
     self->DoAddItfImpl = doAdd;
     self->DoResumeItfImpl = doResume;

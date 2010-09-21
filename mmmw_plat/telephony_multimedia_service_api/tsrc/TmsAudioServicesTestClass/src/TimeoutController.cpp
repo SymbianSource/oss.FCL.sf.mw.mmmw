@@ -27,16 +27,11 @@
 
  Description: Default constructor
 
- C++ default constructor can NOT contain any code, that
- might leave.
+ C++ default constructor can NOT contain any code, that might leave.
 
  Parameters: None
 
  Return Values: None
-
- Errors/Exceptions: None
-
- Status: Approved
 
  -------------------------------------------------------------------------------
  */
@@ -60,10 +55,6 @@ CSimpleTimeout::CSimpleTimeout() :
  Parameters:
 
  Return Values: None
-
- Errors/Exceptions:
-
- Status: Approved
 
  -------------------------------------------------------------------------------
  */
@@ -95,8 +86,6 @@ void CSimpleTimeout::ConstructL(MTimeoutObserver* aObserver,
 
  Errors/Exceptions: Leaves if memory allocation for object fails
  Leaves if ConstructL leaves
-
- Status: Approved
 
  -------------------------------------------------------------------------------
  */

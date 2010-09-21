@@ -16,7 +16,7 @@
  */
 
 #include <audiopreference.h>
-#include <audiooutput.h>
+#include <AudioOutput.h>
 #include <mmcccodecinformation.h>
 #include <gstappsrc.h>
 #include "tmsutility.h"

@@ -19,7 +19,6 @@
 #define XAMETADATAEXTRACTIONITF_H
 
 #include "xaadptbasectx.h"
-#include "xametadataadaptation.h"
 
 /** MACROS **/
 
@@ -37,12 +36,6 @@ typedef struct XAMetadataExtractionItfImpl_
     struct XAMetadataExtractionItfImpl_* self;
 
     /* variables */
-    XAuint32 filteredcount;
-    XAboolean* tagmatchesfilter;
-    XAboolean filteringOn;
-
-    XAMetadataImplTagList currentTags;
-
     XAAdaptationBaseCtx *adaptCtx;
 
     } XAMetadataExtractionItfImpl;
@@ -81,7 +74,7 @@ void XAMetadataExtractionItfImp_AdaptCb(void *pHandlerCtx,
 void XAMetadataExtractionItfImpl_Free(XAMetadataExtractionItfImpl* self);
 
 /* internal methods */
-XAresult CheckAndUnfilterIndex(XAMetadataExtractionItfImpl *impl,
-        XAuint32 oldidx, XAuint32 *newidx);
+/*XAresult CheckAndUnfilterIndex(XAMetadataExtractionItfImpl *impl,
+        XAuint32 oldidx, XAuint32 *newidx);*/
 
 #endif /* XAMETADATAEXTRACTIONITF_H */

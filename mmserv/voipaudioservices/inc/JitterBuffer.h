@@ -11,13 +11,13 @@
  *
  * Contributors:
  *
- * Description:  Jitter buffer for audio frames.
- *  Interface   : VoIPJitterBuffer.lib
+ * Description: Jitter buffer for audio frames.
+ * Interface  : VoIPJitterBuffer.lib
  *
  */
 
-#ifndef __VOIPJITTERBUFFER_H
-#define __VOIPJITTERBUFFER_H
+#ifndef VOIPJITTERBUFFER_H
+#define VOIPJITTERBUFFER_H
 
 // DATA TYPES
 
@@ -33,7 +33,6 @@ class MJitterBufferObserver;
  *  Jitter buffer.
  *
  *  @lib VoIPJitterBuffer.lib
- *  @since Series 60 5.0
  */
 class CVoIPJitterBuffer : public CActive
     {
@@ -54,7 +53,7 @@ private:
     enum TJBTransitionState
         {
         EWait,
-        //    ENeedData,
+        //ENeedData,
         EEmptyData
         };
 
@@ -77,7 +76,7 @@ public:
     /**
      * SetupL
      * Sets codec information and initializes JB.
-     * @since Series 60 5.0
+     *
      * @param TFourCC - codec's fourcc
      * @param TVoIPJBConfig& - JB configuraion parameters
      * @return void
@@ -87,7 +86,7 @@ public:
     /**
      * ResetBuffer
      * Resets JB to its original state with no data.
-     * @since Series 60 5.0
+     *
      * @param TBool - ETrue == tone is to be played
      * @return void
      */
@@ -96,7 +95,6 @@ public:
     /**
      * Delay Down
      *
-     * @since Series 60 5.0
      * @param none
      * @return void
      */
@@ -105,7 +103,6 @@ public:
     /**
      * Delay Up
      *
-     * @since Series 60 5.0
      * @param none
      * @return void
      */
@@ -114,7 +111,6 @@ public:
     /**
      * Play
      *
-     * @since Series 60 5.0
      * @param none
      * @return void
      */
@@ -123,7 +119,6 @@ public:
     /**
      * Pause
      *
-     * @since Series 60 5.0
      * @param none
      * @return void
      */
@@ -132,7 +127,6 @@ public:
     /**
      * Stop
      *
-     * @since Series 60 5.0
      * @param none
      * @return void
      */
@@ -141,7 +135,7 @@ public:
     /**
      * FillBuffer
      * Retrieves next frame from JB queue.
-     * @since Series 60 5.0
+     *
      * @param CMMFBuffer* - buffer to be filled with data from the JB
      * @return TInt
      */
@@ -150,7 +144,7 @@ public:
     /**
      * EmptyBufferL
      * Queues received frame in JB.
-     * @since Series 60 5.0
+     *
      * @param CMMFBuffer* - buffer to be queued in the JB
      * @return TInt
      */
@@ -188,7 +182,7 @@ private:
 
     /**
      * Play current frame from JB.
-     * @since Series 60 5.0
+     *
      * @param none
      * @return void
      */
@@ -196,7 +190,7 @@ private:
 
     /**
      * TransitionState
-     * @since Series 60 5.0
+     *
      * @param TJBTransitionState
      * @param TUint32
      * @return void
@@ -207,7 +201,7 @@ private:
     /**
      * Calculates the time interval at which data rate should be slowed down
      * when subsequent EmptyBufferL calls are coming too fast.
-     * @since Series 60 5.0
+     *
      * @param none
      * @return Suggested delay in microseconds.
      */
@@ -240,9 +234,8 @@ private:
 
     // Current request size of the buffer
     TInt iRequestSize;
-
     };
 
-#endif  //__VOIPJITTERBUFFER_H
+#endif //VOIPJITTERBUFFER_H
 
 // End of file

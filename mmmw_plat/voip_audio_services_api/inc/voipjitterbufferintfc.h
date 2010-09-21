@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPJITTERBUFFERINTFC_H
-#define __VOIPJITTERBUFFERINTFC_H
+#ifndef VOIPJITTERBUFFERINTFC_H
+#define VOIPJITTERBUFFERINTFC_H
 
 //  INCLUDES
 #include <e32base.h>
@@ -28,8 +28,6 @@ class CVoIPJitterBufferIntfcImpl;
 
 /**
  *  TVoIPJBConfig
- *  ?description
- *
  */
 class TVoIPJBConfig
     {
@@ -62,8 +60,6 @@ public:
 /**
  *  MVoIPJitterBufferObserver class
  *
- *  description
- *
  *  @lib VoIPAudioIntfc.dll
  *
  */
@@ -75,9 +71,7 @@ public:
 
 public:
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Event
      * @param const CVoIPJitterBufferIntfc&
      * @param TInt - event type
      * @return void
@@ -99,17 +93,13 @@ class CVoIPJitterBufferIntfc
 public:
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CVoIPJitterBufferIntfc();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetObserver
      * @param MVoIPFormatObserver&
      * @return TInt
      */
@@ -117,7 +107,6 @@ public:
 
     /**
      * ConfigureJitterBuffer
-     * @since S60 v5.0
      * @param TVoIPJBConfig&
      * @return void
      */
@@ -125,7 +114,6 @@ public:
 
     /**
      * ResetJitterbuffer
-     * @since S60 v5.0
      * @param aPlayTone ETrue, if tone should be played
      * @return void
      */
@@ -133,7 +121,6 @@ public:
 
     /**
      * DelayDown
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -141,7 +128,6 @@ public:
 
     /**
      * DelayUp
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -151,8 +137,6 @@ protected:
 
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -160,8 +144,6 @@ protected:
 
     /**
      * 2-nd phase constructor
-     *
-     * @since S60 v5.0
      * @param CVoIPJitterBufferIntfcImpl*
      * @return void
      */
@@ -169,9 +151,8 @@ protected:
 
 protected:
     CVoIPJitterBufferIntfcImpl* iVoIPJitterBufferIntfcImpl;
-
     };
 
-#endif  //__VOIPJITTERBUFFERINTFC_H
+#endif  //VOIPJITTERBUFFERINTFC_H
 
 // End of File

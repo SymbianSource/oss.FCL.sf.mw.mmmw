@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __TIMEOUTCONTROLLER_H
-#define __TIMEOUTCONTROLLER_H
+#ifndef TIMEOUTCONTROLLER_H
+#define TIMEOUTCONTROLLER_H
 
 #include <e32svr.h>
 #include <StifParser.h>
@@ -58,8 +58,6 @@ public:
      */
     ~CSimpleTimeout();
 
-public:
-
     /**
      * Starts timeout counting
      */
@@ -69,8 +67,6 @@ public:
      * Cancel timeout counting
      */
     void Stop();
-
-public:
 
     /**
      * RunL derived from CActive handles the completed requests.
@@ -109,5 +105,5 @@ private:
     CStifLogger* iLog;
     };
 
-#endif //__TIMEOUTCONTROLLER_H
+#endif //TIMEOUTCONTROLLER_H
 

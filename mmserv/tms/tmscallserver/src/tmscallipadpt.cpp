@@ -625,114 +625,6 @@ gint TMSCallIPAdpt::GetGain(guint& gain)
     }
 
 // -----------------------------------------------------------------------------
-// TMSCallIPAdpt::GetGlobalMaxVolume
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::GetGlobalMaxVolume(guint& volume)
-    {
-    TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
-        {
-        status = iIPDownlink->GetMaxVolume(volume);
-        iMaxVolume = volume;
-        TRACE_PRN_N1(_L("TMS->TMSCallIPAdpt::GetGlobalMaxVolume [%d]"), volume);
-        }
-    TRACE_PRN_FN_EXT;
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallIPAdpt::SetGlobalVolume
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::SetGlobalVolume(const guint volume)
-    {
-    TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_INVALID_STATE);
-    //iGlobalVol = volume;
-    if (iIPDownlink && iDnlState != EIdle)
-        {
-        status = iIPDownlink->SetVolume(volume);
-        }
-    TRACE_PRN_FN_EXT;
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallIPAdpt::GetGlobalVolume
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::GetGlobalVolume(guint& volume)
-    {
-    TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
-        {
-        status = iIPDownlink->GetVolume(volume);
-        }
-    TRACE_PRN_FN_EXT;
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallIPAdpt::GetGlobalMaxGain
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::GetGlobalMaxGain(guint& gain)
-    {
-    TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
-        {
-        status = iIPUplink->GetMaxGain(gain);
-        iMaxGain = gain;
-        TRACE_PRN_N1(_L("TMS->TMSCallIPAdpt::GetGlobalMaxGain [%d]"), gain);
-        }
-    TRACE_PRN_FN_EXT;
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallIPAdpt::SetGlobalGain
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::SetGlobalGain(const guint gain)
-    {
-    TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_INVALID_STATE);
-    //iGlobalGain = gain;
-    if (iIPUplink && iUplState != EIdle)
-        {
-        status = iIPUplink->SetGain(gain);
-        }
-    TRACE_PRN_FN_EXT;
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallIPAdpt::GetGlobalGain
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::GetGlobalGain(guint& gain)
-    {
-    TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPUplink && iUplState != EIdle)
-        {
-        status = iIPUplink->GetGain(gain);
-        }
-    TRACE_PRN_FN_EXT;
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
 // TMSCallIPAdpt::GetCodecMode
 //
 // -----------------------------------------------------------------------------
@@ -990,12 +882,6 @@ gint TMSCallIPAdpt::OpenDownlink(const RMessage2& message, const gint retrytime)
     // TODO: Also, TMS will monitor for emergency call and if detected it
     //       will deny access to audio resources.
 
-    /* Clarify with adaptation team which prio/pref values should be used.
-     * 1) KAudioPrefUnknownVoipAudioDownlink      -3rd party VoIP?
-     *    KAudioPriorityUnknownVoipAudioDownlink  -3rd party VoIP?
-     * 2) KAudioPrefVoipAudioDownlink             -NOK native VoIP?
-     *    KAudioPriorityVoipAudioDownlink         -NOK native VoIP?
-     */
     iPriority.iPref = KAudioPrefVoipAudioDownlink;
     iPriority.iPriority = KAudioPriorityVoipAudioDownlink;
 
@@ -1034,14 +920,8 @@ gint TMSCallIPAdpt::OpenUplink(const RMessage2& message, const gint retrytime)
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
 
-    // Clients must have MultimediaDD capability to use this priority/pref
-
-    /* Clarify with adaptation team which prio/pref values should be used.
-     * 1) KAudioPrefUnknownVoipAudioUplink      -3rd party VoIP?
-     *    KAudioPriorityUnknownVoipAudioUplink  -3rd party VoIP?
-     * 2) KAudioPrefVoipAudioUplink             -NOK native VoIP?
-     *    KAudioPriorityVoipAudioUplink         -NOK native VoIP?
-     */
+    // Clients must have MultimediaDD capability to use this priority/pref.
+    // KAudioPrefVoipAudioUplinkNonSignal must be used to allow DTMF mixing.
     iPriority.iPref = KAudioPrefVoipAudioUplinkNonSignal;
     iPriority.iPriority = KAudioPriorityVoipAudioUplink;
 
@@ -1258,80 +1138,6 @@ gint TMSCallIPAdpt::GetG711CodecMode(gint& mode, const TMSStreamType strmtype)
     }
 
 // -----------------------------------------------------------------------------
-// TMSCallIPAdpt::FrameModeRequiredForEC
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::FrameModeRqrdForEC(gboolean& frmodereq)
-    {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EInitialized)
-        {
-        status = iIPDownlink->FrameModeRqrdForEC(frmodereq);
-        }
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallIPAdpt::SetFrameMode
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::SetFrameMode(const gboolean frmode)
-    {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EInitialized)
-        {
-        status = iIPDownlink->SetFrameMode(frmode);
-        }
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallIPAdpt::GetFrameMode
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::GetFrameMode(gboolean& frmode)
-    {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState != EIdle)
-        {
-        status = iIPDownlink->GetFrameMode(frmode);
-        }
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallIPAdpt::ConcealErrorForNextBuffer
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::ConcealErrorForNextBuffer()
-    {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EActivated)
-        {
-        status = iIPDownlink->ConcealErrorForNextBuffer();
-        }
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSCallIPAdpt::BadLsfNextBuffer
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSCallIPAdpt::BadLsfNextBuffer()
-    {
-    gint status(TMS_RESULT_INVALID_STATE);
-    if (iIPDownlink && iDnlState == EActivated)
-        {
-        status = iIPDownlink->BadLsfNextBuffer();
-        }
-    return status;
-    }
-
-// -----------------------------------------------------------------------------
 // TMSCallIPAdpt::SetOutput
 //
 // -----------------------------------------------------------------------------
@@ -1380,11 +1186,16 @@ gint TMSCallIPAdpt::GetPreviousOutput(TMSAudioOutput& /*output*/)
 //
 // -----------------------------------------------------------------------------
 //
-gint TMSCallIPAdpt::GetAvailableOutputsL(gint& /*count*/,
-        CBufFlat*& /*outputsbuf*/)
+gint TMSCallIPAdpt::GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuf)
     {
-    //TODO: return public & private
-    return TMS_RESULT_FEATURE_NOT_SUPPORTED;
+    RBufWriteStream stream;
+    stream.Open(*outputsbuf);
+    CleanupClosePushL(stream);
+    stream.WriteUint32L(TMS_AUDIO_OUTPUT_PUBLIC);
+    stream.WriteUint32L(TMS_AUDIO_OUTPUT_PRIVATE);
+    CleanupStack::PopAndDestroy(&stream);
+    count = 2;
+    return TMS_RESULT_SUCCESS;
     }
 
 // -----------------------------------------------------------------------------

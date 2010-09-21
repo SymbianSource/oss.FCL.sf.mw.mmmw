@@ -18,6 +18,7 @@
 // [INCLUDE FILES] - do not remove
 #include <e32svr.h>
 #include <StifParser.h>
+#include <strings.h>
 #include <StifTestInterface.h>
 #include "openmaxaltestmodule.h"
 
@@ -31,7 +32,14 @@
 //const ?type ?constant_var = ?constant;
 
 // MACROS
-//#define ?macro ?macro_def
+#define RETURN_ERR_IF_NOT_EQUAL(item, valFromItem, value) \
+    status = item.GetNextInt(valFromItem); \
+    if (status || (valFromItem != value)) \
+        { \
+        iLog->Log(_L("Value[%d] is not equal to [%d]"), valFromItem, value); \
+        return KErrCompletion; \
+        } \
+    
 
 // LOCAL CONSTANTS AND MACROS
 //const ?type ?constant_var = ?constant;
@@ -113,6 +121,7 @@ TInt COpenMAXALTestModule::al_audioencodercapitf_GetAudioEncoderCapabilities( CS
     {
     TInt status(KErrNone);
     TInt encId(0);
+    TInt idx(0);
     XAuint32 encoderid(0);
     XAuint32 index(0);
     XAAudioCodecDescriptor desc;
@@ -121,17 +130,81 @@ TInt COpenMAXALTestModule::al_audioencodercapitf_GetAudioEncoderCapabilities( CS
     status = aItem.GetNextInt(encId);
     if(!status)
         {
-        encoderid = encId;
-        if(m_AEncCapItf)
+        status = aItem.GetNextInt(idx);
+        if(!status)
             {
-            res = (*m_AEncCapItf)->GetAudioEncoderCapabilities(
-                    m_AEncCapItf, encoderid, &index, &desc);
-            status = res;
+            index = idx;
+            encoderid = encId;
+            if(m_AEncCapItf)
+                {
+                res = (*m_AEncCapItf)->GetAudioEncoderCapabilities(
+                        m_AEncCapItf, encoderid, &index, &desc);
+                status = res;
+                if (res == XA_RESULT_SUCCESS)
+                    {
+                    status = validateAudioCodecDescriptorAtIndex(encoderid, desc, aItem);
+                    }
+                }
+            else
+                {
+                status = KErrNotFound;
+                }                
             }
-        else
-            {
-            status = KErrNotFound;
-            }                
+        }
+    return status;
+}
+
+TInt COpenMAXALTestModule::validateAudioCodecDescriptorAtIndex(
+        XAuint32 aAudioCodecId,
+        XAAudioCodecDescriptor& aDesc,
+        CStifItemParser& aItem )
+    {
+    TInt status(KErrNone);
+    TInt intVal(0);
+    TInt loopIndex(0);
+    
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.maxChannels);
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.minBitsPerSample);
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.maxBitsPerSample);
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.minSampleRate);
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.maxSampleRate);
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.isFreqRangeContinuous);
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.numSampleRatesSupported);
+    for(loopIndex = 0; loopIndex < aDesc.numSampleRatesSupported; loopIndex++)
+        {
+        RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.pSampleRatesSupported[loopIndex]);
+        }
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.minBitRate);
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.maxBitRate);
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.isBitrateRangeContinuous);
+    RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.numBitratesSupported);
+    for(loopIndex = 0; loopIndex < aDesc.numBitratesSupported; loopIndex++)
+        {
+        RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.pBitratesSupported[loopIndex]);
+        }
+    switch (aAudioCodecId)
+        {
+        case XA_AUDIOCODEC_PCM:
+            RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.profileSetting);
+            if (!status)
+                {
+                RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.modeSetting);
+                }
+            break;
+        case XA_AUDIOCODEC_AMR:
+            RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.profileSetting);
+            if (!status)
+                {
+                RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.modeSetting);
+                }
+            break;
+        case XA_AUDIOCODEC_AAC:
+            RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.profileSetting);
+            if (!status)
+                {
+                RETURN_ERR_IF_NOT_EQUAL(aItem, intVal, aDesc.modeSetting);
+                }
+            break;
         }
     return status;
     }

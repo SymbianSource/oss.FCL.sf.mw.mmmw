@@ -41,10 +41,6 @@ typedef struct XAPlayItfImpl_
 
     /* variables */
     XAPlayItf cbPtrToSelf;
-    /* TODO : This is no longer needed we need to get state from XAMediaPlayerImpl
-     * Delete this.*/
-    XAuint32 playbackState;
-
     xaPlayCallback callback;
     void *cbcontext;
     XAuint32 eventFlags;

@@ -19,7 +19,6 @@
 #include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <errno.h>
 
 #include "xaplatform.h"
@@ -45,7 +44,6 @@ typedef struct
 XAresult XAImpl_CreateMutex(XAImplMutexHandle *mtx)
     {
     XA_MTX *pMtx = (XA_MTX *) malloc(sizeof(XA_MTX));
-    assert(mtx);
     if (pMtx)
         {
         pthread_mutexattr_t *pAttr = NULL;
@@ -75,7 +73,6 @@ XAresult XAImpl_CreateMutex(XAImplMutexHandle *mtx)
 XAresult XAImpl_LockMutex(XAImplMutexHandle mtx)
     {
     XA_MTX *pMtx = (XA_MTX*) mtx;
-    assert(pMtx);
 #ifdef _MUTEXERRORSUPPORT
     if(pthread_mutex_lock(pMtx))
         {
@@ -96,7 +93,6 @@ XAresult XAImpl_TryLockMutex(XAImplMutexHandle mtx)
     XA_MTX *pMtx = (XA_MTX*) mtx;
     XAint32 mutexRet;
     XAresult ret = XA_RESULT_SUCCESS;
-    assert(pMtx);
 
 #ifdef _MUTEXERRORSUPPORT
     mutexRet = pthread_ mutex_trylock(pMtx);
@@ -141,7 +137,6 @@ XAresult XAImpl_TryLockMutex(XAImplMutexHandle mtx)
 XAresult XAImpl_UnlockMutex(XAImplMutexHandle mtx)
     {
     XA_MTX *pMtx = (XA_MTX*) mtx;
-    assert(pMtx);
 #ifdef _MUTEXERRORSUPPORT
     if(pthread_mutex_lock(pMtx))
         {
@@ -180,7 +175,6 @@ void XAImpl_DeleteMutex(XAImplMutexHandle mtx)
 XAresult XAImpl_CreateSemaphore(XAImplSemHandle *sem)
     {
     sem_t *pSem = (sem_t*) malloc(sizeof(sem_t));
-    assert(sem);
     if (pSem)
         {
         if (sem_init(pSem, 0, 0))
@@ -201,7 +195,6 @@ XAresult XAImpl_CreateSemaphore(XAImplSemHandle *sem)
 XAresult XAImpl_WaitSemaphore(XAImplSemHandle sem)
     {
     sem_t* pSem = (sem_t*) sem;
-    assert(pSem);
     sem_wait(pSem);
     return XA_RESULT_SUCCESS;
     }
@@ -209,7 +202,6 @@ XAresult XAImpl_WaitSemaphore(XAImplSemHandle sem)
 XAresult XAImpl_PostSemaphore(XAImplSemHandle sem)
     {
     sem_t *pSem = (sem_t*) sem;
-    assert(pSem);
     sem_post(pSem);
     return XA_RESULT_SUCCESS;
     }
@@ -231,7 +223,6 @@ void XAImpl_DeleteSemaphore(XAImplSemHandle sem)
 XAresult XAImpl_CreateThreadHandle(XAImplThreadHandle *thd)
     {
     pthread_t *pThd = (pthread_t*) malloc(sizeof(pthread_t));
-    assert(thd);
     if (!pThd)
         {
         return XA_RESULT_MEMORY_FAILURE;
@@ -244,7 +235,6 @@ XAresult XAImpl_StartThread(XAImplThreadHandle thd, void *thdattrib,
         XAImplThreadFunction thdfunc, void* thdfuncargs)
     {
     pthread_t *pThd = (pthread_t*) thd;
-    assert(thd);
     if (pthread_create(pThd, thdattrib, thdfunc, thdfuncargs))
         {
         return XA_RESULT_INTERNAL_ERROR;

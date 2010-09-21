@@ -169,7 +169,7 @@ XAresult XARadioItfImpl_GetFreqRangeProperties(XARadioItf self,
         DEBUG_API("<-XARadioItfImpl_GetFreqRangeProperties");
         return XA_RESULT_PARAMETER_INVALID;
     }
-
+    
     ret = XARadioItfAdapt_GetFreqRangeProperties( (XAAdaptationMMFCtx*)impl->adapCtx,
             range, pMinFreq, pMaxFreq );
     if (ret == XA_RESULT_SUCCESS)
@@ -497,7 +497,7 @@ XAresult XARadioItfImpl_GetNumberOfPresets(XARadioItf self, XAuint32* pNumPreset
 {
     XAresult ret = XA_RESULT_SUCCESS;
     XAuint32 presetValue = 0;
-    pNumPresets = &presetValue;
+    *pNumPresets = presetValue;
     DEBUG_API("->XARadioItfImpl_GetNumberOfPresets");
 
     return ret;

@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPG729DECFORMATINTFC_H
-#define __VOIPG729DECFORMATINTFC_H
+#ifndef VOIPG729DECFORMATINTFC_H
+#define VOIPG729DECFORMATINTFC_H
 
 #include <voipaudiocommon.h>
 #include <voipformatintfc.h>
@@ -37,17 +37,13 @@ class CVoIPG729DecoderIntfc : public CVoIPFormatIntfc
 public:
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CVoIPG729DecoderIntfc();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * BadLsfNextBuffer
      * @param none
      * @return TInt
      */
@@ -56,8 +52,6 @@ public:
 protected:
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -65,8 +59,6 @@ protected:
 
     /**
      * 2-nd phase constructor
-     *
-     * @since S60 v5.0
      * @param CVoIPG729DecoderIntfcImpl*
      * @return void
      */
@@ -74,9 +66,8 @@ protected:
 
 protected:
     CVoIPG729DecoderIntfcImpl* iFormatIntfcImpl;
-
     };
 
-#endif //__VOIPG729DECFORMATINTFC_H
+#endif //VOIPG729DECFORMATINTFC_H
 
 // End of file

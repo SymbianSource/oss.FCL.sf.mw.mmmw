@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  JitterBuffer component capable to audioframe buffering.
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  JitterBuffer component capable to audioframe buffering.
+ *
+ */
 
 // INCLUDE FILES
 #include <e32base.h>
@@ -24,7 +23,6 @@
 #include "JitterBufferObserver.h"
 #include "JitterBufferImpl.h"
 #include "JitterBuffer.h"
-
 
 // -----------------------------------------------------------------------------
 // CVoIPJitterBuffer::CVoIPJitterBuffer
@@ -47,7 +45,7 @@ CVoIPJitterBuffer::CVoIPJitterBuffer(MJitterBufferObserver* aObserver) :
 // -----------------------------------------------------------------------------
 //
 EXPORT_C CVoIPJitterBuffer* CVoIPJitterBuffer::NewL(
-                                               MJitterBufferObserver* aObserver)
+        MJitterBufferObserver* aObserver)
     {
     CVoIPJitterBuffer* self = new (ELeave) CVoIPJitterBuffer(aObserver);
     CleanupStack::PushL(self);
@@ -93,7 +91,7 @@ CVoIPJitterBuffer::~CVoIPJitterBuffer()
 // -----------------------------------------------------------------------------
 //
 EXPORT_C void CVoIPJitterBuffer::SetupL(const TFourCC aCodec,
-                                        const TVoIPJBConfig& aJBConfig)
+        const TVoIPJBConfig& aJBConfig)
     {
     TRACE_PRN_FN_ENT;
 
@@ -107,8 +105,8 @@ EXPORT_C void CVoIPJitterBuffer::SetupL(const TFourCC aCodec,
     if (iJitterBufferImpl)
         {
         iJitterBufferImpl->SetupL(aCodec, aJBConfig);
-        iSampleInterval =
-                aJBConfig.iSampleInterval * KJBMillisecondsToMicroseconds;
+        iSampleInterval = aJBConfig.iSampleInterval *
+                KJBMillisecondsToMicroseconds;
 
         // Cannot use with G711 as it asks buffers in uncontrolled manner
         // TODO: change the logic so that it inspects what happens in long
@@ -225,8 +223,6 @@ EXPORT_C void CVoIPJitterBuffer::Stop()
 //
 EXPORT_C TInt CVoIPJitterBuffer::FillBuffer(CMMFBuffer* aBuffer)
     {
-//    TRACE_PRN_FN_ENT;
-
     TInt err = KErrNone;
 
     if (iJitterBufferImpl && iJitterBufferImpl->BufferLength())
@@ -252,7 +248,6 @@ EXPORT_C TInt CVoIPJitterBuffer::FillBuffer(CMMFBuffer* aBuffer)
         iObserver->EventJB(MJitterBufferObserver::EGeneralError, err);
         }
 
-//    TRACE_PRN_FN_EXT;
     return err;
     }
 
@@ -267,7 +262,6 @@ EXPORT_C TInt CVoIPJitterBuffer::FillBuffer(CMMFBuffer* aBuffer)
 //
 EXPORT_C TInt CVoIPJitterBuffer::EmptyBuffer(CMMFBuffer* aBuffer)
     {
-//    TRACE_PRN_FN_ENT;
     TInt err = KErrNotReady;
 
     if (iJitterBufferImpl && (iState == EJBufPlaying))
@@ -277,8 +271,8 @@ EXPORT_C TInt CVoIPJitterBuffer::EmptyBuffer(CMMFBuffer* aBuffer)
             return err;
             }
 
-//        TRACE_PRN_N1(_L("JB-> BUF Size: [%d]"), aBuffer->BufferSize());
-//        TRACE_PRN_N1(_L("JB-> REQ Size: [%d]"), aBuffer->RequestSize());
+        //TRACE_PRN_N1(_L("JB-> BUF Size: [%d]"), aBuffer->BufferSize());
+        //TRACE_PRN_N1(_L("JB-> REQ Size: [%d]"), aBuffer->RequestSize());
 
         // Adaptation control will be done based on played frames
         err = iJitterBufferImpl->AddDataFrame(aBuffer);
@@ -287,7 +281,6 @@ EXPORT_C TInt CVoIPJitterBuffer::EmptyBuffer(CMMFBuffer* aBuffer)
     iObserver->EventJB(MJitterBufferObserver::EBufferConsumed);
 
     TRACE_PRN_IF_ERR(err);
-//    TRACE_PRN_FN_EXT;
     return err;
     }
 
@@ -298,15 +291,11 @@ EXPORT_C TInt CVoIPJitterBuffer::EmptyBuffer(CMMFBuffer* aBuffer)
 //
 void CVoIPJitterBuffer::PlayBuffer()
     {
-//    TRACE_PRN_FN_ENT;
-
     // iDataSink has valid data - send for playback
     iObserver->EventJB(MJitterBufferObserver::EBufferReadyToPlay);
 
     // Go to wait state
-//    TransitionState(EWait);
-
-//    TRACE_PRN_FN_EXT;
+    //TransitionState(EWait);
     }
 
 // -----------------------------------------------------------------------------
@@ -376,7 +365,7 @@ TInt CVoIPJitterBuffer::RunError(TInt aError)
 // -----------------------------------------------------------------------------
 //
 void CVoIPJitterBuffer::TransitionState(TJBTransitionState aTransitionState,
-                                        TUint32 aStateChangeDelay)
+        TUint32 aStateChangeDelay)
     {
     TRequestStatus* stat = &iStatus;
 
@@ -408,7 +397,7 @@ TUint32 CVoIPJitterBuffer::DetermineEmptyBufferDelay()
     if (iTmPreviousEmptyBuffer.Int64())
         {
         TTimeIntervalMicroSeconds difference =
-            iTmCurrentEmptyBuffer.MicroSecondsFrom(iTmPreviousEmptyBuffer);
+                iTmCurrentEmptyBuffer.MicroSecondsFrom(iTmPreviousEmptyBuffer);
 
         if (difference.Int64() < iEmptyBufferDelayThreshold)
             {
@@ -419,6 +408,5 @@ TUint32 CVoIPJitterBuffer::DetermineEmptyBufferDelay()
     iTmPreviousEmptyBuffer = iTmCurrentEmptyBuffer;
     return emptyBufferDelay;
     }
-
 
 //  End of File

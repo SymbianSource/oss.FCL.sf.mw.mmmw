@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPUPLINKSTREAM_H
-#define __VOIPUPLINKSTREAM_H
+#ifndef VOIPUPLINKSTREAM_H
+#define VOIPUPLINKSTREAM_H
 
 #include <voipaudiocommon.h>
 #include <voipdtmftoneplayer.h>
@@ -30,8 +30,6 @@ class CVoIPAudioUplinkStreamImpl;
 /**
  *  MVoIPUplinkObserver class
  *
- *  ?more_complete_description
- *
  *  @lib VoIPAudioIntfc.dll
  *
  */
@@ -44,9 +42,7 @@ public:
 
 public:
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * EmptyBuffer
      * @param CVoIPAudioUplinkStream&
      * @param TPtr8
      * @return void
@@ -55,9 +51,7 @@ public:
             CVoIPDataBuffer* aBuffer) = 0;
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Event
      * @param CVoIPAudioUplinkStream&
      * @param TInt - Event type
      * @param TInt - Status
@@ -70,8 +64,6 @@ public:
 /**
  *  CVoIPAudioUplinkStream class
  *
- *  ?more_complete_description
- *
  *  @lib VoIPAudioIntfc.dll
  *
  */
@@ -81,62 +73,48 @@ public:
 
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CVoIPAudioUplinkStream();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Open
      * @param MVoIPUplinkObserver&
      * @return TInt
      */
     IMPORT_C TInt Open(MVoIPUplinkObserver& aObserver);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetVersion
      * @param TVersion&
      * @return TInt
      */
     IMPORT_C TInt GetVersion(TVersion& aVersion);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetMaxGain
      * @param TInt&
      * @return TInt
      */
     IMPORT_C TInt GetMaxGain(TInt& aGain);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetGain
      * @param TInt
      * @return TInt
      */
     IMPORT_C TInt SetGain(TInt aGain);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetGain
      * @param TInt&
      * @return TInt
      */
     IMPORT_C TInt GetGain(TInt& aGain);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetFormat
      * @param TVoIPCodecFormat
      * @param CVoIPFormatIntfc&
      * @return TInt
@@ -145,36 +123,28 @@ public:
             CVoIPFormatIntfc*& aIntfc);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Start
      * @param none
      * @return TInt
      */
     IMPORT_C TInt Start();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Stop
      * @param none
      * @return TInt
      */
     IMPORT_C TInt Stop();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Close
      * @param none
      * @return void
      */
     IMPORT_C void Close();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * BufferEmptied
      * @param CVoIPDataBuffer*
      * @return TInt
      */
@@ -184,8 +154,6 @@ protected:
 
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -193,8 +161,6 @@ protected:
 
     /**
      * Symbian constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -209,9 +175,8 @@ private:
 private:
 
     CVoIPAudioUplinkStreamImpl* iVoIPAudioUplinkStreamImpl;
-
     };
 
-#endif //__VOIPUPLINKSTREAM_H
+#endif //VOIPUPLINKSTREAM_H
 
 // End of file

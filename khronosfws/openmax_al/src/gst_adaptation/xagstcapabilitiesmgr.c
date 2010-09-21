@@ -19,8 +19,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
-#include <gst/gst.h>
-#include <gobject_global.h>
 
 #include "xagstcapabilitiesmgr.h"
 #include "xaframeworkmgr.h"
@@ -31,225 +29,11 @@ static XAresult XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities(
         XACapabilities **ppNode);
 static XAresult XAGSTCapabilitiesMgr_GetAudioPCMEncoderCapabilities(
         XACapabilities **ppNode);
-static XAresult XAGSTCapabilitiesMgr_GetCapabilities_FromGstElement(
-        XAAudioCodecDescriptor **entries, XAuint32 type);
 
-/* XAresult XAGSTCapabilitiesMgr_UpdateCapabilitieList
- * Description: Update the capabilities list supported by GStreamer framework.
+/* XAresult XAGSTCapabilitiesMgr_UpdateCapabilitieList(
+ *       FrameworkMap *frameworkMap, XACapabilities **ppListHead)
+ * Description: Append capabilities supported by Gstreamer framework.
  */
-static gboolean populate_field(GQuark field, const GValue * value,
-        gpointer pfx)
-    {
-    gchar *field_name;
-    gpointer *pfxd = (gpointer*) pfx;
-    XAAudioCodecDescriptor *ctxx = (XAAudioCodecDescriptor *) pfxd;
-
-    field_name = (gchar*) g_quark_to_string(field);
-
-    if ((strcasecmp((const char*) field_name, "channels") == 0))
-        {
-        if (GST_VALUE_HOLDS_INT_RANGE(value) == TRUE)
-            {
-            (ctxx)->maxChannels = gst_value_get_int_range_max(value);
-            }
-        else
-            (ctxx)->maxChannels = g_value_get_int(value);
-        }
-    if ((strcasecmp((const char*) field_name, "depth") == 0))
-        {
-        if (GST_VALUE_HOLDS_INT_RANGE(value) == TRUE)
-            {
-            (ctxx)->minBitsPerSample = gst_value_get_int_range_min(value);
-            }
-        else
-            (ctxx)->minBitsPerSample = g_value_get_int(value);
-        }
-    if ((strcasecmp((const char*) field_name, "bitrate") == 0))
-        {
-        if (GST_VALUE_HOLDS_INT_RANGE(value) == TRUE)
-            {
-            (ctxx)->minBitRate = gst_value_get_int_range_min(value);
-            (ctxx)->maxBitRate = gst_value_get_int_range_max(value);
-            }
-        else
-            {
-            (ctxx)->minBitRate = g_value_get_int(value);
-            (ctxx)->maxBitRate = g_value_get_int(value);
-            }
-        }
-    if ((strcasecmp((const char*) field_name, "width") == 0))
-        {
-        if (GST_VALUE_HOLDS_INT_RANGE(value) == TRUE)
-            {
-            (ctxx)->maxBitsPerSample = gst_value_get_int_range_max(value);
-            }
-        else
-            (ctxx)->maxBitsPerSample = g_value_get_int(value);
-        }
-    if ((strcasecmp((const char*) field_name, "rate") == 0))
-        {
-        if (GST_VALUE_HOLDS_INT_RANGE(value) == TRUE)
-            {
-            (ctxx)->minSampleRate = gst_value_get_int_range_min(value) * 1000;
-            (ctxx)->maxSampleRate = gst_value_get_int_range_max(value) * 1000;
-            }
-        else
-            {
-            (ctxx)->minSampleRate = g_value_get_int(value) * 1000;
-            (ctxx)->maxSampleRate = g_value_get_int(value) * 1000;
-            }
-        }
-
-    return TRUE;
-    }
-
-XAresult XAGSTCapabilitiesMgr_GetCapabilities_FromGstElement(
-        XAAudioCodecDescriptor **entries, XAuint32 type)
-    {
-    int i = 0;
-    GstElement *element = NULL;
-    GstPad *elementpad = NULL;
-    GstCaps *elementcaps = NULL;
-    GstStructure *s = NULL;
-    GParamSpec *elementproperty;
-    GParamSpecInt *pint;
-    GParamSpecEnum *penum;
-    gchar *findamr = "\0";
-    gpointer *myentries;
-
-
-    if (type == XA_AUDIOCODEC_AAC)
-        {
-        element = gst_element_factory_make("nokiaaacenc", "encoderelement");
-        if (element)
-            {
-            elementpad = gst_element_get_static_pad(element, "sink");
-            if (!elementpad)
-                {
-                DEBUG_ERR("no pad found for AAC Encoder");
-                return XA_RESULT_INTERNAL_ERROR;
-                }
-            elementcaps = gst_pad_get_caps(elementpad);
-            s = gst_caps_get_structure(elementcaps, 0);
-
-            myentries = (gpointer*) *entries;
-            gst_structure_foreach(s, populate_field, (gpointer) myentries);
-
-            elementproperty = g_object_class_find_property(
-                    G_OBJECT_GET_CLASS (element), "bitrate");
-            if (elementproperty)
-                {
-                pint = G_PARAM_SPEC_INT (elementproperty);
-                (*entries)->minBitRate = pint->minimum;
-                (*entries)->maxBitRate = pint->maximum;
-                }
-            elementproperty = g_object_class_find_property(
-                    G_OBJECT_GET_CLASS (element), "profile");
-            if (elementproperty)
-                {
-                penum = G_PARAM_SPEC_ENUM(elementproperty);
-                (*entries)->modeSetting = penum->default_value;
-                }
-
-            (*entries)->profileSetting = XA_AUDIOPROFILE_AAC_AAC;
-            (*entries)->isFreqRangeContinuous = XA_BOOLEAN_TRUE;
-            (*entries)->isBitrateRangeContinuous = XA_BOOLEAN_TRUE;
-            }
-        else
-            {
-            DEBUG_ERR("failed to get the AACencoder element");
-            }
-        }
-    else if (type == XA_AUDIOCODEC_AMR)
-        {
-        element = gst_element_factory_make("devsoundsrc", "encoderelement");
-        if (element)
-            {
-            elementpad = gst_element_get_pad(element, "src");
-            if (!elementpad)
-                {
-                DEBUG_ERR("no source pad for Devsound(amr) element");
-                return XA_RESULT_INTERNAL_ERROR;
-                }
-
-            elementcaps = gst_pad_get_caps(elementpad);
-            while (!(strcasecmp(findamr, "audio/amr") == 0) && i
-                    < elementcaps->structs->len)
-                {
-                s = gst_caps_get_structure(elementcaps, i);
-                findamr = (char*) gst_structure_get_name(s);
-                i++;
-                }
-
-            //populating the Other Values
-            myentries = (gpointer*) *entries;
-            gst_structure_foreach(s, populate_field, (gpointer) myentries);
-
-            elementproperty = g_object_class_find_property(
-                    G_OBJECT_GET_CLASS (element), "speechbitrate");
-            if (elementproperty)
-                {
-                pint = G_PARAM_SPEC_INT (elementproperty);
-                (*entries)->minBitRate = pint->minimum;
-                (*entries)->maxBitRate = pint->maximum;
-                }
-
-            (*entries)->profileSetting = XA_AUDIOPROFILE_AMR;
-            (*entries)->modeSetting = 0;
-            (*entries)->isFreqRangeContinuous = XA_BOOLEAN_TRUE;
-            (*entries)->isBitrateRangeContinuous = XA_BOOLEAN_TRUE;
-
-            }
-        else
-            {
-            DEBUG_ERR("failed to get the Devsoundsrc(amr encoder) element");
-            }
-        }
-
-    else if (type == XA_AUDIOCODEC_PCM)
-        {
-        element = gst_element_factory_make("wavenc", "encoderelement");
-        if (element)
-            {
-            elementpad = gst_element_get_pad(element, "sink");
-            if (!elementpad)
-                {
-                DEBUG_ERR("failed to get Sink pad on Wave encoder element");
-                return XA_RESULT_INTERNAL_ERROR;
-                }
-            elementcaps = gst_pad_get_caps(elementpad);
-            s = gst_caps_get_structure(elementcaps, 2);
-            myentries = (gpointer*) *entries;
-            gst_structure_foreach(s, populate_field, (gpointer) myentries);
-            elementproperty = g_object_class_find_property(
-                    G_OBJECT_GET_CLASS (element), "bitrate");
-            if (elementproperty)
-                {
-                pint = G_PARAM_SPEC_INT (elementproperty);
-                (*entries)->minBitRate = pint->minimum;
-                (*entries)->maxBitRate = pint->maximum;
-                }
-
-            (*entries)->profileSetting = XA_AUDIOPROFILE_PCM;
-            (*entries)->modeSetting = 0;
-            (*entries)->isFreqRangeContinuous = XA_BOOLEAN_TRUE;
-            (*entries)->isBitrateRangeContinuous = XA_BOOLEAN_TRUE;
-            }
-        else
-            {
-            DEBUG_ERR("failed to get the wavencoder element");
-            }
-        }
-
-    if (elementcaps != NULL)
-        gst_caps_unref(elementcaps);
-    if (elementpad != NULL)
-        gst_object_unref(elementpad);
-    if (element != NULL)
-        gst_object_unref(element);
-
-    return XA_RESULT_SUCCESS;
-    }
 XAresult XAGSTCapabilitiesMgr_UpdateCapabilitieList(
         FrameworkMap *frameworkMap, XACapabilities **ppListHead)
 
@@ -258,167 +42,244 @@ XAresult XAGSTCapabilitiesMgr_UpdateCapabilitieList(
     XACapabilities *newNode = NULL;
     FWMgrFwType fwtype = FWMgrFWUknown;
     char *uri = NULL;
-    XACapabilities *lastNode;
-    XACapabilities *firstNode;
+    XACapabilities *lastNode = NULL;
+    XACapabilities *firstNode = NULL;
 
     DEBUG_API("->XAGSTCapabilitiesMgr_UpdateCapabilitieList");
 
     if (!frameworkMap || !ppListHead)
         {
-        res = XA_RESULT_PARAMETER_INVALID;
-        return res;
-        }
-
-    lastNode = firstNode = *ppListHead;
-
-    /* traverse and point to the last node in the list */
-    while (lastNode && lastNode->next)
-        {
-        lastNode = lastNode->next;
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_UpdateCapabilitieList");
+        return XA_RESULT_PARAMETER_INVALID;
         }
 
     uri = "file:///c:/test.mp4";
     fwtype = XAFrameworkMgr_GetFramework(frameworkMap, uri, FWMgrMORecorder);
-
     if (fwtype == FWMgrFWGST)
         {
-        GError* gerror = 0;
-        //initialize gstreamer
-        //AL_PROFILING_BEGIN;
-        if (!gst_init_check(NULL, NULL, &gerror))
-            {
-            DEBUG_ERR("Gst Initalization failure.");
-            return XA_RESULT_INTERNAL_ERROR;
-            }
-        //AL_PROFILING_END_PRINT("gst_init_check");
-
-        }
-
-    if (fwtype == FWMgrFWGST)
-        {
-        /* Add codec capabilities */
-        newNode = NULL;
         res = XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities(&newNode);
         if (res != XA_RESULT_SUCCESS)
             {
+            XACapabilitiesMgr_DeleteCapabilitieList(&firstNode);
+            DEBUG_API("<-XAGSTCapabilitiesMgr_UpdateCapabilitieList");
             return res;
             }
-        if (lastNode)
+        if (!firstNode)
             {
-            lastNode->next = newNode;
-            }
-        if (newNode)
-            { /* if a new node is created move lastNode to the new item */
-            if (!firstNode)
-                firstNode = newNode;
+            firstNode = newNode;
             lastNode = newNode;
             }
         }
 
     uri = "file:///c:/test.amr";
     fwtype = XAFrameworkMgr_GetFramework(frameworkMap, uri, FWMgrMORecorder);
-
     if (fwtype == FWMgrFWGST)
         {
-        newNode = NULL;
         res = XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities(&newNode);
         if (res != XA_RESULT_SUCCESS)
             {
+            XACapabilitiesMgr_DeleteCapabilitieList(&firstNode);
+            DEBUG_API("<-XAGSTCapabilitiesMgr_UpdateCapabilitieList");
             return res;
             }
-        if (lastNode)
+        if (!firstNode)
+            {
+            firstNode = newNode;
+            lastNode = newNode;
+            }
+        else
             {
             lastNode->next = newNode;
-            }
-        if (newNode)
-            { /* if a new node is created move lastNode to the new item */
-            if (!firstNode)
-                firstNode = newNode;
             lastNode = newNode;
             }
         }
 
     uri = "file:///c:/test.wav";
     fwtype = XAFrameworkMgr_GetFramework(frameworkMap, uri, FWMgrMORecorder);
-
     if (fwtype == FWMgrFWGST)
         {
-        newNode = NULL;
         res = XAGSTCapabilitiesMgr_GetAudioPCMEncoderCapabilities(&newNode);
         if (res != XA_RESULT_SUCCESS)
             {
+            XACapabilitiesMgr_DeleteCapabilitieList(&firstNode);
+            DEBUG_API("<-XAGSTCapabilitiesMgr_UpdateCapabilitieList");
             return res;
             }
-        if (lastNode)
+        if (!firstNode)
+            {
+            firstNode = newNode;
+            lastNode = newNode;
+            }
+        else
             {
             lastNode->next = newNode;
-            }
-        if (newNode)
-            { /* if a new node is created move lastNode to the new item */
-            if (!firstNode)
-                firstNode = newNode;
             lastNode = newNode;
             }
         }
-    /* if empty list, then append first node as the head */
-    if (!(*ppListHead))
+
+    /* if we have some capabilities supported by Gstreamer framework */
+    if (firstNode)
         {
-        *ppListHead = firstNode;
+        /* if empty list, then append first node as the head */
+        if (!(*ppListHead))
+            {
+            *ppListHead = firstNode;
+            }
+        else /* traverse to the last item in the list and link firstNode to it */
+            {
+            lastNode = *ppListHead;
+            while(lastNode->next)
+                {
+                lastNode = lastNode->next;
+                }
+            lastNode->next = firstNode;
+            }
         }
     DEBUG_API("<-XAGSTCapabilitiesMgr_UpdateCapabilitieList");
     return res;
     }
 
+/* XAresult XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities(
+        XACapabilities **ppNode)
+ * Description: If return value is XA_RESULT_SUCCESS, Creats a new XACapabilities
+ * node and update ppNode to contain pointer to it.
+ * Otherwise return error code for failure.
+ */
 XAresult XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities(
         XACapabilities **ppNode)
     {
     XAresult res = XA_RESULT_SUCCESS;
     XACapabilities *newNode = NULL;
-    XAAudioCodecDescriptor *entries = NULL;
     XAchar aacencelement[] = "nokiaaacenc";
     int strLen = 0;
+    XAAudioCodecDescriptor *codecDesc = NULL;
 
+    DEBUG_API("->XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities");
     newNode = (XACapabilities *) calloc(1, sizeof(XACapabilities));
     if (!newNode)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
     newNode->capsType = AUD_E;
     newNode->xaid = XA_AUDIOCODEC_AAC;
-    newNode->noOfEntries = 1;
 
     strLen = strlen((char*) aacencelement);
     newNode->adaptId = (XAchar *) calloc(strLen + 1, sizeof(XAchar));
     if (!newNode->adaptId)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
     strncpy((char*) newNode->adaptId, (char*) aacencelement, strLen);
     newNode->adaptId[strLen] = '\0'; /*Null terminate it*/
 
-    /* Allocate array */
-    entries = (XAAudioCodecDescriptor*) calloc(1,
-            sizeof(XAAudioCodecDescriptor));
-    if (!entries)
+    /* create XAAudioCodecDescriptor for AAC and initialize values */
+    codecDesc = (XAAudioCodecDescriptor*) calloc(2, sizeof(XAAudioCodecDescriptor));
+    if (!codecDesc)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
+    newNode->noOfEntries = 2;
+    newNode->pEntry = (void *)codecDesc;
 
-    newNode->pEntry = (void*) entries;
-
-    res = XAGSTCapabilitiesMgr_GetCapabilities_FromGstElement(&entries,
-            newNode->xaid);
-
-    newNode->pEntry = (void*) entries;
+    codecDesc->maxChannels = 2;
+    (codecDesc+1)->maxChannels = 2;
+    codecDesc->minBitsPerSample = 16;
+    (codecDesc+1)->minBitsPerSample = 16;
+    codecDesc->maxBitsPerSample = 16;
+    (codecDesc+1)->maxBitsPerSample = 16;
+    codecDesc->minSampleRate = 8000000;
+    (codecDesc+1)->minSampleRate = 8000000;
+    codecDesc->maxSampleRate = 48000000;
+    (codecDesc+1)->maxSampleRate = 48000000;
+    codecDesc->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
+    (codecDesc+1)->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
+    codecDesc->pSampleRatesSupported = (XAmilliHertz*)calloc(5, sizeof(XAmilliHertz));
+    if (!(codecDesc->pSampleRatesSupported))
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    (codecDesc+1)->pSampleRatesSupported = (XAmilliHertz*)calloc(5, sizeof(XAmilliHertz));
+    if (!((codecDesc+1)->pSampleRatesSupported))
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    codecDesc->pSampleRatesSupported[0] = 8000000;
+    (codecDesc+1)->pSampleRatesSupported[0] = 8000000;
+    codecDesc->pSampleRatesSupported[1] = 16000000;
+    (codecDesc+1)->pSampleRatesSupported[1] = 16000000;
+    codecDesc->pSampleRatesSupported[2] = 24000000;
+    (codecDesc+1)->pSampleRatesSupported[2] = 24000000;
+    codecDesc->pSampleRatesSupported[3] = 32000000;
+    (codecDesc+1)->pSampleRatesSupported[3] = 32000000;
+    codecDesc->pSampleRatesSupported[4] = 48000000;
+    (codecDesc+1)->pSampleRatesSupported[4] = 48000000;
+    codecDesc->numSampleRatesSupported = 5;
+    (codecDesc+1)->numSampleRatesSupported = 5;
+    codecDesc->minBitRate = 32000;
+    (codecDesc+1)->minBitRate = 32000;
+    codecDesc->maxBitRate = 256000;
+    (codecDesc+1)->maxBitRate = 256000;
+    codecDesc->isBitrateRangeContinuous = XA_BOOLEAN_FALSE;
+    (codecDesc+1)->isBitrateRangeContinuous = XA_BOOLEAN_FALSE;
+    codecDesc->pBitratesSupported = (XAuint32 *)calloc(8, sizeof(XAuint32));;
+    if (!(codecDesc->pBitratesSupported))
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    (codecDesc+1)->pBitratesSupported = (XAuint32 *)calloc(8, sizeof(XAuint32));;
+    if (!((codecDesc+1)->pBitratesSupported))
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    codecDesc->pBitratesSupported[0] = 32000;
+    (codecDesc+1)->pBitratesSupported[0] = 32000;
+    codecDesc->pBitratesSupported[1] = 64000;
+    (codecDesc+1)->pBitratesSupported[1] = 64000;
+    codecDesc->pBitratesSupported[2] = 96000;
+    (codecDesc+1)->pBitratesSupported[2] = 96000;
+    codecDesc->pBitratesSupported[3] = 128000;
+    (codecDesc+1)->pBitratesSupported[3] = 128000;
+    codecDesc->pBitratesSupported[4] = 160000;
+    (codecDesc+1)->pBitratesSupported[4] = 160000;
+    codecDesc->pBitratesSupported[5] = 192000;
+    (codecDesc+1)->pBitratesSupported[5] = 192000;
+    codecDesc->pBitratesSupported[6] = 224000;
+    (codecDesc+1)->pBitratesSupported[6] = 224000;
+    codecDesc->pBitratesSupported[7] = 256000;
+    (codecDesc+1)->pBitratesSupported[7] = 256000;
+    codecDesc->numBitratesSupported = 8;    
+    (codecDesc+1)->numBitratesSupported = 8;    
+    codecDesc->profileSetting = XA_AUDIOPROFILE_AAC_AAC;
+    (codecDesc+1)->profileSetting = XA_AUDIOPROFILE_AAC_AAC;
+    codecDesc->modeSetting = XA_AUDIOMODE_AAC_HE;
+    (codecDesc+1)->modeSetting = XA_AUDIOMODE_AAC_LC;
 
     *ppNode = newNode;
+
+    DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAACEncoderCapabilities");
     return res;
     }
 
@@ -427,37 +288,89 @@ XAresult XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities(
     {
     XAresult res = XA_RESULT_SUCCESS;
     XACapabilities *newNode = NULL;
-    XAAudioCodecDescriptor *entries = NULL;
+    XAchar amrencelement[] = "devsoundsrc";
+    int strLen = 0;
+    XAAudioCodecDescriptor *codecDesc = NULL;
 
+    DEBUG_API("->XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities");
     newNode = (XACapabilities *) calloc(1, sizeof(XACapabilities));
     if (!newNode)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
     newNode->capsType = AUD_E;
     newNode->xaid = XA_AUDIOCODEC_AMR;
-    newNode->noOfEntries = 1;
-
-    /* Allocate array */
-    entries = (XAAudioCodecDescriptor*) calloc(1,
-            sizeof(XAAudioCodecDescriptor));
-    if (!entries)
+    
+    strLen = strlen((char*) amrencelement);
+    newNode->adaptId = (XAchar *) calloc(strLen + 1, sizeof(XAchar));
+    if (!newNode->adaptId)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
-    newNode->pEntry = (void*) entries;
+    strncpy((char*) newNode->adaptId, (char*) amrencelement, strLen);
+    newNode->adaptId[strLen] = '\0'; /*Null terminate it*/
+    
+    /* create XAAudioCodecDescriptor for AMR and initialize values */
+    codecDesc = (XAAudioCodecDescriptor*) calloc(1, sizeof(XAAudioCodecDescriptor));
+    if (!codecDesc)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    newNode->noOfEntries = 1;
+    newNode->pEntry = (void *)codecDesc;
 
-    XAGSTCapabilitiesMgr_GetCapabilities_FromGstElement(&entries,
-            newNode->xaid);
-
-    newNode->pEntry = (void*) entries;
-
+    codecDesc->maxChannels = 1;
+    codecDesc->minBitsPerSample = 8;
+    codecDesc->maxBitsPerSample = 8;
+    codecDesc->minSampleRate = 8000000;
+    codecDesc->maxSampleRate = 8000000;
+    codecDesc->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
+    codecDesc->pSampleRatesSupported = (XAmilliHertz*)calloc(1, sizeof(XAmilliHertz));
+    if (!(codecDesc->pSampleRatesSupported))
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    codecDesc->pSampleRatesSupported[0] = 8000000;
+    codecDesc->numSampleRatesSupported = 1;
+    codecDesc->minBitRate = 4750;
+    codecDesc->maxBitRate = 12200;
+    codecDesc->isBitrateRangeContinuous = XA_BOOLEAN_FALSE;
+    codecDesc->pBitratesSupported = (XAuint32 *)calloc(8, sizeof(XAuint32));;
+    if (!(codecDesc->pBitratesSupported))
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    codecDesc->pBitratesSupported[0] = 4750;
+    codecDesc->pBitratesSupported[1] = 5150;
+    codecDesc->pBitratesSupported[2] = 5900;
+    codecDesc->pBitratesSupported[3] = 6700;
+    codecDesc->pBitratesSupported[4] = 7400;
+    codecDesc->pBitratesSupported[5] = 7950;
+    codecDesc->pBitratesSupported[6] = 10200;
+    codecDesc->pBitratesSupported[7] = 12200;    
+    codecDesc->numBitratesSupported = 8;
+    codecDesc->profileSetting = XA_AUDIOPROFILE_AMR;
+    codecDesc->modeSetting = 0;
+    
     *ppNode = newNode;
+
+    DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioAMREncoderCapabilities");
     return res;
     }
 
@@ -466,36 +379,77 @@ XAresult XAGSTCapabilitiesMgr_GetAudioPCMEncoderCapabilities(
     {
     XAresult res = XA_RESULT_SUCCESS;
     XACapabilities *newNode = NULL;
-    XAAudioCodecDescriptor *entries = NULL;
+    XAchar wavencelement[] = "wavenc";
+    int strLen = 0;
+    XAAudioCodecDescriptor *codecDesc = NULL;
 
+    DEBUG_API("->XAGSTCapabilitiesMgr_GetAudioPCMEncoderCapabilities");
     newNode = (XACapabilities *) calloc(1, sizeof(XACapabilities));
     if (!newNode)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioPCMEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
     newNode->capsType = AUD_E;
     newNode->xaid = XA_AUDIOCODEC_PCM;
-    newNode->noOfEntries = 1;
-
-    /* Allocate array */
-    entries = (XAAudioCodecDescriptor*) calloc(1,
-            sizeof(XAAudioCodecDescriptor));
-    if (!entries)
+    
+    strLen = strlen((char*) wavencelement);
+    newNode->adaptId = (XAchar *) calloc(strLen + 1, sizeof(XAchar));
+    if (!newNode->adaptId)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioPCMEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
-    newNode->pEntry = (void*) entries;
+    strncpy((char*) newNode->adaptId, (char*) wavencelement, strLen);
+    newNode->adaptId[strLen] = '\0'; /*Null terminate it*/
 
-    XAGSTCapabilitiesMgr_GetCapabilities_FromGstElement(&entries,
-            newNode->xaid);
+    /* create XAAudioCodecDescriptor for PCM and initialize values */
+    codecDesc = (XAAudioCodecDescriptor*) calloc(1, sizeof(XAAudioCodecDescriptor));
+    if (!codecDesc)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioPCMEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    newNode->noOfEntries = 1;
+    newNode->pEntry = (void *)codecDesc;
 
-    newNode->pEntry = (void*) entries;
-
+    codecDesc->maxChannels = 2;
+    codecDesc->minBitsPerSample = 16;
+    codecDesc->maxBitsPerSample = 16;
+    codecDesc->minSampleRate = 8000000;
+    codecDesc->maxSampleRate = 48000000;
+    codecDesc->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
+    codecDesc->pSampleRatesSupported = (XAmilliHertz*)calloc(12, sizeof(XAmilliHertz));
+    if (!(codecDesc->pSampleRatesSupported))
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioPCMEncoderCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    codecDesc->pSampleRatesSupported[0] = 8000000;
+    codecDesc->pSampleRatesSupported[1] = 16000000;
+    codecDesc->pSampleRatesSupported[2] = 24000000;
+    codecDesc->pSampleRatesSupported[3] = 32000000;
+    codecDesc->pSampleRatesSupported[4] = 48000000;
+    codecDesc->numSampleRatesSupported = 5;
+    codecDesc->minBitRate = 0;
+    codecDesc->maxBitRate = 0;
+    codecDesc->isBitrateRangeContinuous = XA_BOOLEAN_FALSE;
+    codecDesc->pBitratesSupported = NULL;
+    codecDesc->numBitratesSupported = 0;
+    codecDesc->profileSetting = XA_AUDIOPROFILE_PCM;
+    codecDesc->modeSetting = 0;
+    
     *ppNode = newNode;
+
+    DEBUG_API("<-XAGSTCapabilitiesMgr_GetAudioPCMEncoderCapabilities");
     return res;
     }

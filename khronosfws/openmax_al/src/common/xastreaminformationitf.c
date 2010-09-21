@@ -15,10 +15,7 @@
  *
  */
 
-#include <assert.h>
-
 #include "xastreaminformationitf.h"
-
 #include "xastreaminformationitfadaptationmmf.h"
 
 /* XAStreamInformationItfImpl* GetImpl
@@ -191,6 +188,12 @@ XAresult XAStreamInformationItfImpl_RegisterStreamChangeCallback(
     impl->cbcontext = pContext;
     impl->cbPtrToSelf = self;
 
+	
+    if (impl->adapCtx->fwtype == FWMgrFWMMF)
+    {
+    	ret = XAStreamInformationItfAdaptMMF_RegisterCallback(impl->adapCtx, callback);
+    }
+
     DEBUG_API("-<XAStreamInformationItfImpl_RegisterStreamChangeCallback");
     return ret;
     }
@@ -210,7 +213,7 @@ XAresult XAStreamInformationItfImpl_QueryActiveStreams(
         return XA_RESULT_PARAMETER_INVALID;
         }
 
-    if (impl->adapCtx->fwtype == FWMgrFWGST)
+    if (impl->adapCtx->fwtype == FWMgrFWMMF)
         {
         ret = XAAdaptationBase_ThreadEntry(impl->adapCtx);
         if (ret == XA_RESULT_PARAMETER_INVALID)
@@ -272,7 +275,7 @@ XAresult XAStreamInformationItfImpl_SetActiveStream(
  * Description: Allocate and initialize PlayItfImpl
  **/
 XAStreamInformationItfImpl* XAStreamInformationItfImpl_Create(
-        XAAdaptationBaseCtx *adapCtx)
+        XAMediaPlayerImpl* impl)
     {
     XAStreamInformationItfImpl *self;
 
@@ -301,9 +304,12 @@ XAStreamInformationItfImpl* XAStreamInformationItfImpl_Create(
         self->cbPtrToSelf = NULL;
         self->callback = NULL;
         self->cbcontext = NULL;
-        self->adapCtx = adapCtx;
+        self->adapCtx = impl->curAdaptCtx;
 
         self->self = self;
+		
+        XAAdaptationBase_AddEventHandler( 	self->adapCtx, 
+											&XAStreamInformationItfImpl_AdaptCb, XA_STREAMINFOEVENTS, self );
         }
 
     DEBUG_API("<-XAStreamInformationItfImpl_Create");
@@ -317,10 +323,30 @@ void XAStreamInformationItfImpl_Free(XAStreamInformationItfImpl* self)
     {
     DEBUG_API("->XAStreamInformationItfImpl_Free");
     if(self)
-        {
-        assert(self==self->self);
+    {
+        XAAdaptationBase_RemoveEventHandler( (XAAdaptationBaseCtx*)self->adapCtx, &XAStreamInformationItfImpl_AdaptCb );
         free(self);
-        }
+    }
     DEBUG_API("<-XAStreamInformationItfImpl_Free");
     }
+
+void XAStreamInformationItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
+{
+	XAStreamInformationItfImpl* impl = (XAStreamInformationItfImpl*)pHandlerCtx;
+	DEBUG_API("->XAPrefetchStatusItfImpl_AdaptCb");
+	if(!impl)
+	{
+		DEBUG_ERR("XAPrefetchStatusItfImpl_AdaptCb, invalid context pointer!");
+		DEBUG_API("<-XAPrefetchStatusItfImpl_AdaptCb");
+		return;
+	}
+	
+	if (impl->adapCtx->fwtype == FWMgrFWMMF)
+	{
+		impl->callback(impl->cbPtrToSelf, XA_STREAMCBEVENT_PROPERTYCHANGE, event->eventid, NULL, impl->cbcontext);
+	}
+	
+	DEBUG_API("<-XAPrefetchStatusItfImpl_AdaptCb");
+	return;
+}
 

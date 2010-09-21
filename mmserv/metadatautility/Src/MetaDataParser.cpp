@@ -22,7 +22,7 @@
 #include "MetaDataParser.h"
 #include <syslangutil.h>
 #include <languages.hrh>
-#include <TopCharacterSet.rsg>
+#include <topcharacterset.rsg>
 #include <data_caging_path_literals.hrh>
 #include <stdlib.h>
 #include <bautils.h>

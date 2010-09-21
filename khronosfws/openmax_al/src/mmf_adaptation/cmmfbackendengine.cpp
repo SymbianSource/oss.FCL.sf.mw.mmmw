@@ -22,6 +22,7 @@
 #include "cmmfbackendengine.h"
 #include "markerpositiontimer.h"
 #include "positionupdatetimer.h"
+#include "prefetchlevelupdatetimer.h"
 #include "profileutilmacro.h"
 #include <mmf/common/mmfvideoenums.h>
 
@@ -51,6 +52,13 @@ CMMFBackendEngine::~CMMFBackendEngine()
 
 CMMFBackendEngine::CMMFBackendEngine() :
     iPositionUpdatePeriod(1000), /* default is 1000 millisec */
+	bPrefetchCallbackRegistered(EFalse),	
+	bStatusChangeMask(EFalse),
+	iPrefetchLevelUpdatePeriod(1000),
+	iPrefetchStatus(XA_PREFETCHSTATUS_SUFFICIENTDATA), //assume sufficient data
+	iNumStreams(0),
+	iAudioOnly(false),
+	iStreamInfoEventSubscribed(EFalse),
     iUriPtr(NULL, 0)
     {
     iRecordState = ERecorderNotReady;
@@ -110,8 +118,15 @@ void CMMFBackendEngine::InitPlayerTimersL()
                 iAudioPlayer, iVideoPlayer);
         iPlayItfPositionUpdateTimer->SetContext(iAdaptContext);
         }
+	if(!iPrefetchLevelUpdateTimer)
+	{
+		iPrefetchLevelUpdateTimer = CPrefetchLevelUpdateTimer::NewL(iAudioPlayer, iVideoPlayer);
+		iPrefetchLevelUpdateTimer->SetPrefetchLevelUpdatePeriod(iPrefetchLevelUpdatePeriod); //set default update period at beginning
+		iPrefetchLevelUpdateTimer->SetContext(iAdaptContext);
+	}
     iMarkerPositionTimer->Stop();
     iPlayItfPositionUpdateTimer->Stop();
+	iPrefetchLevelUpdateTimer->Stop();
     }
 
 TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format,
@@ -215,9 +230,9 @@ TInt CMMFBackendEngine::SetFileName(char* uri, XAuint32 format,
                 RET_IF_ERR(iErrorCode, XA_RESULT_INTERNAL_ERROR);
 
                 /* Prepare utility */
-                TAG_TIME_PROFILING_BEGIN_NO_VAR_DEF;
+                TAG_TIME_PROFILING_BEGIN;
                 iVideoPlayer->Prepare();
-                TAG_TIME_PROFILING_END_NO_VAR_DEF; 
+                TAG_TIME_PROFILING_END; 
                 PRINT_TO_CONSOLE_TIME_DIFF;
 
                 /* Wait until we receive  MvpuoPrepareComplete */
@@ -331,6 +346,7 @@ void CMMFBackendEngine::MvpuoPrepareComplete(TInt aError)
     iMediaDuration = 0;
     iMarkerPositionTimer->ResetPlayer();
     iPlayItfPositionUpdateTimer->ResetPlayer();
+    iPrefetchLevelUpdateTimer->ResetPlayer();
     if (iErrorCode == KErrNone)
         {
         iMMFPlayerState = EPlayerPrepared;
@@ -344,6 +360,7 @@ void CMMFBackendEngine::MvpuoPrepareComplete(TInt aError)
             iMediaPlayerState = XA_PLAYSTATE_STOPPED;
             iMarkerPositionTimer->UseVideoPlayer();
             iPlayItfPositionUpdateTimer->UseVideoPlayer();
+			iPrefetchLevelUpdateTimer->UseVideoPlayer();
             if (m_pWs && m_pScr && m_pWindow)
                 {
                 TRect videoExtent = TRect(m_pWindow->Size());
@@ -354,6 +371,7 @@ void CMMFBackendEngine::MvpuoPrepareComplete(TInt aError)
                 TAG_TIME_PROFILING_END; 
                 PRINT_TO_CONSOLE_TIME_DIFF;
                 }
+			SetStreamInfo();
             }
         }
     if (iActiveSchedulerWait && iActiveSchedulerWait->IsStarted())
@@ -413,12 +431,12 @@ void CMMFBackendEngine::MvpuoEvent(class TMMFEvent const & event)
         {
         //RDebug::Print(_L("CMMFBackendEngine::MvpuoEvent: Audio Device taken"));
         PausePlayback();
-        XAAdaptEvent alEvent =
+        XAAdaptEvent event1 =
             {
             XA_PLAYITFEVENTS, XA_OBJECT_EVENT_RESOURCES_LOST, 0, NULL
             };
         XAAdaptationBase_SendAdaptEvents(
-                (XAAdaptationBaseCtx*) iAdaptContext, &alEvent);
+                (XAAdaptationBaseCtx*) iAdaptContext, &event1);
         }
     else if (event.iEventType == KMMFRefreshMetaData)
         {
@@ -434,11 +452,36 @@ void CMMFBackendEngine::MvpuoEvent(class TMMFEvent const & event)
 // From MRebufferCallback
 void CMMFBackendEngine::MvloLoadingStarted()
     {
+    	iPrefetchStatus = XA_PREFETCHSTATUS_UNDERFLOW;
+		
+    	if(bStatusChangeMask)
+    	{
+			XAAdaptEvent event =
+			{
+				XA_PREFETCHITFEVENTS, XA_PREFETCHEVENT_STATUSCHANGE, 0, NULL
+			};
+			XAAdaptationBase_SendAdaptEvents(
+				(XAAdaptationBaseCtx*) iAdaptContext, &event);
+    	}
+
+		iPrefetchLevelUpdateTimer->Start();
     }
 
 void CMMFBackendEngine::MvloLoadingComplete()
     {
-    //file playing
+		iPrefetchStatus = XA_PREFETCHSTATUS_SUFFICIENTDATA;
+
+		if(bStatusChangeMask)
+    	{
+			XAAdaptEvent event =
+				{
+					XA_PREFETCHITFEVENTS, XA_PREFETCHEVENT_STATUSCHANGE, 0, NULL
+				};
+			XAAdaptationBase_SendAdaptEvents(
+				(XAAdaptationBaseCtx*) iAdaptContext, &event);
+    	}
+
+		iPrefetchLevelUpdateTimer->Stop();
     }
 
 //MMdaAudioPlayerCallback
@@ -453,6 +496,7 @@ void CMMFBackendEngine::MapcInitComplete(TInt aError,
     iMediaDuration = 0;
     iMarkerPositionTimer->ResetPlayer();
     iPlayItfPositionUpdateTimer->ResetPlayer();
+    iPrefetchLevelUpdateTimer->ResetPlayer();
     if (iErrorCode == KErrNone)
         {
         iMediaDuration = aDuration;
@@ -461,6 +505,9 @@ void CMMFBackendEngine::MapcInitComplete(TInt aError,
         iMMFPlayerState = EPlayerOpened;
         iMarkerPositionTimer->UseAudioPlayer();
         iPlayItfPositionUpdateTimer->UseAudioPlayer();
+		iPrefetchLevelUpdateTimer->UseAudioPlayer();
+		//set stream parameters
+		SetStreamInfo();
         }
     if (iActiveSchedulerWait && iActiveSchedulerWait->IsStarted())
         {
@@ -615,6 +662,10 @@ void CMMFBackendEngine::Close()
         {
         iPlayItfPositionUpdateTimer->Stop();
         }
+    if (iPrefetchLevelUpdateTimer)
+        {
+        iPrefetchLevelUpdateTimer->Stop();
+        }
 
     if (iBaseVideoPlayer && iVideoPlayer)
         {
@@ -674,6 +725,8 @@ void CMMFBackendEngine::Destroy()
     iMarkerPositionTimer = NULL;
     delete iPlayItfPositionUpdateTimer;
     iPlayItfPositionUpdateTimer = NULL;
+	delete iPrefetchLevelUpdateTimer; 
+	iPrefetchLevelUpdateTimer = NULL;
     delete iBaseVideoPlayer;
     iBaseVideoPlayer = NULL;
     iVideoPlayer = NULL;
@@ -1363,58 +1416,36 @@ void CMMFBackendEngine::DoPostEvent(XAuint32 event)
     }
 
 XAresult CMMFBackendEngine::GetNumStreams(XAuint32* numstreams)
-    {
-    XAresult retVal(XA_RESULT_SUCCESS);
-    TInt bitRate(0);
-    TInt numS(0);
-    if (iAPIBeingUsed == EAudioPlayerUtility)
-        {
-        numS = 1;
-        *numstreams = numS;
-        }
-    else if (iAPIBeingUsed == EVideoPlayerUtility)
-        {
-        TRAPD(err, bitRate = iVideoPlayer->VideoBitRateL());
-        if (!err && bitRate)
-            {
-            numS++;
-            *numstreams = numS;
-            }
-
-        bitRate = 0;
-        TRAP(err, bitRate = iVideoPlayer->AudioBitRateL());
-        if (!err && bitRate)
-            {
-            numS++;
-            *numstreams = numS;
-            }
-        }
-    return retVal;
-    }
+{
+    *numstreams = iNumStreams;
+    return XA_RESULT_SUCCESS;
+}
 
 XAresult CMMFBackendEngine::GetStreamInfo(XAuint32 streamindex,
         XAuint32* streamtype)
     {
     XAresult retVal(XA_RESULT_SUCCESS);
-    if (iAPIBeingUsed == EAudioPlayerUtility)
-        {
-        *streamtype = XA_DOMAINTYPE_AUDIO;
-        }
-    else if (iAPIBeingUsed == EVideoPlayerUtility)
-        {
-        switch (streamindex)
-            {
-            case 1:
-                *streamtype = XA_DOMAINTYPE_VIDEO;
-                break;
-            case 2:
-                *streamtype = XA_DOMAINTYPE_AUDIO;
-                break;
-            default:
-                retVal = XA_RESULT_PARAMETER_INVALID;
-                break;
-            }
-        }
+
+	switch (streamindex)
+	{
+		case 1: 			
+			if(iAudioOnly)
+			{
+				*streamtype = XA_DOMAINTYPE_AUDIO;
+			}
+			else
+			{
+				*streamtype = XA_DOMAINTYPE_VIDEO;
+			}
+			break;
+		case 2:
+			*streamtype = XA_DOMAINTYPE_AUDIO;
+			break;
+		default:
+			retVal = XA_RESULT_PARAMETER_INVALID;
+			break;
+	}
+
     return retVal;
     }
 
@@ -1471,13 +1502,11 @@ XAresult CMMFBackendEngine::SetActiveState(XAuint32 streamindex,
         switch (streamindex)
             {
             case 1:
-                TRAP(err, iVideoPlayer->SetVideoEnabledL(active))
-                ;
+                TRAP(err, iVideoPlayer->SetVideoEnabledL(active));
                 retVal = err;
                 break;
             case 2:
-                TRAP(err, iVideoPlayer->SetAudioEnabledL(active))
-                ;
+                TRAP(err, iVideoPlayer->SetAudioEnabledL(active));
                 retVal = err;
                 break;
             default:
@@ -1669,6 +1698,301 @@ XAresult CMMFBackendEngine::GetPlaybackRateCapabilities(XAboolean* forward,
                     {
                     *forward = capability.iPlayForward;
                     *backward = capability.iPlayBackward;
+                    retVal = XA_RESULT_SUCCESS; 
+                    }
+                }
+            break;
+        case XA_PLAYSTATE_PLAYERUNINITIALIZED:
+        default:
+            break;
+        }
+    return retVal;
+    }
+	
+XAresult CMMFBackendEngine::RegisterPrefetchCallback(xaPrefetchCallback callback)
+{
+	if(*callback == NULL)
+	{
+		bPrefetchCallbackRegistered = EFalse;
+	}
+	else
+	{
+		bPrefetchCallbackRegistered = ETrue;
+	}
+	
+    return XA_RESULT_SUCCESS;
+}
+
+XAresult CMMFBackendEngine::SetPrefetchLevelUpdatePeriod(XApermille pfPeriod)
+{
+	if(iPrefetchLevelUpdateTimer)
+	{
+		iPrefetchLevelUpdateTimer->SetUpdateIncrement(pfPeriod); //In AL its effectively update increment and not time period
+	}
+		
+    return XA_RESULT_SUCCESS;
+}
+
+XAresult CMMFBackendEngine::SetPrefetchCallbackEventsMask(XAuint32 eventflags)
+{
+	if(eventflags & XA_PREFETCHEVENT_STATUSCHANGE)
+	{
+		bStatusChangeMask = ETrue;
+	}
+
+	if(iPrefetchLevelUpdateTimer)
+	{
+		iPrefetchLevelUpdateTimer->SetCallbackEventMask(eventflags);
+	}
+	
+    return XA_RESULT_SUCCESS;
+}
+
+XAresult CMMFBackendEngine::GetPrefetchStatus(XAuint32* status)
+{
+	if(!status)
+	{
+		return XA_RESULT_PARAMETER_INVALID;
+	}
+
+	*status = iPrefetchStatus;
+
+    return XA_RESULT_SUCCESS;
+}
+
+XAresult CMMFBackendEngine::GetPrefetchFillLevel(XApermille * level)
+{
+	if(!level)
+	{
+		return XA_RESULT_PARAMETER_INVALID;
+	}
+
+	TInt fillLevel = 0;
+	iPrefetchLevelUpdateTimer->GetLoadingProgress(fillLevel);
+	*level = fillLevel*10; //convert to permille
+
+	return XA_RESULT_SUCCESS;	
+}
+
+void CMMFBackendEngine::SetStreamInfo()
+{
+    TInt bitRate(0);
+
+	TInt numStreams = iNumStreams;
+	bool bAudioOnly = iAudioOnly;
+	
+	//reset
+	iNumStreams = 0;
+	iAudioOnly = ETrue;
+	
+    if (iAPIBeingUsed == EAudioPlayerUtility)
+	{
+        iNumStreams = 1;
+    }
+    else if (iAPIBeingUsed == EVideoPlayerUtility)
+    {
+        TRAPD(err, bitRate = iVideoPlayer->VideoBitRateL());
+        if (!err && bitRate)
+        {
+            iNumStreams++;
+            iAudioOnly = EFalse;
+        }
+
+        bitRate = 0;
+        TRAP(err, bitRate = iVideoPlayer->AudioBitRateL());
+        if (!err && bitRate)
+        {
+            iNumStreams++;
+        }
+    }
+
+	if(numStreams != iNumStreams)
+	{
+		SendStreamInfoEvent(0);
+	}
+	else if(bAudioOnly != iAudioOnly)
+	{
+		SendStreamInfoEvent(1);
+	}
+}
+
+void CMMFBackendEngine::SendStreamInfoEvent(TInt eventData)
+{
+	if(iStreamInfoEventSubscribed)
+	{
+		XAAdaptEvent event =
+			{
+				XA_STREAMINFOEVENTS, eventData, 0, NULL
+			};
+		XAAdaptationBase_SendAdaptEvents(
+			(XAAdaptationBaseCtx*) iAdaptContext, &event);
+	}
+}
+
+XAresult CMMFBackendEngine::RegisterStreamInfoCallback(xaStreamEventChangeCallback cb)
+{
+	if(*cb)
+	{
+		iStreamInfoEventSubscribed = ETrue;
+	}
+	else
+	{
+		iStreamInfoEventSubscribed = EFalse;
+	}
+
+	return XA_RESULT_SUCCESS;
+}
+
+XAresult CMMFBackendEngine::SetSourceRect(const XARectangle* rect)
+    {
+    XAresult retVal(XA_RESULT_PARAMETER_INVALID);
+    
+    switch (iMediaPlayerState)
+        {
+        case XA_PLAYSTATE_STOPPED:
+        case XA_PLAYSTATE_PAUSED:
+        case XA_PLAYSTATE_PLAYING:
+            if (iAPIBeingUsed == EAudioPlayerUtility)
+                {
+                retVal = XA_RESULT_FEATURE_UNSUPPORTED;
+                }
+            else
+                {
+                TRect inputrect(rect->left, rect->top, rect->left + rect->width, rect->top + rect->height);
+                TAG_TIME_PROFILING_BEGIN;
+                TRAPD(err, iVideoPlayer->SetCropRegionL(inputrect));
+                TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
+                if(!err)
+                    {
+                    retVal = XA_RESULT_SUCCESS; 
+                    }
+                }
+            break;
+        case XA_PLAYSTATE_PLAYERUNINITIALIZED:
+        default:
+            break;
+        }
+    return retVal;
+    }
+
+XAresult CMMFBackendEngine::SetDestinationRect(const XARectangle* rect)
+    {
+    XAresult retVal(XA_RESULT_PARAMETER_INVALID);
+    
+    switch (iMediaPlayerState)
+        {
+        case XA_PLAYSTATE_STOPPED:
+        case XA_PLAYSTATE_PAUSED:
+        case XA_PLAYSTATE_PLAYING:
+            if (iAPIBeingUsed == EAudioPlayerUtility)
+                {
+                retVal = XA_RESULT_FEATURE_UNSUPPORTED;
+                }
+            else
+                {
+                TRect inputrect(rect->left, rect->top, rect->left + rect->width, rect->top + rect->height);
+                TAG_TIME_PROFILING_BEGIN;
+                TRAPD(err, iVideoPlayer->SetVideoExtentL(*m_pWindow,inputrect));
+                TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
+                if(!err)
+                    {
+                    retVal = XA_RESULT_SUCCESS; 
+                    }
+                }
+            break;
+        case XA_PLAYSTATE_PLAYERUNINITIALIZED:
+        default:
+            break;
+        }
+    return retVal;
+    }
+
+XAresult CMMFBackendEngine::SetRotation(XAmillidegree rotation)
+    {
+    XAresult retVal(XA_RESULT_PARAMETER_INVALID);
+    
+    switch (iMediaPlayerState)
+        {
+        case XA_PLAYSTATE_STOPPED:
+        case XA_PLAYSTATE_PAUSED:
+        case XA_PLAYSTATE_PLAYING:
+            if (iAPIBeingUsed == EAudioPlayerUtility)
+                {
+                retVal = XA_RESULT_FEATURE_UNSUPPORTED;
+                }
+            else
+                {
+                TVideoRotation rot(EVideoRotationNone);
+                switch(rotation)
+                    {
+                    case 0:
+                        rot = EVideoRotationNone; 
+                        break;
+                    case 90000:
+                        rot = EVideoRotationClockwise90;
+                        break;
+                    case 180000:
+                        rot = EVideoRotationClockwise180;
+                        break;
+                    case 270000:
+                        rot = EVideoRotationClockwise270;
+                        break;
+                    default:
+                        rot = EVideoRotationNone; 
+                        break;
+                    }
+                TAG_TIME_PROFILING_BEGIN;
+                TRAPD(err, iVideoPlayer->SetRotationL(*m_pWindow, rot));
+                TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
+                if(!err)
+                    {
+                    retVal = XA_RESULT_SUCCESS; 
+                    }
+                }
+            break;
+        case XA_PLAYSTATE_PLAYERUNINITIALIZED:
+        default:
+            break;
+        }
+    return retVal;
+    }
+
+XAresult CMMFBackendEngine::SetScaleOptions(XAuint32 options)
+    {
+    XAresult retVal(XA_RESULT_PARAMETER_INVALID);
+    
+    switch (iMediaPlayerState)
+        {
+        case XA_PLAYSTATE_STOPPED:
+        case XA_PLAYSTATE_PAUSED:
+        case XA_PLAYSTATE_PLAYING:
+            if (iAPIBeingUsed == EAudioPlayerUtility)
+                {
+                retVal = XA_RESULT_FEATURE_UNSUPPORTED;
+                }
+            else
+                {
+                TAutoScaleType scale(EAutoScaleBestFit);
+                switch(options)
+                    {
+                    case XA_VIDEOSCALE_STRETCH:
+                        scale = EAutoScaleStretch;
+                        break;
+                    case XA_VIDEOSCALE_FIT:
+                        scale = EAutoScaleBestFit;
+                        break;
+                    case XA_VIDEOSCALE_CROP:
+                        scale = EAutoScaleClip;
+                        break;
+                    default:
+                        scale = EAutoScaleBestFit;
+                        break;
+                    }
+                TAG_TIME_PROFILING_BEGIN;
+                TRAPD(err, iVideoPlayer->SetAutoScaleL(*m_pWindow, scale));
+                TAG_TIME_PROFILING_END; PRINT_TO_CONSOLE_TIME_DIFF;
+                if(!err)
+                    {
                     retVal = XA_RESULT_SUCCESS; 
                     }
                 }
@@ -1926,5 +2250,58 @@ extern "C"
     XAresult mmf_playbackrateitf_get_playbackratecaps(void * context, XAboolean* forward, XAboolean* backward)
         {
         return ((CMMFBackendEngine *) (context))->GetPlaybackRateCapabilities(forward,backward);
+        }
+    XAresult mmf_prefetchstatusitf_register_callback(	void * context,
+            												xaPrefetchCallback callback)
+	{
+        return ((CMMFBackendEngine *) (context))->RegisterPrefetchCallback(callback);
+    }
+    XAresult mmf_prefetchstatusitf_set_fill_level_update_period(	void * context,
+            														XAmillisecond mSec)
+	{
+        return ((CMMFBackendEngine *) (context))->SetPrefetchLevelUpdatePeriod(mSec);
+    }
+
+	
+    XAresult mmf_prefetchstatusitf_set_callback_events_mask(void * context,
+            														XAuint32 evtMask)
+	{
+        return ((CMMFBackendEngine *) (context))->SetPrefetchCallbackEventsMask(evtMask);
+    }
+
+	
+	XAresult mmf_prefetchstatusitf_get_status(void *context, XAuint32* status)
+	{
+		return ((CMMFBackendEngine *) (context))->GetPrefetchStatus(status);
+	}
+	
+	XAresult mmf_prefetchstatusitf_get_fill_level(void *context, XApermille * fillLevel)
+	{
+		return ((CMMFBackendEngine *) (context))->GetPrefetchFillLevel(fillLevel);
+	}
+	
+	XAresult mmf_streaminfoitf_register_callback(void * context, xaStreamEventChangeCallback callback)
+	{
+		return ((CMMFBackendEngine *) (context))->RegisterStreamInfoCallback(callback);
+	}
+	
+    XAresult mmf_videoppitf_set_sourcerectangle(void * context, const XARectangle* rect)
+        {
+        return ((CMMFBackendEngine *) (context))->SetSourceRect(rect);
+        }
+
+    XAresult mmf_videoppitf_set_destinationrectangle(void * context, const XARectangle* rect)
+        {
+        return ((CMMFBackendEngine *) (context))->SetDestinationRect(rect);
+        }
+
+    XAresult mmf_videoppitf_set_rotation(void * context, XAmillidegree rotation)
+        {
+        return ((CMMFBackendEngine *) (context))->SetRotation(rotation);
+        }
+
+    XAresult mmf_videoppitf_set_scalingoptions(void * context, XAuint32 options)
+        {
+        return ((CMMFBackendEngine *) (context))->SetScaleOptions(options);
         }
     }

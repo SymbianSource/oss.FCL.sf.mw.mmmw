@@ -31,7 +31,7 @@
 
 using namespace TMS;
 
-TMSFactoryImpl::TMSFactoryImpl()
+TMSFactoryImpl::TMSFactoryImpl(TMSVer& /*ver*/)
     {
     iFormats.Reset();
     }

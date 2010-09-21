@@ -35,7 +35,7 @@ typedef struct XAMediaRecorderAdaptationMMFCtx_
     XAuint8 recModes;
 
     /* GST elements */
-    XAboolean isobjsink; /*is sink another XA object?*/
+    //XAboolean isobjsink; /*is sink another XA object?*/
     XAboolean isobjasrc; /*is audio source another XA object?*/
     XAboolean isobjvsrc; /*is video source another XA object?*/
     XAboolean encodingchanged;

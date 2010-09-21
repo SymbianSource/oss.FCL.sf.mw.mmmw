@@ -17,11 +17,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include "xaprefetchstatusitf.h"
 
 #include "xaadaptationgst.h"
+#include "xaprefetchstatusitfadaptationmmf.h"
+
 
 
 static XAPrefetchStatusItfImpl* GetImpl(XAPrefetchStatusItf self)
@@ -51,8 +52,11 @@ XAresult XAPrefetchStatusItfImpl_GetPrefetchStatus(XAPrefetchStatusItf self,
         DEBUG_API("<-XAPrefetchStatusItfImpl_GetPrefetchStatus");
         return XA_RESULT_PARAMETER_INVALID;
     }
-
-    *pStatus = impl->pStatus;
+	
+    if (impl->adaptationCtx->fwtype == FWMgrFWMMF)
+    {
+	    ret = XAPrefetchStatusItfAdaptMMF_GetPrefetchStatus(impl->adaptationCtx, pStatus);
+    }
 
     DEBUG_API("<-XAPrefetchStatusItfImpl_GetPrefetchStatus");
     return ret;
@@ -72,8 +76,11 @@ XAresult XAPrefetchStatusItfImpl_GetFillLevel(XAPrefetchStatusItf self,
         DEBUG_API("<-XAPrefetchStatusItfImpl_GetFillLevel");
         return XA_RESULT_PARAMETER_INVALID;
     }
-
-    *pLevel = impl->pLevel;
+	
+    if (impl->adaptationCtx->fwtype == FWMgrFWMMF)
+    {
+	    ret = XAPrefetchStatusItfAdaptMMF_GetFillLevel(impl->adaptationCtx, pLevel);
+    }
 
     DEBUG_API("<-XAPrefetchStatusItfImpl_GetFillLevel");
     return ret;
@@ -99,6 +106,11 @@ XAresult XAPrefetchStatusItfImpl_RegisterCallback(XAPrefetchStatusItf self,
     impl->callback = callback;
     impl->cbcontext = pContext;
     impl->cbPtrToSelf = self;
+	
+    if (impl->adaptationCtx->fwtype == FWMgrFWMMF)
+    {
+	    ret = XAPrefetchStatusItfAdaptMMF_RegisterCallback(impl->adaptationCtx, callback);
+    }
 
     DEBUG_API("<-XAPrefetchStatusItfImpl_RegisterCallback");
     return ret;
@@ -111,7 +123,7 @@ XAresult XAPrefetchStatusItfImpl_SetCallbackEventsMask(XAPrefetchStatusItf self,
     XAPrefetchStatusItfImpl *impl = GetImpl(self);
     DEBUG_API("->XAPrefetchStatusItfImpl_SetCallbackEventsMask");
 
-    if(!impl  )
+    if(!impl || eventFlags > (XA_PREFETCHEVENT_STATUSCHANGE|XA_PREFETCHEVENT_FILLLEVELCHANGE))
     {
         /* invalid parameter */
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
@@ -120,6 +132,11 @@ XAresult XAPrefetchStatusItfImpl_SetCallbackEventsMask(XAPrefetchStatusItf self,
     }
 
     impl->eventFlags = eventFlags;
+	
+    if (impl->adaptationCtx->fwtype == FWMgrFWMMF)
+    {
+	    ret = XAPrefetchStatusItfAdaptMMF_SetCallbackEventsMask(impl->adaptationCtx, eventFlags);
+    }
 
     DEBUG_API("<-XAPrefetchStatusItfImpl_SetCallbackEventsMask");
     return ret;
@@ -162,6 +179,11 @@ XAresult XAPrefetchStatusItfImpl_SetFillUpdatePeriod(XAPrefetchStatusItf self,
     }
 
     impl->fillUpdatePeriod = period;
+
+    if (impl->adaptationCtx->fwtype == FWMgrFWMMF)
+    {
+	    ret = XAPrefetchStatusItfAdaptMMF_SetFillUpdatePeriod(impl->adaptationCtx, period);
+    }
 
     DEBUG_API("<-XAPrefetchStatusItfImpl_SetFillUpdatePeriod");
     return ret;
@@ -229,7 +251,6 @@ XAPrefetchStatusItfImpl* XAPrefetchStatusItfImpl_Create( XAMediaPlayerImpl* impl
 void XAPrefetchStatusItfImpl_Free(XAPrefetchStatusItfImpl* self)
 {
     DEBUG_API("->XAPrefetchStatusItfImpl_Free");
-    assert(self==self->self);
     XAAdaptationBase_RemoveEventHandler( (XAAdaptationBaseCtx*)self->adaptationCtx, &XAPrefetchStatusItfImpl_AdaptCb );
     free(self);
     DEBUG_API("<-XAPrefetchStatusItfImpl_Free");
@@ -248,22 +269,14 @@ void XAPrefetchStatusItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event )
         DEBUG_API("<-XAPrefetchStatusItfImpl_AdaptCb");
         return;
     }
-    assert(event);
-    if( event->eventid == XA_ADAPT_BUFFERING )
+	
+    if (impl->adaptationCtx->fwtype == FWMgrFWMMF)
     {
-        /* Adaptation sends percents convert it to permille */
-        impl->fillUpdatePeriod = ((*(XAint32*)(event->data))*10);
-
-        /*Check do we have to send event */
-        if( impl->callback && impl->eventFlags & XA_PREFETCHEVENT_FILLLEVELCHANGE )
-        {
-            if ( (*(XAint32*)event->data) >  impl->fillUpdatePeriod / 10 )
-            {
-                impl->callback(impl->cbPtrToSelf, impl->cbcontext, XA_PREFETCHEVENT_FILLLEVELCHANGE);
-            }
-        }
+        impl->callback(impl->cbPtrToSelf, impl->cbcontext, event->eventid);
+        DEBUG_API("<-XAPrefetchStatusItfImpl_AdaptCb");
+        return;
     }
-
+	
     DEBUG_API("<-XAPrefetchStatusItfImpl_AdaptCb");
 }
 

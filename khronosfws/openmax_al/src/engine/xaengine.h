@@ -21,9 +21,6 @@
 #include "openmaxalwrapper.h"
 #include "xaglobals.h"
 #include "xaobjectitf.h"
-#include "xaengineadaptctx.h"
-
-#include "xaengineadaptctxmmf.h"
 #include "xaframeworkmgr.h"
 #include "xacapabilitiesmgr.h"
 

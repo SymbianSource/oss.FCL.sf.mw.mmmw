@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
 #include <e32base.h>
 #include <voipdownlinkstream.h>
@@ -25,13 +24,12 @@
 #include "VoIPQueueHandler.h"
 #include "VoIPUtilityFactoryImpl.h"
 
-
 // ---------------------------------------------------------------------------
 // CVoIPUtilityFactory::CreateFactory
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPUtilityFactory::CreateFactory(
-                                   CVoIPUtilityFactory*& aFactory)
+        CVoIPUtilityFactory*& aFactory)
     {
     TInt err = KErrNone;
     CVoIPUtilityFactory* factory = NULL;
@@ -83,14 +81,12 @@ void CVoIPUtilityFactory::ConstructL()
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPUtilityFactory::CreateDownlinkStream(
-                                   const TVersion aVersion,
-                                   const TVoIPCallType aCallType,
-                                   CVoIPAudioDownlinkStream*& aDnLink)
+        const TVersion aVersion, const TVoIPCallType aCallType,
+        CVoIPAudioDownlinkStream*& aDnLink)
     {
     // Push Over Cellular (PoC) implementation will be added in the future.
-
-    TRAPD(err,
-    iVoIPUtilityFactoryImpl->CreateDownlinkStreamL(aVersion, aCallType, aDnLink));
+    TRAPD(err, iVoIPUtilityFactoryImpl->CreateDownlinkStreamL(aVersion,
+            aCallType, aDnLink));
     return err;
     }
 
@@ -99,12 +95,11 @@ EXPORT_C TInt CVoIPUtilityFactory::CreateDownlinkStream(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPUtilityFactory::CreateDownlinkStream(
-                                   const TVersion aVersion,
-                                   CVoIPJitterBufferIntfc*& aJBIntfc,
-                                   CVoIPAudioDownlinkStream*& aDnLink)
+        const TVersion aVersion, CVoIPJitterBufferIntfc*& aJBIntfc,
+        CVoIPAudioDownlinkStream*& aDnLink)
     {
-    TRAPD(err,
-    iVoIPUtilityFactoryImpl->CreateDownlinkStreamL(aVersion, aJBIntfc, aDnLink));
+    TRAPD(err, iVoIPUtilityFactoryImpl->CreateDownlinkStreamL(aVersion,
+            aJBIntfc, aDnLink));
     return err;
     }
 
@@ -113,14 +108,12 @@ EXPORT_C TInt CVoIPUtilityFactory::CreateDownlinkStream(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPUtilityFactory::CreateUplinkStream(
-                                   const TVersion aVersion,
-                                   const TVoIPCallType aCallType,
-                                   CVoIPAudioUplinkStream*& aUpLink)
+        const TVersion aVersion, const TVoIPCallType aCallType,
+        CVoIPAudioUplinkStream*& aUpLink)
     {
     //TODO: What should we do different for PoC call here?
-
-    TRAPD(err,
-    iVoIPUtilityFactoryImpl->CreateUplinkStreamL(aVersion, aCallType, aUpLink));
+    TRAPD(err, iVoIPUtilityFactoryImpl->CreateUplinkStreamL(aVersion,
+            aCallType, aUpLink));
     return err;
     }
 
@@ -129,7 +122,7 @@ EXPORT_C TInt CVoIPUtilityFactory::CreateUplinkStream(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPUtilityFactory::CreateDTMFTonePlayer(
-                                   CDTMFTonePlayer*& aDtmfPlayer)
+        CDTMFTonePlayer*& aDtmfPlayer)
     {
     TRAPD(err, iVoIPUtilityFactoryImpl->CreateDTMFTonePlayerL(aDtmfPlayer));
     return err;
@@ -139,13 +132,12 @@ EXPORT_C TInt CVoIPUtilityFactory::CreateDTMFTonePlayer(
 // CVoIPUtilityFactory::CreateBuffer
 // ---------------------------------------------------------------------------
 //
-EXPORT_C TInt CVoIPUtilityFactory::CreateBuffer(
-                                   CVoIPDataBuffer*& aBuffer,
-                                   const CVoIPDataBuffer::TVoIPBufferType aType,
-                                   const TVoIPCodecFormat aCodecFormat)
+EXPORT_C TInt CVoIPUtilityFactory::CreateBuffer(CVoIPDataBuffer*& aBuffer,
+        const CVoIPDataBuffer::TVoIPBufferType aType,
+        const TVoIPCodecFormat aCodecFormat)
     {
-    TRAPD(err,
-    iVoIPUtilityFactoryImpl->CreateBufferL(aBuffer, aType, aCodecFormat));
+    TRAPD(err, iVoIPUtilityFactoryImpl->CreateBufferL(aBuffer, aType,
+            aCodecFormat));
     return err;
     }
 
@@ -154,7 +146,7 @@ EXPORT_C TInt CVoIPUtilityFactory::CreateBuffer(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPUtilityFactory::GetSupportedDownlinkFormats(
-                                   RArray<TVoIPCodecFormat>& aFormats)
+        RArray<TVoIPCodecFormat>& aFormats)
     {
     TInt err = iVoIPUtilityFactoryImpl->GetSupportedDownlinkFormats(aFormats);
     return err;
@@ -165,11 +157,10 @@ EXPORT_C TInt CVoIPUtilityFactory::GetSupportedDownlinkFormats(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPUtilityFactory::GetSupportedUplinkFormats(
-                                   RArray<TVoIPCodecFormat>& aFormats)
+        RArray<TVoIPCodecFormat>& aFormats)
     {
     TInt err = iVoIPUtilityFactoryImpl->GetSupportedUplinkFormats(aFormats);
     return err;
     }
-
 
 // End of file

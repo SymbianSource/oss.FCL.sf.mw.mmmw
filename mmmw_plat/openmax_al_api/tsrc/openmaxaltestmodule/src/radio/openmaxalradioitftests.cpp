@@ -409,7 +409,7 @@ TInt COpenMAXALTestModule::al_radioitf_StopSeeking( CStifItemParser& /*aItem*/ )
     return status;
     }
 
-TInt COpenMAXALTestModule::al_radioitf_GetNumberOfPresets( CStifItemParser& aItem)
+TInt COpenMAXALTestModule::al_radioitf_GetNumberOfPresets( CStifItemParser& /*aItem*/)
     {
     TInt status(KErrNone);
     RET_ERR_IF_ERR(status);

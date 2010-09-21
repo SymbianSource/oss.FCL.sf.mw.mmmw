@@ -20,6 +20,8 @@
 
 #include "openmaxalwrapper.h"
 #include "xaadptbasectx.h"
+#include "xamediaplayer.h"
+
 
 /** MACROS **/
 
@@ -75,7 +77,10 @@ XAresult XAStreamInformationItfImpl_SetActiveStream(
 
 /* XAStreamInformationItfImpl -specific methods */
 XAStreamInformationItfImpl* XAStreamInformationItfImpl_Create(
-        XAAdaptationBaseCtx *adapCtx);
+        XAMediaPlayerImpl* impl);
 void XAStreamInformationItfImpl_Free(XAStreamInformationItfImpl* self);
+
+void XAStreamInformationItfImpl_AdaptCb( void *pHandlerCtx, XAAdaptEvent *event );
+
 
 #endif /* XASTREAMINFORMATIONITF_H */

@@ -226,10 +226,15 @@ TMSRtAudioHdlr::~TMSRtAudioHdlr()
     delete i3DPlugin;
     delete iAudioOutput;*/
     delete iTonePlayer;
+    iTonePlayer = NULL;
     delete iSamplePlayer;
+    iSamplePlayer = NULL;
     delete iTtsPlayer;
+    iTtsPlayer = NULL;
     delete iSequence;
+    iSequence = NULL;
     delete iTtsText;
+    iTtsText = NULL;
     REComSession::FinalClose();
     TRACE_PRN_FN_EXT;
     }

@@ -47,7 +47,7 @@ XAresult XAPlayItfAdaptMMF_SetPlayState(XAAdaptationBaseCtx *bCtx,
     mCtx = (XAMediaPlayerAdaptationMMFCtx*) bCtx;
 
 
-//    DEBUG_API_A1_STR("->XAPlayItfAdaptMMF_SetPlayState %s",PLAYSTATENAME(state));
+    DEBUG_API_A1_STR("->XAPlayItfAdaptMMF_SetPlayState %s",PLAYSTATENAME(state));
 
     /* bCtx and parameter pointer validation happens in the calling function.
      * We don't need to repeat it here*/

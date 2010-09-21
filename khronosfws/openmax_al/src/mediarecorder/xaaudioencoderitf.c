@@ -15,7 +15,6 @@
  *
  */
 
-#include <assert.h>
 #include "xamediarecorderadaptctxmmf.h"
 #include "xaaudioencoderitf.h"
 #include "xaaudioencoderitfadaptation.h"
@@ -306,7 +305,6 @@ void XAAudioEncoderItfImpl_Free(XAAudioEncoderItfImpl* self)
     DEBUG_API("->XAAudioEncoderItfImpl_Free");
     if(self)
         {
-        assert( self==self->self );
         free(self);
         }
     DEBUG_API("<-XAAudioEncoderItfImpl_Free");

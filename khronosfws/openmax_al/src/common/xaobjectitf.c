@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include "xaobjectitf.h"
 
@@ -340,8 +339,6 @@ XAresult XAObjectItfImpl_Init(XAObjectItfImpl* self, XAuint32 itfCount,
     {
     XAuint32 i = 0;
     DEBUG_API("->XAObjectItfImpl_Init");
-
-    assert( self && itfIIDs && doRealizeImpl && doResumeImpl && freeResourcesImpl );
 
     self->interfaceMap = (XAObjItfMapEntry*) calloc(itfCount,
             sizeof(XAObjItfMapEntry));

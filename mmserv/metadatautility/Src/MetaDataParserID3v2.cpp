@@ -26,7 +26,7 @@
 
 #include    <barsc.h>
 #include    <barsread.h>
-#include	<TopCharacterSet.rsg>
+#include	<topcharacterset.rsg>
 #include 	<data_caging_path_literals.hrh>
 
 // CONSTANTS

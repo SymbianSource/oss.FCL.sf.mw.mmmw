@@ -1,28 +1,26 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
-
-#ifndef __RINGTONEPLAYERIMPL_H
-#define __RINGTONEPLAYERIMPL_H
+#ifndef RINGTONEPLAYERIMPL_H
+#define RINGTONEPLAYERIMPL_H
 
 #include <voipringtoneplayer.h>
 #include "VoIPAudioSession.h"
 #include "VoIPQueueHandler.h"
-
 
 // FORWARD DECLARATIONS
 class RFile;
@@ -38,18 +36,17 @@ class CVoIPDataBuffer;
  *  Ring Tone Player class
  *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
  */
 NONSHARABLE_CLASS(CRingTonePlayerImpl) : public CBase,
-                                         public CRingTonePlayer,
-                                         public MQueueHandlerObserver
+        public CRingTonePlayer,
+        public MQueueHandlerObserver
     {
 public:
 
     /**
      * 2-phase constructor
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return CRingTonePlayerImpl* -
      */
@@ -58,7 +55,7 @@ public:
     /**
      * Destructor
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return none
      */
@@ -67,7 +64,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param MRingToneObserver&
      * @return TInt
      */
@@ -76,7 +73,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param MRingToneObserver&
      * @param TPtr
      * @return TInt
@@ -86,7 +83,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param MRingToneObserver&
      * @param RFile&
      * @return TInt
@@ -96,7 +93,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param MRingToneObserver&
      * @param TPtr8
      * @param TPtr8
@@ -107,7 +104,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return TInt
      */
@@ -116,7 +113,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return TInt
      */
@@ -125,7 +122,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return TInt
      */
@@ -134,7 +131,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return TInt
      */
@@ -143,18 +140,18 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return TInt
      */
     void Close();
 
-// From MQueueHandlerObserver
+    // From MQueueHandlerObserver
 
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param TPtr8
      * @return void
      */
@@ -163,7 +160,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param TPtr8
      * @return void
      */
@@ -172,7 +169,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param TInt
      * @param TInt
      * @return void
@@ -184,7 +181,7 @@ private:
     /**
      * Constructor
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return none
      */
@@ -193,21 +190,21 @@ private:
     /**
      * Symbian constructor
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
     void ConstructL();
 
     /**
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
     void StartMsgQueueL();
 
     /**
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -215,15 +212,14 @@ private:
 
 private:
 
-// Communication queue
+    // Communication queue
     RMsgQueue<TVoIPMsgBuf> iMsgComQueue;
-    CQueueHandler*         iMsgQComHandler;
+    CQueueHandler* iMsgQComHandler;
 
-    MRingToneObserver*     iObserver;
-    RVoIPAudioSession      iVoIPAudioSession;
-
+    MRingToneObserver* iObserver;
+    RVoIPAudioSession iVoIPAudioSession;
     };
 
-#endif //__RINGTONEPLAYERIMPL_H
+#endif //RINGTONEPLAYERIMPL_H
 
 // End of file

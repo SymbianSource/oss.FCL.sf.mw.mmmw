@@ -142,7 +142,6 @@ TInt COpenMAXALTestModule::al_createEngine( CStifItemParser& aItem )
             }
         }
     
-    
     XAresult xa_res = xaCreateEngine(&m_EOEngine, numEngineOption, EngineOption, numInterfaces, iidArray, required);
     status = MapErr(xa_res);    
     return status;

@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef JITTERBUFFER_OBS_H
-#define JITTERBUFFER_OBS_H
+#ifndef JITTERBUFFEROBSERVER_H
+#define JITTERBUFFEROBSERVER_H
 
 class MJitterBufferObserver
     {
@@ -39,13 +39,12 @@ public:
     /**
      * Callback function for codec reconfiguration for dynamic
      * buffer size adjustment.
-     * @since S60 v5.0
      * @param aBufferSize Buffer size request in samples.
      *
      virtual void DynamicBufferChangeRequest(TInt aBufferSize) = 0;
      */
-
     };
 
-#endif  // JITTERBUFFER_OBS_H
+#endif //JITTERBUFFEROBSERVER_H
+
 // End of file

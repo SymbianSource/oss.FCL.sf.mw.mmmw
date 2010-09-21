@@ -30,8 +30,6 @@ CTmsAudioServicesTestClass::CTmsAudioServicesTestClass(
     CScriptBase(aTestModuleIf),
     iTestModuleIf(aTestModuleIf)
     {
-    //iDnLinkCodec = ENULL;
-    //iUpLinkCodec = ENULL;
     iDnLinkStatus = UNINITIALIZED;
     iUpLinkStatus = UNINITIALIZED;
     }

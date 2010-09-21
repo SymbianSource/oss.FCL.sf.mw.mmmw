@@ -34,12 +34,8 @@ typedef enum
     {
     MR_OBJECTITF,
     MR_AUDIOENCODERITF,
-    MR_CONFIGEXTENSIONITF,
     MR_DIMITF,
-    MR_METADATAINSERTIONITF,
     MR_RECORDITF,
-    MR_VOLUMEITF,
-    MR_METADATAEXTRACTIONITF,
     MR_ITFCOUNT
     } MRInterfaces;
 
@@ -65,6 +61,7 @@ typedef struct XAMediaRecorderImpl_
 XAresult XAMediaRecorderImpl_DoRealize(XAObjectItf self);
 XAresult XAMediaRecorderImpl_DoResume(XAObjectItf self);
 void XAMediaRecorderImpl_FreeResources(XAObjectItf self);
+void XAMediaRecorderImpl_AdaptCb(void *pHandlerCtx, XAAdaptEvent *event);
 
 /* MediaRecorderImpl -specific methods*/
 XAresult XAMediaRecorderImpl_DoAddItf(XAObjectItf self,

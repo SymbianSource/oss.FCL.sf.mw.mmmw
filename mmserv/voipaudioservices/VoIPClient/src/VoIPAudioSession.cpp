@@ -276,7 +276,8 @@ EXPORT_C TInt RVoIPAudioSession::GetAudioDevice(
 //
 EXPORT_C TInt RVoIPAudioSession::StartDownlink()
     {
-    TInt err = SendClientRequest(EVoIPStartDownlink, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPStartDownlink, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
@@ -286,7 +287,8 @@ EXPORT_C TInt RVoIPAudioSession::StartDownlink()
 //
 EXPORT_C TInt RVoIPAudioSession::StopDownlink()
     {
-    TInt err = SendClientRequest(EVoIPStopDownlink, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPStopDownlink, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
@@ -427,7 +429,8 @@ EXPORT_C TInt RVoIPAudioSession::SetEncoder(const TUint32 aEncoder)
 //
 EXPORT_C TInt RVoIPAudioSession::StartUplink()
     {
-    TInt err = SendClientRequest(EVoIPStartUplink, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPStartUplink, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
@@ -483,9 +486,14 @@ EXPORT_C void RVoIPAudioSession::GetSupportedBitRatesL(RArray<TUint>& aArray)
         err = pckg().iStatus;
         }
 
+    if (err != KErrNone)
+        {
+        User::Leave(err);
+        }
+
     TRACE_PRN_N1(_L("BRCount [%d]"), brCount);
 
-    if (brCount > 0 && err == KErrNone)
+    if (brCount > 0)
         {
         HBufC8* buf = HBufC8::NewLC(brCount * sizeof(TUint));
         TPtr8 ptr = buf->Des();
@@ -617,7 +625,8 @@ EXPORT_C TInt RVoIPAudioSession::GetFrameMode(TBool& aMode)
 //
 EXPORT_C TInt RVoIPAudioSession::ConcealErrorForNextBuffer()
     {
-    TInt err = SendClientRequest(EVoIPConcealErrForNextBuf, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPConcealErrForNextBuf, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
@@ -747,22 +756,24 @@ EXPORT_C TInt RVoIPAudioSession::GetPLC(TBool& aPlc)
 //
 EXPORT_C TInt RVoIPAudioSession::BadLsfNextBuffer()
     {
-    TInt err = SendClientRequest(EVoIPBadLsfNextBuffer, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPBadLsfNextBuffer, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
 // -----------------------------------------------------------------------------
-// RVoIPAudioSession::Open
+// RVoIPAudioSession::OpenDTMFTonePlayer
 // -----------------------------------------------------------------------------
 //
 EXPORT_C TInt RVoIPAudioSession::OpenDTMFTonePlayer()
     {
-    TInt err = SendClientRequest(EVoIPOpenDTMFTonePlayer, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPOpenDTMFTonePlayer, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
 // ---------------------------------------------------------------------------
-// RVoIPAudioSession::Play
+// RVoIPAudioSession::PlayDTMFTone
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt RVoIPAudioSession::PlayDTMFTone(const TDesC& aTones)
@@ -775,17 +786,18 @@ EXPORT_C TInt RVoIPAudioSession::PlayDTMFTone(const TDesC& aTones)
     }
 
 // ---------------------------------------------------------------------------
-// RVoIPAudioSession::Stop
+// RVoIPAudioSession::StopDTMFTonePlay
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt RVoIPAudioSession::StopDTMFTonePlay()
     {
-    TInt err = SendClientRequest(EVoIPStopDTMFTone, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPStopDTMFTone, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
 // ---------------------------------------------------------------------------
-// RVoIPAudioSession::Close
+// RVoIPAudioSession::CloseDTMFTonePlayer
 // ---------------------------------------------------------------------------
 //
 EXPORT_C void RVoIPAudioSession::CloseDTMFTonePlayer()
@@ -799,7 +811,8 @@ EXPORT_C void RVoIPAudioSession::CloseDTMFTonePlayer()
 //
 EXPORT_C TInt RVoIPAudioSession::OpenRingTonePlayer()
     {
-    TInt err = SendClientRequest(EVoIPOpenRingTonePlayerFromProfile, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPOpenRingTonePlayerFromProfile,
+            TIpcArgs(TIpcArgs::ENothing));
     return err;
     }
 
@@ -847,7 +860,8 @@ EXPORT_C TInt RVoIPAudioSession::OpenRingTonePlayer(const TDesC8& aDesData)
 //
 EXPORT_C TInt RVoIPAudioSession::PlayRingTone()
     {
-    TInt err = SendClientRequest(EVoIPPlayRingTone, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPPlayRingTone, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
@@ -857,7 +871,8 @@ EXPORT_C TInt RVoIPAudioSession::PlayRingTone()
 //
 EXPORT_C TInt RVoIPAudioSession::PauseRingTone()
     {
-    TInt err = SendClientRequest(EVoIPPauseRingTone, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPPauseRingTone, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
@@ -867,7 +882,8 @@ EXPORT_C TInt RVoIPAudioSession::PauseRingTone()
 //
 EXPORT_C TInt RVoIPAudioSession::ResumeRingTone()
     {
-    TInt err = SendClientRequest(EVoIPResumeRingTone, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPResumeRingTone, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
@@ -877,7 +893,8 @@ EXPORT_C TInt RVoIPAudioSession::ResumeRingTone()
 //
 EXPORT_C TInt RVoIPAudioSession::StopRingTone()
     {
-    TInt err = SendClientRequest(EVoIPStopRingTone, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPStopRingTone, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
@@ -920,7 +937,8 @@ EXPORT_C TInt RVoIPAudioSession::ResetJitterBuffer(const TBool aPlayTone)
 //
 EXPORT_C TInt RVoIPAudioSession::DelayDown()
     {
-    TInt err = SendClientRequest(EVoIPJBDelayDown, TIpcArgs(TIpcArgs::ENothing));
+    TInt err = SendClientRequest(EVoIPJBDelayDown, TIpcArgs(
+            TIpcArgs::ENothing));
     return err;
     }
 
@@ -965,7 +983,6 @@ void RVoIPAudioSession::PopulateArrayL(
     CleanupStack::PopAndDestroy(buf);
     }
 
-
 // -----------------------------------------------------------------------------
 // RVoIPAudioSession::SendClientRequest
 // -----------------------------------------------------------------------------
@@ -976,7 +993,6 @@ TInt RVoIPAudioSession::SendClientRequest(
     TInt status = KErrBadHandle;
     if (Handle())
         {
-       // if (&aArgs == TIpcArgs::ENothing)
         status = SendReceive(aRequest, aArgs);
         }
     return status;

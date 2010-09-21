@@ -44,6 +44,8 @@ CVoIPUplinkThread::~CVoIPUplinkThread()
     TRACE_PRN_FN_ENT;
 
     Stop();
+    iBitrates.Close();
+    iShared.iCodecSettings.iArrBitrates = NULL;
     delete iSpeechEncoderConfig;
     delete iG711EncoderIntfc;
     delete iG729EncoderIntfc;
@@ -526,10 +528,10 @@ void CVoIPUplinkThread::GetSupportedBitrates()
 
     if (iSpeechEncoderConfig)
         {
-        RArray<TUint> bitrates;
-        err = iSpeechEncoderConfig->GetSupportedBitrates(bitrates);
+        iBitrates.Reset();
+        err = iSpeechEncoderConfig->GetSupportedBitrates(iBitrates);
         iShared.iMutex.Wait();
-        iShared.iCodecSettings.iArrBitrates = bitrates;
+        iShared.iCodecSettings.iArrBitrates = &iBitrates;
         iShared.iMutex.Signal();
         }
 

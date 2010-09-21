@@ -377,6 +377,29 @@ TInt COpenMAXALTestModule::al_engitf_CreateMediaRecorder( CStifItemParser& aItem
     XADataSource* audioSource(NULL);
     XADataSource* videoSource(NULL);
     XADataSink* dataSink(NULL);
+
+    audioSource = &m_AudioSource;
+    videoSource = &m_VideoSource;
+    dataSink = &m_DataSink;
+    
+    void* itfPtr = (void*) m_EngineItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
+    void* param0 = (void*)(&m_MORecorder);
+    void* param1 = audioSource;
+    void* param2 = videoSource;
+    void* param3 = dataSink;
+    
+    status = CheckForNull(aItem, param0);
+    RET_ERR_IF_ERR(status);
+    status = CheckForNull(aItem, param1);
+    RET_ERR_IF_ERR(status);    
+    status = CheckForNull(aItem, param2);
+    RET_ERR_IF_ERR(status);    
+    status = CheckForNull(aItem, param3);
+    RET_ERR_IF_ERR(status);    
     /* Initialize arrays required[] and iidArray[] */
     for (TInt i = 0; i < MAX_NUMBER_INTERFACES; i++)
         {
@@ -404,27 +427,15 @@ TInt COpenMAXALTestModule::al_engitf_CreateMediaRecorder( CStifItemParser& aItem
             }
         }
     
-    
-    if(m_AudioSource.pFormat && m_AudioSource.pLocator)
-        {
-        audioSource = &m_AudioSource;
-        }
-    
-    if(m_VideoSource.pFormat && m_VideoSource.pLocator)
-        {
-        videoSource = &m_VideoSource;
-        }
-    
-    if(m_DataSink.pFormat && m_DataSink.pLocator)
-        {
-        dataSink = &m_DataSink;
-        }
-    
     if(m_EngineItf)
         {
+        TAG_TIME_PROFILING_BEGIN;
         res = (*m_EngineItf)->CreateMediaRecorder(
-                m_EngineItf, &m_MORecorder, audioSource, videoSource, dataSink,
+                XAEngineItf(itfPtr), /*&(*((XAObjectItf*)param0))*/&m_MORecorder, (XADataSource*)(param1),
+                (XADataSource*)(param2), (XADataSink*)(param3),
                 numInterfaces, iidArray, required);
+        TAG_TIME_PROFILING_END;
+        PRINT_TO_CONSOLE_TIME_DIFF;
         status = res;
         }
     else
@@ -635,21 +646,27 @@ TInt COpenMAXALTestModule::al_engitf_QueryNumSupportedInterfaces( CStifItemParse
     TUint object(0);
     XAuint32 numInterfaces(0);
     XAresult res;
-    XAuint32 objectId;
+    void* itfPtr = (void*) m_EngineItf;
+    void* param = (void*)&numInterfaces;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
     status = aItem.GetNextInt(object);
-    if(!status)
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNull(aItem, param);
+    RET_ERR_IF_ERR(status);
+
+    if(m_EngineItf)
         {
-        objectId = object;
-        if(m_EngineItf)
-            {
-            res = (*m_EngineItf)->QueryNumSupportedInterfaces(
-                    m_EngineItf, objectId,&numInterfaces);
-            status = res;
-            }
-        else
-            {
-            status = KErrNotFound;
-            }
+        res = (*m_EngineItf)->QueryNumSupportedInterfaces(
+                XAEngineItf(itfPtr), (XAuint32)object, (XAuint32*)param);
+        status = res;
+        }
+    else
+        {
+        status = KErrNotFound;
         }
     return status;
     }
@@ -661,34 +678,34 @@ TInt COpenMAXALTestModule::al_engitf_QuerySupportedInterfaces( CStifItemParser& 
     TInt index(0);
     XAresult res;
     XAInterfaceID interface;
-    XAuint32 objectId;
+    
+    void* itfPtr = (void*) m_EngineItf;
+    void* param = (void*)&interface;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
     status = aItem.GetNextInt(object);
-    if(!status)
+    RET_ERR_IF_ERR(status);
+    
+
+    status = aItem.GetNextInt(index);
+    RET_ERR_IF_ERR(status);
+
+    status = CheckForNull(aItem, param);
+    RET_ERR_IF_ERR(status);
+    
+    if(m_EngineItf)
         {
-        objectId = object;
-        status = aItem.GetNextInt(index);
-        if(!status)
-            {
-            if(m_EngineItf)
-                {
-                res = (*m_EngineItf)->QuerySupportedInterfaces(
-                        m_EngineItf, objectId, index,&interface);
-                status = res;
-                }
-            else
-                {
-                status = KErrNotFound;
-                }
-            }
-        else
-            {
-            status = KErrGeneral;
-            }
+        res = (*m_EngineItf)->QuerySupportedInterfaces(
+                XAEngineItf(itfPtr), (XAuint32)object, index, (XAInterfaceID*)param);
+        status = res;
         }
     else
         {
-        status = KErrGeneral;
+        status = KErrNotFound;
         }
+
     return status;
     }
 

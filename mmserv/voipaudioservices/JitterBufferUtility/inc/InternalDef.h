@@ -1,25 +1,22 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Mcc Internal definitions
-*
-*/
-
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Mcc Internal definitions
+ *
+ */
 
 #ifndef INTERNALDEF_H
 #define INTERNALDEF_H
-
 
 // CONSTANTS
 // When the remote end sends us SID/CN frames, then we can update the SID/CN
@@ -63,30 +60,28 @@ const TInt KModeShiftBits = 3;
 //const TUint8 KVoIPAudioFrame = 1;
 const TUint8 KVoIPCNFrame = 2;
 
-
 const TUint KJBAdaptUpdateIval = 250;
 const TUint KJBMillisecondsToMicroseconds = 1000;
 const TUint KJBEmptyBufferDelay = 2;
 
-const TInt  KDefaultSampleRateInkHz = 8;
-const TInt  KLowBufferLimit = 2;
-const TInt  KOverflowAlarmLimit = 20;
+const TInt KDefaultSampleRateInkHz = 8;
+const TInt KLowBufferLimit = 2;
+const TInt KOverflowAlarmLimit = 20;
 
 // Codec frame sizes
-const TInt  KAMRNBFrameSize = 32;
-const TInt  KILBCFrameSize  = 52;
-const TInt  KG729FrameSize  = 24;       // 10 octets + 2 for header
+const TInt KAMRNBFrameSize = 32;
+const TInt KILBCFrameSize = 52;
+const TInt KG729FrameSize = 24; // 10 octets + 2 for header
 
 // Max possible sequence number of RTP packet with standard RTP header.
-const TUint KMaxSeqNumber   = 0xFFFF;   // 16-bit value
+const TUint KMaxSeqNumber = 0xFFFF; // 16-bit value
 
 // Codec frame times
-const TInt  KAMRNBFrameTime = 20;
+const TInt KAMRNBFrameTime = 20;
 
 // VoIP codecs have a two byte header
-const TInt  KVoIPHeaderLength = 2;
+const TInt KVoIPHeaderLength = 2;
 
 #endif //INTERNALDEF_H
-
 
 // End of file

@@ -1,28 +1,23 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: VOIP Audio Service
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: VOIP Audio Service
+ *
+ */
 
 #include <e32base.h>
 #include "VoIPAudioSession.h"
 #include "VoIPRingTonePlayerImpl.h"
-
-// CONSTANTS
-//_LIT8(KMimetypeMP3, "audio/mpeg");
-
 
 // ---------------------------------------------------------------------------
 // CRingTonePlayerImpl::NewL
@@ -119,7 +114,7 @@ void CRingTonePlayerImpl::OpenL(MRingToneObserver& aObserver, TPtr aFileName)
 // ---------------------------------------------------------------------------
 //
 void CRingTonePlayerImpl::OpenL(MRingToneObserver& aObserver,
-                                RFile& aFileHandle)
+        RFile& aFileHandle)
     {
     iObserver = &aObserver;
     StartMsgQueueL();
@@ -133,9 +128,8 @@ void CRingTonePlayerImpl::OpenL(MRingToneObserver& aObserver,
 // Plays ring tone from a descriptor string based on its MIME type
 // ---------------------------------------------------------------------------
 //
-void CRingTonePlayerImpl::OpenL(MRingToneObserver& aObserver,
-                                TPtr8 aDesTone,
-                                TPtr8 /*aMimeType*/)
+void CRingTonePlayerImpl::OpenL(MRingToneObserver& aObserver, TPtr8 aDesTone,
+        TPtr8 /*aMimeType*/)
     {
     iObserver = &aObserver;
     StartMsgQueueL();
@@ -148,22 +142,9 @@ void CRingTonePlayerImpl::OpenL(MRingToneObserver& aObserver,
         }
     else
         {
-//        size += aMimeType.Size();
-
         HBufC8* tone = HBufC8::NewLC(size);
         TPtr8 ptr = tone->Des();
-/*
-        if (aMimeType.Compare(KMimetypeMP3) == 0)
-            {
-            // MP3 requires mime header
-            ptr.Copy(aMimeType);
-            ptr.Append(aDesTone);
-            }
-        else
-            {*/
-            ptr.Copy(aDesTone);
-//            }
-
+        ptr.Copy(aDesTone);
         TInt err = iVoIPAudioSession.OpenRingTonePlayer(*tone);
         CleanupStack::PopAndDestroy(tone);
         User::LeaveIfError(err); //return error via trap mechanism
@@ -229,7 +210,7 @@ void CRingTonePlayerImpl::StartMsgQueueL()
     if (iMsgComQueue.Handle() <= 0)
         {
         TInt err = iMsgComQueue.CreateGlobal(KRingToneComQueue,
-                                             KVoIPMsgComQSlots);
+                KVoIPMsgComQSlots);
         User::LeaveIfError(err);
         }
 
@@ -255,7 +236,6 @@ void CRingTonePlayerImpl::ReceiveMsgQComHandlerEventsL()
     iMsgQComHandler->Start();
     }
 
-
 // ======== CALLBACK FUNCTIONS ========
 
 
@@ -269,6 +249,5 @@ void CRingTonePlayerImpl::Event(TInt aEventType, TInt aError)
     {
     iObserver->Event(*this, aEventType, aError);
     }
-
 
 // End of file

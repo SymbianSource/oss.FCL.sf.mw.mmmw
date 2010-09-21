@@ -17,10 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-
 #include "xaplayitf.h"
-
 #include "xaplayitfadaptationmmf.h"
 #include "xathreadsafety.h"
 #include <string.h>
@@ -55,7 +52,7 @@ XAresult XAPlayItfImpl_SetPlayState(XAPlayItf self, XAuint32 state)
     {
     XAresult ret = XA_RESULT_SUCCESS;
     XAPlayItfImpl* impl = GetImpl(self);
-    DEBUG_API_A1("->XAPlayItfImpl_SetPlayState %s",PLAYSTATENAME(state));
+    DEBUG_API_A1_STR("->XAPlayItfImpl_SetPlayState %s",PLAYSTATENAME(state));
 
     if (!impl || state < XA_PLAYSTATE_STOPPED || state > XA_PLAYSTATE_PLAYING)
         {
@@ -107,7 +104,7 @@ XAresult XAPlayItfImpl_GetPlayState(XAPlayItf self, XAuint32 *pState)
 
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
 
-    DEBUG_API_A1("<-XAPlayItfImpl_GetPlayState: %s",PLAYSTATENAME(impl->playbackState));
+    //DEBUG_API_A1_STR("<-XAPlayItfImpl_GetPlayState: %s",PLAYSTATENAME(pState));
     return ret;
     }
 
@@ -496,7 +493,6 @@ XAPlayItfImpl* XAPlayItfImpl_Create(XAMediaPlayerImpl *impl)
         /* init variables */
         self->callback = NULL;
         self->cbcontext = NULL;
-        self->playbackState = XA_PLAYSTATE_STOPPED;
         self->eventFlags = 0;
         self->markerPosition = NO_POSITION;
         self->positionUpdatePeriod = PLAYITF_DEFAULT_UPDATE_PERIOD;
@@ -523,7 +519,6 @@ XAPlayItfImpl* XAPlayItfImpl_Create(XAMediaPlayerImpl *impl)
 void XAPlayItfImpl_Free(XAPlayItfImpl* self)
     {
     DEBUG_API("->XAPlayItfImpl_Free");
-    assert(self==self->self);
     /*    XAAdaptationBase_RemoveEventHandler( self->adapCtx, &XAPlayItfImpl_AdaptCb );*/
     XAAdaptationBase_RemoveEventHandler(self->pObjImpl->curAdaptCtx,
             &XAPlayItfImpl_AdaptCb);
@@ -539,25 +534,27 @@ void XAPlayItfImpl_AdaptCb(void *pHandlerCtx, XAAdaptEvent *event)
     XAPlayItfImpl* impl = (XAPlayItfImpl*) pHandlerCtx;
 
     DEBUG_API("->XAPlayItfImpl_AdaptCb");
-    XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
+    //XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
     if (!impl)
         {
         DEBUG_ERR("XAPlayItfImpl_AdaptCb, invalid context pointer!");
         DEBUG_API("<-XAPlayItfImpl_AdaptCb");
-        XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
+        //XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
         return;
         }
-    assert(event);
 
     if (impl->pObjImpl->curAdaptCtx->fwtype == FWMgrFWMMF)
         {
-        impl->callback(impl->cbPtrToSelf, impl->cbcontext, event->eventid);
+        if(impl->callback)
+            {
+            impl->callback(impl->cbPtrToSelf, impl->cbcontext, event->eventid);
+            }
         DEBUG_API("<-XAPlayItfImpl_AdaptCb");
-        XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
+        //XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
         return;
         }
 
     DEBUG_API("<-XAPlayItfImpl_AdaptCb");
-    XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
+    //XA_IMPL_THREAD_SAFETY_EXIT_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
     }
 

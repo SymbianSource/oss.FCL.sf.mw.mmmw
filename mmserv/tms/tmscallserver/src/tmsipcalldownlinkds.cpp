@@ -275,6 +275,11 @@ void TMSIPDownlink::SetCodecCiL()
         iErrConcealmentIntfc = CErrorConcealmentIntfc::NewL(*iDevSound);
         }
 
+    if (!iAudioOutput)
+        {
+        iAudioOutput = CAudioOutput::NewL(*iDevSound);
+        }
+
     TRACE_PRN_FN_EXT;
     }
 
@@ -449,88 +454,6 @@ gint TMSIPDownlink::GetG711CodecMode(gint& mode)
     }
 
 // -----------------------------------------------------------------------------
-// TMSIPDownlink::FrameModeRqrdForEC
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSIPDownlink::FrameModeRqrdForEC(gboolean& frmodereq)
-    {
-    gint err = TMS_RESULT_DOES_NOT_EXIST;
-
-    if (iStatus == EReady)
-        {
-        if (iErrConcealmentIntfc)
-            {
-            err = iErrConcealmentIntfc->FrameModeRqrdForEC(frmodereq);
-            TRACE_PRN_N1(_L("TMS->DNL: FrameModeRqrdForEC [%d]"), frmodereq);
-            }
-        }
-    TRACE_PRN_IF_ERR(err);
-    return err;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSIPDownlink::SetFrameMode
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSIPDownlink::SetFrameMode(const gboolean frmode)
-    {
-    gint err = TMS_RESULT_DOES_NOT_EXIST;
-
-    if (iStatus == EReady)
-        {
-        iFrameMode = frmode;
-
-        if (iErrConcealmentIntfc)
-            {
-            err = iErrConcealmentIntfc->SetFrameMode(frmode);
-            TRACE_PRN_N1(_L("TMS->DNL: SetFrameMode [%d]"), frmode);
-            }
-        }
-    TRACE_PRN_IF_ERR(err);
-    return err;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSIPDownlink::GetFrameMode
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSIPDownlink::GetFrameMode(gboolean& frmode)
-    {
-    gint err = TMS_RESULT_DOES_NOT_EXIST;
-
-    if (iErrConcealmentIntfc)
-        {
-        // not available through CIs -> return cached value
-        frmode = iFrameMode;
-        TRACE_PRN_N1(_L("TMS->DNL: GetFrameMode [%d]"), frmode);
-        err = TMS_RESULT_SUCCESS;
-        }
-    TRACE_PRN_IF_ERR(err);
-    return err;
-    }
-
-// -----------------------------------------------------------------------------
-// TMSIPDownlink::ConcealErrorForNextBuffer
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSIPDownlink::ConcealErrorForNextBuffer()
-    {
-    gint err = TMS_RESULT_DOES_NOT_EXIST;
-
-    if (iErrConcealmentIntfc)
-        {
-        err = iErrConcealmentIntfc->ConcealErrorForNextBuffer();
-        TRACE_PRN_N(_L("TMS->DNL: ConcealErrorForNextBuffer"));
-        }
-    TRACE_PRN_IF_ERR(err);
-    return err;
-    }
-
-// -----------------------------------------------------------------------------
 // TMSIPDownlink::SetCng
 //
 // -----------------------------------------------------------------------------
@@ -625,38 +548,12 @@ gint TMSIPDownlink::GetPlc(const TMSFormatType fmttype, gboolean& plc)
     }
 
 // -----------------------------------------------------------------------------
-// TMSIPDownlink::BadLsfNextBuffer
-//
-// -----------------------------------------------------------------------------
-//
-gint TMSIPDownlink::BadLsfNextBuffer()
-    {
-    gint err = TMS_RESULT_DOES_NOT_EXIST;
-
-    if (iStatus == EStreaming)
-        {
-        if (iCodecID == KMccFourCCIdG729 && iG729DecoderIntfc)
-            {
-            err = iG729DecoderIntfc->BadLsfNextBuffer();
-            TRACE_PRN_N(_L("TMS->DNL: BadLsfNextBuffer"));
-            }
-        }
-    TRACE_PRN_IF_ERR(err);
-    return err;
-    }
-
-// -----------------------------------------------------------------------------
 // TMSIPDownlink::SetAudioDeviceL
 //
 // -----------------------------------------------------------------------------
 void TMSIPDownlink::SetAudioDeviceL(TMSAudioOutput output)
     {
     TRACE_PRN_FN_ENT;
-
-    if (!iAudioOutput)
-        {
-        iAudioOutput = CAudioOutput::NewL(*iDevSound);
-        }
 
     if (iAudioOutput)
         {
@@ -694,15 +591,11 @@ void TMSIPDownlink::GetAudioDeviceL(TMSAudioOutput& output)
     {
     TRACE_PRN_FN_ENT;
 
-    if (!iAudioOutput)
-        {
-        iAudioOutput = CAudioOutput::NewL(*iDevSound);
-        }
-
     if (iAudioOutput)
         {
         CAudioOutput::TAudioOutputPreference outputDev =
                 iAudioOutput->AudioOutput();
+        TRACE_PRN_N1(_L("TMS->DNL: GetAudioDeviceL [%d]"), outputDev);
 
         switch (outputDev)
             {
@@ -772,7 +665,16 @@ void TMSIPDownlink::InitializeComplete(TInt aError)
 void TMSIPDownlink::PlayError(TInt aError)
     {
     iStatus = EReady;
+
+#ifndef __WINSCW__
     iObserver.DownlinkStarted(aError);
+#else  //__WINSCW__
+    if (aError == KErrAccessDenied || aError == KErrInUse)
+        {
+        iObserver.DownlinkStarted(TMS_RESULT_SUCCESS);
+        }
+#endif //__WINSCW__
+
     TRACE_PRN_IF_ERR(aError);
     }
 

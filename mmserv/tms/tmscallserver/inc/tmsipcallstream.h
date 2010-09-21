@@ -179,15 +179,10 @@ public:
     gint GetIlbcCodecMode(gint& mode);
     gint SetG711CodecMode(const gint mode);
     gint GetG711CodecMode(gint& mode);
-    gint FrameModeRqrdForEC(gboolean& frmodereq);
-    gint SetFrameMode(gboolean frmode);
-    gint GetFrameMode(gboolean& frmode);
-    gint ConcealErrorForNextBuffer();
     gint SetCng(const TMSFormatType fmttype, const gboolean cng);
     gint GetCng(const TMSFormatType fmttype, gboolean& cng);
     gint SetPlc(const TMSFormatType fmttype, const gboolean plc);
     gint GetPlc(const TMSFormatType fmttype, gboolean& plc);
-    gint BadLsfNextBuffer();
 
     void SetAudioDeviceL(TMSAudioOutput output);
     void GetAudioDeviceL(TMSAudioOutput& output);

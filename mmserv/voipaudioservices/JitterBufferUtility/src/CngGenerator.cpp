@@ -1,21 +1,19 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Comfort noise generator of MCC jitterbuffer
-*
-*/
-
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Comfort noise generator of MCC jitterbuffer
+ *
+ */
 
 // INCLUDE FILES
 #include <mmcccodecinformation.h> //codec FourCC declarations
@@ -25,14 +23,13 @@
 #include "JitterBufferObserver.h"
 #include "CngGenerator.h"
 
-
 // -----------------------------------------------------------------------------
 // CVoIPCNGenerator::NewL
 // Static constructor.
 // -----------------------------------------------------------------------------
 //
 CVoIPCNGenerator* CVoIPCNGenerator::NewL(MJitterBufferObserver* aObserver,
-                                         const TFourCC& aCodec)
+        const TFourCC& aCodec)
     {
     CVoIPCNGenerator* self = new (ELeave) CVoIPCNGenerator(aObserver, aCodec);
     CleanupStack::PushL(self);
@@ -47,7 +44,7 @@ CVoIPCNGenerator* CVoIPCNGenerator::NewL(MJitterBufferObserver* aObserver,
 // -----------------------------------------------------------------------------
 //
 CVoIPCNGenerator::CVoIPCNGenerator(MJitterBufferObserver* aObserver,
-                                   const TFourCC& aCodec)
+        const TFourCC& aCodec)
     {
     iObserver = aObserver;
     iCodec = aCodec;
@@ -88,8 +85,6 @@ CVoIPCNGenerator::~CVoIPCNGenerator()
 //
 void CVoIPCNGenerator::GenerateSidPacket(TDes8& aPayload, TInt aRequestSize)
     {
-//    TRACE_PRN_FN_ENT;
-
     if (aRequestSize > aPayload.MaxLength())
         {
         TRACE_PRN_N(_L("CVoIPCNGenerator::GenerateSidPacket->Adjust Size"));
@@ -114,8 +109,6 @@ void CVoIPCNGenerator::GenerateSidPacket(TDes8& aPayload, TInt aRequestSize)
         {
         GenerateVoIPNoDataPacket(aPayload, aRequestSize);
         }
-
-//    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -125,15 +118,12 @@ void CVoIPCNGenerator::GenerateSidPacket(TDes8& aPayload, TInt aRequestSize)
 //
 void CVoIPCNGenerator::GenerateAmrNoDataPacket(TDes8& aPayload) const
     {
-//    TRACE_PRN_FN_ENT;
 
     if (aPayload.MaxLength() >= KNoDataLength)
         {
         aPayload.Copy(&KAmrNoDataFrame, KNoDataLength);
         }
-
-//    TRACE_PRN_FN_EXT;
-    };
+    }
 
 // -----------------------------------------------------------------------------
 // CVoIPCNGenerator::GenerateVoIPNoDataPacket
@@ -141,9 +131,8 @@ void CVoIPCNGenerator::GenerateAmrNoDataPacket(TDes8& aPayload) const
 // -----------------------------------------------------------------------------
 //
 void CVoIPCNGenerator::GenerateVoIPNoDataPacket(TDes8& aPayload,
-                                                TInt aRequestSize) const
+        TInt aRequestSize) const
     {
-//    TRACE_PRN_FN_ENT;
 
     aPayload.FillZ(aRequestSize);
 
@@ -151,9 +140,7 @@ void CVoIPCNGenerator::GenerateVoIPNoDataPacket(TDes8& aPayload,
         {
         ConcealErrorForNextFrame();
         }
-
-//    TRACE_PRN_FN_EXT;
-    };
+    }
 
 // -----------------------------------------------------------------------------
 // CVoIPCNGenerator::ConcealErrorForNextFrame
@@ -165,6 +152,7 @@ void CVoIPCNGenerator::ConcealErrorForNextFrame() const
     iObserver->EventJB(MJitterBufferObserver::EConcealErrorForNextBuffer);
     }
 
+#ifdef __FEATURE_NOT_SUPPORTED__
 // -----------------------------------------------------------------------------
 // CVoIPCNGenerator::DtxPeriodStatus
 // Returns DTX status
@@ -182,8 +170,6 @@ TBool CVoIPCNGenerator::DtxPeriodStatus() const
 //
 void CVoIPCNGenerator::DoDtxDecision(const TDes8& aData)
     {
-//    TRACE_PRN_FN_ENT;
-
     if (aData.Length() > KMinDataLenForDtx)
         {
         if (IsSidBuffer(aData))
@@ -200,8 +186,6 @@ void CVoIPCNGenerator::DoDtxDecision(const TDes8& aData)
             TRACE_PRN_N(_L("JB-CNG-> DTX_END"));
             }
         }
-
-//    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -211,7 +195,6 @@ void CVoIPCNGenerator::DoDtxDecision(const TDes8& aData)
 //
 TBool CVoIPCNGenerator::IsSidBuffer(const TDes8& aData)
     {
-//    TRACE_PRN_FN_ENT;
     TBool status = ETrue;
 
     switch (iCodec.FourCC())
@@ -219,7 +202,7 @@ TBool CVoIPCNGenerator::IsSidBuffer(const TDes8& aData)
         case KMccFourCCIdAMRNB:
             {
             // Get AMR mode by bit-masking first byte and shifting
-            const TUint8 mode((aData[0] & KAmrModeMask) >> KModeShiftBits); 
+            const TUint8 mode((aData[0] & KAmrModeMask) >> KModeShiftBits);
             if (mode == KAmrSidMode)
                 {
                 status = ETrue;
@@ -255,9 +238,8 @@ TBool CVoIPCNGenerator::IsSidBuffer(const TDes8& aData)
             TRACE_PRN_N(_L("JB-CNG-> SID-UNKNOWN"));
             }
         }
-
-//    TRACE_PRN_FN_EXT;
     return status;
     }
+#endif //__FEATURE_NOT_SUPPORTED__
 
 //  End of File

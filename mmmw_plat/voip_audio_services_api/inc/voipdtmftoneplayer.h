@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPDTMFTONEPLAYER_H
-#define __VOIPDTMFTONEPLAYER_H
+#ifndef VOIPDTMFTONEPLAYER_H
+#define VOIPDTMFTONEPLAYER_H
 
 // FORWARD DECLARATIONS
 class CVoIPAudioUplinkStream;
@@ -26,8 +26,6 @@ class CDTMFTonePlayerImpl;
 
 /**
  *  MDTMFToneObserver class
- *
- *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
  *
@@ -40,9 +38,7 @@ public:
 
 public:
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Event
      * @param CDTMFTonePlayer& - DTMF tone player reference
      * @param TInt - Event type
      * @param TInt - Status
@@ -66,80 +62,62 @@ public:
 
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CDTMFTonePlayer();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Open
      * @param MDTMFToneObserver&
      * @return TInt
      */
     IMPORT_C TInt Open(MDTMFToneObserver& aObserver);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Play
      * @param TPtr -
      * @return TInt -
      */
     IMPORT_C TInt Play(const TPtr aTones);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Stop
      * @param none
      * @return TInt
      */
     IMPORT_C TInt Stop();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Close
      * @param none
      * @return void
      */
     IMPORT_C void Close();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * AddVoIPAudioUplinkStream
      * @param CVoIPAudioUplinkStream& -
      * @return TInt
      */
     IMPORT_C TInt AddVoIPAudioUplinkStream(CVoIPAudioUplinkStream& aStream);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * RemoveVoIPAudioUplinkStream
      * @param CVoIPAudioUplinkStream&
      * @return TInt
      */
     IMPORT_C TInt RemoveVoIPAudioUplinkStream(CVoIPAudioUplinkStream& aStream);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * AddVoIPAudioDownlinkStream
      * @param CVoIPAudioDownlinkStream& -
      * @return TInt
      */
     IMPORT_C TInt AddVoIPAudioDownlinkStream(CVoIPAudioDownlinkStream& aStream);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * RemoveVoIPAudioDownlinkStream
      * @param CVoIPAudioDownlinkStream& -
      * @return TInt
      */
@@ -150,8 +128,6 @@ protected:
 
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -159,8 +135,6 @@ protected:
 
     /**
      * Symbian constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -169,9 +143,8 @@ protected:
 private:
 
     CDTMFTonePlayerImpl* iDTMFTonePlayerImpl;
-
     };
 
-#endif //__VOIPDTMFTONEPLAYER_H
+#endif //VOIPDTMFTONEPLAYER_H
 
 // End of file

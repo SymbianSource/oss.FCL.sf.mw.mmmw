@@ -1,24 +1,22 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
 #include <voipformatintfc.h>
 #include "VoIPFormatIntfcImpl.h"
-
 
 // ---------------------------------------------------------------------------
 // CVoIPFormatIntfc::~CVoIPFormatIntfc
@@ -110,9 +108,10 @@ EXPORT_C TInt CVoIPFormatIntfc::GetVAD(TBool& aVad)
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPFormatIntfc::FrameModeRequiredForErrorConcealment(
-                                TBool& aMode)
+        TBool& aMode)
     {
-    TInt err = iVoIPFormatIntfcImpl->FrameModeRequiredForErrorConcealment(aMode);
+    TInt err = iVoIPFormatIntfcImpl->FrameModeRequiredForErrorConcealment(
+            aMode);
     return err;
     }
 
@@ -145,6 +144,5 @@ EXPORT_C TInt CVoIPFormatIntfc::ConcealErrorForNextBuffer()
     TInt err = iVoIPFormatIntfcImpl->ConcealErrorForNextBuffer();
     return err;
     }
-
 
 // End of file

@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include "xaseekitf.h"
 #include "xathreadsafety.h"
@@ -244,7 +243,6 @@ void XASeekItfImpl_Free(XASeekItfImpl* self)
     DEBUG_API("->XASeekItfImpl_Free");
     if(self)
         {
-        assert(self==self->self);
         free(self);
         }
     DEBUG_API("<-XASeekItfImpl_Free");

@@ -33,6 +33,15 @@ typedef void (*xaFreeResourcesImpl)(XAObjectItf self);
 /** ENUMERATIONS **/
 
 /** STRUCTURES **/
+
+typedef struct XAObjItfCBData_
+    {
+    XAuint32 event;
+    XAresult result;
+    XAuint32 param;
+    void* interface;
+    }XAObjItfCBData;
+
 typedef struct XAObjItfMapEntry_
     {
     XAInterfaceID iid;

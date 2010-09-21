@@ -246,18 +246,18 @@ TInt COpenMAXALTestModule::RunMethodL(
         /*DynamicSourceItf ends*/
         
         /*RadioItf begins*/
-        ENTRY( "al_radioitf_SetFreqRange", COpenMAXALTestModule::al_radioitf_SetFreqRange ),
-        ENTRY( "al_radioitf_GetFreqRange", COpenMAXALTestModule::al_radioitf_GetFreqRange ),
-        ENTRY( "al_radioitf_IsFreqRangeSupported", COpenMAXALTestModule::al_radioitf_IsFreqRangeSupported ),
-        ENTRY( "al_radioitf_GetFreqRangeProperties", COpenMAXALTestModule::al_radioitf_GetFreqRangeProperties ),
-        ENTRY( "al_radioitf_SetFrequency", COpenMAXALTestModule::al_radioitf_SetFrequency ),
-        ENTRY( "al_radioitf_CancelSetFrequency", COpenMAXALTestModule::al_radioitf_CancelSetFrequency ),
-        ENTRY( "al_radioitf_GetFrequency", COpenMAXALTestModule::al_radioitf_GetFrequency ),
-        ENTRY( "al_radioitf_SetSquelch", COpenMAXALTestModule::al_radioitf_SetSquelch ),
-        ENTRY( "al_radioitf_GetSquelch", COpenMAXALTestModule::al_radioitf_GetSquelch ),
-        ENTRY( "al_radioitf_SetStereoMode", COpenMAXALTestModule::al_radioitf_SetStereoMode ),
-        ENTRY( "al_radioitf_GetStereoMode", COpenMAXALTestModule::al_radioitf_GetStereoMode ),
-        ENTRY( "al_radioitf_GetSignalStrength", COpenMAXALTestModule::al_radioitf_GetSignalStrength ),
+        ENTRY( "al_radioitf_SetFreqRange", COpenMAXALTestModule::al_radioitf_SetFreqRange ),    
+        ENTRY( "al_radioitf_GetFreqRange", COpenMAXALTestModule::al_radioitf_GetFreqRange ),    
+        ENTRY( "al_radioitf_IsFreqRangeSupported", COpenMAXALTestModule::al_radioitf_IsFreqRangeSupported ),    
+        ENTRY( "al_radioitf_GetFreqRangeProperties", COpenMAXALTestModule::al_radioitf_GetFreqRangeProperties ),    
+        ENTRY( "al_radioitf_SetFrequency", COpenMAXALTestModule::al_radioitf_SetFrequency ),            	        	        	        	
+        ENTRY( "al_radioitf_CancelSetFrequency", COpenMAXALTestModule::al_radioitf_CancelSetFrequency ),    
+        ENTRY( "al_radioitf_GetFrequency", COpenMAXALTestModule::al_radioitf_GetFrequency ),    
+        ENTRY( "al_radioitf_SetSquelch", COpenMAXALTestModule::al_radioitf_SetSquelch ),    
+        ENTRY( "al_radioitf_GetSquelch", COpenMAXALTestModule::al_radioitf_GetSquelch ),    
+        ENTRY( "al_radioitf_SetStereoMode", COpenMAXALTestModule::al_radioitf_SetStereoMode ),    
+        ENTRY( "al_radioitf_GetStereoMode", COpenMAXALTestModule::al_radioitf_GetStereoMode ),    
+        ENTRY( "al_radioitf_GetSignalStrength", COpenMAXALTestModule::al_radioitf_GetSignalStrength ),    
         ENTRY( "al_radioitf_Seek", COpenMAXALTestModule::al_radioitf_Seek ),
         ENTRY( "al_radioitf_StopSeeking", COpenMAXALTestModule::al_radioitf_StopSeeking ),
         ENTRY( "al_radioitf_GetNumberOfPresets", COpenMAXALTestModule::al_radioitf_GetNumberOfPresets ),
@@ -273,6 +273,7 @@ TInt COpenMAXALTestModule::RunMethodL(
         ENTRY( "al_strminfoitf_RegisterStreamChangeCallback", COpenMAXALTestModule::al_strminfoitf_RegisterStreamChangeCallback ),
         ENTRY( "al_strminfoitf_QueryActiveStreams", COpenMAXALTestModule::al_strminfoitf_QueryActiveStreams ),
         ENTRY( "al_strminfoitf_SetActiveStream", COpenMAXALTestModule::al_strminfoitf_SetActiveStream ),
+        ENTRY( "al_strminfoitf_SetStreamInfoIndex", COpenMAXALTestModule::al_strminfoitf_SetStreamInfoIndex ),
         /*StreamInformationItf ends*/
         
         /*VolumeItf begins*/
@@ -331,6 +332,30 @@ TInt COpenMAXALTestModule::RunMethodL(
         ENTRY( "al_playbackrateitf_GetCapabilitiesOfRate", COpenMAXALTestModule::al_playbackrateitf_GetCapabilitiesOfRate ),
         ENTRY( "al_playbackrateitf_GetRateRange", COpenMAXALTestModule::al_playbackrateitf_GetRateRange ),
          /*PlaybackRateItf ends*/
+        /*PrefetchStatusItf*/
+        ENTRY( "al_prefetchstatusitf_GetFillLevel", COpenMAXALTestModule::al_prefetchstatusitf_GetFillLevel),
+        ENTRY( "al_prefetchstatusitf_GetPrefetchStatus", COpenMAXALTestModule::al_prefetchstatusitf_GetPrefetchStatus),
+        ENTRY( "al_prefetchstatusitf_RegisterCallback", COpenMAXALTestModule::al_prefetchstatusitf_RegisterCallback),
+        ENTRY( "al_prefetchstatusitf_SetCallbackEventMask", COpenMAXALTestModule::al_prefetchstatusitf_SetCallbackEventMask),
+        ENTRY( "al_prefetchstatusitf_GetCallbackEventMaskNullParam", COpenMAXALTestModule::al_prefetchstatusitf_GetCallbackEventMaskNullParam),
+        ENTRY( "al_prefetchstatusitf_GetCallbackEventMask", COpenMAXALTestModule::al_prefetchstatusitf_GetCallbackEventMask),
+        ENTRY( "al_prefetchstatusitf_SetFillUpdatePeriod", COpenMAXALTestModule::al_prefetchstatusitf_SetFillUpdatePeriod),
+        ENTRY( "al_prefetchstatusitf_GetFillUpdatePeriodNullParam", COpenMAXALTestModule::al_prefetchstatusitf_GetFillUpdatePeriodNullParam),
+        ENTRY( "al_prefetchstatusitf_GetFillUpdatePeriod", COpenMAXALTestModule::al_prefetchstatusitf_GetFillUpdatePeriod),
+        ENTRY( "al_prefetchstatusitf_TestEvent", COpenMAXALTestModule::al_prefetchstatusitf_TestEvent),
+        ENTRY( "al_prefetchstatusitf_RegisterTestEventCallback", COpenMAXALTestModule::al_prefetchstatusitf_RegisterTestEventCallback),
+        /*PrefetchStatusItf*/
+		
+        
+        /*VideoPostProcessingItf*/
+        ENTRY( "al_videoppitf_SetRotation", COpenMAXALTestModule::al_videoppitf_SetRotation ),
+        ENTRY( "al_videoppitf_IsArbitraryRotationSupported", COpenMAXALTestModule::al_videoppitf_IsArbitraryRotationSupported ),
+        ENTRY( "al_videoppitf_SetScaleOptions", COpenMAXALTestModule::al_videoppitf_SetScaleOptions ),
+        ENTRY( "al_videoppitf_SetSourceRectangle", COpenMAXALTestModule::al_videoppitf_SetSourceRectangle ),
+        ENTRY( "al_videoppitf_SetDestinationRectangle", COpenMAXALTestModule::al_videoppitf_SetDestinationRectangle ),
+        ENTRY( "al_videoppitf_SetMirror", COpenMAXALTestModule::al_videoppitf_SetMirror ),
+        ENTRY( "al_videoppitf_Commit", COpenMAXALTestModule::al_videoppitf_Commit ),
+         /*VideoPostProcessingItf ends*/
         
         //ADD NEW ENTRY HERE
         // [test cases entries] - Do not remove
@@ -890,6 +915,7 @@ TInt COpenMAXALTestModule::StoreInterface(TInt interface, void* id)
             break;
         case 9:
 /*            XA_IID_PREFETCHSTATUS;*/
+            m_PrefetchStatusItf = XAPrefetchStatusItf(id);
             break;
         case 10:
 /*            XA_IID_SEEK;*/
@@ -907,6 +933,7 @@ TInt COpenMAXALTestModule::StoreInterface(TInt interface, void* id)
             break;
         case 14:
 /*            XA_IID_VIDEOPOSTPROCESSING;*/
+            m_VideoPP = XAVideoPostProcessingItf(id);
             break;
         case 15:
             m_RecordItf = XARecordItf(id);

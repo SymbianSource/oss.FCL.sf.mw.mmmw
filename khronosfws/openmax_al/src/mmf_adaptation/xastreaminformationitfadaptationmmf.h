@@ -46,4 +46,8 @@ XAresult XAStreamInformationItfAdaptMMF_SetActiveStream(
         XAAdaptationBaseCtx *adaptCtx, XAuint32 streamNum, XAboolean active,
         XAboolean commitNow);
 
+XAresult XAStreamInformationItfAdaptMMF_RegisterCallback(
+				XAAdaptationBaseCtx *adaptCtx,
+				xaStreamEventChangeCallback callback);
+
 #endif /* XASTREAMINFORMATIONITFADAPTATION_H */

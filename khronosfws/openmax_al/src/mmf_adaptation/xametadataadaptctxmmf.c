@@ -15,7 +15,6 @@
  *
  */
 
-#include <assert.h>
 #include <stdlib.h>
 #include "xametadataadaptctxmmf.h"
 #include "xaobjectitf.h"

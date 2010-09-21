@@ -31,8 +31,7 @@ class TMSCallProxy;
 
 // Class declaration
 class TMSAMRFormatBodyImpl : public TMSAMRFormatBody,
-                             public TMSFormatBodyImpl,
-                             public MQueueHandlerObserver
+                             public TMSFormatBodyImpl
     {
 public:
     static gint Create(TMSAMRFormatBody*& bodyimpl);
@@ -41,10 +40,6 @@ public:
     // From TMSAMRFormatBody begins
     virtual gint GetType(TMSFormatType& Formattype);
     // From TMSAMRFormatBody ends
-
-    // From MQueueHandlerObserver starts
-    virtual void QueueEvent(TInt aEventType, TInt aError, void* user_data);
-    // From MQueueHandlerObserver ends
 
     virtual void SetProxy(TMSGlobalContext* context, gpointer queuehandler);
 

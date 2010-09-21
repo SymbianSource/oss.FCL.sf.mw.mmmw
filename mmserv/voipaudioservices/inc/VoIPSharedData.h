@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef __VOIPSHAREDDATA_H
-#define __VOIPSHAREDDATA_H
+#ifndef VOIPSHAREDDATA_H
+#define VOIPSHAREDDATA_H
 
 // INCLUDES
 #include <e32std.h>
@@ -149,7 +149,7 @@ public:
     TBool iFrameMode;
     TBool iFrameModeReqForEC;
     TUint iBitrate;
-    RArray<TUint> iArrBitrates;
+    RArray<TUint>* iArrBitrates;
     };
 
 // -----------------------------------------------------------------------------
@@ -195,9 +195,8 @@ public:
     TInt iInt;
     TUint iUint;
     TBool iBool;
-
     };
 
-#endif  // __VOIPSHAREDDATA_H
+#endif  //VOIPSHAREDDATA_H
 
 // End of file

@@ -61,7 +61,8 @@ XAresult XAThreadSafety_Init(XAboolean tsEnable)
                     {
                     break;
                     }
-                DEBUG_INFO_A2("Created %s:%x",MEDIAOBJECTNAME(i), threadSafety->mutexTable[i] );
+                DEBUG_INFO_A1_STR("Created for [%s]", MEDIAOBJECTNAME(i));
+                DEBUG_INFO_A1("Object pointer in mutex table: %x", (int)threadSafety->mutexTable[i] );
                 }
             }
         else
@@ -90,11 +91,13 @@ XAresult XAThreadSafety_Destroy()
             {
             for (i = 0; i < XATSCount; i++)
                 {
-                DEBUG_INFO_A2("Free %s:%x",MEDIAOBJECTNAME(i), threadSafety->mutexTable[i] );
+                DEBUG_INFO_A1_STR("Free for [%s]", MEDIAOBJECTNAME(i));
+                DEBUG_INFO_A1("Object pointer in mutex table: %x", (int)threadSafety->mutexTable[i] );
                 XAImpl_DeleteMutex(threadSafety->mutexTable[i]);
                 }
             }
         free(threadSafety);
+        threadSafety = NULL;
         }
     else
         {
@@ -124,7 +127,8 @@ XAresult XAThreadSafety_Unlock(XAThreadSafetyMediaObjects mediaObject)
             ret = XAImpl_UnlockMutex(threadSafety->mutexTable[mediaObject]);
             if (ret == XA_RESULT_SUCCESS)
                 {
-                DEBUG_INFO_A2("Released lock for %s:%x",MEDIAOBJECTNAME(mediaObject), threadSafety->mutexTable[mediaObject] );
+                DEBUG_INFO_A1_STR("Released lock for [%s]", MEDIAOBJECTNAME(mediaObject));
+                DEBUG_INFO_A1("Object pointer in mutex table: %x", (int)threadSafety->mutexTable[mediaObject] );
                 }
             }
         }
@@ -153,7 +157,8 @@ XAresult XAThreadSafety_TryLock(XAThreadSafetyMediaObjects mediaObject)
             ret = XAImpl_TryLockMutex(threadSafety->mutexTable[mediaObject]);
             if (ret == XA_RESULT_SUCCESS)
                 {
-                DEBUG_INFO_A2("Locked %s:%x",MEDIAOBJECTNAME(mediaObject), threadSafety->mutexTable[mediaObject] );
+                DEBUG_INFO_A1_STR("Obtained lock for [%s]", MEDIAOBJECTNAME(mediaObject));
+                DEBUG_INFO_A1("Object pointer in mutex table: %x", (int                                                                                                                              )threadSafety->mutexTable[mediaObject] );
                 }
             }
         }

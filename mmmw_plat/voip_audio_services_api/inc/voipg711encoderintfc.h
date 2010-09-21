@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPG711ENCFORMATINTFC_H
-#define __VOIPG711ENCFORMATINTFC_H
+#ifndef VOIPG711ENCFORMATINTFC_H
+#define VOIPG711ENCFORMATINTFC_H
 
 #include <voipaudiocommon.h>
 #include <voipformatintfc.h>
@@ -37,26 +37,20 @@ class CVoIPG711EncoderIntfc : public CVoIPFormatIntfc
 public:
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CVoIPG711EncoderIntfc();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetMode
      * @param TG711CodecMode
      * @return TInt
      */
     IMPORT_C TInt SetMode(TG711CodecMode aMode);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetMode
      * @param TG711CodecMode&
      * @return TInt
      */
@@ -65,8 +59,6 @@ public:
 protected:
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -74,8 +66,6 @@ protected:
 
     /**
      * 2-nd phase constructor
-     *
-     * @since S60 v5.0
      * @param CVoIPG711EncoderIntfcImpl*
      * @return void
      */
@@ -83,9 +73,8 @@ protected:
 
 protected:
     CVoIPG711EncoderIntfcImpl* iFormatIntfcImpl;
-
     };
 
-#endif //__VOIPG711ENCFORMATINTFC_H
+#endif //VOIPG711ENCFORMATINTFC_H
 
 // End of file

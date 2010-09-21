@@ -19,86 +19,128 @@
 #include "xacapabilitiesmgr.h"
 #include "xammfcapabilitiesmgr.h"
 #include "xagstcapabilitiesmgr.h"
+#include "xaadptbasectx.h"
 #include <stdio.h>
 #include <string.h>
 
-static XAresult XACapabilitiesMgr_GetAudioInputDeviceCapabilities(
+static XAresult XACapabilitiesMgr_GetAudioInputDeviceMicCapabilities(
+        XACapabilities **ppNode);
+static XAresult XACapabilitiesMgr_GetAudioInputDeviceFMRxCapabilities(
+        XACapabilities **ppNode);
+static XAresult XACapabilitiesMgr_GetAudioInputDeviceCallCapabilities(
         XACapabilities **ppNode);
 static XAresult XACapabilitiesMgr_GetAudioOutputDeviceCapabilities(
         XACapabilities **ppNode);
 
 /* XAresult XAGSTCapabilitiesMgr_UpdateAudioIOCapabilitieList
- * Description: Update the capabilities list supported by GStreamer framework.
+ * Description: Update the capabilities list supported by the engine.
  */
 XAresult XACapabilitiesMgr_UpdateAudioIOCapabilitieList(
         FrameworkMap *frameworkMap, XACapabilities **ppListHead)
 
     {
     XAresult res = XA_RESULT_SUCCESS;
-    XACapabilities *lastNode;
-    XACapabilities *firstNode;
+    XACapabilities *lastNode = NULL;
+    XACapabilities *firstNode = NULL;
     XACapabilities *newNode = NULL;
-
-    if (!frameworkMap || !ppListHead)
-        {
-        res = XA_RESULT_PARAMETER_INVALID;
-        return res;
-        }
-
-    lastNode = *ppListHead;
-    firstNode = *ppListHead;
 
     DEBUG_API("->XACapabilitiesMgr_UpdateAudioIOCapabilitieList");
 
-    /* traverse and point to the last node in the list */
-    while (lastNode && lastNode->next)
+    if (!frameworkMap || !ppListHead)
         {
-        lastNode = lastNode->next;
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XACapabilitiesMgr_UpdateAudioIOCapabilitieList");
+        return XA_RESULT_PARAMETER_INVALID;
         }
 
-    /* If no input devices are supported, the function returns
-     * XA_RESULT_SUCCESS and newNode will be NULL*/
-    newNode = NULL;
-    res = XACapabilitiesMgr_GetAudioInputDeviceCapabilities(&newNode);
+    res = XACapabilitiesMgr_GetAudioInputDeviceMicCapabilities(&newNode);
     if (res != XA_RESULT_SUCCESS)
         {
+        XACapabilitiesMgr_DeleteCapabilitieList(&firstNode);
+        DEBUG_API("<-XACapabilitiesMgr_UpdateAudioIOCapabilitieList");
         return res;
         }
 
-    if (lastNode)
+    if (!firstNode)
+        {
+        firstNode = newNode;
+        lastNode = newNode;
+        }
+    
+    res = XACapabilitiesMgr_GetAudioInputDeviceFMRxCapabilities(&newNode);
+    if (res != XA_RESULT_SUCCESS)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&firstNode);
+        DEBUG_API("<-XACapabilitiesMgr_UpdateAudioIOCapabilitieList");
+        return res;
+        }
+
+    if (!firstNode)
+        {
+        firstNode = newNode;
+        lastNode = newNode;
+        }
+    else
         {
         lastNode->next = newNode;
+        lastNode = newNode;
         }
-    if (newNode)
-        { /* if a new node is created move lastNode to the new item */
-        if (!firstNode)
-            firstNode = newNode;
+    
+    res = XACapabilitiesMgr_GetAudioInputDeviceCallCapabilities(&newNode);
+    if (res != XA_RESULT_SUCCESS)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&firstNode);
+        DEBUG_API("<-XACapabilitiesMgr_UpdateAudioIOCapabilitieList");
+        return res;
+        }
+
+    if (!firstNode)
+        {
+        firstNode = newNode;
+        lastNode = newNode;
+        }
+    else
+        {
+        lastNode->next = newNode;
         lastNode = newNode;
         }
 
-    /* If no input devices are supported, the function returns
-     * XA_RESULT_SUCCESS and newNode will be NULL*/
-    newNode = NULL;
     res = XACapabilitiesMgr_GetAudioOutputDeviceCapabilities(&newNode);
     if (res != XA_RESULT_SUCCESS)
         {
+        XACapabilitiesMgr_DeleteCapabilitieList(&firstNode);
+        DEBUG_API("<-XACapabilitiesMgr_UpdateAudioIOCapabilitieList");
         return res;
         }
 
-    if (lastNode)
+    if (!firstNode)
         {
-        lastNode->next = newNode;
-        }
-    if (newNode)
-        { /* if a new node is created move lastNode to the new item */
-        if (!firstNode)
-            firstNode = newNode;
+        firstNode = newNode;
         lastNode = newNode;
         }
-    /* if empty list, then append first node as the head */
-    if (!(*ppListHead))
+    else
         {
-        *ppListHead = firstNode;
+        lastNode->next = newNode;
+        lastNode = newNode;
+        }
+
+    /* if we have some iodevice capabilities in the list */
+    if (firstNode)
+        {
+        /* if empty list, then append first node as the head */
+        if (!(*ppListHead))
+            {
+            *ppListHead = firstNode;
+            }
+        else /* traverse to the last item in the list and link firstNode to it */
+            {
+            lastNode = *ppListHead;
+            while(lastNode->next)
+                {
+                lastNode = lastNode->next;
+                }
+            lastNode->next = firstNode;
+            }
         }
     DEBUG_API("<-XACapabilitiesMgr_UpdateAudioIOCapabilitieList");
     return res;
@@ -109,10 +151,13 @@ XAresult XACapabilitiesMgr_CreateCapabilitieList(FrameworkMap* frameworkMap,
     {
     XACapabilities* list = NULL;
     XAresult res = XA_RESULT_SUCCESS;
-    if (!ppListHead)
+
+    DEBUG_API("->XACapabilitiesMgr_CreateCapabilitieList");
+    if (!frameworkMap || !ppListHead)
         {
-        res = XA_RESULT_PARAMETER_INVALID;
-        return res;
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XACapabilitiesMgr_CreateCapabilitieList");
+        return XA_RESULT_PARAMETER_INVALID;
         }
 
     *ppListHead = NULL;
@@ -121,6 +166,7 @@ XAresult XACapabilitiesMgr_CreateCapabilitieList(FrameworkMap* frameworkMap,
     if (res != XA_RESULT_SUCCESS)
         {
         XACapabilitiesMgr_DeleteCapabilitieList(&list);
+        DEBUG_API("<-XACapabilitiesMgr_CreateCapabilitieList");
         return res;
         }
 
@@ -128,6 +174,7 @@ XAresult XACapabilitiesMgr_CreateCapabilitieList(FrameworkMap* frameworkMap,
     if (res != XA_RESULT_SUCCESS)
         {
         XACapabilitiesMgr_DeleteCapabilitieList(&list);
+        DEBUG_API("<-XACapabilitiesMgr_CreateCapabilitieList");
         return res;
         }
 
@@ -135,10 +182,12 @@ XAresult XACapabilitiesMgr_CreateCapabilitieList(FrameworkMap* frameworkMap,
     if (res != XA_RESULT_SUCCESS)
         {
         XACapabilitiesMgr_DeleteCapabilitieList(&list);
+        DEBUG_API("<-XACapabilitiesMgr_CreateCapabilitieList");
         return res;
         }
 
     *ppListHead = list;
+    DEBUG_API("<-XACapabilitiesMgr_CreateCapabilitieList");
     return res;
     }
 
@@ -148,10 +197,12 @@ XAresult XACapabilitiesMgr_DeleteCapabilitieList(XACapabilities** ppListHead)
     XACapabilities* nextNode = NULL;
     XAresult res = XA_RESULT_SUCCESS;
 
+    DEBUG_API("->XACapabilitiesMgr_DeleteCapabilitieList");
     if (!ppListHead)
         {
-        res = XA_RESULT_PARAMETER_INVALID;
-        return res;
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XACapabilitiesMgr_DeleteCapabilitieList");
+        return XA_RESULT_PARAMETER_INVALID;
         }
 
     currNode = *ppListHead;
@@ -192,7 +243,6 @@ XAresult XACapabilitiesMgr_DeleteCapabilitieList(XACapabilities** ppListHead)
                 free(entries[i].pBitratesSupported);
                 }
             free(entries);
-
             }
 
         if (currNode->adaptId)
@@ -206,6 +256,8 @@ XAresult XACapabilitiesMgr_DeleteCapabilitieList(XACapabilities** ppListHead)
         }
 
     *ppListHead = NULL;
+
+    DEBUG_API("<-XACapabilitiesMgr_DeleteCapabilitieList");
     return res;
     }
 
@@ -222,8 +274,9 @@ XAresult XACapabilitiesMgr_GetCapsCount(XACapabilities* pListHead,
     DEBUG_API("->XACapabilitiesMgr_GetCapsCount");
     if (!currNode || !count)
         {
-        res = XA_RESULT_PARAMETER_INVALID;
-        return res;
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XACapabilitiesMgr_GetCapsCount");
+        return XA_RESULT_PARAMETER_INVALID;
         }
 
     (*count) = 0;
@@ -254,8 +307,9 @@ XAresult XACapabilitiesMgr_GetCapsById(XACapabilities* pListHead,
 
     if (!currNode)
         {
-        res = XA_RESULT_PARAMETER_INVALID;
-        return res;
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XACapabilitiesMgr_GetCapsById");
+        return XA_RESULT_PARAMETER_INVALID;
         }
 
     while (currNode)
@@ -272,8 +326,9 @@ XAresult XACapabilitiesMgr_GetCapsById(XACapabilities* pListHead,
 
     if (!found)
         {
-        res = XA_RESULT_FEATURE_UNSUPPORTED;
-        return res;
+        DEBUG_ERR("XA_RESULT_FEATURE_UNSUPPORTED");
+        DEBUG_API("<-XACapabilitiesMgr_GetCapsById");
+        return XA_RESULT_FEATURE_UNSUPPORTED;
         }
 
     DEBUG_API("<-XACapabilitiesMgr_GetCapsById");
@@ -295,8 +350,9 @@ XAresult XACapabilitiesMgr_GetCapsByIdx(XACapabilities* pListHead,
 
     if (!currNode)
         {
-        res = XA_RESULT_PARAMETER_INVALID;
-        return res;
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XACapabilitiesMgr_GetCapsByIdx");
+        return XA_RESULT_PARAMETER_INVALID;
         }
 
     while (currNode)
@@ -315,8 +371,9 @@ XAresult XACapabilitiesMgr_GetCapsByIdx(XACapabilities* pListHead,
 
     if (!found)
         {
-        res = XA_RESULT_PARAMETER_INVALID;
-        return res;
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XACapabilitiesMgr_GetCapsByIdx");
+        return XA_RESULT_PARAMETER_INVALID;
         }
 
     DEBUG_API("<-XACapabilitiesMgr_GetCapsByIdx");
@@ -336,9 +393,9 @@ XAresult XACapabilitiesMgr_QueryColorFormats(XACapabilities* pListHead,
 
     if (!pIndex)
         {
-        DEBUG_ERR("illegal NULL parameter");
-        res = XA_RESULT_PARAMETER_INVALID;
-        return res;
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XACapabilitiesMgr_QueryColorFormats");
+        return XA_RESULT_PARAMETER_INVALID;
         }
 
     res = XACapabilitiesMgr_GetCapsById(pListHead,
@@ -354,7 +411,7 @@ XAresult XACapabilitiesMgr_QueryColorFormats(XACapabilities* pListHead,
             { /* query color format */
             if (*pIndex >= 1) /* one used by camera context */
                 {
-                DEBUG_ERR("index parameter invalid");
+                DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
                 res = XA_RESULT_PARAMETER_INVALID;
                 }
             else
@@ -373,24 +430,26 @@ XAresult XACapabilitiesMgr_QueryColorFormats(XACapabilities* pListHead,
     }
 
 /* Add AudioInputDeviceCaps */
-XAresult XACapabilitiesMgr_GetAudioInputDeviceCapabilities(
+XAresult XACapabilitiesMgr_GetAudioInputDeviceMicCapabilities(
         XACapabilities** ppNode)
     {
     XAresult res = XA_RESULT_SUCCESS;
     XACapabilities *newNode = NULL;
     XAAudioInputDescriptor *entries = NULL;
-    XAchar micDeviceName[] = "Default Mic";
+    XAchar inpDeviceName[] = "Default Mic";
     int strLen = 0;
 
+    DEBUG_API("->XACapabilitiesMgr_GetAudioInputDeviceMicCapabilities");
     newNode = (XACapabilities *) calloc(1, sizeof(XACapabilities));
     if (!newNode)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceMicCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
     newNode->capsType = AUD_I;
-    newNode->xaid = 0xAD7E5001;
+    newNode->xaid = XA_ADAPTID_DEVSOUNDSRC_MIC;
     newNode->noOfEntries = 1;
 
     /* Allocate array */
@@ -398,58 +457,215 @@ XAresult XACapabilitiesMgr_GetAudioInputDeviceCapabilities(
             sizeof(XAAudioInputDescriptor));
     if (!entries)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceMicCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
     newNode->pEntry = (void*) entries;
 
-    strLen = strlen((char*) micDeviceName);
+    strLen = strlen((char*) inpDeviceName);
     entries->deviceName = (XAchar *) calloc(strLen + 1, sizeof(XAchar));
     if (!entries->deviceName)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceMicCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
-    strncpy((char*) entries->deviceName, (char*) micDeviceName, strLen);
+    strncpy((char*) entries->deviceName, (char*) inpDeviceName, strLen);
     entries->deviceName[strLen] = '\0'; /*Null terminate it*/
     entries->deviceConnection = XA_DEVCONNECTION_INTEGRATED;
     entries->deviceScope = XA_DEVSCOPE_ENVIRONMENT;
     entries->deviceLocation = XA_DEVLOCATION_HANDSET;
     entries->isForTelephony = XA_BOOLEAN_FALSE;
     entries->minSampleRate = 8000000; /* milliHz */
-    entries->maxSampleRate = 96000000; /* milliHz */
+    entries->maxSampleRate = 48000000; /* milliHz */
     entries->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
-    entries->numOfSamplingRatesSupported = 12;
+    entries->numOfSamplingRatesSupported = 5;
     entries->samplingRatesSupported = (XAmilliHertz*) calloc(
             entries->numOfSamplingRatesSupported, sizeof(XAmilliHertz));
     if (!entries->samplingRatesSupported)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceMicCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
     /* entries in milliHz */
     entries->samplingRatesSupported[0] = 8000000;
-    entries->samplingRatesSupported[1] = 11025000;
-    entries->samplingRatesSupported[2] = 12000000;
-    entries->samplingRatesSupported[3] = 16000000;
-    entries->samplingRatesSupported[4] = 22050000;
-    entries->samplingRatesSupported[5] = 24000000;
-    entries->samplingRatesSupported[6] = 32000000;
-    entries->samplingRatesSupported[7] = 44100000;
-    entries->samplingRatesSupported[8] = 48000000;
-    entries->samplingRatesSupported[9] = 64000000;
-    entries->samplingRatesSupported[10] = 88200000;
-    entries->samplingRatesSupported[11] = 96000000;
+    entries->samplingRatesSupported[1] = 16000000;
+    entries->samplingRatesSupported[2] = 24000000;
+    entries->samplingRatesSupported[3] = 32000000;
+    entries->samplingRatesSupported[4] = 48000000;
     entries->maxChannels = 2;
 
     newNode->pEntry = (void*) entries;
 
     *ppNode = newNode;
+    DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceMicCapabilities");
+    return res;
+    }
+
+/* Add AudioInputDeviceCaps */
+XAresult XACapabilitiesMgr_GetAudioInputDeviceFMRxCapabilities(
+        XACapabilities** ppNode)
+    {
+    XAresult res = XA_RESULT_SUCCESS;
+    XACapabilities *newNode = NULL;
+    XAAudioInputDescriptor *entries = NULL;
+    XAchar inpDeviceName[] = "FMRadio Recvr";
+    int strLen = 0;
+
+    DEBUG_API("->XACapabilitiesMgr_GetAudioInputDeviceFMRxCapabilities");
+    newNode = (XACapabilities *) calloc(1, sizeof(XACapabilities));
+    if (!newNode)
+        {
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceFMRxCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+
+    newNode->capsType = AUD_I;
+    newNode->xaid = XA_ADAPTID_DEVSOUNDSRC_FMRX;
+    newNode->noOfEntries = 1;
+
+    /* Allocate array */
+    entries = (XAAudioInputDescriptor*) calloc(1,
+            sizeof(XAAudioInputDescriptor));
+    if (!entries)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceFMRxCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+
+    newNode->pEntry = (void*) entries;
+
+    strLen = strlen((char*) inpDeviceName);
+    entries->deviceName = (XAchar *) calloc(strLen + 1, sizeof(XAchar));
+    if (!entries->deviceName)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceFMRxCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+
+    strncpy((char*) entries->deviceName, (char*) inpDeviceName, strLen);
+    entries->deviceName[strLen] = '\0'; /*Null terminate it*/
+    entries->deviceConnection = XA_DEVCONNECTION_INTEGRATED;
+    entries->deviceScope = XA_DEVSCOPE_ENVIRONMENT;
+    entries->deviceLocation = XA_DEVLOCATION_HANDSET;
+    entries->isForTelephony = XA_BOOLEAN_FALSE;
+    entries->minSampleRate = 8000000; /* milliHz */
+    entries->maxSampleRate = 48000000; /* milliHz */
+    entries->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
+    entries->numOfSamplingRatesSupported = 5;
+    entries->samplingRatesSupported = (XAmilliHertz*) calloc(
+            entries->numOfSamplingRatesSupported, sizeof(XAmilliHertz));
+    if (!entries->samplingRatesSupported)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceFMRxCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    /* entries in milliHz */
+    entries->samplingRatesSupported[0] = 8000000;
+    entries->samplingRatesSupported[1] = 16000000;
+    entries->samplingRatesSupported[2] = 24000000;
+    entries->samplingRatesSupported[3] = 32000000;
+    entries->samplingRatesSupported[4] = 48000000;
+    entries->maxChannels = 2;
+
+    newNode->pEntry = (void*) entries;
+
+    *ppNode = newNode;
+    DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceFMRxCapabilities");
+    return res;
+    }
+
+/* Add AudioInputDeviceCaps */
+XAresult XACapabilitiesMgr_GetAudioInputDeviceCallCapabilities(
+        XACapabilities** ppNode)
+    {
+    XAresult res = XA_RESULT_SUCCESS;
+    XACapabilities *newNode = NULL;
+    XAAudioInputDescriptor *entries = NULL;
+    XAchar inpDeviceName[] = "Call";
+    int strLen = 0;
+
+    DEBUG_API("->XACapabilitiesMgr_GetAudioInputDeviceCallCapabilities");
+    newNode = (XACapabilities *) calloc(1, sizeof(XACapabilities));
+    if (!newNode)
+        {
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceCallCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+
+    newNode->capsType = AUD_I;
+    newNode->xaid = XA_ADAPTID_DEVSOUNDSRC_CALL;
+    newNode->noOfEntries = 1;
+
+    /* Allocate array */
+    entries = (XAAudioInputDescriptor*) calloc(1,
+            sizeof(XAAudioInputDescriptor));
+    if (!entries)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceCallCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+
+    newNode->pEntry = (void*) entries;
+
+    strLen = strlen((char*) inpDeviceName);
+    entries->deviceName = (XAchar *) calloc(strLen + 1, sizeof(XAchar));
+    if (!entries->deviceName)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceCallCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+
+    strncpy((char*) entries->deviceName, (char*) inpDeviceName, strLen);
+    entries->deviceName[strLen] = '\0'; /*Null terminate it*/
+    entries->deviceConnection = XA_DEVCONNECTION_INTEGRATED;
+    entries->deviceScope = XA_DEVSCOPE_ENVIRONMENT;
+    entries->deviceLocation = XA_DEVLOCATION_HANDSET;
+    entries->isForTelephony = XA_BOOLEAN_FALSE;
+    entries->minSampleRate = 8000000; /* milliHz */
+    entries->maxSampleRate = 48000000; /* milliHz */
+    entries->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
+    entries->numOfSamplingRatesSupported = 5;
+    entries->samplingRatesSupported = (XAmilliHertz*) calloc(
+            entries->numOfSamplingRatesSupported, sizeof(XAmilliHertz));
+    if (!entries->samplingRatesSupported)
+        {
+        XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceCallCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
+        }
+    /* entries in milliHz */
+    entries->samplingRatesSupported[0] = 8000000;
+    entries->samplingRatesSupported[1] = 16000000;
+    entries->samplingRatesSupported[2] = 24000000;
+    entries->samplingRatesSupported[3] = 32000000;
+    entries->samplingRatesSupported[4] = 48000000;
+    entries->maxChannels = 2;
+
+    newNode->pEntry = (void*) entries;
+
+    *ppNode = newNode;
+    DEBUG_API("<-XACapabilitiesMgr_GetAudioInputDeviceCallCapabilities");
     return res;
     }
 
@@ -462,15 +678,17 @@ XAresult XACapabilitiesMgr_GetAudioOutputDeviceCapabilities(
     XAchar outputDeviceName[] = "Default Speaker";
     int strLen = 0;
 
+    DEBUG_API("->XACapabilitiesMgr_GetAudioOutputDeviceCapabilities");
     newNode = (XACapabilities *) calloc(1, sizeof(XACapabilities));
     if (!newNode)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioOutputDeviceCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
     newNode->capsType = AUD_O;
-    newNode->xaid = 0xAD7E5002;
+    newNode->xaid = XA_ADAPTID_DEVSOUNDSINK;
     newNode->noOfEntries = 1;
 
     /* Allocate array */
@@ -478,9 +696,10 @@ XAresult XACapabilitiesMgr_GetAudioOutputDeviceCapabilities(
             sizeof(XAAudioOutputDescriptor));
     if (!entries)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioOutputDeviceCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
 
     newNode->pEntry = (void*) entries;
@@ -489,9 +708,10 @@ XAresult XACapabilitiesMgr_GetAudioOutputDeviceCapabilities(
     entries->pDeviceName = (XAchar *) calloc(strLen + 1, sizeof(XAchar));
     if (!entries->pDeviceName)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioOutputDeviceCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
     strncpy((char*) entries->pDeviceName, (char*) outputDeviceName, strLen);
     entries->pDeviceName[strLen] = '\0'; /*Null terminate it*/
@@ -500,35 +720,30 @@ XAresult XACapabilitiesMgr_GetAudioOutputDeviceCapabilities(
     entries->deviceLocation = XA_DEVLOCATION_HANDSET;
     entries->isForTelephony = XA_BOOLEAN_FALSE;
     entries->minSampleRate = 8000000; /* milliHz */
-    entries->maxSampleRate = 96000000; /* milliHz */
+    entries->maxSampleRate = 48000000; /* milliHz */
     entries->isFreqRangeContinuous = XA_BOOLEAN_FALSE;
-    entries->numOfSamplingRatesSupported = 12;
+    entries->numOfSamplingRatesSupported = 5;
     entries->samplingRatesSupported = (XAmilliHertz*) calloc(
             entries->numOfSamplingRatesSupported, sizeof(XAmilliHertz));
     if (!entries->samplingRatesSupported)
         {
-        res = XA_RESULT_MEMORY_FAILURE;
         XACapabilitiesMgr_DeleteCapabilitieList(&newNode);
-        return res;
+        DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
+        DEBUG_API("<-XACapabilitiesMgr_GetAudioOutputDeviceCapabilities");
+        return XA_RESULT_MEMORY_FAILURE;
         }
     /* entries in milliHz */
     entries->samplingRatesSupported[0] = 8000000;
-    entries->samplingRatesSupported[1] = 11025000;
-    entries->samplingRatesSupported[2] = 12000000;
-    entries->samplingRatesSupported[3] = 16000000;
-    entries->samplingRatesSupported[4] = 22050000;
-    entries->samplingRatesSupported[5] = 24000000;
-    entries->samplingRatesSupported[6] = 32000000;
-    entries->samplingRatesSupported[7] = 44100000;
-    entries->samplingRatesSupported[8] = 48000000;
-    entries->samplingRatesSupported[9] = 64000000;
-    entries->samplingRatesSupported[10] = 88200000;
-    entries->samplingRatesSupported[11] = 96000000;
+    entries->samplingRatesSupported[1] = 16000000;
+    entries->samplingRatesSupported[2] = 24000000;
+    entries->samplingRatesSupported[3] = 32000000;
+    entries->samplingRatesSupported[4] = 48000000;
     entries->maxChannels = 2;
 
     newNode->pEntry = (void*) entries;
 
     *ppNode = newNode;
+
+    DEBUG_API("<-XACapabilitiesMgr_GetAudioOutputDeviceCapabilities");
     return res;
     }
-

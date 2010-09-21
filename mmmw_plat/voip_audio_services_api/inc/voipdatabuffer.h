@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPDATABUFFER_H
-#define __VOIPDATABUFFER_H
+#ifndef VOIPDATABUFFER_H
+#define VOIPDATABUFFER_H
 
 #include <e32base.h>
 
@@ -44,8 +44,6 @@ public:
 public:
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -53,8 +51,6 @@ public:
 
     /**
      * SetPayloadPtr
-     *
-     * @since S60 v5.0
      * @param TPtr8
      * @return none
      */
@@ -62,8 +58,6 @@ public:
 
     /**
      * GetPayloadPtr
-     *
-     * @since S60 v5.0
      * @param TPtr8&
      * @return none
      */
@@ -71,8 +65,6 @@ public:
 
     /**
      * GetBufferType
-     *
-     * @since S60 v5.0
      * @param TVoIPBufferType&
      * @return none
      */
@@ -81,8 +73,6 @@ public:
 protected:
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -90,8 +80,6 @@ protected:
 
     /**
      * 2nd phase constructor
-     *
-     * @since S60 v5.0
      * @param CVoIPDataBufferImpl*
      * @return void
      */
@@ -100,7 +88,6 @@ protected:
 private:
 
     CVoIPDataBufferImpl* iVoIPDataBufferImpl;
-
     };
 
 /**
@@ -113,8 +100,6 @@ class CVoIPJBDataBuffer : public CVoIPDataBuffer
 public:
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -122,8 +107,6 @@ public:
 
     /**
      * SetBufferSequence
-     *
-     * @since S60 v5.0
      * @param const TUint - between 0 and 0xFFFF
      * @return none
      */
@@ -131,8 +114,6 @@ public:
 
     /**
      * GetBufferSequence
-     *
-     * @since S60 v5.0
      * @param TUint& - between 0 and 0xFFFF
      * @return none
      */
@@ -141,8 +122,6 @@ public:
 protected:
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -150,8 +129,6 @@ protected:
 
     /**
      * 2nd phase constructor
-     *
-     * @since S60 v5.0
      * @param CVoIPJBDataBufferImpl*
      * @return void
      */
@@ -160,9 +137,8 @@ protected:
 private:
 
     CVoIPJBDataBufferImpl* iVoIPJBDataBufferImpl;
-
     };
 
-#endif //__VOIPDATABUFFER_H
+#endif //VOIPDATABUFFER_H
 
 // End of file

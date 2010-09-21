@@ -29,6 +29,7 @@
 #include <e32msgqueue.h>
 #include "TimeoutController.h"
 #include <w32std.h>
+#include "profileutilmacro.h"
 
 // CONSTANTS
 //const ?type ?constant_var = ?constant;
@@ -101,6 +102,9 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         virtual void HandleRadioItfCallback(XARadioItf caller, XAuint32 event );
         virtual void HandleObjectCallback(XAObjectItf caller,XAuint32 event,
                                 XAresult result,XAuint32 param, void * pInterface);
+        virtual void HandlePrefetchStatusItfCallback( XAPrefetchStatusItf caller, XAuint32 event );
+        virtual void HandlePrefetchStatusItfTestEventCallback( XAPrefetchStatusItf caller, XAuint32 event );
+        virtual void HandleStreamInfoItfCallback( XAStreamInformationItf caller, XAuint32 event, XAuint32 streamIndex );
      
         enum TOMXExpectedEvent
             {
@@ -257,7 +261,9 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         virtual TInt al_SetDataFormat( CStifItemParser& aItem );        
         virtual TInt al_CreateWindow( CStifItemParser& aItem );
         virtual TInt al_DeleteWindow( CStifItemParser& aItem );        
-
+        virtual TInt CheckForNull(CStifItemParser& aItem, void*& paramPtr);
+        virtual TInt CheckForNullParam(CStifItemParser& aItem, void*& paramPtr);
+        
         virtual TInt al_createEngine( CStifItemParser& aItem );
         virtual TInt al_queryNumSupportedEngineInterfaces( CStifItemParser& aItem );
         virtual TInt al_querySupportedEngineInterfaces( CStifItemParser& aItem );
@@ -381,6 +387,7 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         virtual TInt al_strminfoitf_RegisterStreamChangeCallback( CStifItemParser& aItem );
         virtual TInt al_strminfoitf_QueryActiveStreams( CStifItemParser& aItem );
         virtual TInt al_strminfoitf_SetActiveStream( CStifItemParser& aItem );        
+        virtual TInt al_strminfoitf_SetStreamInfoIndex(CStifItemParser& aItem);
         
         virtual TInt al_volumeitf_SetVolumeLevel( CStifItemParser& aItem );
         virtual TInt al_volumeitf_GetVolumeLevel( CStifItemParser& aItem );
@@ -429,12 +436,36 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
 		virtual TInt al_playbackrateitf_GetCapabilitiesOfRate( CStifItemParser& aItem );
 		virtual TInt al_playbackrateitf_GetRateRange( CStifItemParser& aItem );
 
+        virtual TInt al_prefetchstatusitf_GetFillLevel( CStifItemParser& aItem ) ;
+        virtual TInt al_prefetchstatusitf_GetPrefetchStatus( CStifItemParser& aItem );
+        virtual TInt al_prefetchstatusitf_RegisterCallback( CStifItemParser& aItem );
+        virtual TInt al_prefetchstatusitf_RegisterTestEventCallback( CStifItemParser& aItem );
+        virtual TInt al_prefetchstatusitf_SetCallbackEventMask( CStifItemParser& aItem );
+        virtual TInt al_prefetchstatusitf_GetCallbackEventMaskNullParam( CStifItemParser& aItem );
+        virtual TInt al_prefetchstatusitf_GetCallbackEventMask( CStifItemParser& aItem );
+        virtual TInt al_prefetchstatusitf_SetFillUpdatePeriod( CStifItemParser& aItem );
+        virtual TInt al_prefetchstatusitf_GetFillUpdatePeriodNullParam( CStifItemParser& aItem );
+        virtual TInt al_prefetchstatusitf_GetFillUpdatePeriod( CStifItemParser& aItem );
+        virtual TInt al_prefetchstatusitf_TestEvent( CStifItemParser& aItem );
+		
+		virtual TInt al_videoppitf_SetRotation( CStifItemParser& aItem );
+		virtual TInt al_videoppitf_IsArbitraryRotationSupported( CStifItemParser& aItem );
+		virtual TInt al_videoppitf_SetScaleOptions( CStifItemParser& aItem );
+		virtual TInt al_videoppitf_SetSourceRectangle( CStifItemParser& aItem );
+		virtual TInt al_videoppitf_SetDestinationRectangle( CStifItemParser& aItem );
+		virtual TInt al_videoppitf_SetMirror( CStifItemParser& aItem );
+		virtual TInt al_videoppitf_Commit( CStifItemParser& aItem );
+
         /**
          * Method used to log version of test class
          */
         void SendTestClassVersion();
 
         //ADD NEW METHOD DEC HERE
+        TInt validateAudioCodecDescriptorAtIndex(
+                XAuint32 aAudioCodecId,
+                XAAudioCodecDescriptor& aDesc,
+                CStifItemParser& aItem );
         //[TestMethods] - Do not remove
 
     public:     // Data
@@ -498,6 +529,7 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         XARadioItf m_RadioItf;
         XADynamicSourceItf m_DynSrcItf;
         XAPlaybackRateItf m_PlaybackRateItf;
+        XAVideoPostProcessingItf m_VideoPP;
         
         XAVolumeItf m_VolumeItf;
         XANokiaLinearVolumeItf  m_NokiaLinearVolumeItf;
@@ -512,6 +544,7 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         XAAudioEncoderItf m_AudEncItf;
         XAMetadataInsertionItf m_MetadataInsertionItf;
         XAMetadataExtractionItf m_MetadataExtractionItf;
+        XAPrefetchStatusItf m_PrefetchStatusItf;
         
         /*Audio Source*/
         XADataSource m_AudioSource;
@@ -546,8 +579,17 @@ NONSHARABLE_CLASS(COpenMAXALTestModule) : public CScriptBase,
         RWindowGroup iRwGroup;
         RWindow iRWindow;
         CWsScreenDevice* iDevice;
+        //prefetch status variables
+        TInt iStatusEventCount;
+        TInt iFillEventCount;
+        TInt iFillUpdateIncrement;
+        TInt iLastFillIncrement;
+        TBool iPrefetchEventTesting;
+        TBool iPrefetchEventError;
 		
         XAAudioEncoderSettings m_audioensettings;
+		
+		TInt iStreamInfoItfIndex; //expected streamIndex for callback event
         // ?one_line_short_description_of_data
         //?data_declaration;
 

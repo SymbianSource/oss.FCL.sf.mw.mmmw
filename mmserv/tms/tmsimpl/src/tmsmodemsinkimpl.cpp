@@ -67,10 +67,11 @@ gint TMSModemSinkImpl::Create(TMSSink*& tmssink)
     return ret;
     }
 
-gint TMSModemSinkImpl::SetProxy(TMSCallProxy* /*aProxy*/,
-        gpointer /*queuehandler*/)
+gint TMSModemSinkImpl::SetProxy(TMSCallProxy* aProxy, gpointer queuehandler)
     {
     gint ret = TMS_RESULT_SUCCESS;
+    static_cast<TMSModemSinkBodyImpl*>(this->iBody)->SetProxy(aProxy,
+            queuehandler);
     return ret;
     }
 

@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "xarecorditf.h"
 
 #include "xarecorditfadaptation.h"
@@ -238,7 +237,7 @@ XAresult XARecordItfImpl_SetCallbackEventsMask(XARecordItf self,
     XAresult ret = XA_RESULT_SUCCESS;
     XARecordItfImpl* impl = GetImpl(self);
     DEBUG_API_A1("->XARecordItfImpl_SetCallbackEventsMask- %lu", eventFlags);
-    XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaRecorder);
+    //XA_IMPL_THREAD_SAFETY_ENTRY(XATSMediaRecorder);
 
     if (!impl || (eventFlags > (XA_RECORDEVENT_HEADATLIMIT
             | XA_RECORDEVENT_HEADATMARKER | XA_RECORDEVENT_HEADATNEWPOS
@@ -306,7 +305,7 @@ XAresult XARecordItfImpl_SetCallbackEventsMask(XARecordItf self,
                 }
             }
         }
-    XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
+    //XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaRecorder);
     DEBUG_API("<-XARecordItfImpl_SetCallbackEventsMask");
     return ret;
     }
@@ -323,7 +322,7 @@ XAresult XARecordItfImpl_GetCallbackEventsMask(XARecordItf self,
     XARecordItfImpl *impl = GetImpl(self);
     DEBUG_API("->XARecordItfImpl_GetCallbackEventsMask");
 
-    DEBUG_INFO_A1("pEventFlags - %u", pEventFlags);
+    DEBUG_INFO_A1("pEventFlags - %u", (int) pEventFlags);
 
     if (!impl || !pEventFlags)
         {
@@ -407,6 +406,7 @@ XAresult XARecordItfImpl_GetMarkerPosition(XARecordItf self,
         /* invalid parameter */
         return XA_RESULT_PARAMETER_INVALID;
         }
+    
     if (impl->markerPosition == NO_POSITION)
         {
         DEBUG_ERR("No marker position set.");
@@ -533,7 +533,6 @@ XARecordItfImpl* XARecordItfImpl_Create(XAMediaRecorderImpl* impl)
 void XARecordItfImpl_Free(XARecordItfImpl* self)
     {
     DEBUG_API("->XARecordItfImpl_Free");
-    assert( self==self->self );
     XAAdaptationBase_RemoveEventHandler(self->adapCtx,
             &XARecordItfImpl_AdaptCb);
     free(self);
@@ -554,12 +553,10 @@ void XARecordItfImpl_AdaptCb(void *pHandlerCtx, XAAdaptEvent *event)
         DEBUG_API("<-XARecordItfImpl_AdaptCb");
         return;
         }
-    assert(event);
     /* check position update events */
     if (event->eventid == XA_ADAPT_POSITION_UPDATE_EVT)
         {
         XAuint32 newpos = 0;
-        assert(event->data);
         newpos = *((XAuint32*) (event->data));
         DEBUG_INFO_A1("new position %u",newpos);
         /* check if marker passed and callback needed */

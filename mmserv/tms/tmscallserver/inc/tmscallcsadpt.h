@@ -66,44 +66,14 @@ public:
             const TMSStreamType strmType, const gint strmId);
     virtual gint DeleteStream(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId);
-    virtual gint DataXferBufferEmptied(const TMSCallType callType,
-            const TMSStreamType strmType, const gint strmId);
-    virtual gint DataXferBufferFilled(const TMSCallType callType,
-            const TMSStreamType strmType, const gint strmId,
-            const guint datasize);
-    virtual gint GetDataXferBufferHndl(const TMSCallType callType,
-            const TMSStreamType strmType, const gint strmId,
-            const guint32 key, RChunk& chunk);
 
     // From TMS effects
-    virtual gint GetMaxVolume(guint& volume);
-    virtual gint SetVolume(const guint volume);
-    virtual gint GetVolume(guint& volume);
-    virtual gint GetMaxGain(guint& gain);
-    virtual gint SetGain(const guint gain);
-    virtual gint GetGain(guint& gain);
-    virtual gint GetGlobalMaxVolume(guint& volume);
-    virtual gint SetGlobalVolume(const guint volume);
-    virtual gint GetGlobalVolume(guint& volume);
-    virtual gint GetGlobalMaxGain(guint& gain);
-    virtual gint SetGlobalGain(const guint gain);
-    virtual gint GetGlobalGain(guint& gain);
-
-    // From TMS formats
-    virtual gint GetCodecMode(const TMSFormatType fmttype,
-            const TMSStreamType strmtype, gint& mode);
-    virtual gint SetCodecMode(const TMSFormatType fmttype,
-            const TMSStreamType strmtype, const gint mode);
-    virtual gint GetSupportedBitRatesCount(guint& count);
-    virtual gint GetSupportedBitRates(CBufFlat*& brbuffer);
-    virtual gint GetBitRate(guint& bitrate);
-    virtual gint SetBitRate(const guint bitrate);
-    virtual gint GetVAD(const TMSFormatType fmttype, gboolean& vad);
-    virtual gint SetVAD(const TMSFormatType fmttype, const gboolean vad);
-    virtual gint GetCNG(const TMSFormatType fmttype, gboolean& cng);
-    virtual gint SetCNG(const TMSFormatType fmttype, const gboolean cng);
-    virtual gint GetPlc(const TMSFormatType fmttype, gboolean& plc);
-    virtual gint SetPlc(const TMSFormatType fmttype, const gboolean plc);
+    gint GetGlobalMaxVolume(guint& volume);
+    gint SetGlobalVolume(const guint volume);
+    gint GetGlobalVolume(guint& volume);
+    gint GetGlobalMaxGain(guint& gain);
+    gint SetGlobalGain(const guint gain);
+    gint GetGlobalGain(guint& gain);
 
     // From TMS audio routing
     virtual gint SetOutput(const TMSAudioOutput output);
@@ -128,7 +98,6 @@ private:
     void OutputChanged(CTelephonyAudioRouting& aTelephonyAudioRouting);
     void SetOutputComplete(CTelephonyAudioRouting& aTelephonyAudioRouting,
             gint status);
-    void GetSupportedBitRatesL(CBufFlat*& brbuffer);
     void NotifyClient(const gint strmId, const gint command,
             const gint status = KErrNone, const gint64 int64 = TInt64(0));
 

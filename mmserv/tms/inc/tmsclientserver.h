@@ -27,7 +27,7 @@ namespace TMS {
 // Used for client-server communication
 enum TMSClientServerRequest
     {
-    ETMSCallSessionHandle,
+    ETMSCallSessionHandle = 0,
     ETMSGetSupportedDecodersCount,
     ETMSGetSupportedEncodersCount,
     ETMSGetSupportedDecoders,
@@ -63,7 +63,8 @@ enum TMSClientServerRequest
     ETMSStopDTMF,
     ETMSContinueDTMF,
     ETMSStartInbandTone,
-    ETMSStopInbandTone
+    ETMSStopInbandTone,
+    ETMSTermSrv
     };
 
 // Ring tone open methods

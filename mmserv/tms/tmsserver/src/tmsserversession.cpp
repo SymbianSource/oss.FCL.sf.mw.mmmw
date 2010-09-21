@@ -248,6 +248,9 @@ void TMSServerSession::DispatchMessageL(const RMessage2& aMessage)
         case ETMSStopInbandTone:
             StopInbandTone(aMessage);
             break;
+        case ETMSTermSrv:
+            iServer.TermSrv(aMessage);
+            break;
         default:
             User::Leave(KErrNotSupported);
             break;

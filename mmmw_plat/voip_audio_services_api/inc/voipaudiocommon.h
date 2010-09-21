@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPAUDIOCOMMON_H
-#define __VOIPAUDIOCOMMON_H
+#ifndef VOIPAUDIOCOMMON_H
+#define VOIPAUDIOCOMMON_H
 
 #include <e32base.h>
 
@@ -38,6 +38,6 @@ enum TVoIPCodecFormat
     EPCM16
     };
 
-#endif //__VOIPAUDIOCOMMON_H
+#endif //VOIPAUDIOCOMMON_H
 
 // End of file

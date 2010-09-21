@@ -22,7 +22,6 @@
 #include "VoIPAudioSession.h"
 #include "VoIPAudioClientServer.h"
 #include "VoIPFormatIntfcImpl.h"
-#include "VoIPFormatIntfcImpl.h"
 #include "VoIPBaseCodecIntfcImpl.h"
 #include "VoIPILBCEncoderIntfcImpl.h"
 #include "VoIPG711EncoderIntfcImpl.h"
@@ -51,6 +50,7 @@ CVoIPAudioUplinkStreamImpl::NewL(const TMMFPrioritySettings aPriority)
 CVoIPAudioUplinkStreamImpl::~CVoIPAudioUplinkStreamImpl()
     {
     Close();
+    iCodecFormats.Close();
 
     if (iMsgQHandler)
         {
@@ -176,7 +176,16 @@ void CVoIPAudioUplinkStreamImpl::GetSupportedFormatsL(
         const TMMFPrioritySettings aPriority,
         RArray<TVoIPCodecFormat>& aFormats)
     {
-    if (!iCodecFormats || aFormats.Count() <= 0)
+    TInt count = iCodecFormats.Count();
+    aFormats.Reset();
+    if (count > 0)
+        {
+        for (TInt i = 0; i < count; i++)
+            {
+            aFormats.Append(iCodecFormats[i]);
+            }
+        }
+    else
         {
         RArray<TUint32> codecIDs;
         CleanupClosePushL(codecIDs);
@@ -184,10 +193,14 @@ void CVoIPAudioUplinkStreamImpl::GetSupportedFormatsL(
         iVoIPAudioSession.GetSupportedEncoders(aPriority, codecIDs,
                 iG711FrameSize);
 
+#ifdef _DEBUG
+        RDebug::Print(_L("G711 Frame Size=%d"), iG711FrameSize);
+#endif
+
         TUint32 codec = 0;
         TInt count = codecIDs.Count();
         TVoIPCodecFormat format;
-        aFormats.Reset();
+        iCodecFormats.Reset();
 
         for (TInt i = 0; i < count; i++)
             {
@@ -203,11 +216,10 @@ void CVoIPAudioUplinkStreamImpl::GetSupportedFormatsL(
             format = ConvertFourCC(codec);
             if (format != ENULL)
                 {
+                iCodecFormats.Append(format);
                 aFormats.Append(format);
                 }
             }
-
-        iCodecFormats = &aFormats;
         CleanupStack::PopAndDestroy(&codecIDs);
         }
     }
@@ -270,17 +282,8 @@ void CVoIPAudioUplinkStreamImpl::SetFormatL(TVoIPCodecFormat aFormat,
             }
         }
 
-    TUint32 codecFourCC = CodecFourCC(aFormat);
+    TUint32 codecFourCC = CodecFourCC(iFormat);
     iVoIPAudioSession.SetEncoder(codecFourCC);
-    }
-
-// ---------------------------------------------------------------------------
-// CVoIPAudioUplinkStreamImpl::GetFormat
-// ---------------------------------------------------------------------------
-//
-TVoIPCodecFormat CVoIPAudioUplinkStreamImpl::GetFormat()
-    {
-    return iFormat;
     }
 
 // ---------------------------------------------------------------------------
@@ -507,7 +510,11 @@ TBool CVoIPAudioUplinkStreamImpl::IsCodecSupportedL(TVoIPCodecFormat aFormat)
     {
     TBool status = EFalse;
 
-    if (!iCodecFormats)
+    if (iCodecFormats.Count() > 0)
+        {
+        status = FindFormat(aFormat);
+        }
+    else
         {
         // Client hasn't called GetSupportedFormatsL
         RArray<TVoIPCodecFormat> codecs;
@@ -516,11 +523,6 @@ TBool CVoIPAudioUplinkStreamImpl::IsCodecSupportedL(TVoIPCodecFormat aFormat)
         GetSupportedFormatsL(iPriority, codecs); //sets iCodecFormats
         status = FindFormat(aFormat);
         CleanupStack::PopAndDestroy(&codecs);
-        iCodecFormats = NULL;
-        }
-    else
-        {
-        status = FindFormat(aFormat);
         }
 
     return status;
@@ -534,27 +536,32 @@ TBool CVoIPAudioUplinkStreamImpl::FindFormat(TVoIPCodecFormat aFormat)
     {
     TBool found = EFalse;
 
-    if (iCodecFormats)
+    if (iCodecFormats.Count() > 0)
         {
-        if (iCodecFormats->Count() > 0)
+        if (iCodecFormats.Find(aFormat) == KErrNotFound)
             {
-            if (iCodecFormats->Find(aFormat) == KErrNotFound)
+            // For backward compatibility with VAS 1.0
+            if (aFormat == EG711)
                 {
-                // For backward compatibility with VAS 1.0
-                if (aFormat == EG711)
+                if (iCodecFormats.Find(EG711_10MS) != KErrNotFound)
                     {
-                    if (iCodecFormats->Find(EG711_10MS) != KErrNotFound)
-                        {
-                        iFormat = EG711_10MS;
-                        found = ETrue;
-                        }
+                    iFormat = EG711_10MS;
+                    found = ETrue;
                     }
                 }
-            else
+            else if (aFormat == EG711_10MS)
                 {
-                iFormat = aFormat;
-                found = ETrue;
+                if (iCodecFormats.Find(EG711) != KErrNotFound)
+                    {
+                    iFormat = EG711;
+                    found = ETrue;
+                    }
                 }
+            }
+        else
+            {
+            iFormat = aFormat;
+            found = ETrue;
             }
         }
 
@@ -584,16 +591,6 @@ void CVoIPAudioUplinkStreamImpl::EmptyBuffer(CVoIPDataBuffer* aBuffer)
 void CVoIPAudioUplinkStreamImpl::Event(TInt aEventType, TInt aError)
     {
     iObserver->Event(*this, aEventType, aError);
-    }
-
-// ---------------------------------------------------------------------------
-// CVoIPAudioUplinkStreamImpl::Event
-// From MVoIPFormatObserver
-// ---------------------------------------------------------------------------
-//
-void CVoIPAudioUplinkStreamImpl::Event(const CVoIPFormatIntfc& /*aSrc*/,
-        TInt /*aEventType*/)
-    {
     }
 
 // End of file

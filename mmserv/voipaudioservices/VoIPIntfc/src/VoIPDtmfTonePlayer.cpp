@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: VOIP Audio Service
-*
-*/
-
+ * Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: VOIP Audio Service
+ *
+ */
 
 #include <e32base.h>
 #include <voipdtmftoneplayer.h>
@@ -22,7 +21,6 @@
 #include "VoIPDownlinkStreamImpl.h"
 #include "VoIPUplinkStreamImpl.h"
 #include "VoIPDtmfTonePlayerImpl.h"
-
 
 // ---------------------------------------------------------------------------
 // CDTMFTonePlayer::~CDTMFTonePlayer
@@ -93,12 +91,15 @@ EXPORT_C void CDTMFTonePlayer::Close()
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CDTMFTonePlayer::AddVoIPAudioUplinkStream(
-                               CVoIPAudioUplinkStream& aStream)
+        CVoIPAudioUplinkStream& aStream)
     {
-    RVoIPAudioSession* session =
-                       aStream.iVoIPAudioUplinkStreamImpl->GetSession();
-
-    TInt err = iDTMFTonePlayerImpl->AddVoIPAudioUplinkStream(aStream, session);
+    TInt err = KErrArgument;
+    if (&aStream)
+        {
+        RVoIPAudioSession* session =
+                aStream.iVoIPAudioUplinkStreamImpl->GetSession();
+        err = iDTMFTonePlayerImpl->AddVoIPAudioUplinkStream(aStream, session);
+        }
     return err;
     }
 
@@ -107,7 +108,7 @@ EXPORT_C TInt CDTMFTonePlayer::AddVoIPAudioUplinkStream(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CDTMFTonePlayer::RemoveVoIPAudioUplinkStream(
-                               CVoIPAudioUplinkStream& aStream)
+        CVoIPAudioUplinkStream& aStream)
     {
     TInt err = iDTMFTonePlayerImpl->RemoveVoIPAudioUplinkStream(aStream);
     return err;
@@ -118,13 +119,15 @@ EXPORT_C TInt CDTMFTonePlayer::RemoveVoIPAudioUplinkStream(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CDTMFTonePlayer::AddVoIPAudioDownlinkStream(
-                               CVoIPAudioDownlinkStream& aStream)
+        CVoIPAudioDownlinkStream& aStream)
     {
-    RVoIPAudioSession* session =
-                       aStream.iVoIPAudioDownlinkStreamImpl->GetSession();
-
-    TInt err = iDTMFTonePlayerImpl->AddVoIPAudioDownlinkStream(aStream,
-                                                               session);
+    TInt err = KErrArgument;
+    if (&aStream)
+        {
+        RVoIPAudioSession* session =
+                aStream.iVoIPAudioDownlinkStreamImpl->GetSession();
+        err = iDTMFTonePlayerImpl->AddVoIPAudioDownlinkStream(aStream, session);
+        }
     return err;
     }
 
@@ -133,11 +136,10 @@ EXPORT_C TInt CDTMFTonePlayer::AddVoIPAudioDownlinkStream(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CDTMFTonePlayer::RemoveVoIPAudioDownlinkStream(
-                               CVoIPAudioDownlinkStream& aStream)
+        CVoIPAudioDownlinkStream& aStream)
     {
     TInt err = iDTMFTonePlayerImpl->RemoveVoIPAudioDownlinkStream(aStream);
     return err;
     }
-
 
 // End of file

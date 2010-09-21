@@ -647,7 +647,16 @@ void TMSIPUplink::InitializeComplete(TInt aError)
 void TMSIPUplink::RecordError(TInt aError)
     {
     iStatus = EReady;
+
+#ifndef __WINSCW__
     iObserver.UplinkStarted(aError);
+#else  //__WINSCW__
+    if (aError == KErrAccessDenied || aError == KErrInUse)
+        {
+        iObserver.UplinkStarted(TMS_RESULT_SUCCESS);
+        }
+#endif //__WINSCW__
+
     TRACE_PRN_IF_ERR(aError);
     }
 

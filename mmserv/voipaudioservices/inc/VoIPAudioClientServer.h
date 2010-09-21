@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef __VOIPAUDIOCLIENTSERVER_H
-#define __VOIPAUDIOCLIENTSERVER_H
+#ifndef VOIPAUDIOCLIENTSERVER_H
+#define VOIPAUDIOCLIENTSERVER_H
 
 #include <e32base.h>
 #include <f32file.h> //for RFile
@@ -90,7 +90,6 @@ enum TVoIPAudioClientServerRequest
     EVoIPResetJitterBuffer,
     EVoIPJBDelayDown,
     EVoIPJBDelayUp,
-
     EVoIPSessionClose
     };
 
@@ -169,6 +168,6 @@ struct TTonesMsgBuf
 
 typedef TPckgBuf<TTonesMsgBuf> TTonesMsgBufPckg;
 
-#endif //__VOIPAUDIOCLIENTSERVER_H
+#endif //VOIPAUDIOCLIENTSERVER_H
 
 // End of file

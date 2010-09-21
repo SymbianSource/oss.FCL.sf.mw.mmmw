@@ -15,7 +15,6 @@
  *
  */
 
-#include <assert.h>
 #include <stdlib.h>
 #include "xamediaplayeradaptctxmmf.h"
 #include "xaadaptationmmf.h"
@@ -82,6 +81,7 @@ XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc,
             pSelf->cameraSinkSynced = XA_BOOLEAN_FALSE;
             pSelf->rateprops = XA_RATEPROP_SMOOTHVIDEO | XA_RATEPROP_NOPITCHCORAUDIO;
             pSelf->playrate = 1000;
+            pSelf->mmfContext = NULL;
             }
         }
     else
@@ -93,7 +93,7 @@ XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc,
     if (pSelf)
         {
         res = mmf_backend_engine_init(&(pSelf->mmfContext));
-        if (!(pSelf->mmfContext) || (res != XA_RESULT_SUCCESS))
+        if ((res != XA_RESULT_SUCCESS) || !(pSelf->mmfContext))
             {
             /* TODO Check to make sure there is no undeleted MMF objects here*/
             DEBUG_ERR("Failed to init mmf context!!!");
@@ -111,12 +111,16 @@ XAAdaptationBaseCtx* XAMediaPlayerAdaptMMF_Create(XADataSource *pDataSrc,
             if (!pSelf->mmfMetadataContext)
                 {
                 DEBUG_ERR("Failed to init mmf metadata context!!!");
-                pSelf->mmfMetadataContext = NULL;
+                free(pSelf);
+                pSelf = NULL;
+                return NULL;
                 }
             }
         else
             {
             DEBUG_ERR("Failed to create XAMediaPlayerAdaptationMMFCtx !!!");
+            free(pSelf);
+            pSelf = NULL;
             return NULL;
             }
         }

@@ -29,6 +29,5 @@ PRJ_MMPFILES
 #include "../VoIPServer/group/bld.inf"
 #include "../VoIPClient/group/bld.inf"
 #include "../VoIPIntfc/group/bld.inf"
-//#include "../internal/VoIPTestApp/group/bld.inf"
 
 // End of file

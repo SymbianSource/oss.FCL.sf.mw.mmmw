@@ -500,7 +500,7 @@ private:
     /**
      * Constructor
      */
-    TMSFactory();
+    TMSFactory(TMSVer& ver);
 
 private:
     TMSFactoryImpl* impl;

@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include "xamediaplayer.h"
 #include "xaplayitf.h"
 #include "xaseekitf.h"
@@ -27,13 +26,12 @@
 #include "xavolumeitf.h"
 #include "xametadataextractionitf.h"
 #include "xaplaybackrateitf.h"
-#include "xaconfigextensionsitf.h"
 #include "xathreadsafety.h"
-#include "xametadataadaptation.h"
 #include "xacapabilitiesmgr.h"
 #include "xadynamicsourceitf.h"
 #include "xastreaminformationitf.h"
 #include "xanlinearvolumeitf.h"
+#include "xavideopostprocessingitf.h"
 #include "xanvolumeextitf.h"
 
 extern void* vfHandle;
@@ -47,13 +45,13 @@ static const XAInterfaceID* xaMediaPlayerItfIIDs[MP_ITFCOUNT] =
     &XA_IID_SEEK,
     &XA_IID_VOLUME,
     &XA_IID_PREFETCHSTATUS,
-    &XA_IID_CONFIGEXTENSION,
     &XA_IID_DYNAMICSOURCE,
     &XA_IID_METADATAEXTRACTION,
     &XA_IID_PLAYBACKRATE,
     &XA_IID_NOKIAVOLUMEEXT,
     &XA_IID_NOKIALINEARVOLUME,
-    &XA_IID_STREAMINFORMATION
+    &XA_IID_STREAMINFORMATION,
+    &XA_IID_VIDEOPOSTPROCESSING
     };
 
 /* Global methods */
@@ -176,6 +174,8 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
     if (ret != XA_RESULT_SUCCESS)
         { /* creation fails */
         XAObjectItfImpl_Destroy((XAObjectItf) &(pBaseObj));
+        XA_IMPL_THREAD_SAFETY_EXIT(XATSMediaPlayer);
+        DEBUG_API("<-XAMediaPlayerImpl_CreateMediaPlayer");
         return ret;
         }
 
@@ -184,9 +184,6 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
     pBaseObj->interfaceMap[MP_METADATAEXTRACTIONITF].isDynamic
             = XA_BOOLEAN_TRUE;
     pBaseObj->interfaceMap[MP_PLAYBACKRATEITF].isDynamic = XA_BOOLEAN_TRUE;
-
-    /*Set ObjectItf to point to newly created object*/
-    *pPlayer = (XAObjectItf) &(pBaseObj->self);
 
     /*initialize XAPlayerImpl variables */
 
@@ -242,7 +239,10 @@ XAresult XAMediaPlayerImpl_CreateMediaPlayer(FrameworkMap* mapper,
 
     pPlayerImpl->curAdaptCtx->capslist = capabilities;
     pPlayerImpl->curAdaptCtx->fwtype = fwType;
-
+    
+    /*Set ObjectItf to point to newly created object*/
+    *pPlayer = (XAObjectItf) &(pBaseObj->self);
+    
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaPlayer );
     DEBUG_API("<-XAMediaPlayerImpl_CreateMediaPlayer");
     return XA_RESULT_SUCCESS;
@@ -351,7 +351,7 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                             if (ioDevice->deviceType == XA_IODEVICE_CAMERA)
                                 {
                                 vfHandle = (void*) pItf;
-                                DEBUG_INFO_A1("Stored view finder pointer to global address %x", vfHandle);
+                                DEBUG_INFO_A1("Stored view finder pointer to global address %x", (int)vfHandle);
                                 }
                             }
                         else
@@ -376,11 +376,6 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                 case MP_PLAYBACKRATEITF:
                     pItf = XAPlaybackRateItfImpl_Create(pImpl);
                     break;
-                case MP_CONFIGEXTENSIONITF:
-                    pItf = XAConfigExtensionsItfImpl_Create();
-                    XAConfigExtensionsItfImpl_SetContext(pItf,
-                            pImpl->curAdaptCtx);
-                    break;
                 case MP_DYNAMICSOURCEITF:
                     pItf = XADynamicSourceItfImpl_Create(pImpl->curAdaptCtx);
                     break;
@@ -393,6 +388,10 @@ XAresult XAMediaPlayerImpl_DoRealize(XAObjectItf self)
                     break;
                 case MP_STREAMINFORMATIONITF:
                     pItf = XAStreamInformationItfImpl_Create(
+                            pImpl);
+                    break;
+                case MP_VIDEOPOSTPROCESSINGITF:
+                    pItf = XAVideoPostProcessingItfImpl_Create(
                             pImpl->curAdaptCtx);
                     break;
                 default:
@@ -457,7 +456,6 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
     DEBUG_API("->XAMediaPlayerImpl_FreeResources");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS( XATSMediaPlayer );
 
-    assert(pObj && pImpl && pObj == pObj->self);
     for (itfIdx = 0; itfIdx < MP_ITFCOUNT; itfIdx++)
         {
         void *pItf = pObj->interfaceMap[itfIdx].pItf;
@@ -486,9 +484,6 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
                 case MP_PLAYBACKRATEITF:
                     XAPlaybackRateItfImpl_Free(pItf);
                     break;
-                case MP_CONFIGEXTENSIONITF:
-                    XAConfigExtensionsItfImpl_Free(pItf);
-                    break;
                 case MP_DYNAMICSOURCEITF:
                     XADynamicSourceItfImpl_Free(pItf);
                     break;
@@ -500,6 +495,9 @@ void XAMediaPlayerImpl_FreeResources(XAObjectItf self)
                     break;
                 case MP_STREAMINFORMATIONITF:
                     XAStreamInformationItfImpl_Free(pItf);
+                    break;
+                case MP_VIDEOPOSTPROCESSINGITF:
+                    XAVideoPostProcessingItfImpl_Free(pItf);
                     break;
 
                 }

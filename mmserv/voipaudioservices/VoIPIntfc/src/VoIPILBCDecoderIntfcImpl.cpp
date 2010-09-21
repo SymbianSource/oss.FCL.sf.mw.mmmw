@@ -1,32 +1,30 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
 #include "VoIPAudioSession.h"
 #include "VoIPDownlinkStreamImpl.h"
 #include "VoIPILBCDecoderIntfcImpl.h"
-
 
 // ---------------------------------------------------------------------------
 // CVoIPILBCDecoderIntfcImpl::NewL
 // ---------------------------------------------------------------------------
 //
 CVoIPILBCDecoderIntfcImpl* CVoIPILBCDecoderIntfcImpl::NewL(
-                           CVoIPAudioDownlinkStreamImpl* aDnLinkStreamImpl)
+        CVoIPAudioDownlinkStreamImpl* aDnLinkStreamImpl)
     {
     CVoIPILBCDecoderIntfcImpl* self = new (ELeave) CVoIPILBCDecoderIntfcImpl();
     CleanupStack::PushL(self);
@@ -56,7 +54,7 @@ CVoIPILBCDecoderIntfcImpl::CVoIPILBCDecoderIntfcImpl()
 // ---------------------------------------------------------------------------
 //
 void CVoIPILBCDecoderIntfcImpl::ConstructL(
-    CVoIPAudioDownlinkStreamImpl* aDnLinkStreamImpl)
+        CVoIPAudioDownlinkStreamImpl* aDnLinkStreamImpl)
     {
     iVoIPAudioSession = aDnLinkStreamImpl->GetSession();
     CVoIPFormatIntfcImpl::ConstructL(iVoIPAudioSession);
@@ -102,6 +100,5 @@ TInt CVoIPILBCDecoderIntfcImpl::GetCNG(TBool& aCng)
     TInt err = iVoIPAudioSession->GetCNG(aCng);
     return err;
     }
-
 
 // End of file

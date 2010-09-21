@@ -19,39 +19,9 @@
 #define XAMEDIARECORDERADAPTCTX_H_
 
 #include "xaadaptationgst.h"
-#include "xametadataadaptation.h"
+
 
 /* TYPEDEFS */
-
-typedef struct XASnapshotItfVars_
-    {
-
-    /*User variables*/
-    XAuint32 numpics;
-    XAuint32 fps;
-    XAboolean freeze;
-    gchar* fnametemplate;
-    XADataSink* xaSink;
-
-    /* internal variables */
-    gboolean waitforbuffer;
-    gboolean parsenegotiated;
-    XAuint32 numpicstaken;
-
-    GstBus* ssbus;
-    GstElement* sspipeline;
-    GstElement* ssbuffersrc;
-    GstElement* ssparser;
-    GstElement* ssscaler;
-    GstElement* ssfilter;
-    GstElement* ssencoder;
-    GstElement* sstagger;
-    GstElement* sssink;
-    gulong sighandler;
-
-    GstBuffer* snapshotbuffer;
-
-    } XASnapshotItfVars;
 
 /* context to track buffer insufficient event */
 typedef struct recordItfCtx_
@@ -74,28 +44,28 @@ typedef struct XAMediaRecorderAdaptationCtx_
 
     /* GST elements */
     GstElement *datasink;
-    XAboolean isobjsink; /*is sink another XA object?*/
+    //XAboolean isobjsink; /*is sink another XA object?*/
     GstElement *codecbin;
-    GstElement *audioppbin;
+    //GstElement *audioppbin;
     GstElement *audiofilter;
-    GstElement *videoppbin;
-    GstElement *videofilter;
-    GstElement *videoextract;
+    //GstElement *videoppbin;
+    //GstElement *videofilter;
+    //GstElement *videoextract;
     GstElement *audiosource;
-    GstElement *audioqueue;
-    XAboolean isobjasrc; /*is audio source another XA object?*/
-    GstElement *videosource;
-    GstState vsrcOrigState;
-    GstElement *videoqueue;
-    XAboolean isobjvsrc; /*is video source another XA object?*/
+    //GstElement *audioqueue;
+    //XAboolean isobjasrc; /*is audio source another XA object?*/
+    //GstElement *videosource;
+    //GstState vsrcOrigState;
+    //GstElement *videoqueue;
+    //XAboolean isobjvsrc; /*is video source another XA object?*/
     XAboolean encodingchanged;
 
-    XAboolean mute;
-    XAuint32 imageEffectID;
-    XAboolean isStereoPosition;
+    //XAboolean mute;
+    //XAuint32 imageEffectID;
+    //XAboolean isStereoPosition;
     XAuint32 xaRecordState;
-    XAmillidegree curRotation;
-    XAuint32 curMirror;
+    //XAmillidegree curRotation;
+    //XAuint32 curMirror;
     XAboolean isRecord;
 
     /* internals */
@@ -103,21 +73,21 @@ typedef struct XAMediaRecorderAdaptationCtx_
     gboolean runpositiontimer;
     GSourceFunc positionCb;
 
-    XAImplThreadHandle recordingEventThr;
-    recodtItfCtx recThrCtx;
+    //XAImplThreadHandle recordingEventThr;
+    //recodtItfCtx recThrCtx;
 
     /* Variables for snapshot */
-    XASnapshotItfVars snapshotVars;
+    //XASnapshotItfVars snapshotVars;
 
-    XAMetadataAdaptVars *metadatavars;
+    //XAMetadataAdaptVars *metadatavars;
 
     /* Variables for encoders */
     XAAudioEncoderSettings audioEncSettings;
-    XAVideoSettings videoEncSettings;
-    XAImageSettings imageEncSettings;
+    //XAVideoSettings videoEncSettings;
+    //XAImageSettings imageEncSettings;
 
     /*buffersink variable*/
-    guint64 writepos;
+    //guint64 writepos;
 
     } XAMediaRecorderAdaptationCtx_;
 
@@ -131,7 +101,5 @@ XAresult XAMediaRecorderAdapt_ChangeEncoders(
         XAMediaRecorderAdaptationCtx_* mCtx);
 XAresult XAMediaRecorderAdapt_CheckCodec(XAMediaRecorderAdaptationCtx_* mCtx,
         XACapsType encType, XAuint32 encoderId);
-
-void* XAMediaRecorderAdapt_RecordEventThr(void* ctx);
 
 #endif /* XAMEDIARECORDERADAPTCTX_H_ */

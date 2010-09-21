@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPDOWNLINKSTREAM_H
-#define __VOIPDOWNLINKSTREAM_H
+#ifndef VOIPDOWNLINKSTREAM_H
+#define VOIPDOWNLINKSTREAM_H
 
 #include <voipaudiocommon.h>
 #include <voipdtmftoneplayer.h>
@@ -29,8 +29,6 @@ class CVoIPFormatIntfc;
 
 /**
  *  MVoIPDownlinkObserver class
- *
- *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
  *
@@ -45,9 +43,7 @@ public:
 
 public:
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * FillBuffer
      * @param const CVoIPAudioDownlinkStream&
      * @param CVoIPDataBuffer*
      * @return void
@@ -55,9 +51,7 @@ public:
     virtual void FillBuffer(const CVoIPAudioDownlinkStream& aSrc,
             CVoIPDataBuffer* aBuffer) = 0;
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Event
      * @param const CVoIPAudioDownlinkStream&
      * @param TInt - Event type
      * @param TInt - Status
@@ -70,8 +64,6 @@ public:
 /**
  *  CVoIPAudioDownlinkStream class
  *
- *  ?more_complete_description
- *
  *  @lib VoIPAudioIntfc.dll
  *
  */
@@ -80,8 +72,6 @@ class CVoIPAudioDownlinkStream
 public:
     /**
      *  TVoIPOutputDevice
-     *  ?description
- *
      */
     enum TVoIPOutputDevice
         {
@@ -93,62 +83,48 @@ public:
 public:
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CVoIPAudioDownlinkStream();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Open
      * @param MVoIPDownlinkObserver&
      * @return TInt
      */
     IMPORT_C TInt Open(MVoIPDownlinkObserver& aObserver);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetVersion
      * @param TVersion&
      * @return TInt
      */
     IMPORT_C TInt GetVersion(TVersion& aVersion);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetMaxVolume
      * @param TInt&
      * @return TInt
      */
     IMPORT_C TInt GetMaxVolume(TInt& aVolume);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetVolume
      * @param TInt
      * @return TInt
      */
     IMPORT_C TInt SetVolume(TInt aVolume);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetVolume
      * @param TInt&
      * @return TInt
      */
     IMPORT_C TInt GetVolume(TInt& aVolume);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetFormat
      * @param TVoIPCodecFormat
      * @param CVoIPFormatIntfc*&
      * @return TInt
@@ -157,54 +133,42 @@ public:
             CVoIPFormatIntfc*& aIntfc);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetAudioDevice
      * @param TVoIPOutputDevice
      * @return TInt
      */
     IMPORT_C TInt SetAudioDevice(TVoIPOutputDevice aDevice);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetAudioDevice
      * @param TVoIPOutputDevice&
      * @return TInt
      */
     IMPORT_C TInt GetAudioDevice(TVoIPOutputDevice& aDevice);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Start
      * @param none
      * @return TInt
      */
     IMPORT_C TInt Start();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Stop
      * @param none
      * @return TInt
      */
     IMPORT_C TInt Stop();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Close
      * @param none
      * @return void
      */
     IMPORT_C void Close();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * BufferFilled
      * @param CVoIPDataBuffer*
      * @return TInt
      */
@@ -214,8 +178,6 @@ protected:
 
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -223,13 +185,11 @@ protected:
 
     /**
      * Symbian constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
-    void ConstructL(
-            CVoIPAudioDownlinkStreamImpl* aVoIPAudioDownlinkStreamImpl);
+    void ConstructL(CVoIPAudioDownlinkStreamImpl*
+            aVoIPAudioDownlinkStreamImpl);
 
 private:
     /**
@@ -240,9 +200,8 @@ private:
 private:
 
     CVoIPAudioDownlinkStreamImpl* iVoIPAudioDownlinkStreamImpl;
-
     };
 
-#endif //__VOIPDOWNLINKSTREAM_H
+#endif //VOIPDOWNLINKSTREAM_H
 
 // End of file

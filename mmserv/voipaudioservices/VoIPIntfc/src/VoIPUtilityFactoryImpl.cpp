@@ -85,10 +85,7 @@ void CVoIPUtilityFactoryImpl::CreateDownlinkStreamL(
         CVoIPAudioDownlinkStream*& aDnLink)
     {
     iDownLink = CVoIPAudioDownlinkStreamImpl::NewL(iPriorityDn);
-    if (iDownLink)
-        {
-        aDnLink = iDownLink;
-        }
+    aDnLink = iDownLink;
     }
 
 // ---------------------------------------------------------------------------
@@ -100,11 +97,11 @@ void CVoIPUtilityFactoryImpl::CreateDownlinkStreamL(
         CVoIPAudioDownlinkStream*& aDnLink)
     {
     iDownLink = CVoIPAudioDownlinkStreamImpl::NewL(iPriorityDn);
+    aDnLink = iDownLink;
 
     if (iDownLink)
         {
         iDownLink->CreateJitterBufferIntfcL(aJBIntfc);
-        aDnLink = iDownLink;
         }
     }
 
@@ -166,7 +163,11 @@ void CVoIPUtilityFactoryImpl::CreateBufferL(CVoIPDataBuffer*& aBuffer,
         }
 
     // Create buffer type- and codec-dependent
-    if (aType == CVoIPDataBuffer::EJitterBuffer && aCodecFormat != EPCM16)
+    if (aType == CVoIPDataBuffer::EJitterBuffer && aCodecFormat == EPCM16)
+        {
+        User::Leave(KErrNotSupported);
+        }
+    else if (aType == CVoIPDataBuffer::EJitterBuffer)
         {
         aBuffer = CVoIPJBDataBufferImpl::NewL(bufLen);
         }

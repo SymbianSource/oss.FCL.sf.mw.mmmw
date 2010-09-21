@@ -31,8 +31,7 @@ class TMSCallProxy;
 
 // TMSILBCFormatBodyImpl class
 class TMSILBCFormatBodyImpl : public TMSILBCFormatBody,
-                              public TMSFormatBodyImpl,
-                              public MQueueHandlerObserver
+                              public TMSFormatBodyImpl
     {
 public:
     static gint Create(TMSILBCFormatBody*& bodyimpl);
@@ -46,10 +45,6 @@ public:
     virtual gint SetVADMode(const gboolean aVad);
     virtual gint GetVADMode(gboolean& aVad);
     virtual gint GetType(TMSFormatType& Formattype);
-
-    // From MQueueHandlerObserver starts
-    virtual void QueueEvent(TInt aEventType, TInt aError, void* user_data);
-
     virtual void SetProxy(TMSGlobalContext* context, gpointer queuehandler);
 
 private:

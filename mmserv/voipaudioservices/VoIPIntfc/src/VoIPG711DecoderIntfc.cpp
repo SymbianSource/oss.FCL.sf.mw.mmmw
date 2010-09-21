@@ -1,27 +1,23 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
 #include <voipg711decoderintfc.h>
 #include "VoIPFormatIntfcImpl.h"
 #include "VoIPG711DecoderIntfcImpl.h"
-
-
-// ======== MEMBER FUNCTIONS ========
 
 // ---------------------------------------------------------------------------
 // CVoIPG711DecoderIntfc::~CVoIPG711DecoderIntfc
@@ -44,7 +40,7 @@ CVoIPG711DecoderIntfc::CVoIPG711DecoderIntfc()
 // ---------------------------------------------------------------------------
 //
 void CVoIPG711DecoderIntfc::ConstructL(
-                            CVoIPG711DecoderIntfcImpl* aFormatIntfcImpl)
+        CVoIPG711DecoderIntfcImpl* aFormatIntfcImpl)
     {
     iFormatIntfcImpl = aFormatIntfcImpl;
     CVoIPFormatIntfc::ConstructL(iFormatIntfcImpl);
@@ -109,6 +105,5 @@ EXPORT_C TInt CVoIPG711DecoderIntfc::GetPLC(TBool& aPlc)
     TInt err = iFormatIntfcImpl->GetPLC(aPlc);
     return err;
     }
-
 
 // End of file

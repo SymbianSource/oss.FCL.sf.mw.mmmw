@@ -19,6 +19,7 @@
 #include <e32svr.h>
 #include <StifParser.h>
 #include <StifTestInterface.h>
+#include <strings.h>
 #include "openmaxaltestmodule.h"
 
 // EXTERNAL DATA STRUCTURES
@@ -77,7 +78,15 @@ TInt COpenMAXALTestModule::al_audioencoderitf_SetEncoderSettings( CStifItemParse
     XAAudioEncoderSettings setting;
     TUint value(0);
     TInt i(0);
-    TInt numItems;
+    TInt numItems = -1;
+    void* param = (void*)&setting;
+    void* itfPtr = (void*) m_AudEncItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNull(aItem, param);
+    RET_ERR_IF_ERR(status);
     
     status = aItem.GetNextInt(numItems);
     
@@ -138,7 +147,7 @@ TInt COpenMAXALTestModule::al_audioencoderitf_SetEncoderSettings( CStifItemParse
     if(m_AudEncItf)
         {
         res = (*m_AudEncItf)->SetEncoderSettings(
-                m_AudEncItf, &setting);              
+                XAAudioEncoderItf(itfPtr), (XAAudioEncoderSettings*)param);
         status = res;
         }
     else
@@ -148,15 +157,30 @@ TInt COpenMAXALTestModule::al_audioencoderitf_SetEncoderSettings( CStifItemParse
     return status;
     }
 
-TInt COpenMAXALTestModule::al_audioencoderitf_GetEncoderSettings( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_audioencoderitf_GetEncoderSettings( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
+    TInt status_check(KErrNone);
     XAresult res;
     XAAudioEncoderSettings setting;
+    TUint value(0);
+    TInt i(0);
+    TInt numItems;
+    TPtrC check;
+    
+    void* param = (void*)&setting;
+    void* itfPtr = (void*) m_AudEncItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNull(aItem, param);
+    RET_ERR_IF_ERR(status);
+    
     if(m_AudEncItf)
         {
         res = (*m_AudEncItf)->GetEncoderSettings(
-                m_AudEncItf, &setting);
+                XAAudioEncoderItf(itfPtr), (XAAudioEncoderSettings*)param);
         iLog->Log(_L("GetEncoderSettings"));
         iLog->Log(_L("GetEncoderSettings value[%d]"),setting.encoderId);
         iLog->Log(_L("GetEncoderSettings value[%d]"),setting.channelsIn);
@@ -177,5 +201,90 @@ TInt COpenMAXALTestModule::al_audioencoderitf_GetEncoderSettings( CStifItemParse
         {
         status = KErrNotFound;
         }
-    return status;
+    status_check = aItem.GetNextString(check);
+    
+    if(status_check == KErrNone)
+        {    
+        HBufC8* buf = HBufC8::NewL(check.Length()+1);
+        CleanupStack::PushL(buf);
+        TPtr8 des = buf->Des();
+        des.Copy(check);
+        if(strcasecmp((const char*)des.PtrZ(),"check") == NULL)
+        { 
+        status = aItem.GetNextInt(numItems);
+        while((numItems != 0) && (status == KErrNone))
+                {
+                status = aItem.GetNextInt(value);
+                if(!status)
+                    {
+                    switch(i)
+                        {
+                        case 0:
+                            if(!(setting.encoderId == value))
+                                status_check = KErrGeneral;
+                            break;
+                            
+                        case 1:
+                            if(!(setting.channelsIn == value))
+                                status_check = KErrGeneral;
+                            break;
+                        case 2:
+                            if(!(setting.channelsOut == value))
+                                status_check = KErrGeneral;
+                            break;
+                        case 3:
+                            if(!(setting.sampleRate == value))
+                                status_check = KErrGeneral;
+                            break;
+                        case 4:
+                            if(!(setting.bitRate == value))
+                            status_check = KErrGeneral;
+                            break;
+                        case 5:
+                            if(!(setting.bitsPerSample == value))
+                            status_check = KErrGeneral;
+                            break;
+                        case 6:
+                            if(!(setting.rateControl == value))
+                            status_check = KErrGeneral;
+                            break;
+                        case 7:
+                            if(!(setting.profileSetting == value))
+                            status_check = KErrGeneral;
+                            break;
+                        case 8:
+                            if(!(setting.levelSetting == value))
+                            status_check = KErrGeneral;
+                            break;
+                        case 9:
+                            if(!(setting.channelMode == value))
+                            status_check = KErrGeneral;
+                            break;
+                        case 10:
+                            if(!(setting.streamFormat == value))
+                            status_check = KErrGeneral;
+                            break;
+                        case 11:
+                            if(!(setting.encodeOptions == value))
+                            status_check = KErrGeneral;
+                            break;
+                        case 12:
+                            if(!(setting.blockAlignment == value))
+                            status_check = KErrGeneral;
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                i++;
+                numItems--;
+                }
+        
+            }
+        CleanupStack::PopAndDestroy(buf);
+        }
+    if(status_check == KErrNotFound)
+        status_check = KErrNone;
+
+    return status | status_check;
     }

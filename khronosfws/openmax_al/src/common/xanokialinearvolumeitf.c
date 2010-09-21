@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include "xanlinearvolumeitf.h"
 #include "xanokialinearvolumeitfadaptationmmf.h"
@@ -277,7 +276,6 @@ XANokiaLinearVolumeItfImpl* XANokiaLinearVolumeItfImpl_Create(
 void XANokiaLinearVolumeItfImpl_Free(XANokiaLinearVolumeItfImpl* self)
     {
     DEBUG_API("->XANokiaLinearVolumeItfImpl_Free");
-    assert(self==self->self);
     free(self);
     DEBUG_API("<-XANokiaLinearVolumeItfImpl_Free");
     }
@@ -309,6 +307,10 @@ void XANokiaLinearVolumeItfImpl_AdaptCb(void *pHandlerCtx,
             impl->callback(impl->cbPtrToSelf, impl->context,
                     XA_NOKIALINEARVOLUME_EVENT_VOLUME_CHANGED, eventBoolean);
             }
+        }
+    else
+        {
+        /* do nothing */
         }
     DEBUG_API("<-XANokiaLinearVolumeItfimpl_AdaptCb");
     }

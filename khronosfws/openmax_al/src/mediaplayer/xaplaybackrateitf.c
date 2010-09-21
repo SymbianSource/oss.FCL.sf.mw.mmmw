@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "xaplaybackrateitf.h"
 
 #include "xaplaybackrateitfadaptationmmf.h"
@@ -275,7 +274,6 @@ XAPlaybackRateItfImpl* XAPlaybackRateItfImpl_Create( XAMediaPlayerImpl *impl )
 void XAPlaybackRateItfImpl_Free(XAPlaybackRateItfImpl* self)
 {
     DEBUG_API("->XAPlaybackRateItfImpl_Free");
-    assert(self==self->self);
     free(self);
     DEBUG_API("<-XAPlaybackRateItfImpl_Free");
 }

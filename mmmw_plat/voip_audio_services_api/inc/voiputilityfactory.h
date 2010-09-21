@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef __VOIPUTILITYFACTORY_H
-#define __VOIPUTILITYFACTORY_H
+#ifndef VOIPUTILITYFACTORY_H
+#define VOIPUTILITYFACTORY_H
 
 #include <voipaudiocommon.h>
 #include <voipdatabuffer.h>
@@ -32,8 +32,6 @@ class CVoIPJitterBufferIntfc;
 /**
  *  CVoIPUtilityFactory class
  *
- *  ?more_complete_description
- *
  *  @lib VoIPAudioIntfc.dll
  *
  */
@@ -42,8 +40,6 @@ class CVoIPUtilityFactory
 public:
     /**
      *  TVoIPCallType
-     *  ?description
- *
      */
     enum TVoIPCallType
         {
@@ -54,9 +50,7 @@ public:
 public:
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * CreateFactory
      * @param CVoIPUtilityFactory*&
      * @return TInt
      */
@@ -64,17 +58,13 @@ public:
 
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C ~CVoIPUtilityFactory();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * CreateDownlinkStream
      * @param TVersion
      * @param TCallType
      * @param CVoIPAudioDownlinkStream*&
@@ -84,9 +74,7 @@ public:
             const TVoIPCallType aCallType, CVoIPAudioDownlinkStream*& aDnLink);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * CreateDownlinkStream with jitter buffer management
      * @param TVersion
      * @param CVoIPJitterBufferIntfc*&
      * @param CVoIPAudioDownlinkStream*&
@@ -97,9 +85,7 @@ public:
             CVoIPAudioDownlinkStream*& aDnLink);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * CreateUplinkStream
      * @param TVersion
      * @param TCallType
      * @param CVoIPAudioUplinkStream*&
@@ -109,18 +95,14 @@ public:
             const TVoIPCallType aCallType, CVoIPAudioUplinkStream*& aUpLink);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * CreateDTMFTonePlayer
      * @param CDTMFTonePlayer*&
      * @return TInt
      */
     IMPORT_C TInt CreateDTMFTonePlayer(CDTMFTonePlayer*& aDtmfPlayer);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * CreateBuffer
      * @param CVoIPDataBuffer*&
      * @param const CVoIPDataBuffer::TVoIPBufferType
      * @param const TVoIPCodecFormat aCodecFormat - default EG711 assumes
@@ -132,9 +114,7 @@ public:
             const TVoIPCodecFormat aCodecFormat = EG711);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetSupportedDownlinkFormats
      * @param RArray<TVoIPCodecFormat>&
      * @return TInt -
      */
@@ -142,9 +122,7 @@ public:
             RArray<TVoIPCodecFormat>& aFormats);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetSupportedUplinkFormats
      * @param RArray<TVoIPCodecFormat>&
      * @return TInt -
      */
@@ -155,8 +133,6 @@ private:
 
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -164,8 +140,6 @@ private:
 
     /**
      * Symbian constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -174,9 +148,8 @@ private:
 private:
 
     CVoIPUtilityFactoryImpl* iVoIPUtilityFactoryImpl;
-
     };
 
-#endif //__VOIPUTILITYFACTORY_H
+#endif //VOIPUTILITYFACTORY_H
 
 // End of file

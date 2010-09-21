@@ -226,6 +226,10 @@ TInt CMetaDataDisplay::TestCreateUtility( CStifItemParser& /*aItem*/ )
 		{
     	iLog->Log(_L("CMetaDataDisplay::TestCreateUtility returned no error"));
     	}
+    for (TInt i=0; i < KNumMetaDataField; i++)
+        {
+        iMetaDataFieldID[i] = TMetaDataFieldId(i);
+        }
     return err;
     }
 

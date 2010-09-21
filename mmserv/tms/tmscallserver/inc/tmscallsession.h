@@ -94,6 +94,7 @@ private:
     TMSCallAdpt* iCallAdpt;
     gint iGlobalVol;
     gint iGlobalGain;
+    TMSCallType iActiveCallType;
     };
 
 } //namespace TMS

@@ -56,6 +56,8 @@ TMSAudioDtmfTonePlayer::~TMSAudioDtmfTonePlayer()
     TRACE_PRN_FN_ENT;
     Cancel();
     delete iDTMFPlayer;
+    // Release memory and close handles to unused plug-ins held by the DevSound
+    REComSession::FinalClose();
     TRACE_PRN_FN_EXT;
     }
 

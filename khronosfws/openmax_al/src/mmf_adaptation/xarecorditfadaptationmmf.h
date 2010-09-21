@@ -30,7 +30,7 @@ static const char* recordstatenamesmmf[3] =
             "XA_RECORDSTATE_PAUSED",
             "XA_RECORDSTATE_RECORDING",
     };
-#define RECORDSTATENAME(i) ((i>0&&i<4)?recordstatenamesmmf[i-1]:"INVALID")
+#define RECORDSTATENAMEMMF(i) ((i>0&&i<4)?recordstatenamesmmf[i-1]:"INVALID")
 #endif /*_DEBUG*/
 
 /*forward declaration of position updater callback*/

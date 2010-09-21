@@ -99,7 +99,7 @@ XAresult XACommon_CheckDataSource(XADataSource* source, XAMediaType* type)
             FILE* file = fopen((char*) fname, "r");
             if (!file)
                 {
-                DEBUG_INFO_A1("%s not found from filesystem", fname);
+                DEBUG_INFO_A1_STR("%s not found from filesystem", (char *)fname);
                 ret = XA_RESULT_CONTENT_NOT_FOUND;
                 }
             else
@@ -251,7 +251,7 @@ XAresult XACommon_ValidateDataLocator(XAuint32 pCounter, void* pSnk, ...)
         if (counter > 0)
             {
             /*XADataSink and XADataSrc are equivalent, use XADataSink for both*/
-xaSnk            = va_arg(argptr, XADataSink*);
+            xaSnk = va_arg(argptr, XADataSink*);
             }
         if( !xaSnk )
             { /*NULL sinks/sources are possible, not checked here*/
@@ -269,63 +269,63 @@ xaSnk            = va_arg(argptr, XADataSink*);
         switch ( *(XAuint32*)(xaSnk->pLocator) )
             {
             case XA_DEFAULTDEVICEID_AUDIOOUTPUT:
-            DEBUG_INFO("XA_DEFAULTDEVICEID_AUDIOOUTPUT");
-            uri = (XADataLocator_URI*)xaSnk->pLocator;
-            break;
+                DEBUG_INFO("XA_DEFAULTDEVICEID_AUDIOOUTPUT");
+                uri = (XADataLocator_URI*)xaSnk->pLocator;
+                break;
             case XA_DATALOCATOR_URI:
-            DEBUG_INFO("XA_DATALOCATOR_URI");
-            uri = (XADataLocator_URI*)xaSnk->pLocator;
-            if( !uri->URI && !xaSnk->pFormat )
-                {
-                DEBUG_ERR("Invalid parameter set for uri ");
-                ret = XA_RESULT_PARAMETER_INVALID;
-                }
-            break;
-            case XA_DATALOCATOR_NATIVEDISPLAY:
-            DEBUG_INFO("Sink locator type - XA_DATALOCATOR_NATIVEDISPLAY");
-            display = (XADataLocator_NativeDisplay*)(xaSnk->pLocator);
-            if( !display->hDisplay || !display->hWindow )
-                {
-                /*No action at this time*/
-                DEBUG_INFO("Warning - no display or window handle set");
-                }
-            break;
-            case XA_DATALOCATOR_OUTPUTMIX:
-            DEBUG_INFO("Sink locator type - XA_DATALOCATOR_OUTPUTMIX");
-                {
-                omix = (XADataLocator_OutputMix*)(xaSnk->pLocator);
-                if ( !omix->outputMix )
+                DEBUG_INFO("XA_DATALOCATOR_URI");
+                uri = (XADataLocator_URI*)xaSnk->pLocator;
+                if( !uri->URI && !xaSnk->pFormat )
                     {
-                    DEBUG_ERR("Invalid parameter set for outputmix");
+                    DEBUG_ERR("Invalid parameter set for uri ");
                     ret = XA_RESULT_PARAMETER_INVALID;
                     }
-                }
-            break;
+                break;
+            case XA_DATALOCATOR_NATIVEDISPLAY:
+                DEBUG_INFO("Sink locator type - XA_DATALOCATOR_NATIVEDISPLAY");
+                display = (XADataLocator_NativeDisplay*)(xaSnk->pLocator);
+                if( !display->hDisplay || !display->hWindow )
+                    {
+                    /*No action at this time*/
+                    DEBUG_INFO("Warning - no display or window handle set");
+                    }
+                break;
+            case XA_DATALOCATOR_OUTPUTMIX:
+                DEBUG_INFO("Sink locator type - XA_DATALOCATOR_OUTPUTMIX");
+                    {
+                    omix = (XADataLocator_OutputMix*)(xaSnk->pLocator);
+                    if ( !omix->outputMix )
+                        {
+                        DEBUG_ERR("Invalid parameter set for outputmix");
+                        ret = XA_RESULT_PARAMETER_INVALID;
+                        }
+                    }
+                break;
             case XA_DATALOCATOR_ADDRESS:
-            DEBUG_INFO("XA_DATALOCATOR_ADDRESS");
-            address = (XADataLocator_Address*)(xaSnk->pLocator);
-            if( !address->pAddress && !xaSnk->pFormat )
-                {
-                DEBUG_ERR("Invalid parameter set for address");
-                ret = XA_RESULT_PARAMETER_INVALID;
-                }
-            break;
+                DEBUG_INFO("XA_DATALOCATOR_ADDRESS");
+                address = (XADataLocator_Address*)(xaSnk->pLocator);
+                if( !address->pAddress && !xaSnk->pFormat )
+                    {
+                    DEBUG_ERR("Invalid parameter set for address");
+                    ret = XA_RESULT_PARAMETER_INVALID;
+                    }
+                break;
             case XA_DATALOCATOR_IODEVICE:
-            DEBUG_INFO("XA_DATALOCATOR_IODEVICE");
-            iodevice = (XADataLocator_IODevice*)(xaSnk->pLocator);
-            if( iodevice->device )
-                {
-                DEBUG_INFO("Media object as IODevice");
-                }
-            else
-                {
-                DEBUG_INFO("Iodevice id used");
-                }
-            break;
+                DEBUG_INFO("XA_DATALOCATOR_IODEVICE");
+                iodevice = (XADataLocator_IODevice*)(xaSnk->pLocator);
+                if( iodevice->device )
+                    {
+                    DEBUG_INFO("Media object as IODevice");
+                    }
+                else
+                    {
+                    DEBUG_INFO("Iodevice id used");
+                    }
+                break;
             default:
-            DEBUG_ERR("Incorrect data locator for sink.")
-            ret = XA_RESULT_PARAMETER_INVALID;
-            break;
+                DEBUG_ERR("Incorrect data locator for sink.");
+                ret = XA_RESULT_PARAMETER_INVALID;
+                break;
             }
         counter ++;
         }

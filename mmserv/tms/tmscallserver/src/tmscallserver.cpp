@@ -138,4 +138,25 @@ CSession2* TMSCallServer::NewSessionL(const TVersion& aVersion,
     return session;
     }
 
+// -----------------------------------------------------------------------------
+// TMSCallServer::TerminateServer
+//
+// -----------------------------------------------------------------------------
+//
+void TMSCallServer::TerminateServer()
+    {
+    TMSCallSession *session;
+    iSessionIter.SetToFirst();
+
+    for (;;)
+        {
+        session = static_cast<TMSCallSession*>(iSessionIter++);
+        if (!session)
+            {
+            break;
+            }
+        delete session;
+        }
+    }
+
 // End of file
