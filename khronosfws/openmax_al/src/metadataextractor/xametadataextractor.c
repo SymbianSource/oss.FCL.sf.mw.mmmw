@@ -17,12 +17,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "xametadataextractor.h"
 #include "xadynamicsourceitf.h"
 #include "xadynintmgmtitf.h"
 #include "xametadataextractionitf.h"
-#include "xaconfigextensionsitf.h"
 
 #include "xacapabilitiesmgr.h"
 #include "xathreadsafety.h"
@@ -36,7 +34,6 @@ static const XAInterfaceID* xaMetadataExtractorItfIIDs[MDE_ITFCOUNT] =
     &XA_IID_OBJECT,
     &XA_IID_DYNAMICINTERFACEMANAGEMENT,
     &XA_IID_METADATAEXTRACTION,
-    &XA_IID_CONFIGEXTENSION,
     &XA_IID_DYNAMICSOURCE
     };
 
@@ -140,9 +137,6 @@ XAresult XAMetadataExtractorImpl_Create(FrameworkMap* mapper,
         }
 
     // Mark interfaces that can be handled dynamically 
-    pBaseObj->interfaceMap[MDE_CONFIGEXTENSIONITF].isDynamic
-            = XA_BOOLEAN_TRUE;
-
     //Set ObjectItf to point to newly created object 
     *pMetadataExtractor = (XAObjectItf) &(pBaseObj->self);
 
@@ -280,11 +274,6 @@ XAresult XAMetadataExtractorImpl_DoRealize(XAObjectItf self)
                     pItf = XAMetadataExtractionItfImpl_Create(
                             pObjImpl->curAdaptCtx);
                     break;
-                case MDE_CONFIGEXTENSIONITF:
-                    pItf = XAConfigExtensionsItfImpl_Create();
-                    XAConfigExtensionsItfImpl_SetContext(pItf,
-                            pObjImpl->curAdaptCtx);
-                    break;
                 case MDE_DYNAMICSOURCEITF:
                     pItf = XADynamicSourceItfImpl_Create(
                             pObjImpl->curAdaptCtx);
@@ -353,8 +342,6 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
     DEBUG_API("->XAMetadataExtractorImpl_FreeResources");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS(XATSMediaPlayer);
 
-    assert( pObj && pImpl && pObj == pObj->self );
-
     for (itfIdx = 0; itfIdx < MDE_ITFCOUNT; itfIdx++)
         {
         pItf = pObj->interfaceMap[itfIdx].pItf;
@@ -370,9 +357,6 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
                     break;
                 case MDE_DIMITF:
                     XADIMItfImpl_Free(pItf);
-                    break;
-                case MDE_CONFIGEXTENSIONITF:
-                    XAConfigExtensionsItfImpl_Free(pItf);
                     break;
                 }
             pObj->interfaceMap[itfIdx].pItf = NULL;
@@ -406,10 +390,6 @@ void XAMetadataExtractorImpl_FreeResources(XAObjectItf self)
 XAresult XAMetadataExtractorImpl_DoAddItf(XAObjectItf self,
         XAObjItfMapEntry *mapEntry)
     {
-
-    XAObjectItfImpl* pObj = (XAObjectItfImpl*) (*self);
-    XAMetadataExtractorImpl* pImpl = (XAMetadataExtractorImpl*) (pObj);
-
     XAresult ret = XA_RESULT_SUCCESS;
     DEBUG_API("->XAMetadataExtractorImpl_DoAddItf");
 
@@ -417,13 +397,6 @@ XAresult XAMetadataExtractorImpl_DoAddItf(XAObjectItf self,
         {
         switch (mapEntry->mapIdx)
             {
-            case MDE_CONFIGEXTENSIONITF:
-                mapEntry->pItf = XAConfigExtensionsItfImpl_Create();
-
-                XAConfigExtensionsItfImpl_SetContext(mapEntry->pItf,
-                        pImpl->adaptationCtxGst);
-
-                break;
             default:
                 DEBUG_ERR("XAMetadataExtractorImpl_DoAddItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
@@ -471,9 +444,6 @@ XAresult XAMetadataExtractorImpl_DoRemoveItf(XAObjectItf self,
         {
         switch (mapEntry->mapIdx)
             {
-            case MDE_CONFIGEXTENSIONITF:
-                XAConfigExtensionsItfImpl_Free(mapEntry->pItf);
-                break;
             default:
                 DEBUG_ERR("XAMetadataExtractorImpl_DoRemoveItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;

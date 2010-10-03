@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Implementation of Mcc Jitterbuffer
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Implementation of Mcc Jitterbuffer
+ *
+ */
 
 // INCLUDE FILES
 #include <e32base.h>
@@ -25,14 +24,13 @@
 #include "JitterBufferObserver.h"
 #include "JitterBufferImpl.h"
 
-
 // -----------------------------------------------------------------------------
 // TJitterBufferElement::CompareSeqNum
 // Compare SequenceNumber
 // -----------------------------------------------------------------------------
 //
 TInt TJitterBufferElement::CompareSeqNum(const TJitterBufferElement& aElem1,
-                                         const TJitterBufferElement& aElem2)
+        const TJitterBufferElement& aElem2)
     {
     if (aElem1.iSequenceNumber > aElem2.iSequenceNumber)
         {
@@ -54,7 +52,7 @@ TInt TJitterBufferElement::CompareSeqNum(const TJitterBufferElement& aElem1,
 // -----------------------------------------------------------------------------
 //
 TInt TJitterBufferElement::CompareStamp(const TJitterBufferElement& aElem1,
-                                        const TJitterBufferElement& aElem2)
+        const TJitterBufferElement& aElem2)
     {
     if (aElem1.iTimeStamp > aElem2.iTimeStamp)
         {
@@ -76,10 +74,10 @@ TInt TJitterBufferElement::CompareStamp(const TJitterBufferElement& aElem1,
 // -----------------------------------------------------------------------------
 //
 CVoIPJitterBufferImpl::CVoIPJitterBufferImpl(MJitterBufferObserver* aObserver) :
-    iBufStampSorter(TLinearOrder<TJitterBufferElement>(
-                    TJitterBufferElement::CompareStamp)),
-    iBufSequenceSorter(TLinearOrder<TJitterBufferElement>(
-                    TJitterBufferElement::CompareSeqNum))
+    iBufStampSorter(TLinearOrder<TJitterBufferElement> (
+            TJitterBufferElement::CompareStamp)),
+    iBufSequenceSorter(TLinearOrder<TJitterBufferElement> (
+            TJitterBufferElement::CompareSeqNum))
     {
     iObserver = aObserver;
     iTonePlayTime.UniversalTime();
@@ -94,9 +92,9 @@ CVoIPJitterBufferImpl::CVoIPJitterBufferImpl(MJitterBufferObserver* aObserver) :
 // -----------------------------------------------------------------------------
 //
 CVoIPJitterBufferImpl* CVoIPJitterBufferImpl::NewL(
-                                              MJitterBufferObserver* aObserver)
+        MJitterBufferObserver* aObserver)
     {
-    CVoIPJitterBufferImpl* self = new(ELeave) CVoIPJitterBufferImpl(aObserver);
+    CVoIPJitterBufferImpl* self = new (ELeave) CVoIPJitterBufferImpl(aObserver);
     CleanupStack::PushL(self);
     self->ConstructL();
     CleanupStack::Pop(self);
@@ -145,7 +143,7 @@ CVoIPJitterBufferImpl::~CVoIPJitterBufferImpl()
 // -----------------------------------------------------------------------------
 //
 void CVoIPJitterBufferImpl::SetupL(const TFourCC aCodec,
-                                   const TVoIPJBConfig& aJBConfig)
+        const TVoIPJBConfig& aJBConfig)
     {
     TRACE_PRN_FN_ENT;
 
@@ -161,7 +159,7 @@ void CVoIPJitterBufferImpl::SetupL(const TFourCC aCodec,
     if (iJBConfig.iJBInactivityTimeOut)
         {
         if ((iJBConfig.iJBPlayToneFrequency > 0) &&
-            (iJBConfig.iJBPlayToneDuration > 0))
+                (iJBConfig.iJBPlayToneDuration > 0))
             {
             iPlayToneInterval = iJBConfig.iJBPlayToneTimeout;
             iPlay = ETrue;
@@ -180,7 +178,7 @@ void CVoIPJitterBufferImpl::SetupL(const TFourCC aCodec,
         // G.711 is configured dynamically. Take voip headerlength also into
         // account. G.711 hwframetime is in milliseconds, so need to multiply.
         iFrameSize = (iJBConfig.iSampleInterval * KDefaultSampleRateInkHz) +
-                     KVoIPHeaderLength;
+                KVoIPHeaderLength;
         iSampleInterval = 0;
 
         // In case of G.711 codec dynamic configuration, we may need to double
@@ -230,12 +228,12 @@ void CVoIPJitterBufferImpl::SetupL(const TFourCC aCodec,
 
     // Calculate needed elements
     iBufferLength = iJBConfig.iJBBufferLength * bufLenMultiplier;
-    
+
     if (iJBConfig.iJBThreshold >= iBufferLength)
-    	{
-    	// adjust threshold size (no need to leave here)
-    	iJBConfig.iJBThreshold = iBufferLength / 2;
-    	}
+        {
+        // adjust threshold size (no need to leave here)
+        iJBConfig.iJBThreshold = iBufferLength / 2;
+        }
 
     // If the difference between buffer length and threshold is less than 10
     // increase buffer length, so the differences is 10. This helps handle
@@ -284,7 +282,6 @@ void CVoIPJitterBufferImpl::SetupL(const TFourCC aCodec,
 // Reset Jitter Buffer
 // -----------------------------------------------------------------------------
 //
-
 void CVoIPJitterBufferImpl::ResetBuffer(TBool aPlayTone)
     {
     TRACE_PRN_FN_ENT;
@@ -320,7 +317,7 @@ void CVoIPJitterBufferImpl::DelayUpL()
     newElement.iTimeStamp = -1;
     iBuffer.AppendL(newElement);
     CleanupStack::Pop(buf);
-    
+
     iBufferLength++;
 
     // Insert one NO_DATA frame into the audio stream, so the jitterbuffer has
@@ -437,6 +434,7 @@ void CVoIPJitterBufferImpl::DelayDownL()
     TRACE_PRN_FN_EXT;
     }
 
+#ifdef __FEATURE_NOT_SUPPORTED__
 // -----------------------------------------------------------------------------
 // CVoIPJitterBufferImpl::CalculateDelay
 // Calculates the current jitter buffer playback
@@ -444,13 +442,14 @@ void CVoIPJitterBufferImpl::DelayDownL()
 //
 TTimeIntervalMicroSeconds32 CVoIPJitterBufferImpl::CalculateDelay() const
     {
-    TTimeIntervalMicroSeconds32 delay =
-                                iJBConfig.iJitterLatency * iPacketsInBuffer;
+    TTimeIntervalMicroSeconds32 delay = iJBConfig.iJitterLatency *
+            iPacketsInBuffer;
 
-//    TRACE_PRN_N1(_L("JB-CalculateDelay-> Delay [%d]"), delay);
+    //TRACE_PRN_N1(_L("JB-CalculateDelay-> Delay [%d]"), delay);
 
     return delay;
     }
+#endif //__FEATURE_NOT_SUPPORTED__
 
 // -----------------------------------------------------------------------------
 // CVoIPJitterBufferImpl::AddDataFrame
@@ -489,18 +488,18 @@ TInt CVoIPJitterBufferImpl::AddDataFrame(CMMFBuffer* aDataBuffer)
     //
 
     TUint index = FindLargestSeqNum();
-        
+
     if (iLastPlayedSeqNum < KMaxSeqNumber - iSeqNumIncrement)
         {
         iIsWrappedAround = IsSeqNumWrappedAround(iLargestSeqNum,
-                                                 iCurrentSeqNum);    
+                iCurrentSeqNum);
         }
     else
         {
         // If the last played frame was larger than the current largest
         // in JB we are most likely running in the wrap-around mode.
         iIsWrappedAround = IsSeqNumWrappedAround(iLastPlayedSeqNum,
-                                                 iLargestSeqNum);
+                iLargestSeqNum);
         }
 
     if (iIsWrappedAround)
@@ -513,7 +512,7 @@ TInt CVoIPJitterBufferImpl::AddDataFrame(CMMFBuffer* aDataBuffer)
     TRACE_PRN_N1(_L("JB-> [ADD] LAST PLAYED [%d]"), TInt32(iLastPlayedSeqNum));
     TRACE_PRN_N1(_L("JB-> [ADD] PACKETS [%d]"), iPacketsInBuffer);
 
-    iDataBuffer = static_cast<CMMFDataBuffer*>(aDataBuffer);
+    iDataBuffer = static_cast<CMMFDataBuffer*> (aDataBuffer);
 
     if (iCurrentSeqNum > iLastPlayedSeqNum)
         {
@@ -561,8 +560,8 @@ TInt CVoIPJitterBufferImpl::AddDataFrame(CMMFBuffer* aDataBuffer)
                 TRACE_PRN_N1(_L("JB-> [ADD] Interval Tm [%d]"), interval.Int());
                 }
 
-            // No point to run at 0 threshold; restore the original 
-            // settings and rebuffer. 
+            // No point to run at 0 threshold; restore the original
+            // settings and rebuffer.
             iCurrentPlayThreshold = iOriginalPlayThreshold;
 
             const TInt64 nextGetSeqNum(iLastPlayedSeqNum + iSeqNumIncrement);
@@ -596,7 +595,7 @@ TInt CVoIPJitterBufferImpl::AddDataFrame(CMMFBuffer* aDataBuffer)
         aDataBuffer->SetStatus(EAvailable);
         TRACE_PRN_N(_L("JB-> [ADD] TOO LATE"));
         }
-    
+
     return KErrNone;
     }
 
@@ -612,7 +611,7 @@ TInt CVoIPJitterBufferImpl::GetDataFrame(CMMFBuffer* aBuffer)
         return KErrNotReady;
         }
 
-    iDataBuffer = static_cast<CMMFDataBuffer*>(aBuffer);
+    iDataBuffer = static_cast<CMMFDataBuffer*> (aBuffer);
     TDes8& playBuffer(iDataBuffer->Data());
     iFramesPlayed++;
 
@@ -623,8 +622,9 @@ TInt CVoIPJitterBufferImpl::GetDataFrame(CMMFBuffer* aBuffer)
         // the CN generator will do the error concealment.
         TRACE_PRN_N(_L("JB-> [GET] BUFFER EMPTY"));
 
-        iCNGenerator->GenerateSidPacket(playBuffer, iDataBuffer->RequestSize());
-        
+        iCNGenerator->GenerateSidPacket(playBuffer,
+                iDataBuffer->RequestSize());
+
         // Used for talkburst; when talk-burst is over, reset buffer
         // and sequence number
         if (iJBConfig.iJBInactivityTimeOut > 0 && iInactivityTime >= 0)
@@ -635,7 +635,7 @@ TInt CVoIPJitterBufferImpl::GetDataFrame(CMMFBuffer* aBuffer)
             if (iInactivityTime >= iJBConfig.iJBInactivityTimeOut)
                 {
                 TRACE_PRN_N1(_L("JB-> [GET] Inactivity Time Detected [%d]"),
-                             iInactivityTime);
+                        iInactivityTime);
                 iInactivityTime = -1;
                 ResetBuffer();
                 }
@@ -649,7 +649,7 @@ TInt CVoIPJitterBufferImpl::GetDataFrame(CMMFBuffer* aBuffer)
             // Give comfort noise when we are buffering before playback starts
             TRACE_PRN_N(_L("JB-> [GET] THRESHOLD NOT REACHED"));
             iCNGenerator->GenerateSidPacket(playBuffer,
-                                            iDataBuffer->RequestSize());
+                    iDataBuffer->RequestSize());
             }
         else
             {
@@ -660,29 +660,30 @@ TInt CVoIPJitterBufferImpl::GetDataFrame(CMMFBuffer* aBuffer)
             iCurrentPlayThreshold = 0;
 
             // The actual sequence number which is in the buffer
-//            const TInt64 frameToPlay(
-//                         iBuffer[iPacketsInBuffer - 1].iSequenceNumber);
+            //const TInt64 frameToPlay(
+            //iBuffer[iPacketsInBuffer - 1].iSequenceNumber);
 
             TRACE_PRN_N1(_L("JB-> [GET] FRAME TO PLAY [%d]"),
-                         TInt32(iBuffer[iPacketsInBuffer - 1].iSequenceNumber));
+                    TInt32(iBuffer[iPacketsInBuffer - 1].iSequenceNumber));
             TRACE_PRN_N1(_L("JB-> [GET] LAST PLAYED   [%d]"),
-                         TInt32(iLastPlayedSeqNum));
+                    TInt32(iLastPlayedSeqNum));
             TRACE_PRN_N1(_L("JB-> [GET] PACKETS [%d]"), iPacketsInBuffer);
 
             // Get next in order frame to play
             TJitterBufferElement& jbElement = iBuffer[iPacketsInBuffer - 1];
 
-            if (playBuffer.MaxLength() >= jbElement.iDataFrame->Data().Length())
+            if (playBuffer.MaxLength() >=
+                    jbElement.iDataFrame->Data().Length())
                 {
                 playBuffer.Copy(jbElement.iDataFrame->Data());
                 }
             else
                 {
                 TRACE_PRN_N1(_L("JB-> [GET] ERROR: BUFFER TOO SMALL [%d]"),
-                             playBuffer.MaxLength());
+                        playBuffer.MaxLength());
 
                 iCNGenerator->GenerateSidPacket(playBuffer,
-                                                iDataBuffer->RequestSize());
+                        iDataBuffer->RequestSize());
                 }
 
             iLastPlayedSeqNum = jbElement.iSequenceNumber;
@@ -693,11 +694,13 @@ TInt CVoIPJitterBufferImpl::GetDataFrame(CMMFBuffer* aBuffer)
             // Reset inactivity timeout timer
             iInactivityTime = 0;
 
+#ifdef __FEATURE_NOT_SUPPORTED__
             // Try to lead new buffer to DTX period
             iCNGenerator->DoDtxDecision(playBuffer);
+#endif //__FEATURE_NOT_SUPPORTED__
             }
         }
-    
+
     return KErrNone;
     }
 
@@ -732,11 +735,9 @@ TUint CVoIPJitterBufferImpl::FindLargestSeqNum()
 // -----------------------------------------------------------------------------
 //
 void CVoIPJitterBufferImpl::InsertBufferElement(const TDesC8& aBuffer,
-                                                TInt64 aLargestSeqNum)
+        TInt64 aLargestSeqNum)
     {
-//    TRACE_PRN_FN_ENT;
-
-/*    if (aBuffer.Length() == 0 || aBuffer.Length() > iFrameSize)
+    /* if (aBuffer.Length() == 0 || aBuffer.Length() > iFrameSize)
         {
         TRACE_PRN_N(_L("JB->INVALID DATA, IGNORING"));
         return;
@@ -746,8 +747,8 @@ void CVoIPJitterBufferImpl::InsertBufferElement(const TDesC8& aBuffer,
 
     if (iIsWrappedAround)
         {
-        iBuffer[len-1].iDataFrame->Data().Copy(aBuffer);
-        iBuffer[len-1].iSequenceNumber = iCurrentSeqNum;
+        iBuffer[len - 1].iDataFrame->Data().Copy(aBuffer);
+        iBuffer[len - 1].iSequenceNumber = iCurrentSeqNum;
 
         for (TInt i = 0; i < len; i++)
             {
@@ -757,21 +758,19 @@ void CVoIPJitterBufferImpl::InsertBufferElement(const TDesC8& aBuffer,
                 }
             }
 
-        iBuffer[len-1].iTimeStamp = aLargestSeqNum + 1;
+        iBuffer[len - 1].iTimeStamp = aLargestSeqNum + 1;
         iBuffer.Sort(iBufStampSorter);
         iLastPlayedSeqNum = -1;
         }
     else
         {
-        iBuffer[len-1].iDataFrame->Data().Copy(aBuffer);
-        iBuffer[len-1].iSequenceNumber = iCurrentSeqNum;
-        iBuffer[len-1].iTimeStamp = iCurrentSeqNum - BufferLength();
+        iBuffer[len - 1].iDataFrame->Data().Copy(aBuffer);
+        iBuffer[len - 1].iSequenceNumber = iCurrentSeqNum;
+        iBuffer[len - 1].iTimeStamp = iCurrentSeqNum - BufferLength();
         iBuffer.Sort(iBufSequenceSorter);
         }
 
     iPacketsInBuffer++;
-
-//    TRACE_PRN_FN_EXT;
     }
 
 // -----------------------------------------------------------------------------
@@ -784,6 +783,7 @@ TInt CVoIPJitterBufferImpl::BufferLength() const
     return iBufferLength;
     }
 
+#ifdef __FEATURE_NOT_SUPPORTED__
 // -----------------------------------------------------------------------------
 // CVoIPJitterBufferImpl::PacketCount()
 // Return number of packets that are currently in the buffer.
@@ -793,6 +793,7 @@ TInt CVoIPJitterBufferImpl::PacketCount() const
     {
     return iPacketsInBuffer;
     }
+#endif //__FEATURE_NOT_SUPPORTED__
 
 // -----------------------------------------------------------------------------
 // CVoIPJitterBufferImpl::IsFull()
@@ -826,12 +827,12 @@ TBool CVoIPJitterBufferImpl::IsEmpty() const
 // -----------------------------------------------------------------------------
 //
 TBool CVoIPJitterBufferImpl::IsSeqNumWrappedAround(TInt64 aSeqNum1,
-                                                   TInt64 aSeqNum2) const
+        TInt64 aSeqNum2) const
     {
     TBool status = EFalse;
 
     if (aSeqNum1 >= (KMaxSeqNumber - iSeqNumIncrement) &&
-        aSeqNum2 <= (iBufferLength * iSeqNumIncrement))
+            aSeqNum2 <= (iBufferLength * iSeqNumIncrement))
         {
         TRACE_PRN_N(_L("JB-> SEQUENCE WRAPPED-AROUND"));
         status = ETrue;
@@ -840,28 +841,30 @@ TBool CVoIPJitterBufferImpl::IsSeqNumWrappedAround(TInt64 aSeqNum1,
     return status;
     }
 
+#ifdef __FEATURE_NOT_SUPPORTED__
 // -----------------------------------------------------------------------------
 // CVoIPJitterBufferImpl::GenerateStatistics
 // Generates the statistics from the jitterbuffer
 // -----------------------------------------------------------------------------
 //
 void CVoIPJitterBufferImpl::GenerateStatistics(/*TJBStats& aStats*/) const
-    {/*
+    {
     aStats.iFramesReceived = iFramesReceived;
     aStats.iBufferLength = iBufferLength;
     aStats.iFramesInBuffer = iPacketsInBuffer;
     aStats.iFrameLoss = iFramesLost;
     aStats.iLateFrames = iNumOfLateFrames;
     aStats.iFramesRemoved = iFramesRemoved;
-    aStats.iFramesPlayed = iFramesPlayed;*/
+    aStats.iFramesPlayed = iFramesPlayed;
     }
+#endif //__FEATURE_NOT_SUPPORTED__
 
 // -----------------------------------------------------------------------------
 // CVoIPJitterBufferImpl::CheckThresholdBufferLength
 // -----------------------------------------------------------------------------
 //
 void CVoIPJitterBufferImpl::CheckThresholdBufferLength(TInt& aBufferLength,
-                                                       TInt aTreshhold) const
+        TInt aTreshhold) const
     {
     const TInt numTen = 10;
 
@@ -870,7 +873,6 @@ void CVoIPJitterBufferImpl::CheckThresholdBufferLength(TInt& aBufferLength,
         aBufferLength = aTreshhold + numTen;
         }
     }
-
 
 //  End of File
 

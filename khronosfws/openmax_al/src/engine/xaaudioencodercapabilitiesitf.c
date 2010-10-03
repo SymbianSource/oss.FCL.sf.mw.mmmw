@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 
 #include "xaglobals.h"
@@ -69,8 +68,8 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoders(
             { /* query array of encoders */
             if (*pNumEncoders < impl->numCodecs)
                 {
-                DEBUG_ERR("XA_RESULT_BUFFER_INSUFFICIENT");
-                res = XA_RESULT_BUFFER_INSUFFICIENT;
+                DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+                res = XA_RESULT_PARAMETER_INVALID;
                 }
             else
                 {
@@ -85,10 +84,6 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoders(
                             &temp);
                     pEncoderIds[i] = temp.xaid;
                     }
-
-                pEncoderIds[0] = XA_AUDIOCODEC_AMR;
-                pEncoderIds[1] = XA_AUDIOCODEC_AAC;
-                pEncoderIds[2] = XA_AUDIOCODEC_PCM;
                 }
             }
 
@@ -111,6 +106,7 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
 
     XACapabilities temp;
 
+    XAint16 index;
     DEBUG_API("->XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities");
 
     /*if( !impl || !pIndex || !pDescriptor )*/
@@ -123,15 +119,19 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
         res = XA_RESULT_PARAMETER_INVALID;
         return res;
         }
-    else
+    else if(!pDescriptor)
         {
-        *pIndex = 1;
-        if (!pDescriptor)
-            {
-            return res;
-            }
-        }
+        res = XACapabilitiesMgr_GetCapsById(impl->capslist,
+                (XACapsType) (XACAP_ENCODER | XACAP_AUDIO), encoderId, &temp);
+        
+        *pIndex = temp.noOfEntries;
 
+        return res;
+
+        }
+    
+    index = *pIndex;
+    
     /* query capabilities from adaptation using codec id */
     memset(pDescriptor, 0, sizeof(XAAudioCodecDescriptor));
  
@@ -141,8 +141,23 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
         {
         XAAudioCodecDescriptor* desc =
                 ((XAAudioCodecDescriptor*) (temp.pEntry));
+        if(index >= temp.noOfEntries)
+            {
+            DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+            res = XA_RESULT_PARAMETER_INVALID;
+            return res;
+        
+            }
+        else
+            {
+            //indexing
+            desc = desc+index;
+            }
+
         /* map applicable values to XAAudioCodecCapabilities */
         pDescriptor->maxChannels = desc->maxChannels;
+        pDescriptor->minBitsPerSample = desc->minBitsPerSample;
+        pDescriptor->maxBitsPerSample = desc->maxBitsPerSample;
         pDescriptor->minSampleRate = desc->minSampleRate ; /* milliHz */
         if (desc->maxSampleRate < (0xFFFFFFFF))
             {
@@ -152,13 +167,15 @@ XAresult XAAudioEncoderCapabilitiesItfImpl_GetAudioEncoderCapabilities(
             {
             pDescriptor->maxSampleRate = 0xFFFFFFFF;
             }
-        pDescriptor->minBitsPerSample = desc->minBitsPerSample;
-        pDescriptor->maxBitsPerSample = desc->maxBitsPerSample;
+
       pDescriptor->isFreqRangeContinuous=desc->isFreqRangeContinuous;
-        pDescriptor->minBitRate = desc->minBitRate;
-        pDescriptor->maxBitRate = desc->maxBitRate;
-        pDescriptor->numBitratesSupported = desc->numBitratesSupported;
+      pDescriptor->pSampleRatesSupported = desc->pSampleRatesSupported;
+      pDescriptor->numSampleRatesSupported = desc->numSampleRatesSupported;
+      pDescriptor->minBitRate = desc->minBitRate;
+      pDescriptor->maxBitRate = desc->maxBitRate;
       pDescriptor->isBitrateRangeContinuous=desc->isBitrateRangeContinuous;
+      pDescriptor->pBitratesSupported = desc->pBitratesSupported;
+      pDescriptor->numBitratesSupported = desc->numBitratesSupported;
       pDescriptor->profileSetting=desc->profileSetting;
       pDescriptor->modeSetting=desc->modeSetting; /* no chanmode for pcm defined */
     }
@@ -199,11 +216,12 @@ XAAudioEncoderCapabilitiesItfImpl* XAAudioEncoderCapabilitiesItfImpl_Create(
         self->capslist = caps;
 
         /* init variables */
-        assert( XACapabilitiesMgr_GetCapsCount( caps, (XACapsType)((XACapsType)(XACAP_ENCODER|XACAP_AUDIO)),
-                        &(self->numCodecs) ) == XA_RESULT_SUCCESS );
+        XACapabilitiesMgr_GetCapsCount( caps, (XACapsType)((XACapsType)(XACAP_ENCODER|XACAP_AUDIO)),
+                        &(self->numCodecs) );
 
         /*self->mmfEngine = (void*)mmf_capability_engine_init();*/
-        self->numCodecs = 3;
+        
+        //self->numCodecs = 3;
         self->self = self;
 
         }
@@ -218,7 +236,6 @@ void XAAudioEncoderCapabilitiesItfImpl_Free(
         XAAudioEncoderCapabilitiesItfImpl* self)
     {
     DEBUG_API("->XAAudioEncoderCapabilitiesItfImpl_Free");
-    assert(self==self->self);
     free(self);
     DEBUG_API("<-XAAudioEncoderCapabilitiesItfImpl_Free");
     }

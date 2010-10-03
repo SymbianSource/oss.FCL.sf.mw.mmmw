@@ -21,3 +21,10 @@ DEFAULT
 PRJ_TESTMMPFILES
 TmsAudioServicesTestClass.mmp
 
+PRJ_TESTEXPORTS
+//TmsAudioServicesTest.iby CORE_MW_LAYER_IBY_EXPORT_PATH(TmsAudioServicesTest.iby)
+//../../conf/TMSAudioServicesTestClass.cfg /epoc32/winscw/c/TestFramework/TMSAudioServicesTestClass.cfg
+//../../init/TmsAudioServicesTestClass.ini /epoc32/winscw/c/TestFramework/TmsAudioServicesTestClass.ini
+//../../init/TestFramework.ini             /epoc32/data/z/system/data/TestFramework.ini
+//../../data/test_8khz.wav   		   /epoc32/winscw/c/testing/data/test_8khz.wav
+

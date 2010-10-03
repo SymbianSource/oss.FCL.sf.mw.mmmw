@@ -1,32 +1,30 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
 #include "VoIPAudioSession.h"
 #include "VoIPUplinkStreamImpl.h"
 #include "VoIPILBCEncoderIntfcImpl.h"
-
 
 // ---------------------------------------------------------------------------
 // CVoIPILBCEncoderIntfcImpl::NewL
 // ---------------------------------------------------------------------------
 //
 CVoIPILBCEncoderIntfcImpl* CVoIPILBCEncoderIntfcImpl::NewL(
-                           CVoIPAudioUplinkStreamImpl* aUpLinkStreamImpl)
+        CVoIPAudioUplinkStreamImpl* aUpLinkStreamImpl)
     {
     CVoIPILBCEncoderIntfcImpl* self = new (ELeave) CVoIPILBCEncoderIntfcImpl();
     CleanupStack::PushL(self);
@@ -56,7 +54,7 @@ CVoIPILBCEncoderIntfcImpl::CVoIPILBCEncoderIntfcImpl()
 // ---------------------------------------------------------------------------
 //
 void CVoIPILBCEncoderIntfcImpl::ConstructL(
-    CVoIPAudioUplinkStreamImpl* aUpLinkStreamImpl)
+        CVoIPAudioUplinkStreamImpl* aUpLinkStreamImpl)
     {
     iVoIPAudioSession = aUpLinkStreamImpl->GetSession();
     CVoIPFormatIntfcImpl::ConstructL(iVoIPAudioSession);
@@ -82,6 +80,5 @@ TInt CVoIPILBCEncoderIntfcImpl::GetMode(TILBCCodecMode& aMode)
     TInt err = iVoIPAudioSession->GetMode(aMode);
     return err;
     }
-
 
 // End of file

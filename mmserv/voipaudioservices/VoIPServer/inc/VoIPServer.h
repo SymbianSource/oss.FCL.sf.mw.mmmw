@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPAUDIOSERVER_H
-#define __VOIPAUDIOSERVER_H
+#ifndef VOIPAUDIOSERVER_H
+#define VOIPAUDIOSERVER_H
 
 #include <e32base.h>
 
@@ -62,6 +62,6 @@ private:
     CVoIPAudioServerSession* iUplinkSession;
     };
 
-#endif //__VOIPAUDIOSERVER_H
+#endif //VOIPAUDIOSERVER_H
 
 // End of file

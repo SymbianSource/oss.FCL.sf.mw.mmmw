@@ -61,61 +61,51 @@ public:
             const TMSStreamType strmType, const gint strmId);
     virtual gint DeleteStream(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId);
-    virtual gint DataXferBufferEmptied(const TMSCallType callType,
+
+    // From TMS effects
+    gint GetMaxVolume(guint& volume);
+    gint SetVolume(const guint volume);
+    gint GetVolume(guint& volume);
+    gint GetMaxGain(guint& gain);
+    gint SetGain(const guint gain);
+    gint GetGain(guint& gain);
+
+    // From TMS audio routing
+     virtual gint SetOutput(const TMSAudioOutput output);
+     virtual gint GetOutput(TMSAudioOutput& output);
+     virtual gint GetPreviousOutput(TMSAudioOutput& output);
+     virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuf);
+
+    gint DataXferBufferEmptied(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId);
-    virtual gint DataXferBufferFilled(const TMSCallType callType,
+    gint DataXferBufferFilled(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId,
             const guint datasize);
-    virtual gint GetDataXferBufferHndl(const TMSCallType callType,
+    gint GetDataXferBufferHndl(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId,
             const guint32 key, RChunk& chunk);
 
-    // From TMS effects
-    virtual gint GetMaxVolume(guint& volume);
-    virtual gint SetVolume(const guint volume);
-    virtual gint GetVolume(guint& volume);
-    virtual gint GetMaxGain(guint& gain);
-    virtual gint SetGain(const guint gain);
-    virtual gint GetGain(guint& gain);
-    virtual gint GetGlobalMaxVolume(guint& volume);
-    virtual gint SetGlobalVolume(const guint volume);
-    virtual gint GetGlobalVolume(guint& volume);
-    virtual gint GetGlobalMaxGain(guint& gain);
-    virtual gint SetGlobalGain(const guint gain);
-    virtual gint GetGlobalGain(guint& gain);
-
     // From TMS formats
-    virtual gint GetCodecMode(const TMSFormatType fmttype,
+    gint GetCodecMode(const TMSFormatType fmttype,
             const TMSStreamType strmtype, gint& mode);
-    virtual gint SetCodecMode(const TMSFormatType fmttype,
+    gint SetCodecMode(const TMSFormatType fmttype,
             const TMSStreamType strmtype, const gint mode);
-    virtual gint GetSupportedBitRatesCount(guint& count);
-    virtual gint GetSupportedBitRates(CBufFlat*& brbuffer);
-    virtual gint GetBitRate(guint& bitrate);
-    virtual gint SetBitRate(const guint bitrate);
-    virtual gint GetVAD(const TMSFormatType fmttype, gboolean& vad);
-    virtual gint SetVAD(const TMSFormatType fmttype, const gboolean vad);
-    virtual gint GetCNG(const TMSFormatType fmttype, gboolean& cng);
-    virtual gint SetCNG(const TMSFormatType fmttype, const gboolean cng);
-    virtual gint GetPlc(const TMSFormatType fmttype, gboolean& plc);
-    virtual gint SetPlc(const TMSFormatType fmttype, const gboolean plc);
-
-    // From TMS audio routing
-    virtual gint SetOutput(const TMSAudioOutput output);
-    virtual gint GetOutput(TMSAudioOutput& output);
-    virtual gint GetPreviousOutput(TMSAudioOutput& output);
-    virtual gint GetAvailableOutputsL(gint& count, CBufFlat*& outputsbuf);
+    gint GetSupportedBitRatesCount(guint& count);
+    gint GetSupportedBitRates(CBufFlat*& brbuffer);
+    gint GetBitRate(guint& bitrate);
+    gint SetBitRate(const guint bitrate);
+    gint GetVAD(const TMSFormatType fmttype, gboolean& vad);
+    gint SetVAD(const TMSFormatType fmttype, const gboolean vad);
+    gint GetCNG(const TMSFormatType fmttype, gboolean& cng);
+    gint SetCNG(const TMSFormatType fmttype, const gboolean cng);
+    gint GetPlc(const TMSFormatType fmttype, gboolean& plc);
+    gint SetPlc(const TMSFormatType fmttype, const gboolean plc);
 
     // From TMS codec formats
     gint SetIlbcCodecMode(const gint mode, const TMSStreamType strmtype);
     gint GetIlbcCodecMode(gint& mode, const TMSStreamType strmtype);
     gint SetG711CodecMode(const gint mode, const TMSStreamType strmtype);
     gint GetG711CodecMode(gint& mode, const TMSStreamType strmtype);
-    gint FrameModeRqrdForEC(gboolean& frmodereq);
-    gint SetFrameMode(const gboolean frmode);
-    gint GetFrameMode(gboolean& frmode);
-    gint ConcealErrorForNextBuffer();
-    gint BadLsfNextBuffer();
 
     void SetFormat(const gint strmId, const guint32 aFormat);
 

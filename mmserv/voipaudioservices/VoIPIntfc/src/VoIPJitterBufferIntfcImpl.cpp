@@ -1,35 +1,33 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
 #include <e32base.h>
 #include "VoIPAudioSession.h"
 #include "VoIPJitterBufferIntfcImpl.h"
-
 
 // ---------------------------------------------------------------------------
 // CVoIPJitterBufferIntfcImpl::NewL
 // ---------------------------------------------------------------------------
 //
 CVoIPJitterBufferIntfcImpl* CVoIPJitterBufferIntfcImpl::NewL(
-    RVoIPAudioSession* aVoIPAudioSession)
+        RVoIPAudioSession* aVoIPAudioSession)
     {
     CVoIPJitterBufferIntfcImpl* self =
-                                new (ELeave) CVoIPJitterBufferIntfcImpl();
+            new (ELeave) CVoIPJitterBufferIntfcImpl();
     CleanupStack::PushL(self);
     self->ConstructL(aVoIPAudioSession);
     CleanupStack::Pop(self);
@@ -57,7 +55,7 @@ CVoIPJitterBufferIntfcImpl::CVoIPJitterBufferIntfcImpl()
 // ---------------------------------------------------------------------------
 //
 void CVoIPJitterBufferIntfcImpl::ConstructL(
-                                 RVoIPAudioSession* aVoIPAudioSession)
+        RVoIPAudioSession* aVoIPAudioSession)
     {
     CVoIPJitterBufferIntfc::ConstructL(this);
     iVoIPAudioSession = aVoIPAudioSession;
@@ -68,7 +66,7 @@ void CVoIPJitterBufferIntfcImpl::ConstructL(
 // ---------------------------------------------------------------------------
 //
 TInt CVoIPJitterBufferIntfcImpl::SetObserver(
-                                 MVoIPJitterBufferObserver& aObserver)
+        MVoIPJitterBufferObserver& aObserver)
     {
     iObserver = &aObserver;
     return KErrNone;
@@ -79,7 +77,7 @@ TInt CVoIPJitterBufferIntfcImpl::SetObserver(
 // ---------------------------------------------------------------------------
 //
 TInt CVoIPJitterBufferIntfcImpl::ConfigureJitterBuffer(
-                                 const TVoIPJBConfig& aJbConfig)
+        const TVoIPJBConfig& aJbConfig)
     {
     TInt err = iVoIPAudioSession->ConfigureJitterBuffer(aJbConfig);
     return err;
@@ -115,6 +113,7 @@ TInt CVoIPJitterBufferIntfcImpl::DelayUp()
     return err;
     }
 
+#ifdef __FEATURE_NOT_SUPPORTED__
 // ---------------------------------------------------------------------------
 // CVoIPJitterBufferIntfcImpl::SendEventToObserver
 // ---------------------------------------------------------------------------
@@ -123,5 +122,7 @@ void CVoIPJitterBufferIntfcImpl::SendEventToObserver(TInt aEvent)
     {
     iObserver->Event(*this, aEvent);
     }
+#endif //__FEATURE_NOT_SUPPORTED__
+
 
 // End of file

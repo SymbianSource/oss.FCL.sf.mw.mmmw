@@ -56,7 +56,6 @@ SYSTEMINCLUDE 	/epoc32/include/libc
 LIBRARY         euser.lib
 LIBRARY 		efsrv.lib				// File server session for database
 LIBRARY         EStor.lib
-LIBRARY 		downloadmgr.lib
 LIBRARY 		commdb.lib
 LIBRARY			stiftestinterface.lib
 LIBRARY         EnhancedMediaClient.lib 

@@ -17,17 +17,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <string.h>
 #include "xamediarecorder.h"
 #include "xaaudioencoderitf.h"
-#include "xaconfigextensionsitf.h"
 #include "xadynintmgmtitf.h"
-#include "xametadatainsertionitf.h"
 #include "xarecorditf.h"
-#include "xavolumeitf.h"
-#include "xametadataextractionitf.h"
 #include "xathreadsafety.h"
-#include <string.h>
 #include "xacapabilitiesmgr.h"
 #include "xamediarecorderadaptctxmmf.h"
 #include "xamediarecorderadaptctx.h"
@@ -36,12 +31,8 @@ static const XAInterfaceID* xaMediaRecorderItfIIDs[MR_ITFCOUNT] =
     {
     &XA_IID_OBJECT,
     &XA_IID_AUDIOENCODER,
-    &XA_IID_CONFIGEXTENSION,
     &XA_IID_DYNAMICINTERFACEMANAGEMENT,
-    &XA_IID_METADATAINSERTION,
-    &XA_IID_RECORD,
-    &XA_IID_VOLUME,
-    &XA_IID_METADATAEXTRACTION
+    &XA_IID_RECORD
     };
 
 /* Global methods */
@@ -67,7 +58,20 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
     DEBUG_API("->XAMediaRecorderImpl_CreateMediaRecorder");
     XA_IMPL_THREAD_SAFETY_ENTRY( XATSMediaRecorder );
 
-    if (!pRecorder)
+    /* check sink&source parameters */
+    ret = XACommon_ValidateDataLocator(3, pAudioSrc, pImageVideoSrc,
+                    pDataSnk);
+    if (ret != XA_RESULT_SUCCESS)
+        {
+        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
+        DEBUG_API("<-XAMediaRecorderImpl_CreateMediaRecorder");
+        return ret;
+        }
+    
+    /* check only sink media type, do not care about return value (availability) */
+    XACommon_CheckDataSource((XADataSource*) pDataSnk, &mediaType);
+    
+    if (!pRecorder || (!pAudioSrc && !pImageVideoSrc) || !pDataSnk)
         {
         /* invalid parameter */
         XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
@@ -76,50 +80,34 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
         return XA_RESULT_PARAMETER_INVALID;
         }
 
-    /* check sink&source parameters */
-    ret
-            = XACommon_ValidateDataLocator(3, pAudioSrc, pImageVideoSrc,
-                    pDataSnk);
-    if (ret != XA_RESULT_SUCCESS)
-        {
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
-        DEBUG_API("<-XAMediaRecorderImpl_CreateMediaRecorder");
-        return ret;
-        }
-
     /* instantiate object implementation */
     pImpl = (XAMediaRecorderImpl*) calloc(1, sizeof(XAMediaRecorderImpl));
     if (!pImpl)
         {
-
         /* memory allocation failed */
         XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
         DEBUG_ERR("XA_RESULT_MEMORY_FAILURE");
         DEBUG_API("<-XAMediaRecorderImpl_CreateMediaRecorder");
         return XA_RESULT_MEMORY_FAILURE;
         }
+    
     pBaseObj = &pImpl->baseObj;
 
     /* Initialize base object default implementation */
     XAObjectItfImpl_Init(pBaseObj, MR_ITFCOUNT, xaMediaRecorderItfIIDs,
             XAMediaRecorderImpl_DoRealize, XAMediaRecorderImpl_DoResume,
             XAMediaRecorderImpl_FreeResources);
-
+        
     /* Mark interfaces that need to be exposed */
-    /* Implicit and mandated interfaces */
-    pBaseObj->interfaceMap[MR_RECORDITF].required = XA_BOOLEAN_TRUE;
-    if (pAudioSrc && mediaType != XA_MEDIATYPE_IMAGE)
-        {
-        pBaseObj->interfaceMap[MR_AUDIOENCODERITF].required = XA_BOOLEAN_TRUE;
-        }
-
+    /* Mandated Implicit interfaces */
     pBaseObj->interfaceMap[MR_DIMITF].required = XA_BOOLEAN_TRUE;
 
-    /* Explicit interfaces */
+    /* Mark interfaces that can be handled dynamically */
+    /* Mandated dynamic itfs */
+
+    /*Mandated  Explicit interfaces */
     if ((numInterfaces != 0) && pInterfaceIds && pInterfaceRequired)
         {
-        /* check only sink media type, do not care about return value (availability) */
-        XACommon_CheckDataSource((XADataSource*) pDataSnk, &mediaType);
         /* Check required interfaces */
         for (itfIdx = 0; itfIdx < numInterfaces; itfIdx++)
             {
@@ -141,50 +129,9 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
                     }
                 }
             else
-                { /* weed out unsupported content-aware itf's */
-                if ((mediaType == XA_MEDIATYPE_IMAGE || !pAudioSrc)
-                        && (entry->mapIdx == MR_VOLUMEITF || entry->mapIdx == MR_AUDIOENCODERITF))
-                    {
-                    entry->required = XA_BOOLEAN_FALSE;
-                    if (pInterfaceRequired[itfIdx])
-                        {
-                        DEBUG_ERR("Required interface not supported for given media - abort creation!");
-                        ret = XA_RESULT_FEATURE_UNSUPPORTED;
-                        break;
-                        }
-                    }
-                else
-                    {
-                    entry->required = XA_BOOLEAN_TRUE;
-                    }
-
-                if (entry->mapIdx == MR_RECORDITF)
-                    {
-                    DEBUG_ERR("RecordItf requested - support stream mode");
-                    pImpl->recModes |= XA_RECMODE_STREAM;
-                    }
+                {
+                entry->required = XA_BOOLEAN_TRUE;
                 }
-            }
-        }
-    if (pImpl->recModes == 0)
-        {
-        DEBUG_ERR("Warning!!! No recording interfaces requested - unable to record!!");
-        }
-    /*check sink and src parameters*/
-    if (ret == XA_RESULT_SUCCESS)
-        {
-        ret = XACommon_ValidateDataLocator(3, pDataSnk, pAudioSrc,
-                pImageVideoSrc);
-        /*datasink ignored if only snapshotitf is used*/
-        if (!pDataSnk && (pImpl->recModes & XA_RECMODE_STREAM))
-            {
-            DEBUG_ERR("No datasink to record to!");
-            ret = XA_RESULT_PARAMETER_INVALID;
-            }
-        if (!pAudioSrc && !pImageVideoSrc)
-            {
-            DEBUG_ERR("No data sources set!");
-            ret = XA_RESULT_PARAMETER_INVALID;
             }
         }
 
@@ -195,20 +142,17 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
         DEBUG_API("<-XAMediaRecorderImpl_CreateMediaRecorder");
         return ret;
         }
-
-    /* Mark interfaces that can be handled dynamically */
-    /* Mandated dynamic itfs */
-    pBaseObj->interfaceMap[MR_METADATAINSERTIONITF].isDynamic
-            = XA_BOOLEAN_TRUE;
-
+    
     /* Initialize XAMediaRecorderImpl variables */
     pImpl->audioSrc = pAudioSrc;
     pImpl->dataSnk = pDataSnk;
     pImpl->imageVideoSrc = pImageVideoSrc;
+    pImpl->recModes |= XA_RECMODE_STREAM;
+
     /* Determine framework type that can handle recording */
     fwType = (FWMgrFwType) FWMgrMOUnknown;
     /**/
-    if (pDataSnk && pDataSnk->pLocator)
+    if (pDataSnk->pLocator)
         {
         XADataLocator_URI* dataLoc = (XADataLocator_URI*) pDataSnk->pLocator;
         if (dataLoc->locatorType == XA_DATALOCATOR_URI)
@@ -216,34 +160,41 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
             uri = (char*) dataLoc->URI;
             }
         }
+    
     fwType = XAFrameworkMgr_GetFramework(mapper, uri, FWMgrMORecorder);
 
-    if (fwType == FWMgrMOUnknown)
+    switch(fwType)
         {
-        ret = XA_RESULT_CONTENT_UNSUPPORTED;
+        case FWMgrFWMMF:
+            {
+
+            pImpl->adaptationCtx = XAMediaRecorderAdaptMMF_Create(
+                    pImpl->audioSrc, pImpl->imageVideoSrc, pImpl->dataSnk,
+                    pImpl->recModes);
+            }
+            break;
+        case FWMgrFWGST:
+            {
+            pImpl->adaptationCtx = XAMediaRecorderAdapt_Create(pImpl->audioSrc,
+                    pImpl->imageVideoSrc, pImpl->dataSnk, pImpl->recModes);
+            break;
+            }
+        case FWMgrFWUknown:
+        default:
+            {
+            ret = XA_RESULT_CONTENT_UNSUPPORTED;
+            break;
+            }
+        }
+    
+    if (ret != XA_RESULT_SUCCESS)
+        { /* creation fails */
         XAObjectItfImpl_Destroy((XAObjectItf) &(pBaseObj));
         XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
         DEBUG_API("<-XAMediaRecorderImpl_CreateMediaRecorder");
         return ret;
         }
-
-    /* Set ObjectItf to point to newly created object */
-    *pRecorder = (XAObjectItf) &(pBaseObj->self);
-
-    if (fwType == FWMgrFWMMF)
-        {
-
-        pImpl->adaptationCtx = XAMediaRecorderAdaptMMF_Create(
-                pImpl->audioSrc, pImpl->imageVideoSrc, pImpl->dataSnk,
-                pImpl->recModes);
-        }
-    else
-        {
-
-        pImpl->adaptationCtx = XAMediaRecorderAdapt_Create(pImpl->audioSrc,
-                pImpl->imageVideoSrc, pImpl->dataSnk, pImpl->recModes);
-        }
-
+    
     if (pImpl->adaptationCtx)
         {
         pImpl->adaptationCtx->capslist = capabilities;
@@ -258,6 +209,9 @@ XAresult XAMediaRecorderImpl_CreateMediaRecorder(FrameworkMap* mapper,
         return ret;
         }
 
+    /* Set ObjectItf to point to newly created object */
+    *pRecorder = (XAObjectItf) &(pBaseObj->self);
+    
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
     DEBUG_API("<-XAMediaRecorderImpl_CreateMediaRecorder");
     return XA_RESULT_SUCCESS;
@@ -270,18 +224,9 @@ XAresult XAMediaRecorderImpl_QueryNumSupportedInterfaces(
         XAuint32 *pNumSupportedInterfaces)
     {
     DEBUG_API("->XAMediaRecorderImpl_QueryNumSupportedInterfaces");
-    if (pNumSupportedInterfaces)
-        {
-        *pNumSupportedInterfaces = MR_ITFCOUNT;
-
-        DEBUG_API("<-XAMediaRecorderImpl_QueryNumSupportedInterfaces");
-        return XA_RESULT_SUCCESS;
-        }
-    else
-        {
-        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
-        return XA_RESULT_PARAMETER_INVALID;
-        }
+    *pNumSupportedInterfaces = MR_ITFCOUNT;
+    DEBUG_API("<-XAMediaRecorderImpl_QueryNumSupportedInterfaces");
+    return XA_RESULT_SUCCESS;
     }
 /* XAResult XAMediaRecorderImpl_QuerySupportedInterfaces
  * Statically query supported interfaces
@@ -290,7 +235,7 @@ XAresult XAMediaRecorderImpl_QuerySupportedInterfaces(XAuint32 index,
         XAInterfaceID *pInterfaceId)
     {
     DEBUG_API("->XAMediaRecorderImpl_QuerySupportedInterfaces");
-    if (index >= MR_ITFCOUNT || !pInterfaceId)
+    if (index >= MR_ITFCOUNT)
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         return XA_RESULT_PARAMETER_INVALID;
@@ -298,7 +243,6 @@ XAresult XAMediaRecorderImpl_QuerySupportedInterfaces(XAuint32 index,
     else
         {
         *pInterfaceId = *(xaMediaRecorderItfIIDs[index]);
-
         DEBUG_API("<-XAMediaRecorderImpl_QuerySupportedInterfaces");
         return XA_RESULT_SUCCESS;
         }
@@ -331,25 +275,7 @@ XAresult XAMediaRecorderImpl_DoRealize(XAObjectItf self)
         XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
         return XA_RESULT_PARAMETER_INVALID;
         }
-
-    /* init adaptation */
-    if (pObjImpl->adaptationCtx->fwtype == FWMgrFWMMF)
-        {
-        ret = XAMediaRecorderAdaptMMF_PostInit(
-                (XAAdaptationMMFCtx*) pObjImpl->adaptationCtx);
-        }
-    else
-        {
-        ret = XAMediaRecorderAdapt_PostInit(
-                (XAAdaptationGstCtx*) pObjImpl->adaptationCtx);
-        }
-
-    if (ret != XA_RESULT_SUCCESS)
-        {
-        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
-        return ret;
-        }
-
+ 
     /* Realize all implicit and explicitly wanted interfaces */
     for (itfIdx = 0; itfIdx < MR_ITFCOUNT; itfIdx++)
         {
@@ -375,22 +301,6 @@ XAresult XAMediaRecorderImpl_DoRealize(XAObjectItf self)
                 case MR_AUDIOENCODERITF:
                     pItf = XAAudioEncoderItfImpl_Create(pObjImpl);
                     break;
-                case MR_METADATAINSERTIONITF:
-                    pItf = XAMetadataInsertionItfImpl_Create(pObjImpl);
-                    break;
-
-                case MR_CONFIGEXTENSIONITF:
-                    pItf = XAConfigExtensionsItfImpl_Create();
-                    XAConfigExtensionsItfImpl_SetContext(pItf,
-                            pObjImpl->adaptationCtx);
-                    break;
-                case MR_VOLUMEITF:
-                    pItf = XAVolumeItfImpl_Create(pObjImpl->adaptationCtx);
-                    break;
-                case MR_METADATAEXTRACTIONITF:
-                    pItf = XAMetadataExtractionItfImpl_Create(
-                            pObjImpl->adaptationCtx);
-                    break;
                 default:
                     break;
                 }
@@ -408,6 +318,27 @@ XAresult XAMediaRecorderImpl_DoRealize(XAObjectItf self)
             }
         }
 
+    /* init adaptation */
+    if (pObjImpl->adaptationCtx->fwtype == FWMgrFWMMF)
+        {
+        ret = XAMediaRecorderAdaptMMF_PostInit(
+                (XAAdaptationMMFCtx*) pObjImpl->adaptationCtx);
+        }
+    else
+        {
+        ret = XAMediaRecorderAdapt_PostInit(
+                (XAAdaptationGstCtx*) pObjImpl->adaptationCtx);
+        }
+
+    if (ret != XA_RESULT_SUCCESS)
+        {
+        XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
+        return ret;
+        }
+
+    XAAdaptationBase_AddEventHandler(pObjImpl->adaptationCtx,
+            &XAMediaRecorderImpl_AdaptCb, XA_OBJECTITFEVENTS, pObjImpl);
+    
     pObj->state = XA_OBJECT_STATE_REALIZED;
     DEBUG_API("<-XAMediaRecorderImpl_DoRealize");
     XA_IMPL_THREAD_SAFETY_EXIT( XATSMediaRecorder );
@@ -436,7 +367,6 @@ void XAMediaRecorderImpl_FreeResources(XAObjectItf self)
     XAMediaRecorderImpl* pImpl = (XAMediaRecorderImpl*) (*self);
     DEBUG_API("->XAMediaRecorderImpl_FreeResources");
     XA_IMPL_THREAD_SAFETY_ENTRY_FOR_VOID_FUNCTIONS( XATSMediaRecorder );
-    assert( pObj && pImpl && pObj == pObj->self );
 
     /* free all allocated interfaces */
     for (itfIdx = 0; itfIdx < MR_ITFCOUNT; itfIdx++)
@@ -449,23 +379,11 @@ void XAMediaRecorderImpl_FreeResources(XAObjectItf self)
                 case MR_AUDIOENCODERITF:
                     XAAudioEncoderItfImpl_Free(pItf);
                     break;
-                case MR_CONFIGEXTENSIONITF:
-                    XAConfigExtensionsItfImpl_Free(pItf);
-                    break;
                 case MR_DIMITF:
                     XADIMItfImpl_Free(pItf);
                     break;
-                case MR_METADATAINSERTIONITF:
-                    XAMetadataInsertionItfImpl_Free(pItf);
-                    break;
                 case MR_RECORDITF:
                     XARecordItfImpl_Free(pItf);
-                    break;
-                case MR_VOLUMEITF:
-                    XAVolumeItfImpl_Free(pItf);
-                    break;
-                case MR_METADATAEXTRACTIONITF:
-                    XAMetadataExtractionItfImpl_Free(pItf);
                     break;
                 default:
                     break;
@@ -496,6 +414,38 @@ void XAMediaRecorderImpl_FreeResources(XAObjectItf self)
     return;
     }
 
+/* void XARecordItfImpl_AdaptCb
+ * Description: Listen changes in adaptation
+ */
+void XAMediaRecorderImpl_AdaptCb(void *pHandlerCtx, XAAdaptEvent *event)
+    {
+    XAObjectItfImpl* impl = (XAObjectItfImpl*) pHandlerCtx;
+    DEBUG_API("->XAMediaRecorderImpl_AdaptCb");
+
+    if (!impl)
+        {
+        DEBUG_ERR("XAMediaRecorderImpl_AdaptCb, invalid context pointer!");
+        DEBUG_API("<-XAMediaRecorderImpl_AdaptCb");
+        return;
+        }
+
+    if(impl->callBack)
+        {
+        if(event)
+            {
+            XAObjItfCBData* data = (XAObjItfCBData*)(event->data);
+            if(data->event == XA_OBJECT_EVENT_RESOURCES_LOST )
+                {
+                impl->state = data->param;
+                }
+            impl->callBack(impl->cbPtrToSelf, impl->context, data->event, data->result, data->param, data->interface);
+            }
+        }
+    
+    DEBUG_API("<-XAMediaRecorderImpl_AdaptCb");
+    }
+
+
 /*****************************************************************************
  * MediaRecorderImpl -specific methods
  *****************************************************************************/
@@ -506,10 +456,6 @@ void XAMediaRecorderImpl_FreeResources(XAObjectItf self)
 XAresult XAMediaRecorderImpl_DoAddItf(XAObjectItf self,
         XAObjItfMapEntry *mapEntry)
     {
-
-    XAObjectItfImpl* pObj = (XAObjectItfImpl*) (*self);
-    XAMediaRecorderImpl* pImpl = (XAMediaRecorderImpl*) (pObj);
-
     XAresult ret = XA_RESULT_SUCCESS;
 
     DEBUG_API("->XAMediaRecorderImpl_DoAddItf");
@@ -519,10 +465,6 @@ XAresult XAMediaRecorderImpl_DoAddItf(XAObjectItf self,
         {
         switch (mapEntry->mapIdx)
             {
-
-            case MR_METADATAINSERTIONITF:
-                mapEntry->pItf = XAMetadataInsertionItfImpl_Create(pImpl);
-                break;
             default:
                 DEBUG_ERR("XAMediaRecorderImpl_DoAddItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;
@@ -574,9 +516,6 @@ XAresult XAMediaRecorderImpl_DoRemoveItf(XAObjectItf self,
         {
         switch (mapEntry->mapIdx)
             {
-            case MR_METADATAINSERTIONITF:
-                XAMetadataInsertionItfImpl_Free(mapEntry->pItf);
-                break;
             default:
                 DEBUG_ERR("XAMediaRecorderImpl_DoRemoveItf unknown id");
                 ret = XA_RESULT_FEATURE_UNSUPPORTED;

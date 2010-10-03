@@ -121,6 +121,8 @@ public:
     void HandleNotifyPSL(const TUid aUid, const TInt& aKey,
                 const TRequestStatus& aStatus);
 
+    void TermSrv(const RMessage2& aMessage);
+
 private:
     static TMSServer* NewLC();
     TMSServer();
@@ -131,7 +133,6 @@ private:
     TInt StartTMSCallServer(TMSCallProxyLocal& aHandle);
     void GetAvailableOutputsL(const RMessage2& aMessage);
     TInt SendMessageToCallServ(TInt func, TInt value);
-    TInt SendMessageToCallServ(TInt func, TIpcArgs args);
 
 private:
     TInt iSession;
@@ -173,7 +174,6 @@ class TMSCallProxyLocal : public RSessionBase
 public:
     TInt Open(RServer2& aTMSCallServerHandle);
     TInt SendToCallServer(TInt aFunc, TUint value);
-    TInt SendToCallServer(TInt aFunc, TIpcArgs args);
     TInt ReceiveFromCallServer(TInt aFunc, TUint& value);
     TInt ReceiveFromCallServer(TInt aFunc, TIpcArgs args);
     };

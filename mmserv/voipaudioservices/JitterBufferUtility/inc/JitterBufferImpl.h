@@ -1,25 +1,23 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Jitter buffer for Audio frames.
-*  Interface   : VoIPJitterBuffer.lib
-*
-*/
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Jitter buffer for Audio frames.
+ *  Interface   : VoIPJitterBuffer.lib
+ *
+ */
 
-
-
-#ifndef __VOIPJITTERBUFFERIMPL_H
-#define __VOIPJITTERBUFFERIMPL_H
+#ifndef VOIPJITTERBUFFERIMPL_H
+#define VOIPJITTERBUFFERIMPL_H
 
 //  INCLUDES
 #include <voipjitterbufferintfc.h>
@@ -34,39 +32,43 @@ class MJitterBufferObserver;
  *  Jitter buffer element including packet received.
  *
  *  @lib VoIPJitterBuffer.lib
- *  @since Series 60 5.0
  */
 class TJitterBufferElement
     {
-public: // Constructor
-    inline TJitterBufferElement() : iDataFrame(NULL),
-                                    iSequenceNumber(-1),
-                                    iTimeStamp(-1) {}
+public:
+    // Constructor
+    inline TJitterBufferElement() :
+        iDataFrame(NULL),
+        iSequenceNumber(-1),
+        iTimeStamp(-1) {}
 
-public: // Methods
+public:
+    // Methods
 
     /**
      * Compares two elements based on their sequence number
-     * @since Series 60 5.0
+     *
      * @param aElem1 First element
      * @param aElem2 Second element
      * @return TInt
      */
     static TInt CompareSeqNum(const TJitterBufferElement& aElem1,
-                              const TJitterBufferElement& aElem2);
+            const TJitterBufferElement& aElem2);
 
     /**
      * Compares two elements based on their stamps
-     * @since Series 60 5.0
+     *
      * @param aElem1 First element
      * @param aElem2 Second element
      * @return TInt
      */
     static TInt CompareStamp(const TJitterBufferElement& aElem1,
-                             const TJitterBufferElement& aElem2);
+            const TJitterBufferElement& aElem2);
 
-public: // Data members
-    // Data
+public:
+    // Data members
+
+    // Data buffer
     CMMFDataBuffer* iDataFrame;
 
     // Data packet number
@@ -74,19 +76,17 @@ public: // Data members
 
     // Time stamp
     TInt64 iTimeStamp;
-
     };
-
 
 /**
  *  Jitter buffer.
  *
  *  @lib VoIPJitterBuffer.lib
- *  @since Series 60 5.0
  */
 class CVoIPJitterBufferImpl : public CBase
     {
-public: // Constructors and destructor
+public:
+    // Constructors and destructor
 
     /**
      * Two-phased constructor.
@@ -98,11 +98,12 @@ public: // Constructors and destructor
      */
     virtual ~CVoIPJitterBufferImpl();
 
-public: // Methods
+public:
+    // Methods
 
     /**
      * Setup jitterbuffer
-     * @since Series 60 5.0
+     *
      * @param parameters
      * @return void
      */
@@ -110,7 +111,7 @@ public: // Methods
 
     /**
      * Reset buffer
-     * @since Series 60 5.0
+     *
      * @param aPlayTone ETrue, if tone is to played
      * @return void
      */
@@ -118,7 +119,7 @@ public: // Methods
 
     /**
      * Add DataFrame to buffer
-     * @since Series 60 5.0
+     *
      * @param aBuffer Buffer to read data from
      * @return void
      */
@@ -126,7 +127,7 @@ public: // Methods
 
     /**
      * Get DataFrame from buffer
-     * @since Series 60 5.0
+     *
      * @param aBuffer Buffer to write data to
      * @return TInt
      */
@@ -134,7 +135,7 @@ public: // Methods
 
     /**
      * Get Current Codec
-     * @since Series 60 5.0
+     *
      * @param None
      * @return TFourCC
      */
@@ -142,7 +143,7 @@ public: // Methods
 
     /**
      * Delay Up
-     * @since Series 60 5.0
+     *
      * @param None
      * @return void
      */
@@ -150,39 +151,43 @@ public: // Methods
 
     /**
      * Decreases jitter buffer delay
-     * @since Series 60 5.0
+     *
      * @param None
      * @return void
      */
     void DelayDownL();
 
+#ifdef __FEATURE_NOT_SUPPORTED__
     /**
      * ?Description
-     * @since Series 60 5.0
+     *
      * @param None
      * @return TTimeIntervalMicroSeconds32
      */
     TTimeIntervalMicroSeconds32 CalculateDelay() const;
+#endif //__FEATURE_NOT_SUPPORTED__
 
     /**
      * Get the length of jitter buffer, in terms of number of packets.
-     * @since Series 60 5.0
+     *
      * @param none
      * @return buffer lenght.
      */
     TInt BufferLength() const;
 
+#ifdef __FEATURE_NOT_SUPPORTED__
     /**
      * Get number of packets that are currently inside the buffer.
-     * @since Series 60 5.0
+     *
      * @param none
      * @return Number of packet in buffer.
      */
     TInt PacketCount() const;
+#endif //__FEATURE_NOT_SUPPORTED__
 
     /**
      * Fills the given event with statistics of the jitterbuffer
-     * @since Series 60 5.0
+     *
      * @param aEvent Event into which set the statistics
      * @return void
      */
@@ -200,11 +205,12 @@ private:
      */
     void ConstructL();
 
-private: // New functions
+private:
+    // New functions
 
     /**
      * Is sequence number wrapped around TUint16 65535->0
-     * @since Series 60 5.0
+     *
      * @param TInt aSeqNum1 is oldest packet sequence number in buffer
      * @param TInt aSeqNum2 is new element sequence number to buffer
      * @return detect the wrap-around condition.
@@ -213,7 +219,7 @@ private: // New functions
 
     /**
      * Find Largest SequenceNumber
-     * @since Series 60 5.0
+     *
      * @param None
      * @return TUint Largest sequence number
      */
@@ -221,7 +227,7 @@ private: // New functions
 
     /**
      * Inserts a databuffer into the jitter buffer
-     * @since Series 60 5.0
+     *
      * @param aBuffer Buffer containing the data
      * @param aLargestSeqNum Largest sequence number returned by
      *                       FindLargestSeqNum()
@@ -231,7 +237,7 @@ private: // New functions
 
     /**
      * Is jitter buffer full?
-     * @since Series 60 5.0
+     *
      * @param none
      * @return True if full.
      */
@@ -239,7 +245,7 @@ private: // New functions
 
     /**
      * Is jitter buffer empty?
-     * @since Series 60 5.0
+     *
      * @param none
      * @return True if empty.
      */
@@ -247,14 +253,15 @@ private: // New functions
 
     /**
      * CheckThresholdBufferLength
-     * @since Series 60 5.0
+     *
      * @param none
      * @return void
      */
     void CheckThresholdBufferLength(TInt& aBufferLength,
-                                    const TInt aTreshhold) const;
+            const TInt aTreshhold) const;
 
-private: // Data
+private:
+    // Data
 
     // Playout thresholds
     TInt iCurrentPlayThreshold;
@@ -284,20 +291,20 @@ private: // Data
     TVoIPJBConfig iJBConfig;
 
     // Codec frame size
-    TInt  iFrameSize;
+    TInt iFrameSize;
 
     // Encoded frame sample interval
-    TInt  iSampleInterval;
+    TInt iSampleInterval;
 
     // Increment in frame sequence number
     TUint iSeqNumIncrement;
-    
+
     TBool iIsWrappedAround;
 
     MJitterBufferObserver* iObserver;
     CMMFDataBuffer* iDataBuffer;
 
-// These are mainly for statistical purpose
+    // These are mainly for statistical purpose
 
     // Number of frames totally lost
     TUint iFramesLost;
@@ -321,16 +328,15 @@ private: // Data
     TUint iOverflowCounter;
 
     // Jitter buffer inctivity time
-    TInt  iInactivityTime;
+    TInt iInactivityTime;
 
-// These are for tone playback
-    TInt  iPlayToneInterval;
+    // These are for tone playback
+    TInt iPlayToneInterval;
     TTime iTonePlayTime;
-    TInt  iSampleRate;
+    TInt iSampleRate;
     TBool iPlay;
-
     };
 
-#endif  //__VOIPJITTERBUFFERIMPL_H
+#endif  //VOIPJITTERBUFFERIMPL_H
 
 // End of file

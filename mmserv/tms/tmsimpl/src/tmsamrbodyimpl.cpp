@@ -74,18 +74,6 @@ void TMSAMRFormatBodyImpl::SetProxy(TMSGlobalContext* context,
         iProxy = context->CallProxy;
         iStreamType = context->StreamType;
         TMSFormatBodyImpl::SetProxy(iProxy, queuehandler);
-        static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
-                TMS_FORMAT_AMR);
-        }
-    }
-
-void TMSAMRFormatBodyImpl::QueueEvent(TInt aEventType, TInt /*aError*/,
-        void* /*user_data*/)
-    {
-    switch (aEventType)
-        {
-        default:
-            break;
         }
     }
 

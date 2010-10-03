@@ -39,7 +39,6 @@ SYSTEMINCLUDE   /epoc32/include/mmf/common
 
 SOURCEPATH      ../src
 SOURCE          tmscallimpl.cpp
-SOURCE          tmscallbodyimpl.cpp
 SOURCE          tmsipcallbodyimpl.cpp
 SOURCE          tmscscallbodyimpl.cpp
 SOURCE          tmsstreamimpl.cpp

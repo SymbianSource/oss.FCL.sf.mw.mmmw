@@ -35,7 +35,6 @@ typedef enum
 {
     RADIO_OBJECTITF,
     RADIO_RADIOITF,
-    RADIO_CONFIGEXTENSIONITF,
     RADIO_DIMITF,
     RADIO_ITFCOUNT
 } XARadioDeviceInterfaces;

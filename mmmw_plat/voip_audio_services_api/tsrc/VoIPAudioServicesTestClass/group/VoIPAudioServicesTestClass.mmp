@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
+ * Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
  * All rights reserved.
  * This component and the accompanying materials are made available
  * under the terms of "Eclipse Public License v1.0"
@@ -11,7 +11,7 @@
  *
  * Contributors:
  *
- * Description: voip audio service -  
+ * Description: voip audio service - Stif test
  *
  */
 
@@ -20,10 +20,8 @@
 TARGET          VoIPAudioServicesTestClass.dll
 TARGETTYPE      dll
 UID             0x1000008D 0x101FB3E3
-
-CAPABILITY      ALL -TCB
-
-DEFFILE         VoIPAudioServicesTestClass.def
+CAPABILITY      All -Tcb
+VENDORID        VID_DEFAULT
 
 SOURCEPATH      ../src
 SOURCE          VoIPAudioServicesTestClass.cpp
@@ -43,8 +41,7 @@ LIBRARY         Orientationbase.lib
 LIBRARY         efsrv.lib  // File server session for database
 LIBRARY         VoIPAudioIntfc.lib
 
-LANG            SC
+DEFFILE         VoIPAudioServicesTestClass.def
 
 SMPSAFE
 
-// End of File

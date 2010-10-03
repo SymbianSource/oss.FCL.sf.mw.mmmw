@@ -135,11 +135,6 @@ typedef struct XARadioAdaptationCtx_
 
     } XARadioAdaptationCtx_;
 /* FUNCTIONS */
-/*
- * gboolean XAAdaptationBase_GstBusCb( GstBus *bus, GstMessage *message, gpointer data );
- * Default CallBack handler for gst-bus messages. This will be called if object specific callback is
- * not implemented.
- */
 
 XAresult XAAdaptationBaseMMF_Init(XAAdaptationMMFCtx* pSelf, XAuint32 ctxId);
 XAresult XAAdaptationBaseMMF_PostInit(XAAdaptationMMFCtx* ctx);

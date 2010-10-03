@@ -18,26 +18,7 @@
 PRJ_PLATFORMS
 DEFAULT
 
-PRJ_EXPORTS
-
-#ifdef  __3GP_EXTENTION
-
-// Exporting 3GPExtParser Binaries
-../armv5/LIB/3GPExtParser.lib                   /epoc32/release/armv5/LIB/3GPExtParser.lib
-../armv5/LIB/3GPExtParser.dso                   /epoc32/release/armv5/LIB/3GPExtParser.dso
-../armv5/LIB/3GPExtParser{000a0000}.lib         /epoc32/release/armv5/LIB/3GPExtParser{000a0000}.lib
-../armv5/LIB/3GPExtParser{000a0000}.dso         /epoc32/release/armv5/LIB/3GPExtParser{000a0000}.dso
-
-../armv5/udeb/3GPExtParser.dll 			/epoc32/release/armv5/udeb/3GPExtParser.dll
-../armv5/urel/3GPExtParser.dll 			/epoc32/release/armv5/urel/3GPExtParser.dll
-
-../winscw/udeb/3GPExtParser.lib 		/epoc32/release/winscw/udeb/3GPExtParser.lib
-../winscw/udeb/3GPExtParser.dll 		/epoc32/release/winscw/udeb/3GPExtParser.dll
-../winscw/urel/3GPExtParser.dll 		/epoc32/release/winscw/urel/3GPExtParser.dll
-
-#endif
-
 PRJ_MMPFILES
-
+3GPExtParser.mmp
 
 //  End of File  

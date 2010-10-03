@@ -1,25 +1,23 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
 #include <e32base.h>
 #include <voipringtoneplayer.h>
 #include "VoIPRingTonePlayerImpl.h"
-
 
 // ---------------------------------------------------------------------------
 // CRingTonePlayer::~CRingTonePlayer
@@ -65,7 +63,7 @@ EXPORT_C TInt CRingTonePlayer::Open(MRingToneObserver& aObserver)
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CRingTonePlayer::Open(MRingToneObserver& aObserver,
-                                    TPtr aFileName)
+        TPtr aFileName)
     {
     TRAPD(err, iRingTonePlayerImpl->OpenL(aObserver, aFileName));
     return err;
@@ -76,7 +74,7 @@ EXPORT_C TInt CRingTonePlayer::Open(MRingToneObserver& aObserver,
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CRingTonePlayer::Open(MRingToneObserver& aObserver,
-                                    RFile& aFileHandle)
+        RFile& aFileHandle)
     {
     TRAPD(err, iRingTonePlayerImpl->OpenL(aObserver, aFileHandle));
     return err;
@@ -87,8 +85,7 @@ EXPORT_C TInt CRingTonePlayer::Open(MRingToneObserver& aObserver,
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CRingTonePlayer::Open(MRingToneObserver& aObserver,
-                                    TPtr8 aDesTone,
-                                    TPtr8 aMimeType)
+        TPtr8 aDesTone, TPtr8 aMimeType)
     {
     TRAPD(err, iRingTonePlayerImpl->OpenL(aObserver, aDesTone, aMimeType));
     return err;
@@ -142,6 +139,5 @@ EXPORT_C void CRingTonePlayer::Close()
     {
     iRingTonePlayerImpl->Close();
     }
-
 
 // End of file

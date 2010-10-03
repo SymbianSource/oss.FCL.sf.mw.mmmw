@@ -40,8 +40,7 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
     XAboolean requestStateChange = XA_BOOLEAN_FALSE;
     GstStateChangeReturn gstRet = GST_STATE_CHANGE_SUCCESS;
     XAMediaRecorderAdaptationCtx* mCtx = NULL;
-    XAboolean recording = XA_BOOLEAN_FALSE;
-    DEBUG_API_A1("->XARecordItfAdapt_SetRecordState %s",RECORDSTATENAME(state));
+    DEBUG_API_A1_STR("->XARecordItfAdapt_SetRecordState %s",RECORDSTATENAME(state));
     if (!bCtx || bCtx->baseObj.ctxId != XAMediaRecorderAdaptation)
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
@@ -51,19 +50,19 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
 
     mCtx = (XAMediaRecorderAdaptationCtx*) bCtx;
 
-    mCtx->isRecord = XA_BOOLEAN_TRUE;
-
     switch (state)
         {
         case XA_RECORDSTATE_STOPPED:
             {
             // Audio sourse should be stopped 
-            if (mCtx->audiosource)
+            if (!bCtx->busError && mCtx->audiosource && mCtx->isRecord == XA_BOOLEAN_TRUE)
                 {
+                XAAdaptationGst_PrepareAsyncWait(bCtx);
                 if (gst_element_send_event(mCtx->audiosource,
                         gst_event_new_eos()) == TRUE)
                     {
                     DEBUG_INFO ("posted eos");
+                    XAAdaptationGst_StartAsyncWait(bCtx);
                     }
                 else
                     {
@@ -71,7 +70,7 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
                     }
                 }
 
-            bCtx->binWantedState = GST_STATE_PAUSED;
+            bCtx->binWantedState = GST_STATE_READY;
             closeSink = XA_BOOLEAN_TRUE;
             if (mCtx->runpositiontimer > 0)
                 {
@@ -79,20 +78,11 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
                 mCtx->runpositiontimer = 0;
                 }
 
-            if (mCtx->recThrCtx.bufInsufficientSem)
-                {
-                DEBUG_INFO("No buffer-insufficient received, posting record thr semaphore.");
-                if (XAImpl_PostSemaphore(mCtx->recThrCtx.bufInsufficientSem)
-                        != XA_RESULT_SUCCESS)
-                    {
-                    DEBUG_ERR("Posting buffer-insufficient semaphore FAILED!");
-                    }
-                }
-
             break;
             }
         case XA_RECORDSTATE_PAUSED:
             {
+            mCtx->isRecord = XA_BOOLEAN_TRUE;
             if (mCtx->xaRecordState == XA_RECORDSTATE_STOPPED
                     && mCtx->encodingchanged)
                 {
@@ -113,6 +103,7 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
             }
         case XA_RECORDSTATE_RECORDING:
             {
+            mCtx->isRecord = XA_BOOLEAN_TRUE;
             if (mCtx->xaRecordState == XA_RECORDSTATE_STOPPED
                     && (mCtx->encodingchanged))
                 {
@@ -124,24 +115,11 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
                     }
                 }
 
-            if (mCtx->recThrCtx.bufInsufficientSem)
-                {
-                /* Recording to address and recording thread semaphora is created */
-                if (!XAImpl_StartThread(&(mCtx->recordingEventThr), NULL,
-                        &XAMediaRecorderAdapt_RecordEventThr, (void*) mCtx))
-                    {
-                    DEBUG_ERR("Start thread Failed");
-                    return XA_RESULT_INTERNAL_ERROR;
-                    }
-                }
-
             bCtx->binWantedState = GST_STATE_PLAYING;
-            recording = XA_BOOLEAN_TRUE;
             break;
             }
         default:
-            DEBUG_ERR("Unhandled state")
-            ;
+            DEBUG_ERR("Unhandled state");
             ret = XA_RESULT_PARAMETER_INVALID;
             break;
         }
@@ -177,8 +155,7 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
         switch (gstRet)
             {
             case GST_STATE_CHANGE_FAILURE:
-                DEBUG_ERR_A1("FAILED to change state (target %d)",bCtx->binWantedState)
-                ;
+                DEBUG_ERR_A1("FAILED to change state (target %d)",bCtx->binWantedState);
                 bCtx->binWantedState = GST_STATE(bCtx->bin);
                 ret = XA_RESULT_INTERNAL_ERROR;
                 break;
@@ -188,17 +165,14 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
                 ret = XA_RESULT_SUCCESS;
                 break;
             case GST_STATE_CHANGE_NO_PREROLL:
-                DEBUG_INFO("GST_STATE_CHANGE_NO_PREROLL")
-                ;
+                DEBUG_INFO("GST_STATE_CHANGE_NO_PREROLL");
                 /* deliberate fall-through */
             case GST_STATE_CHANGE_SUCCESS:
-                DEBUG_INFO_A1("Successfully changed state (target %d)",bCtx->binWantedState)
-                ;
+                DEBUG_INFO_A1("Successfully changed state (target %d)",bCtx->binWantedState);
                 ret = XA_RESULT_SUCCESS;
                 break;
             default:
-                DEBUG_ERR_A1("Unhandled error (%d)",gstRet)
-                ;
+                DEBUG_ERR_A1("Unhandled error (%d)",gstRet);
                 ret = XA_RESULT_UNKNOWN_ERROR;
                 break;
             }
@@ -210,30 +184,6 @@ XAresult XARecordItfAdapt_SetRecordState(XAAdaptationGstCtx *bCtx,
         gst_element_send_event(bCtx->bin, gst_event_new_flush_stop());
         }
 
-    if (recording && mCtx->isobjvsrc && mCtx->videosource)
-        {
-        GstPad *pad = gst_element_get_static_pad(
-                GST_ELEMENT(mCtx->videosource), "MRObjSrc");
-        if (pad && gst_pad_is_linked(pad))
-            {
-            DEBUG_INFO_A2("unblock element:%s pad:%s",
-                    gst_element_get_name(mCtx->videosource),
-                    gst_pad_get_name(pad));
-            gst_pad_set_blocked_async(pad, FALSE, XAAdaptationGst_PadBlockCb,
-                    NULL);
-            }
-
-        if (GST_STATE( GST_ELEMENT(mCtx->videosource)) != GST_STATE_PLAYING)
-            {
-            GstStateChangeReturn gret = GST_STATE_CHANGE_SUCCESS;
-            DEBUG_INFO("Start camera source");
-            gret = gst_element_set_state(GST_ELEMENT(mCtx->videosource),
-                    GST_STATE_PLAYING);
-            if (gret == GST_STATE_CHANGE_SUCCESS)
-                gret = gst_element_get_state(GST_ELEMENT(mCtx->videosource),
-                        NULL, NULL, XA_ADAPT_ASYNC_TIMEOUT_SHORT_NSEC);
-            }
-        }
     DEBUG_API("<-XARecordItfAdapt_SetRecordState");
     return ret;
     }

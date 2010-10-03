@@ -1,23 +1,22 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
-
-#ifndef __VOIPFORMATINTFCIMPL_H
-#define __VOIPFORMATINTFCIMPL_H
+#ifndef VOIPFORMATINTFCIMPL_H
+#define VOIPFORMATINTFCIMPL_H
 
 // FORWARD DECLARATIONS
 class RVoIPAudioSession;
@@ -38,7 +37,7 @@ public:
     TInt GetVAD(TBool& aVad);
     TInt FrameModeRequiredForErrorConcealment(TBool& aMode);
     TInt SetFrameMode(TBool aMode);
-    TInt GetFrameMode(TBool& aMode);   //not avail. through CIs
+    TInt GetFrameMode(TBool& aMode); //not avail. through CIs
     TInt ConcealErrorForNextBuffer();
 
 protected:
@@ -46,12 +45,10 @@ protected:
     void ConstructL(RVoIPAudioSession* aVoIPAudioSession);
 
 protected:
-    RVoIPAudioSession*   iVoIPAudioSession;
+    RVoIPAudioSession* iVoIPAudioSession;
     MVoIPFormatObserver* iObserver;
-
     };
 
-
-#endif //__VOIPFORMATINTFCIMPL_H
+#endif //VOIPFORMATINTFCIMPL_H
 
 // End of file

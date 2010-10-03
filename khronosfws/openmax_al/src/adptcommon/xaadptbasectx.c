@@ -15,7 +15,6 @@
  *
  */
 
-#include <assert.h>
 #include <string.h>
 #include "xaadptbasectx.h"
 #include "xathreadsafety.h"
@@ -37,7 +36,7 @@ XAresult XAAdaptationBase_Init(XAAdaptationBaseCtx* pSelf, XAuint32 ctxId)
                     sizeof(XAAdaptEvtHdlr));
             if (!pSelf->evtHdlrs)
                 {
-                DEBUG_ERR("Memory allocation failure in Base Ctx.")
+                DEBUG_ERR("Memory allocation failure in Base Ctx.");
                 return XA_RESULT_MEMORY_FAILURE;
                 }
             }
@@ -45,7 +44,7 @@ XAresult XAAdaptationBase_Init(XAAdaptationBaseCtx* pSelf, XAuint32 ctxId)
         }
     else
         {
-        DEBUG_ERR("Invalid Adaptation Base Context.")
+        DEBUG_ERR("Invalid Adaptation Base Context.");
         return XA_RESULT_PARAMETER_INVALID;
         }
 

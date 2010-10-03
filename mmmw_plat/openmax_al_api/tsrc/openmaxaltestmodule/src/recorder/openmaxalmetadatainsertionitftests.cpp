@@ -86,6 +86,13 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_CreateChildNode( CStifItemPar
     TInt type(0);
     TPtrC mimetype;
     XAint32 childnode;
+    _LIT8(paramnull, "null");
+    
+    void* param1 = (void*)&childnode;
+    void* itfPtr = (void*) m_MetadataInsertionItf;
+    void* param2 = NULL;
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
     
     status = aItem.GetNextInt(parentId);
     RET_ERR_IF_ERR(status);
@@ -99,11 +106,19 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_CreateChildNode( CStifItemPar
     HBufC8* buf = HBufC8::NewL(mimetype.Length()+1);
     CleanupStack::PushL(buf);
     TPtr8 des = buf->Des();
-
+    des.Copy(mimetype);
+    if(des.Compare(paramnull))
+        {
+        param2 = (void*)des.PtrZ();
+        }
+    
+    status = CheckForNullParam(aItem, param1);
+    RET_ERR_IF_ERR(status);
+    
     if(m_MetadataInsertionItf)
         {
         res = (*m_MetadataInsertionItf)->CreateChildNode(
-                m_MetadataInsertionItf, parentId , type, const_cast<TUint8*>(des.PtrZ()), &childnode);              
+                XAMetadataInsertionItf(itfPtr), parentId , type, (XAchar*)param2, (XAint32*)param1);              
         status = res;
         }
     else
@@ -122,14 +137,31 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_GetSupportedKeysCount( CStifI
     XAboolean freeKeys;
     XAuint32 keycount(0);
     XAuint32 encodingcount(0);
+    void* param1 = (void*)&freeKeys;
+    void* itfPtr = (void*) m_MetadataInsertionItf;
+    void* param2 = (void*)&keycount;
+    void* param3 = (void*)&encodingcount;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
     
     status = aItem.GetNextInt(parentId);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNullParam(aItem, param1);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNullParam(aItem, param2);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNullParam(aItem, param3);
     RET_ERR_IF_ERR(status);
     
     if(m_MetadataInsertionItf)
         {
         res = (*m_MetadataInsertionItf)->GetSupportedKeysCount(
-                m_MetadataInsertionItf, parentId , &freeKeys, &keycount, &encodingcount);              
+                XAMetadataInsertionItf(itfPtr), parentId , (XAuint32*)param1,
+                                        (XAuint32*)param2, (XAuint32*)param3);              
         status = res;
         }
     else
@@ -146,17 +178,25 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_GetKeySize( CStifItemParser& 
     TInt nodeId(0);
     TUint index(0);
     XAuint32 keysize(0);
+    void* param1 = (void*)&keysize;
+    void* itfPtr = (void*) m_MetadataInsertionItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
     
     status = aItem.GetNextInt(nodeId);
     RET_ERR_IF_ERR(status);
     
     status = aItem.GetNextInt(index);
     RET_ERR_IF_ERR(status);
+
+    status = CheckForNullParam(aItem, param1);
+    RET_ERR_IF_ERR(status);  
     
     if(m_MetadataInsertionItf)
         {
         res = (*m_MetadataInsertionItf)->GetKeySize(
-                m_MetadataInsertionItf, nodeId , index, &keysize);              
+                XAMetadataInsertionItf(itfPtr), nodeId , index, (XAuint32*)param1);              
         status = res;
         }
     else
@@ -174,6 +214,11 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_GetKey( CStifItemParser& aIte
     TUint index(0);
     TUint keysize(0);
     XAMetadataInfo info = {1,1,"en-us",'a'};
+    void* param1 = (void*)&info;
+    void* itfPtr = (void*) m_MetadataInsertionItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
     
     status = aItem.GetNextInt(nodeId);
     RET_ERR_IF_ERR(status);
@@ -184,10 +229,13 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_GetKey( CStifItemParser& aIte
     status = aItem.GetNextInt(keysize);
     RET_ERR_IF_ERR(status);
     
+    status = CheckForNullParam(aItem, param1);
+    RET_ERR_IF_ERR(status);
+    
     if(m_MetadataInsertionItf)
         {
         res = (*m_MetadataInsertionItf)->GetKey(
-                m_MetadataInsertionItf, nodeId , index, keysize, &info);              
+                XAMetadataInsertionItf(itfPtr), nodeId , index, keysize, (XAMetadataInfo*)param1);              
         status = res;
         }
     else
@@ -204,6 +252,11 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_GetFreeKeysEncoding( CStifIte
     TInt nodeId(0);
     TUint index(0);
     XAuint32 encoding(0);
+    void* param1 = (void*)&encoding;
+    void* itfPtr = (void*) m_MetadataInsertionItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
     
     status = aItem.GetNextInt(nodeId);
     RET_ERR_IF_ERR(status);
@@ -211,10 +264,13 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_GetFreeKeysEncoding( CStifIte
     status = aItem.GetNextInt(index);
     RET_ERR_IF_ERR(status);
     
+    status = CheckForNullParam(aItem, param1);
+    RET_ERR_IF_ERR(status);
+    
     if(m_MetadataInsertionItf)
         {
         res = (*m_MetadataInsertionItf)->GetFreeKeysEncoding(
-                m_MetadataInsertionItf, nodeId , index, &encoding);              
+                XAMetadataInsertionItf(itfPtr), nodeId , index, (XAuint32*)param1);              
         status = res;
         }
     else
@@ -235,7 +291,12 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_InsertMetadataItem( CStifItem
     XAchar valuelangCountry[16];    
     XAMetadataInfo keyinput = {1,1,"abc",'a'};
     XAMetadataInfo valueinput = {1,1,"efg",'a'};
+    void* param1 = (void*)&keyinput;
+    void* param2 = (void*)&valueinput;
+    void* itfPtr = (void*) m_MetadataInsertionItf;
     
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
 
     TUint keyinputsize;
     TPtrC language;
@@ -277,10 +338,17 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_InsertMetadataItem( CStifItem
     status = aItem.GetNextInt(overwrite);
     RET_ERR_IF_ERR(status);
     
+    status = CheckForNull(aItem, param1);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNull(aItem, param2);
+    RET_ERR_IF_ERR(status);
+    
     if(m_MetadataInsertionItf)
         {
         res = (*m_MetadataInsertionItf)->InsertMetadataItem(
-                m_MetadataInsertionItf, nodeId , &keyinput, &valueinput, overwrite);              
+                XAMetadataInsertionItf(itfPtr), nodeId , (XAMetadataInfo*)param1,
+                (XAMetadataInfo*)param2, overwrite);              
         status = res;
         }
     else
@@ -290,14 +358,19 @@ TInt COpenMAXALTestModule::al_metadatainsertionitf_InsertMetadataItem( CStifItem
     return status;
     }
 
-TInt COpenMAXALTestModule::al_metadatainsertionitf_RegisterCallback( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_metadatainsertionitf_RegisterCallback( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
+    void* itfPtr = (void*) m_MetadataInsertionItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
     if(m_MetadataInsertionItf)
         {
         res = (*m_MetadataInsertionItf)->RegisterCallback(
-                m_MetadataInsertionItf, MetadataInsertionCallback , (void*)this);              
+                XAMetadataInsertionItf(itfPtr), MetadataInsertionCallback , (void*)this);              
         status = res;
         }
     else

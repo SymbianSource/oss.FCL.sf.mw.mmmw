@@ -1,172 +1,159 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: voip audio service -
-*
-*/
-
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: voip audio service -
+ *
+ */
 
 #include "VoIPAudioServicesTestClass.h"
 #include "debug.h"
 
 /*
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 
-Class: CSimpleTimeout
+ Class: CSimpleTimeout
 
-Method: CSimpleTimeout
+ Method: CSimpleTimeout
 
-Description: voip audio service - Default constructor
+ Description: voip audio service - Default constructor
 
-C++ default constructor can NOT contain any code, that
-might leave.
+ C++ default constructor can NOT contain any code, that might leave.
 
-Parameters: None
+ Parameters: None
 
-Return Values: None
+ Return Values: None
 
-Errors/Exceptions: None
-
-Status: Approved
-
--------------------------------------------------------------------------------
-*/
-CSimpleTimeout::CSimpleTimeout() : CActive (CActive::EPriorityStandard)
-{
+ -------------------------------------------------------------------------------
+ */
+CSimpleTimeout::CSimpleTimeout() :
+    CActive(CActive::EPriorityStandard)
+    {
     FTRACE(FPrint(_L("CSimpleTimeout::CSimpleTimeout")));
-}
+    }
 
 /*
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 
-Class: CSimpleTimeout
+ Class: CSimpleTimeout
 
-Method: ConstructL
+ Method: ConstructL
 
-Description: voip audio service - Symbian OS second phase constructor
+ Description: voip audio service - Symbian OS second phase constructor
 
-Symbian OS default constructor can leave.
+ Symbian OS default constructor can leave.
 
-Parameters:
+ Parameters:
 
-Return Values: None
+ Return Values: None
 
-Errors/Exceptions:
-
-Status: Approved
-
--------------------------------------------------------------------------------
-*/
-void CSimpleTimeout::ConstructL( MTimeoutObserver* aObserver,
-CStifLogger* aLogger)
-{
+ -------------------------------------------------------------------------------
+ */
+void CSimpleTimeout::ConstructL(MTimeoutObserver* aObserver,
+        CStifLogger* aLogger)
+    {
     FTRACE(FPrint(_L("CSimpleTimeout::ConstructL")));
     iObserver = aObserver;
     iLog = aLogger;
     iTimer.CreateLocal();
-    iTestCaseTimeout = 0;  // Initialize
+    iTestCaseTimeout = 0; // Initialize
 
     // Add to active scheduler
-    CActiveScheduler::Add ( this );
-}
+    CActiveScheduler::Add(this);
+    }
 
 /*
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 
-Class: CSimpleTimeout
+ Class: CSimpleTimeout
 
-Method: NewL
+ Method: NewL
 
-Description: voip audio service - Two-phased constructor.
+ Description: voip audio service - Two-phased constructor.
 
-Parameters: const TTestReportOutput aReportOutput: in: Report output type
+ Parameters: const TTestReportOutput aReportOutput: in: Report output type
 
-Return Values: CSimpleTimeout* : pointer to created object
+ Return Values: CSimpleTimeout* : pointer to created object
 
-Errors/Exceptions: Leaves if memory allocation for object fails
-Leaves if ConstructL leaves
+ Errors/Exceptions: Leaves if memory allocation for object fails
+ Leaves if ConstructL leaves
 
-Status: Approved
-
--------------------------------------------------------------------------------
-*/
-CSimpleTimeout* CSimpleTimeout::NewL( MTimeoutObserver* aTestClass,
-CStifLogger* aLogger)
-{
+ -------------------------------------------------------------------------------
+ */
+CSimpleTimeout* CSimpleTimeout::NewL(MTimeoutObserver* aTestClass,
+        CStifLogger* aLogger)
+    {
     FTRACE(FPrint(_L("CSimpleTimeout::NewL")));
-    CSimpleTimeout* self = new ( ELeave ) CSimpleTimeout();
-    CleanupStack::PushL( self );
-    self->ConstructL( aTestClass, aLogger);
-    CleanupStack::Pop( self );
+    CSimpleTimeout* self = new (ELeave) CSimpleTimeout();
+    CleanupStack::PushL(self);
+    self->ConstructL(aTestClass, aLogger);
+    CleanupStack::Pop(self);
     return self;
-
-}
+    }
 
 /*
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 
-Class: CSimpleTimeout
+ Class: CSimpleTimeout
 
-Method: ~CSimpleTimeout
+ Method: ~CSimpleTimeout
 
-Description: voip audio service - Destructor.
+ Description: voip audio service - Destructor.
 
-Cancel request
+ Cancel request
 
-Parameters: None
+ Parameters: None
 
-Return Values: None
+ Return Values: None
 
-Errors/Exceptions: None
+ Errors/Exceptions: None
 
-Status: Approved
+ Status: Approved
 
--------------------------------------------------------------------------------
-*/
+ -------------------------------------------------------------------------------
+ */
 CSimpleTimeout::~CSimpleTimeout()
-{
+    {
     FTRACE(FPrint(_L("CSimpleTimeout::~CSimpleTimeout")));
     Cancel();
     iTimer.Close();
-}
+    }
 
 /*
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 
-Class: CSimpleTimeout
+ Class: CSimpleTimeout
 
-Method: Start
+ Method: Start
 
-Description: voip audio service - Start timeout counting
+ Description: voip audio service - Start timeout counting
 
-Parameters: None
+ Parameters: None
 
-Return Values: None
+ Return Values: None
 
-Errors/Exceptions: None
+ Errors/Exceptions: None
 
-Status: Approved
+ Status: Approved
 
--------------------------------------------------------------------------------
-*/
+ -------------------------------------------------------------------------------
+ */
 void CSimpleTimeout::Start(TTimeIntervalMicroSeconds aTimeout)
-{
+    {
     FTRACE(FPrint(_L("CSimpleTimeout::Start")));
     if (IsActive())
-    {
+        {
         Cancel();
-    }
+        }
 
     // Request timer
     TTime endTime;
@@ -187,59 +174,58 @@ void CSimpleTimeout::Start(TTimeIntervalMicroSeconds aTimeout)
     // Note: iTimer.After() method cannot use because there needed
     // TTimeIntervalMicroSeconds32 and it is 32 bit. So then cannot create
     // timeout time that is long enough. At() uses 64 bit value=>Long enough.
-    iTimer.At( iStatus, endTime );
+    iTimer.At(iStatus, endTime);
     SetActive();
-}
-
+    }
 
 /*
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 
-Class: CSimpleTimeout
+ Class: CSimpleTimeout
 
-Method: Start
+ Method: Start
 
-Description: voip audio service - Start timeout counting
+ Description: voip audio service - Start timeout counting
 
-Parameters: None
+ Parameters: None
 
-Return Values: None
+ Return Values: None
 
-Errors/Exceptions: None
+ Errors/Exceptions: None
 
-Status: Approved
+ Status: Approved
 
--------------------------------------------------------------------------------
-*/
+ -------------------------------------------------------------------------------
+ */
 void CSimpleTimeout::Stop()
-{
+    {
     FTRACE(FPrint(_L("CSimpleTimeout::Stop")));
     if (IsActive())
-    {
+        {
         Cancel();
+        }
     }
-}
 /*
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 
-Class: CSimpleTimeout
+ Class: CSimpleTimeout
 
-Method: RunL
+ Method: RunL
 
-Description: voip audio service - RunL handles completed timeouts.
+ Description: voip audio service - RunL handles completed timeouts.
 
-Parameters: None
+ Parameters: None
 
-Return Values: None
+ Return Values: None
 
-Errors/Exceptions: None
+ Errors/Exceptions: None
 
-Status: Approved
+ Status: Approved
 
--------------------------------------------------------------------------------
-*/
+ -------------------------------------------------------------------------------
+ */
 void CSimpleTimeout::RunL()
-{
+    {
     FTRACE(FPrint(_L("CSimpleTimeout::RunL")));
     iLog->Log(_L("CSimpleTimeout::RunL"));
     TTime timeout;
@@ -247,84 +233,83 @@ void CSimpleTimeout::RunL()
     // Handle the abort case when system time gets changed, but timeout is
     // still valid. All other cases should timeout since they invalidate the
     // logic of the timers.
-    if ( iStatus == KErrAbort)
-    {
-        if ( iTestCaseTimeout > timeout )
+    if (iStatus == KErrAbort)
         {
-            RDebug::Print( _L( "Absolute timer still valid. Restaring timer. iStatus: %d" ), iStatus.Int() );
+        if (iTestCaseTimeout > timeout)
+            {
+            RDebug::Print(_L( "Absolute timer still valid. Restaring timer. iStatus: %d" ),
+                    iStatus.Int());
             // Start new timer
             iStatus = KErrNone; // reset value
-            iTimer.At ( iStatus, iTestCaseTimeout );  // restart timer
+            iTimer.At(iStatus, iTestCaseTimeout); // restart timer
             SetActive();
-        }
+            }
         else
-        {
+            {
             // Absolute timer no longer valid. Must timeout.
             iLog->Log(_L("Absolute timeout no longer valid"));
             iObserver->HandleTimeout(KErrNone);
+            }
         }
-
-    }
     else
-    {
+        {
         // Status was not KErrAbort. Timing out!
         // iLog->Log(_L("CSimpleTimeout::RunL - Timeout !!"), iTimeout);
         iLog->Log(_L("Timing out"));
         iObserver->HandleTimeout(KErrNone);
+        }
     }
 
-}
-
 /*
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 
-Class: CSimpleTimeout
+ Class: CSimpleTimeout
 
-Method: DoCancel
+ Method: DoCancel
 
-Description: voip audio service - Cancel active request
+ Description: voip audio service - Cancel active request
 
-Parameters: None
+ Parameters: None
 
-Return Values: None
+ Return Values: None
 
-Errors/Exceptions: None
+ Errors/Exceptions: None
 
-Status: Approved
+ Status: Approved
 
--------------------------------------------------------------------------------
-*/
+ -------------------------------------------------------------------------------
+ */
 void CSimpleTimeout::DoCancel()
-{
+    {
     FTRACE(FPrint(_L("CSimpleTimeout::DoCancel")));
     iTimer.Cancel();
-}
+    }
 
 /*
--------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------
 
-Class: CSimpleTimeout
+ Class: CSimpleTimeout
 
-Method: RunError
+ Method: RunError
 
-Description: voip audio service - Handle errors. Just let framework handle errors because
-RunL does not leave.
+ Description: Handle errors. Just let framework handle errors because
+ RunL does not leave.
 
-Parameters: TInt aError: in: Symbian OS error: Error code
+ Parameters: TInt aError: in: Symbian OS error: Error code
 
-Return Values: TInt: Symbian OS error code
+ Return Values: TInt: Symbian OS error code
 
-Errors/Exceptions: None
+ Errors/Exceptions: None
 
-Status: Approved
+ Status: Approved
 
--------------------------------------------------------------------------------
-*/
-TInt CSimpleTimeout::RunError( TInt aError )
-{
+ -------------------------------------------------------------------------------
+ */
+TInt CSimpleTimeout::RunError(TInt aError)
+    {
     FTRACE(FPrint(_L("CSimpleTimeout::RunError")));
     iLog->Log(_L("Timeout error %d"), aError);
     iObserver->HandleTimeout(aError);
     return aError;
-}
+    }
 

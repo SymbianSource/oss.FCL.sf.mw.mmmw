@@ -97,8 +97,6 @@ CVoIPAudioServerSession::~CVoIPAudioServerSession()
         }
 
     iShared.iMutex.Close();
-    iShared.iCodecSettings.iArrBitrates.Reset();
-
     iVoIPServer.DropSession(); // will start shutdown if no more sessions left
 
     // Release memory and close handles to unused plug-ins held by the DevSound
@@ -128,6 +126,7 @@ void CVoIPAudioServerSession::ConstructL()
     iAO = new (ELeave) CVoIPServerAO(this, tID);
     iShared.iMnThreadStatus = &(this->iAO->iStatus);
     iShared.iCodecSettings.iG711FrameRate = TVoIPCodecSettings::E20MS;
+    iShared.iCodecSettings.iArrBitrates = NULL;
     iShared.iMutex.Signal();
     iAO->Request();
     iSessionType = ENone;
@@ -412,16 +411,16 @@ void CVoIPAudioServerSession::GetCodecsCountL(const RMessage2& aMessage)
     p().iInt = 0;
 
     // Is codecs info already available?
-    if (iCodecsCountUp > 0 &&
-       (iSessionType == EQueryEnc || iSessionType == EUplink))
+    if (iCodecsCountUp > 0 && (iSessionType == EQueryEnc ||
+            iSessionType == EUplink))
         {
         p().iInt = iCodecsCountUp;
         iShared.iMutex.Wait();
         p().iUint = iShared.iCodecSettings.iG711FrameRate; //TODO:
         iShared.iMutex.Signal();
         }
-    else if (iCodecsCountDn > 0 &&
-            (iSessionType == EQueryDec || iSessionType == EDnlink))
+    else if (iCodecsCountDn > 0 && (iSessionType == EQueryDec ||
+            iSessionType == EDnlink))
         {
         p().iInt = iCodecsCountDn;
         iShared.iMutex.Wait();
@@ -481,8 +480,8 @@ void CVoIPAudioServerSession::GetSupportedCodecsL(const RMessage2& aMessage)
     stream.Open(*dataCopyBuffer);
     CleanupClosePushL(stream);
 
-    if (iCodecsCountUp > 0 &&
-       (iSessionType == EQueryEnc || iSessionType == EUplink))
+    if (iCodecsCountUp > 0 && (iSessionType == EQueryEnc ||
+            iSessionType == EUplink))
         {
         for (TInt i = 0; i < iCodecsCountUp; i++)
             {
@@ -490,8 +489,8 @@ void CVoIPAudioServerSession::GetSupportedCodecsL(const RMessage2& aMessage)
             TRACE_PRN_N2(_L("VoIP->CodecUP[%d]==[0x%x]"), i+1, iCodecsUp[i].FourCC());
             }
         }
-    else if (iCodecsCountDn > 0 &&
-            (iSessionType == EQueryDec || iSessionType == EDnlink))
+    else if (iCodecsCountDn > 0 && (iSessionType == EQueryDec ||
+            iSessionType == EDnlink))
         {
         for (TInt i = 0; i < iCodecsCountDn; i++)
             {
@@ -535,11 +534,9 @@ void CVoIPAudioServerSession::OpenDownlinkL(const RMessage2& aMessage)
     if (iThread.Handle() <= 0)
         {
         err = iThread.Create(_L("VoIPDownlinkThread"),
-                             CVoIPDownlinkThread::ThreadFunction,
-                             KDefaultStackSize,
-                             KMinHeapSize,
-                             KMinHeapSize << 12, //1MB
-                             &iShared);
+                CVoIPDownlinkThread::ThreadFunction, KDefaultStackSize,
+                KMinHeapSize, KMinHeapSize << 12, //1MB
+                &iShared);
         if (err == KErrNone)
             {
             iThread.SetPriority(EPriorityRealTime);
@@ -594,11 +591,9 @@ void CVoIPAudioServerSession::OpenUplinkL(const RMessage2& aMessage)
     if (iThread.Handle() <= 0)
         {
         err = iThread.Create(_L("VoIPUplinkThread"),
-                             CVoIPUplinkThread::ThreadFunction,
-                             KDefaultStackSize,
-                             KMinHeapSize,
-                             KMinHeapSize << 12, //1MB
-                             &iShared);
+                CVoIPUplinkThread::ThreadFunction, KDefaultStackSize,
+                KMinHeapSize, KMinHeapSize << 12, //1MB
+                &iShared);
         if (err == KErrNone)
             {
             iThread.SetPriority(EPriorityRealTime);
@@ -989,14 +984,13 @@ void CVoIPAudioServerSession::GetSupportedBitratesL(const RMessage2& aMessage)
 
     RArray<TUint> bitrates;
     iShared.iMutex.Wait();
-    bitrates = iShared.iCodecSettings.iArrBitrates;
+    bitrates = *iShared.iCodecSettings.iArrBitrates;
     iShared.iMutex.Signal();
     TInt numOfItems = bitrates.Count();
 
     for (TInt i = 0; i < numOfItems; i++)
         {
         stream.WriteUint32L(bitrates[i]);
-
         TRACE_PRN_N1(_L("VoIP->SRV-SESSION: BR: [%d]"), bitrates[i]);
         }
 
@@ -1677,9 +1671,14 @@ void CVoIPAudioServerSession::GetSupportedBitratesComplete(TInt aError)
     TRACE_PRN_IF_ERR(aError);
 
     TVoIPMsgBufPckg p;
-    iShared.iMutex.Wait();
-    p().iInt = iShared.iCodecSettings.iArrBitrates.Count();
+    p().iInt = 0;
     p().iStatus = aError;
+
+    iShared.iMutex.Wait();
+    if (iShared.iCodecSettings.iArrBitrates)
+        {
+        p().iInt = iShared.iCodecSettings.iArrBitrates->Count();
+        }
     iShared.iMutex.Signal();
     TRAPD(err, iMessage.WriteL(0, p));
     iMessage.Complete(err);
@@ -2042,7 +2041,6 @@ void CVoIPAudioServerSession::InitializeComplete(TInt aError)
 void CVoIPAudioServerSession::ToneFinished(TInt aError)
     {
     TRACE_PRN_IF_ERR(aError);
-
     NotifyDtmfClient(ECmdDTMFTonePlayFinished, aError);
     }
 

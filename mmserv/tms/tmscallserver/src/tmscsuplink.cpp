@@ -63,21 +63,6 @@ TMSCSUplink::~TMSCSUplink()
     }
 
 // -----------------------------------------------------------------------------
-// Gives mic mute state
-// -----------------------------------------------------------------------------
-//
-gboolean TMSCSUplink::IsMuted()
-    {
-    gint gain(0);
-
-    if (iDevSound)
-        {
-        gain = iDevSound->Gain();
-        }
-    return ((!gain)? TRUE : FALSE);
-    }
-
-// -----------------------------------------------------------------------------
 // Sets mic gain
 // -----------------------------------------------------------------------------
 //
@@ -148,6 +133,7 @@ void TMSCSUplink::RecordError(TInt aError)
     if (iActivationOngoing && (aError == KErrAccessDenied ||
             aError == KErrInUse))
         {
+#ifndef __WINSCW__
         if (iStartRetryTime != 0)
             {
             StartTimer();
@@ -158,6 +144,9 @@ void TMSCSUplink::RecordError(TInt aError)
             iActivationOngoing = EFalse;
             iObserver.UplinkActivationCompleted(aError);
             }
+#else  //__WINSCW__
+        iObserver.UplinkActivationCompleted(TMS_RESULT_SUCCESS);
+#endif //__WINSCW__
         }
     }
 

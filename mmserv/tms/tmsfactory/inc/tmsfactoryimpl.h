@@ -21,6 +21,7 @@
 #include <e32cmn.h>
 #include <w32std.h>
 #include <tms.h>
+#include <tmsver.h>
 
 namespace TMS {
 
@@ -39,7 +40,7 @@ class TMSInbandTone;
 class TMSFactoryImpl
     {
 public:
-    TMSFactoryImpl();
+    TMSFactoryImpl(TMSVer& ver);
     virtual ~TMSFactoryImpl();
 
     gint CreateCall(TMSCallType ctype, TMSCall*& tmscall, guint ctxid);

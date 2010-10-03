@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "xaframeworkmgr.h"
+#include "xadebug.h"
 
 /* Default line width permitted in the cfg file + 2 to hold "\r\n"*/
 #define LINEWIDTH 82
@@ -79,60 +80,65 @@ FrameworkMap* XAFrameworkMgr_CreateFrameworkMap()
     FrameworkMap *curNode = NULL;
     FWMgrBool newNode;
     FrameworkMap *frameworkMap = NULL;
+    FILE* fp = NULL;
 
-    FILE* fp = fopen(configFileLocationC, "r");
+    DEBUG_API("->XAFrameworkMgr_CreateFrameworkMap");
+    /* Open file on C drive */
+    DEBUG_INFO("Opening configuration file from C drive...");
+    fp = fopen(configFileLocationC, "r");
     if (fp == NULL)
         {
+        DEBUG_INFO("Opening configuration file from Z drive...");
         fp = fopen(configFileLocationZ, "r");
         }
 
-    if (fp != NULL)
+    if (fp == NULL)
         {
-        while ((fgets(buffer, LINEWIDTH, fp) != NULL) && processedEntry)
+        DEBUG_ERR("ERROR: Unable to open configuration file!");
+        DEBUG_API("<-XAFrameworkMgr_CreateFrameworkMap");
+        return NULL;
+        }
+    while ((fgets(buffer, LINEWIDTH, fp) != NULL) && processedEntry)
+        {
+        /* keep looping until NULL pointer OR error... */
+        lineNumber++;
+        readSize = strlen(buffer);
+        /* Ignore comments line */
+        if (buffer[0] == '#')
+            continue;
+
+        /* Ignore replace "\r\n" with '\0' */
+        if ((readSize >= 2) && (buffer[readSize - 2] == '\r')
+                && (buffer[readSize - 1] == '\n'))
+            buffer[readSize - 2] = '\0';
+
+        /* Ignore new line... */
+        if (readSize == 2)
+            continue;
+
+        processedEntry = processConfigEntry(buffer, &currentMediaType,
+                &currentFrameworkType, &currentTagType, &newNode,
+                &curNode);
+        if (newNode)
             {
-            /* keep looping until NULL pointer OR error... */
-            lineNumber++;
-            readSize = strlen(buffer);
-            /* Ignore comments line */
-            if (buffer[0] == '#')
-                continue;
-
-            /* Ignore replace "\r\n" with '\0' */
-            if ((readSize >= 2) && (buffer[readSize - 2] == '\r')
-                    && (buffer[readSize - 1] == '\n'))
-                buffer[readSize - 2] = '\0';
-
-            /* Ignore new line... */
-            if (readSize == 2)
-                continue;
-
-            processedEntry = processConfigEntry(buffer, &currentMediaType,
-                    &currentFrameworkType, &currentTagType, &newNode,
-                    &curNode);
-            if (newNode)
+            /*Just link to the last element in the chain*/
+            if (!frameworkMap)
                 {
-                /*Just link to the last element in the chain*/
-                if (!frameworkMap)
+                frameworkMap = curNode;
+                }
+            else
+                {
+                FrameworkMap *lastNode = frameworkMap;
+                while (lastNode->next)
                     {
-                    frameworkMap = curNode;
+                    lastNode = lastNode->next;
                     }
-                else
-                    {
-                    FrameworkMap *lastNode = frameworkMap;
-                    while (lastNode->next)
-                        {
-                        lastNode = lastNode->next;
-                        }
-                    lastNode->next = curNode;
-                    }
+                lastNode->next = curNode;
                 }
             }
-        fclose(fp);
         }
-    else
-        {
-        printf("unable to open config file!\n");
-        }
+    fclose(fp);
+    DEBUG_API("<-XAFrameworkMgr_CreateFrameworkMap");
     return frameworkMap;
     }
 
@@ -145,31 +151,50 @@ void XAFrameworkMgr_DumpFrameworkMap(FrameworkMap *map)
     FrameworkMap *node = map;
     int i;
     int loopIndex = 0;
+
+    DEBUG_API("->XAFrameworkMgr_DumpFrameworkMap");
     while (node)
         {
         loopIndex++;
-        printf("%d>", loopIndex);
+        DEBUG_INFO_A1("%d>", loopIndex);
         if (node->moType == FWMgrMOPlayer)
-            printf("MediaPlayer-");
+            {
+            DEBUG_INFO("MediaPlayer-");
+            }
         else if (node->moType == FWMgrMORecorder)
-            printf("MediaRecrdr-");
+            {
+            DEBUG_INFO("MediaRecrdr-");
+            }
         else
-            printf("UKNOWN-");
+            {
+            DEBUG_INFO("UKNOWN-");
+            }
         if (node->fwType == FWMgrFWMMF)
-            printf("MMF-");
+            {
+            DEBUG_INFO("MMF-");
+            }
         else if (node->fwType == FWMgrFWGST)
-            printf("GST-");
+            {
+            DEBUG_INFO("GST-");
+            }
         else
-            printf("UKNOWN-");
-        printf("Scheme[");
+            {
+            DEBUG_INFO("UKNOWN-");
+            }
+        DEBUG_INFO("Scheme[");
         for (i = 0; i < node->uriSchemeCount; i++)
-            printf(" %s", node->uriSchemes[i]);
+            {
+            DEBUG_INFO_A1_STR(" %s", node->uriSchemes[i]);
+            }
         printf("]FileExt[");
         for (i = 0; i < node->fileExtCount; i++)
-            printf(" %s", node->fileExts[i]);
-        printf("]\n");
+            {
+            DEBUG_INFO_A1_STR(" %s", node->fileExts[i]);
+            }
+        DEBUG_INFO("]\n");
         node = node->next;
         }
+    DEBUG_API("<-XAFrameworkMgr_DumpFrameworkMap");
     }
 #endif
 
@@ -181,6 +206,7 @@ void XAFrameworkMgr_DeleteFrameworkMap(FrameworkMap **map)
     FrameworkMap *node = *map;
     FrameworkMap *nextNode = NULL;
     int i;
+    DEBUG_API("->XAFrameworkMgr_DeleteFrameworkMap");
     while (node)
         {
         for (i = 0; i < node->uriSchemeCount; i++)
@@ -196,6 +222,7 @@ void XAFrameworkMgr_DeleteFrameworkMap(FrameworkMap **map)
         node = nextNode;
         }
     *map = NULL;
+    DEBUG_API("<-XAFrameworkMgr_DeleteFrameworkMap");
     }
 
 /* FWMgrFwType XAFrameworkMgr_GetFramework
@@ -214,17 +241,21 @@ FWMgrFwType XAFrameworkMgr_GetFramework(FrameworkMap *map, const char *uri,
     int i = 0;
     int copyLen = 0;
 
+    DEBUG_API("->XAFrameworkMgr_GetFramework");
     if (!map || !uri)
         {
-        /* TODO Log invalid uri */
+        DEBUG_ERR("NULL map/uri");
+        DEBUG_API("<-XAFrameworkMgr_GetFramework");
         return retVal;
         }
 
+    DEBUG_INFO_A1_STR("uri[%s]", uri);
     /* Get uri scheme */
     uriScheme = strchr(uri, ':');
     if (uriScheme == NULL)
         {
-        /* TODO Log invalid uri */
+        DEBUG_ERR("malformed URI. Could not find [:]");
+        DEBUG_API("<-XAFrameworkMgr_GetFramework");
         return retVal;
         }
 
@@ -239,7 +270,8 @@ FWMgrFwType XAFrameworkMgr_GetFramework(FrameworkMap *map, const char *uri,
         char* dotLoc = strrchr(uri, '.');
         if (dotLoc == NULL)
             {
-            /* TODO Log invalid uri */
+            DEBUG_ERR("malformed URI. Could not find extension char[.]");
+            DEBUG_API("<-XAFrameworkMgr_GetFramework");
             free(uriScheme);
             return retVal;
             }
@@ -260,8 +292,9 @@ FWMgrFwType XAFrameworkMgr_GetFramework(FrameworkMap *map, const char *uri,
             for (i = 0; i < node->uriSchemeCount; i++)
                 {
                 if (strcasecmp(uriScheme, node->uriSchemes[i]) == 0)
-                    {
+                    {                    
                     uriMatchFound = FWMgrTrue;
+                    DEBUG_INFO_A1_STR("Found macthing framework for scheme[%s]", uriScheme);
                     break;
                     }
                 }
@@ -277,15 +310,17 @@ FWMgrFwType XAFrameworkMgr_GetFramework(FrameworkMap *map, const char *uri,
                     if (strcasecmp(fileExt, node->fileExts[i]) == 0)
                         {
                         fileExtMatchFound = FWMgrTrue;
+                        DEBUG_INFO_A1_STR("Found macthing framework for fileext[%s]", fileExt);
                         break;
                         }
                     }
                 }
 
-            if ((uriMatchFound == FWMgrTrue) && (fileExtMatchFound
-                    == FWMgrTrue))
+            if ((uriMatchFound == FWMgrTrue) &&
+                    (fileExtMatchFound == FWMgrTrue))
                 {
                 retVal = node->fwType;
+                DEBUG_INFO_A1("Framework is[%d]", (int)retVal);
                 break;
                 }
             }
@@ -293,6 +328,7 @@ FWMgrFwType XAFrameworkMgr_GetFramework(FrameworkMap *map, const char *uri,
         }
     free(uriScheme);
     free(fileExt);
+    DEBUG_API("<-XAFrameworkMgr_GetFramework");
     return retVal;
     }
 

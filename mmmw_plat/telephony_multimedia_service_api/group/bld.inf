@@ -23,6 +23,7 @@ DEFAULT
 PRJ_EXPORTS
 
 ../inc/tms.h                    MW_LAYER_PLATFORM_EXPORT_PATH(tms.h)
+../inc/tmsver.h                 MW_LAYER_PLATFORM_EXPORT_PATH(tmsver.h)
 ../inc/tmsamrformat.h           MW_LAYER_PLATFORM_EXPORT_PATH(tmsamrformat.h)
 ../inc/tmsbuffer.h              MW_LAYER_PLATFORM_EXPORT_PATH(tmsbuffer.h)
 ../inc/tmscall.h                MW_LAYER_PLATFORM_EXPORT_PATH(tmscall.h)

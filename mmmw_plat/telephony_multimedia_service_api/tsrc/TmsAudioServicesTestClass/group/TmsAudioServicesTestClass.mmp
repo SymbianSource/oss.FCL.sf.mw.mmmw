@@ -42,7 +42,7 @@ OS_LAYER_STDCPP_SYSTEMINCLUDE
 
 LIBRARY         euser.lib
 LIBRARY         stiftestinterface.lib
-LIBRARY         efsrv.lib               // File server session for database
+LIBRARY         efsrv.lib
 LIBRARY         tmsfactory.lib
 LIBRARY	        tmsapi.lib
 LIBRARY	        libglib.lib

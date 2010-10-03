@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include "xanvolumeextitf.h"
 #include "xanokiavolumeextitfadaptationmmf.h"
@@ -479,7 +478,6 @@ XANokiaVolumeExtItfImpl* XANokiaVolumeExtItfImpl_Create(
 void XANokiaVolumeExtItfImpl_Free(XANokiaVolumeExtItfImpl* self)
     {
     DEBUG_API("->XANokiaVolumeExtItfImpl_Free");
-    assert(self==self->self);
     free(self);
     DEBUG_API("<-XANokiaVolumeExtItfImpl_Free");
     }
@@ -500,7 +498,6 @@ void XANokiaVolumeExtItfImpl_AdaptCb(void *pHandlerCtx, XAAdaptEvent *event)
         DEBUG_API("<-XANokiaVolumeExtItfImpl_AdaptCb");
         return;
         }
-    assert(event);
 
     if (event->eventid == XA_ADAPT_VOLUME_MUTE_CHANGED && impl->callback)
         {

@@ -54,6 +54,7 @@ const TUid KUidMetaDataWriteCustomCommand =
 
 class CMarkerPositionTimer;
 class CPositionUpdateTimer;
+class CPrefetchLevelUpdateTimer;
 NONSHARABLE_CLASS(CMMFBackendEngine) : public CBase,
         public MVideoPlayerUtilityObserver,
         public MVideoLoadingObserver,
@@ -139,6 +140,20 @@ public:
 
     XAresult SetPlaybackRate(XAint16 rate);
     XAresult GetPlaybackRateCapabilities(XAboolean* forward, XAboolean* backward);
+	//PrefetchStatus
+	XAresult RegisterPrefetchCallback(xaPrefetchCallback);
+	XAresult SetPrefetchLevelUpdatePeriod(XApermille);
+	XAresult SetPrefetchCallbackEventsMask(XAuint32 eventflags);
+	
+	XAresult GetPrefetchStatus(XAuint32* status);
+	XAresult GetPrefetchFillLevel(XApermille* level);
+
+	XAresult RegisterStreamInfoCallback(xaStreamEventChangeCallback);
+
+    XAresult SetSourceRect(const XARectangle* rect);
+    XAresult SetDestinationRect(const XARectangle* rect);
+    XAresult SetRotation(XAmillidegree rotation);
+    XAresult SetScaleOptions(XAuint32 options);
 
 public:
 
@@ -183,6 +198,10 @@ private:
     XAresult DoHandlePlayItfAttributesChanged();
     void DoPostEvent(XAuint32 event);
     TInt InitializeURIForMMFUtil(char *uri);
+
+	//StreamInfo
+	void SetStreamInfo();
+	void SendStreamInfoEvent(TInt);	
 
 private:
     CVideoPlayerUtility2* iVideoPlayer;
@@ -245,6 +264,19 @@ private:
     XAmillisecond iMarkerPosition;
     /* Property set by client */
     XAmillisecond iPositionUpdatePeriod;
+
+	//PrefetchStatus Interface variables
+	TBool bPrefetchCallbackRegistered;
+	TBool bStatusChangeMask;
+    CPrefetchLevelUpdateTimer* iPrefetchLevelUpdateTimer;
+    XAmillisecond iPrefetchLevelUpdatePeriod;
+	XAuint32 iPrefetchStatus;
+
+	//StreamInfo
+	TInt iNumStreams;
+	TBool iAudioOnly; 
+	TBool iStreamInfoEventSubscribed;
+
     /* Property set by client (for file without file:///) */
     HBufC* iUri; /* owns */
     TPtr iUriPtr;
@@ -318,6 +350,20 @@ extern XAresult mmf_volumeitf_get_maxvolume(void * context, XAuint32* volume);
 extern XAresult mmf_playbackrateitf_set_playbackrate(void * context, XAint16 rate);
 extern XAresult mmf_playbackrateitf_get_playbackratecaps(void * context,
                                 XAboolean* forward, XAboolean* backward);
+
+extern XAresult mmf_prefetchstatusitf_register_callback(void * context, xaPrefetchCallback callback);
+extern XAresult mmf_prefetchstatusitf_set_callback_events_mask(void * context,	XAuint32 cbMask);
+extern XAresult mmf_prefetchstatusitf_set_fill_level_update_period( void * context, XAmillisecond mSec);
+
+extern XAresult mmf_prefetchstatusitf_get_status(void *context, XAuint32* status);
+extern XAresult mmf_prefetchstatusitf_get_fill_level(void *context,XApermille* fillLevel);
+
+extern XAresult mmf_streaminfoitf_register_callback(void * context, xaStreamEventChangeCallback callback);
+
+extern XAresult mmf_videoppitf_set_sourcerectangle(void * context, const XARectangle* rect);
+extern XAresult mmf_videoppitf_set_destinationrectangle(void * context, const XARectangle* rect);
+extern XAresult mmf_videoppitf_set_rotation(void * context, XAmillidegree rotation);
+extern XAresult mmf_videoppitf_set_scalingoptions(void * context, XAuint32 options);
 
 #endif /* __cplusplus */
 

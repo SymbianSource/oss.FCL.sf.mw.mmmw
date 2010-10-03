@@ -96,7 +96,10 @@ TInt COpenMAXALTestModule::al_objitf_Realize( CStifItemParser& aItem )
                     }
                 else
                     {
+                    TAG_TIME_PROFILING_BEGIN;
                     res = (*itf)->Realize(itf, async);
+                    TAG_TIME_PROFILING_END;
+                    PRINT_TO_CONSOLE_TIME_DIFF;
                     }
                 status = res;
                 }
@@ -258,7 +261,10 @@ TInt COpenMAXALTestModule::al_objitf_Destroy( CStifItemParser& aItem )
                 }
             else
                 {
+                TAG_TIME_PROFILING_BEGIN;
                 (*itf)->Destroy(itf);
+                TAG_TIME_PROFILING_END;
+                PRINT_TO_CONSOLE_TIME_DIFF;
                 }
             }
         else

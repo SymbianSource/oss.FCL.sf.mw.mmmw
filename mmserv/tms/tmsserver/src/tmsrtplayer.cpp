@@ -49,15 +49,10 @@ const TInt Kkilo = 1024;
 _LIT(KTMSTtsHeader, "(tts)");
 
 #ifdef __WINSCW__
-//_LIT(KTMSDefaultSoundFile, "z:\\data\\sounds\\digital\\Nokia_tune.aac");
-_LIT(KTMSDefaultSoundFile, "Z:\\Data\\Sounds\\Digital\\Nokia tune.aac");
-//_LIT(KTMSDefaultSoundFile, "c:\\data\\sounds\\digital\\test_8khz.wav");
-_LIT(KTMSNoSoundSequence,  "z:\\data\\sounds\\digital\\clock.aac");
-//_LIT(KTMSNoSoundSequence, "c:\\data\\sounds\\digital\\test_8khz.wav");
-_LIT(KTMSBeepSequence,     "z:\\data\\sounds\\digital\\clock.aac");
-//_LIT(KTMSBeepSequence, "c:\\data\\sounds\\digital\\test_8khz.wav");
+_LIT(KTMSDefaultSoundFile, "z:\\data\\sounds\\digital\\Nokia_tune.aac");
+_LIT(KTMSNoSoundSequence,  "z:\\data\\sounds\\digital\\alarm.aac");
+_LIT(KTMSBeepSequence,     "z:\\data\\sounds\\digital\\alarm.aac");
 _LIT(KTMSUnsecureVoIPCall, "z:\\data\\sounds\\digital\\alarm.aac");
-//_LIT(KTMSUnsecureVoIPCall, "c:\\data\\sounds\\digital\\test_8khz.wav");
 #else
 // DO NOT change these sequences!
 _LIT(KTMSDefaultSoundFile, "\\System\\Sounds\\Simple\\Nokia tune.wav");
@@ -143,10 +138,15 @@ TMSRingTonePlayer::~TMSRingTonePlayer()
         }
     RemovePlayers();
     delete iBackupPlayer;
+    iBackupPlayer = NULL;
     delete iAsyncReqAO;
+    iAsyncReqAO = NULL;
     delete iTimer;
+    iTimer = NULL;
     delete iTtsDelayTimer;
+    iTtsDelayTimer = NULL;
     delete iRtContainer;
+    iRtContainer = NULL;
 
     TRACE_PRN_FN_EXT;
     }

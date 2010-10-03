@@ -16,7 +16,6 @@
 */
 
 #include <unistd.h>
-#include <openMAXAL.h>
 #include "xadebug.h"
 #include "xaadaptationmmf.h"
 #include "xaradioitfadaptation.h"
@@ -214,7 +213,6 @@ XAresult XARadioItfAdapt_GetStereoMode(XAuint32 * pMode)
  */
 void XARadioItfAdapt_Free()
 {
-    DEBUG_API("->XARadioItfAdapt_Free");
 }
 
 void XARadioItfAdapt_SeekComplete(XAAdaptationBaseCtx *ctx, TInt aError, TInt aFrequency)

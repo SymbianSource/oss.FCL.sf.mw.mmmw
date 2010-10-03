@@ -17,13 +17,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 
 #include "xaglobals.h"
 #include "xaaudioiodevicecapabilitiesitf.h"
 #include "xacapabilitiesmgr.h"
-
+#include "xaadptbasectx.h"
 
 /* XAAudIODevCapaItfImpl* GetImpl
  * Description: Validate interface pointer and cast it to implementation pointer.
@@ -81,11 +80,12 @@ XAresult XAAudIODevCapaItfImpl_GetAvailableAudioInputs(
                     res = XACapabilitiesMgr_GetCapsByIdx(impl->capslist, (XACapsType)(XACAP_DEVSRC|XACAP_AUDIO), i, &temp);
                     pInputDeviceIDs[i] = temp.xaid;
                 }
-
-                pInputDeviceIDs[0] = 0xAD7E5001;
             }
         }
-        *pNumInputs = impl->numInputDevices;
+        else
+        {
+            *pNumInputs = impl->numInputDevices;
+        }
     }
     DEBUG_API("<-XAAudIODevCapaItfImpl_GetAvailableAudioInputs");
     return res;
@@ -216,11 +216,12 @@ XAresult XAAudIODevCapaItfImpl_GetAvailableAudioOutputs(
                     res = XACapabilitiesMgr_GetCapsByIdx(impl->capslist, (XACapsType)(XACAP_DEVSNK|XACAP_AUDIO), i, &temp);
                     pOutputDeviceIDs[i] = temp.xaid;
                 }
-
-                pOutputDeviceIDs[0] = 0xAD7E5002;
             }
         }
-        *pNumOutputs = impl->numOutputDevices;
+        else
+        {
+            *pNumOutputs = impl->numOutputDevices;
+        }
     }
     DEBUG_API("<-XAAudIODevCapaItfImpl_GetAvailableAudioOutputs");
     return res;
@@ -397,39 +398,6 @@ XAresult XAAudIODevCapaItfImpl_GetAssociatedAudioInputs(
         }
 
         *pNumAudioInputs = associatedCount;
-
-
-    if(!pAudioInputDeviceIDs)
-        {
-        switch(deviceId)
-            {
-            case 0xAD7E5001:
-                *pNumAudioInputs = 0;
-                break;
-            case 0xAD7E5002:
-                *pNumAudioInputs = 1;
-                break;
-            default:
-                res = XA_RESULT_PARAMETER_INVALID;
-                break;
-            }
-        }
-    else
-        {
-        switch(deviceId)
-            {
-            case 0xAD7E5001:
-                res = XA_RESULT_PARAMETER_INVALID;
-                break;
-            case 0xAD7E5002:
-                pAudioInputDeviceIDs[*pNumAudioInputs - 1] = 0xAD7E5001;
-                break;
-            default:
-                res = XA_RESULT_PARAMETER_INVALID;
-                break;
-            }
-        }
-
     }
 
     DEBUG_API("<-XAAudIODevCapaItfImpl_GetAssociatedAudioInputs");
@@ -493,38 +461,6 @@ XAresult XAAudIODevCapaItfImpl_GetAssociatedAudioOutputs(
         }
 
         *pNumAudioOutputs = associatedCount;
-
-
-        if(!pAudioOutputDeviceIDs)
-            {
-            switch(deviceId)
-                {
-                case 0xAD7E5002:
-                    *pNumAudioOutputs = 0;
-                    break;
-                case 0xAD7E5001:
-                    *pNumAudioOutputs = 1;
-                    break;
-                default:
-                    res = XA_RESULT_PARAMETER_INVALID;
-                    break;
-                }
-            }
-        else
-            {
-            switch(deviceId)
-                {
-                case 0xAD7E5002:
-                    res = XA_RESULT_PARAMETER_INVALID;
-                    break;
-                case 0xAD7E5001:
-                    pAudioOutputDeviceIDs[*pNumAudioOutputs - 1] = 0xAD7E5001;
-                    break;
-                default:
-                    res = XA_RESULT_PARAMETER_INVALID;
-                    break;
-                }
-            }
     }
 
     DEBUG_API("<-XAAudIODevCapaItfImpl_GetAssociatedAudioOutputs");
@@ -570,10 +506,10 @@ XAresult XAAudIODevCapaItfImpl_GetDefaultAudioDevices(XAAudioIODeviceCapabilitie
         switch(defaultDeviceID)
             {
             case XA_DEFAULTDEVICEID_AUDIOOUTPUT:
-                pAudioDeviceIDs[*pNumAudioDevices - 1] = 0xAD7E5002;
+                pAudioDeviceIDs[*pNumAudioDevices - 1] = XA_ADAPT_DEFAULTAUDIOOUTPUT;
                 break;
             case XA_DEFAULTDEVICEID_AUDIOINPUT:
-                pAudioDeviceIDs[*pNumAudioDevices - 1] = 0xAD7E5001;
+                pAudioDeviceIDs[*pNumAudioDevices - 1] = XA_ADAPT_DEFAULTAUDIOINPUT;
                 break;
             default:
                 res = XA_RESULT_PARAMETER_INVALID;
@@ -718,8 +654,6 @@ XAAudIODevCapaItfImpl* XAAudIODevCapaItfImpl_Create(XACapabilities* caps)
         self->inputCbPtrToSelf = NULL;
         self->outputCbPtrToSelf = NULL;
         self->deviceMapCbPtrToSelf = NULL;
-        self->numInputDevices = 1;
-        self->numOutputDevices = 1;
         self->self = self;
     }
     DEBUG_API("<-XAAudIODevCapaItfImpl_Create");
@@ -732,7 +666,6 @@ XAAudIODevCapaItfImpl* XAAudIODevCapaItfImpl_Create(XACapabilities* caps)
 void XAAudIODevCapaItfImpl_Free(XAAudIODevCapaItfImpl* self)
 {
     DEBUG_API("->XAAudIODevCapaItfImpl_Free");
-    assert(self==self->self);
     free(self);
     DEBUG_API("<-XAAudIODevCapaItfImpl_Free");
 }

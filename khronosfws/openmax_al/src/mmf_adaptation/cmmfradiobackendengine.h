@@ -41,24 +41,23 @@ public:
     ~CMMFRadioBackendEngine();
     
     void SetFrequency(TInt aFreq);
-    TInt GetFrequency(TInt& aFreq);
-    TInt GetSignalStrength(TInt& aFreq);
+    XAresult GetFrequency(TInt& aFreq);
+    XAresult GetSignalStrength(TInt& aFreq);
     void StationSeek(TBool aUpwards);
     void CancelSetFrequency();
     void CancelStationSeek();
     void SetFreqRange(TFmRadioFrequencyRange aRange);
-    TInt GetFreqRange(TFmRadioFrequencyRange& aRange);
-    TInt GetFreqRangeProperties(TFmRadioFrequencyRange& aRange, TInt& aMinFreq, TInt& aMaxFreq);
-    TInt GetMaxVolume(TInt& aMaxVol);
-    TInt SetVolume(TInt aVol);
-    TInt GetVolume(TInt& aVol);
-    TInt SetMute(TBool aMute);
-    TInt GetForcedMonoReception(TUint& aForcedMono);
-    TInt ForceMonoReception(TUint aForcedMono);
+    XAresult GetFreqRange(TFmRadioFrequencyRange& aRange);
+    XAresult GetFreqRangeProperties(TFmRadioFrequencyRange& aRange, TInt& aMinFreq, TInt& aMaxFreq);
+    XAresult SetVolume(TInt aVol);
+    XAresult GetVolume(TInt& aVol);
+    XAresult SetMute(TBool aMute);
+    XAresult GetForcedMonoReception(TUint& aForcedMono);
+    XAresult ForceMonoReception(TUint aForcedMono);
     void PlayRadio();
     void StopRadio();
-    TInt GetSquelch(TBool& aSquelch);
-    TInt SetSquelch(TBool aSquelch);
+    XAresult GetSquelch(TBool& aSquelch);
+    XAresult SetSquelch(TBool aSquelch);
     void SetAdaptContext(void* adaptcontext);
 
     /**
@@ -231,13 +230,13 @@ private:
     XAresult SetForceMonoFlag();
 
 private:
-    CRadioUtility*          iRadioUtility; 
+    CRadioUtility*          iRadioUtility;
     CRadioFmTunerUtility*   iFmTunerUtility;
     CRadioPlayerUtility*    iRadioPlayerUtility;
     TBool                   iForceStereo;
     void*                   iAdaptContext;
     TFmRadioFrequencyRange  iDefaultFreqRange;
-    TUint                   iDefaultFrequency;     
+    TUint                   iDefaultFrequency;
     TInt                    iDefaultMinFreq;
     TInt                    iDefaultMaxFreq; 
        

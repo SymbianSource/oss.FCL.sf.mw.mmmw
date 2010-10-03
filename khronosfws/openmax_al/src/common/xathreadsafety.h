@@ -54,7 +54,7 @@ static const char* mediaobjectnames[5] =
         DEBUG_INFO("Thread safety - invalid mutex reference index");                    \
         return XA_RESULT_PARAMETER_INVALID;                                             \
     }                                                                                   \
-    DEBUG_INFO_A1("Thread safety entry for %s",MEDIAOBJECTNAME(mediaObject));           \
+    DEBUG_INFO_A1_STR("Thread safety entry for %s",MEDIAOBJECTNAME(mediaObject));       \
     mutexRet = XAThreadSafety_TryLock( mediaObject );                                   \
     if ( mutexRet == XA_RESULT_PERMISSION_DENIED )                                      \
     {                                                                                   \
@@ -77,7 +77,7 @@ static const char* mediaobjectnames[5] =
         DEBUG_INFO("Thread safety - invalid mutex reference index");                    \
         return;                                                                         \
     }                                                                                   \
-    DEBUG_INFO_A1("Thread safety entry for %s",MEDIAOBJECTNAME(mediaObject));           \
+    DEBUG_INFO_A1_STR("Thread safety entry for %s",MEDIAOBJECTNAME(mediaObject));       \
     mutexRet = XAThreadSafety_TryLock( mediaObject );                                   \
     if ( mutexRet == XA_RESULT_PERMISSION_DENIED )                                      \
     {                                                                                   \
@@ -107,11 +107,11 @@ static const char* mediaobjectnames[5] =
         DEBUG_INFO("Thread safety - invalid mutex reference index");                    \
         return XA_RESULT_PARAMETER_INVALID;                                             \
     }                                                                                   \
-    DEBUG_INFO_A1("Thread safety exit for %s",MEDIAOBJECTNAME(mediaObject));            \
+    DEBUG_INFO_A1_STR("Thread safety exit for %s",MEDIAOBJECTNAME(mediaObject));        \
     mutexRet = XAThreadSafety_Unlock( mediaObject );                                    \
     if ( mutexRet != XA_RESULT_SUCCESS)                                                 \
     {                                                                                   \
-        DEBUG_INFO("Unable to unlock media object!")                                    \
+        DEBUG_INFO("Unable to unlock media object!");                                   \
         return XA_RESULT_INTERNAL_ERROR;                                                \
     }                                                                                   \
 }                                                                                       \
@@ -124,11 +124,11 @@ static const char* mediaobjectnames[5] =
         DEBUG_INFO("Thread safety - invalid mutex reference index");                    \
         return;                                                                         \
     }                                                                                   \
-    DEBUG_INFO_A1("Thread safety exit for %s",MEDIAOBJECTNAME(mediaObject));            \
+    DEBUG_INFO_A1_STR("Thread safety exit for %s",MEDIAOBJECTNAME(mediaObject));        \
     mutexRet = XAThreadSafety_Unlock( mediaObject );                                    \
     if ( mutexRet != XA_RESULT_SUCCESS)                                                 \
     {                                                                                   \
-        DEBUG_INFO("Unable to unlock media object!")                                    \
+        DEBUG_INFO("Unable to unlock media object!");                                   \
         return;                                                                         \
     }                                                                                   \
 }                                                                                       \

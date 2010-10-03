@@ -43,6 +43,7 @@ public:
 
     void AddSession();
     void DropSession();
+    void TerminateServer();
 
     IMPORT_C static TInt StartThread(TAny* aParams);
 

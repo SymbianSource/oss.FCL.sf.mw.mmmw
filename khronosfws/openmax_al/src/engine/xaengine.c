@@ -17,8 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-
 #include "xaengine.h"
 #include "xaobjectitf.h"
 #include "xaengineitf.h"
@@ -26,7 +24,6 @@
 #include "xadynintmgmtitf.h"
 #include "xaaudioiodevicecapabilitiesitf.h"
 #include "xaaudioencodercapabilitiesitf.h"
-#include "xaconfigextensionsitf.h"
 #include "xathreadsafety.h"
 #include "xaframeworkmgr.h"  
 
@@ -37,18 +34,8 @@ static const XAInterfaceID* xaEngineItfIIDs[ENGINE_ITFCOUNT] =
     &XA_IID_ENGINE,
     &XA_IID_DYNAMICINTERFACEMANAGEMENT,
     &XA_IID_THREADSYNC,
-    /*    &XA_IID_CONFIGEXTENSION,*/
-    /*    &XA_IID_DEVICEVOLUME,*/
     &XA_IID_AUDIOIODEVICECAPABILITIES,
-    /*    &XA_IID_AUDIODECODERCAPABILITIES,*/
     &XA_IID_AUDIOENCODERCAPABILITIES
-    /*
-    &XA_IID_CAMERACAPABILITIES,
-    &XA_IID_IMAGEDECODERCAPABILITIES,
-    &XA_IID_IMAGEENCODERCAPABILITIES,
-    &XA_IID_VIDEODECODERCAPABILITIES,
-    &XA_IID_VIDEOENCODERCAPABILITIES
-     */
     };
 
 /*****************************************************************************
@@ -331,7 +318,6 @@ void XAEngineImpl_FreeResources(XAObjectItf self)
     XAEngineImpl* pImpl = (XAEngineImpl*) (*self);
     XAuint8 itfIdx = 0;
     DEBUG_API("->XAEngineImpl_FreeResources");
-    assert( pObj && pImpl && pObj == pObj->self );
 
     /* free all allocated interfaces */
     for (itfIdx = 0; itfIdx < ENGINE_ITFCOUNT; itfIdx++)

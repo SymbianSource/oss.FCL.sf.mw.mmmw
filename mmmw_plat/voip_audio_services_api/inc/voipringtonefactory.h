@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __RINGTONEFACTORY_H
-#define __RINGTONEFACTORY_H
+#ifndef RINGTONEFACTORY_H
+#define RINGTONEFACTORY_H
 
 // FORWARD DECLARATIONS
 class CRingTonePlayer;
@@ -24,8 +24,6 @@ class CRingToneFactoryImpl;
 
 /**
  *  CRingToneFactory class
- *
- *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
  *
@@ -36,8 +34,6 @@ public:
 
     /**
      * CreateFactory
-     *
-     * @since S60 v5.0
      * @param CRingToneFactory*&
      * @return TInt
      */
@@ -45,8 +41,6 @@ public:
 
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -54,8 +48,6 @@ public:
 
     /**
      * CreateRingTonePlayer
-     *
-     * @since S60 v5.0
      * @param CRingTonePlayer*&
      * @return TInt
      */
@@ -65,8 +57,6 @@ private:
 
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -74,8 +64,6 @@ private:
 
     /**
      * Symbian constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -84,9 +72,8 @@ private:
 private:
 
     CRingToneFactoryImpl* iRingToneFactoryImpl;
-
     };
 
-#endif //__RINGTONEFACTORY_H
+#endif //RINGTONEFACTORY_H
 
 // End of file

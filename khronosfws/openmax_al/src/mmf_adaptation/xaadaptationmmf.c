@@ -15,7 +15,6 @@
  *
  */
 
-#include <assert.h>
 #include <string.h>
 #include "xaadaptationmmf.h"
 #include "xaadaptationmmf.h"
@@ -45,7 +44,7 @@ XAresult XAAdaptationBaseMMF_Init(XAAdaptationMMFCtx* pSelf, XAuint32 ctxId)
         }
     else
         {
-        DEBUG_ERR("Invalid Adaptation Base Context.")
+        DEBUG_ERR("Invalid Adaptation Base Context.");
         return XA_RESULT_PARAMETER_INVALID;
         }
 

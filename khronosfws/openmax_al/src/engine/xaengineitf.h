@@ -41,9 +41,6 @@ typedef struct XAEngineItfImpl_
     struct FrameworkMap_* mapper;
     /*Not Owned*/
     struct XACapabilities_* capabilities;
-
-    int xyz;
-
     } XAEngineItfImpl;
 
 /** METHODS **/

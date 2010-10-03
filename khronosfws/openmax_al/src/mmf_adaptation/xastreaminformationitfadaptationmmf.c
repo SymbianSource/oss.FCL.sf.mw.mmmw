@@ -234,22 +234,6 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamInformation(
             streamInfo->duration = duration;
             }
             break;
-/*
-        case XA_DOMAINTYPE_MIDI:
-            {
-            XAMIDIStreamInformation* streamInfo =
-                    (XAMIDIStreamInformation*) info;
-            DEBUG_INFO("Assigning values for XAMIDIStreamInformation");*/
-            /*currently there is no way to get these information from gstreamer*/
-/*            streamInfo->channels = XA_MIDI_UNKNOWN;
-            streamInfo->tracks = XA_MIDI_UNKNOWN;
-            streamInfo->bankType = XA_MIDIBANK_DEVICE;*/
-            /*streamInfo->bitRate = 0;*/
-/*            streamInfo->langCountry[0] = '\0';
-            streamInfo->duration = duration;
-            }
-            break;
-*/
         case XA_DOMAINTYPE_VIDEO:
             {
             XAVideoStreamInformation* streamInfo =
@@ -263,21 +247,6 @@ XAresult XAStreamInformationItfAdaptMMF_QueryStreamInformation(
             streamInfo->frameRate = frameRate;
             }
             break;
-/*
-        case XA_DOMAINTYPE_IMAGE:
-            {
-            XAImageStreamInformation* streamInfo =
-                    (XAImageStreamInformation*) info;
-            DEBUG_INFO("Assigning values for XAImageStreamInformation");
-            streamInfo->codecId = codecId;
-            streamInfo->width = width;
-            streamInfo->height = height;
-            streamInfo->presentationDuration = duration;
-            }
-            break;
-        default:
-            break;
-*/
         };
     DEBUG_API("<-XAStreamInformationItfAdaptMMF_QueryStreamInformation");
     return ret;
@@ -460,3 +429,12 @@ XAresult XAStreamInformationItfAdaptMMF_SetActiveStream(
     DEBUG_API("->XAStreamInformationItfAdaptMMF_SetActiveStream");
     return ret;
     }
+
+XAresult XAStreamInformationItfAdaptMMF_RegisterCallback(
+					XAAdaptationBaseCtx *adaptCtx,
+					xaStreamEventChangeCallback callback)
+{
+    DEBUG_API("<->XAStreamInformationItfAdaptMMF_RegisterCallback");
+	return mmf_streaminfoitf_register_callback(((XAMediaPlayerAdaptationMMFCtx*) adaptCtx)->mmfContext,callback);
+}
+

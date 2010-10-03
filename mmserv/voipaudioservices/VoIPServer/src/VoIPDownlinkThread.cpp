@@ -50,7 +50,6 @@ CVoIPDownlinkThread::~CVoIPDownlinkThread()
     delete iJitterBuffer;
     delete iAddJBuffer;
     delete iGetJBuffer;
-
     delete iAudioOutput;
     delete iErrConcealmentIntfc;
     delete iG711DecoderIntfc;
@@ -462,6 +461,11 @@ void CVoIPDownlinkThread::SetCodecCiL()
             }
         }
 
+    if (!iAudioOutput)
+        {
+        iAudioOutput = CAudioOutput::NewL(*iDevSound);
+        }
+
     TRACE_PRN_FN_EXT;
     }
 
@@ -506,11 +510,6 @@ void CVoIPDownlinkThread::SetAudioDeviceL()
     TUint device = iShared.iAudioDevice;
     iShared.iMutex.Signal();
 
-    if (!iAudioOutput)
-        {
-        iAudioOutput = CAudioOutput::NewL(*iDevSound);
-        }
-
     if (iAudioOutput)
         {
         // ENoPreference=0, EAll=1, ENoOutput=2, EPrivate=3, EPublic=4
@@ -529,9 +528,10 @@ void CVoIPDownlinkThread::SetAudioDeviceL()
         else // Use default device routing
             {
             outputDev = CAudioOutput::ENoPreference;
-            } //make sure doesn't break loudspeaker audio
+            }
 
         iAudioOutput->SetAudioOutputL(outputDev);
+        TRACE_PRN_N1(_L("Output device set=[%d]"), outputDev);
         }
 
     TRACE_PRN_FN_EXT;
@@ -546,17 +546,12 @@ void CVoIPDownlinkThread::GetAudioDeviceL()
     {
     TRACE_PRN_FN_ENT;
 
-    if (!iAudioOutput)
-        {
-        iAudioOutput = CAudioOutput::NewL(*iDevSound);
-        }
-
     if (iAudioOutput)
         {
+        CVoIPAudioDownlinkStream::TVoIPOutputDevice device;
         CAudioOutput::TAudioOutputPreference outputDev =
                 iAudioOutput->AudioOutput();
-
-        CVoIPAudioDownlinkStream::TVoIPOutputDevice device;
+        TRACE_PRN_N1(_L("VoIP->DNL GetAudioDeviceL [%d]"), outputDev);
 
         switch (outputDev)
             {
@@ -940,7 +935,7 @@ void CVoIPDownlinkThread::BadLsfNextBuffer()
 //
 void CVoIPDownlinkThread::ConfigureJitterBufferL()
     {
-    TInt err = KErrNone;
+    TInt err = KErrNotSupported;
 
     if (iCodecID != KMMFFourCCCodePCM16)
         {
@@ -1269,8 +1264,8 @@ void CVoIPDownlinkThread::EventJB(TInt aEventType, TInt aError)
             break;
             }
         case MJitterBufferObserver::EGeneralError:
-//        case MJitterBufferObserver::EBufferUnderflow:
-//        case MJitterBufferObserver::EBufferOverflow:
+//      case MJitterBufferObserver::EBufferUnderflow:
+//      case MJitterBufferObserver::EBufferOverflow:
         default:
             {
             SendCmd(ECmdDnLinkJBError, aError);

@@ -1,24 +1,22 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
-
-#ifndef __VOIPDOWNLINKSTREAMIMPL_H
-#define __VOIPDOWNLINKSTREAMIMPL_H
-
+#ifndef VOIPDOWNLINKSTREAMIMPL_H
+#define VOIPDOWNLINKSTREAMIMPL_H
 
 // INCLUDES
 #include <voipdownlinkstream.h>
@@ -26,19 +24,14 @@
 #include "VoIPDtmfTonePlayerImpl.h"
 #include "VoIPQueueHandler.h"
 
-
 /**
  *  CVoIPAudioDownlinkStreamImpl class
  *
- *  ?more_complete_description
- *
  *  @lib VoIPAudioIntfc.dll
- *  @since S60 v5.0
  */
-NONSHARABLE_CLASS(CVoIPAudioDownlinkStreamImpl) :
-                    public CBase,
-                    public CVoIPAudioDownlinkStream,
-                    public MQueueHandlerObserver
+NONSHARABLE_CLASS(CVoIPAudioDownlinkStreamImpl) : public CBase,
+        public CVoIPAudioDownlinkStream,
+        public MQueueHandlerObserver
     {
     enum TQueueType
         {
@@ -51,17 +44,16 @@ public:
     /**
      * 2-phased constructor
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return none
      */
     static CVoIPAudioDownlinkStreamImpl* NewL(
-                    const TMMFPrioritySettings aPriority);
+            const TMMFPrioritySettings aPriority);
 
     /**
      * Destructor
      *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -70,7 +62,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param MVoIPDownlinkObserver&
      * @return TInt
      */
@@ -79,7 +70,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TVersion&
      * @return TInt
      */
@@ -88,7 +78,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TInt&
      * @return TInt
      */
@@ -97,7 +86,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TInt
      * @return TInt
      */
@@ -106,7 +94,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TInt&
      * @return TInt
      */
@@ -115,18 +102,16 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param const TMMFPrioritySettings
      * @param RArray<TVoIPCodecFormat>&
      * @return void
      */
     void GetSupportedFormatsL(const TMMFPrioritySettings aPriority,
-                              RArray<TVoIPCodecFormat>& aFormats);
+            RArray<TVoIPCodecFormat>& aFormats);
 
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TVoIPCodecFormat
      * @param CVoIPFormatIntfc&
      * @return void
@@ -136,16 +121,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
-     * @param none
-     * @return TVoIPCodecFormat
-     */
-    TVoIPCodecFormat GetFormat();
-
-    /**
-     * ?description
      *
-     * @since S60 v5.0
      * @param TVoIPOutputDevice
      * @return TInt
      */
@@ -154,7 +130,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TVoIPOutputDevice&
      * @return TInt
      */
@@ -163,7 +138,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -172,7 +146,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -181,7 +154,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -190,7 +162,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param CVoIPDataBuffer*
      * @return TInt
      */
@@ -199,7 +170,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param CVoIPJitterBufferIntfc*&
      * @return void
      */
@@ -208,19 +178,16 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return RVoIPAudioSession*
      */
     RVoIPAudioSession* GetSession();
 
-
-// From MQueueHandlerObserver
+    // From MQueueHandlerObserver
 
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param CVoIPDataBuffer*
      * @return void
      */
@@ -229,7 +196,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TPtr8
      * @return void
      */
@@ -238,7 +204,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TInt
      * @param TInt
      * @return void
@@ -250,16 +215,14 @@ private:
     /**
      * Constructor
      *
-     * @since S60 v5.0
      * @param none
-     * @return TInt
+     * @return none
      */
     CVoIPAudioDownlinkStreamImpl();
 
     /**
      * Symbian constructor
      *
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -268,20 +231,17 @@ private:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TDesC&
      * @param TInt
      * @param TQueueType
      * @return TInt
      */
-    TInt CreateQueue(const TDesC& aQueueName,
-                     const TInt aNumSlots,
-                     const TQueueType aQueueType);
+    TInt CreateQueue(const TDesC& aQueueName, const TInt aNumSlots,
+            const TQueueType aQueueType);
 
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -290,7 +250,6 @@ private:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -299,7 +258,6 @@ private:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TVoIPCodecFormat
      * @return TFourCC
      */
@@ -308,7 +266,6 @@ private:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TUint32
      * @return TVoIPCodecFormat
      */
@@ -317,7 +274,6 @@ private:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TVoIPCodecFormat
      * @return TBool
      */
@@ -326,7 +282,6 @@ private:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TVoIPCodecFormat
      * @return TBool
      */
@@ -336,29 +291,28 @@ private:
     friend class CDTMFTonePlayerImpl;
 
 private:
-// Client side VoIP server session
-    RVoIPAudioSession         iVoIPAudioSession;
+    // Client side VoIP server session
+    RVoIPAudioSession iVoIPAudioSession;
 
-    MVoIPDownlinkObserver*    iObserver;
+    MVoIPDownlinkObserver* iObserver;
 
-// Message queues
-    RMsgQueue<TVoIPMsgBuf>    iMsgQueue;
-    RMsgQueue<TVoIPMsgBuf>    iMsgComQueue;
+    // Message queues
+    RMsgQueue<TVoIPMsgBuf> iMsgQueue;
+    RMsgQueue<TVoIPMsgBuf> iMsgComQueue;
 
-// Message queue handlers
-    CQueueHandler*            iMsgQHandler;
-    CQueueHandler*            iMsgQComHandler;
+    // Message queue handlers
+    CQueueHandler* iMsgQHandler;
+    CQueueHandler* iMsgQComHandler;
 
-    TMMFPrioritySettings      iPriority;
-    TPtr8                     iBufferPtr;
-    TInt                      iBufferLen;
-    TInt                      iG711FrameSize;
+    TMMFPrioritySettings iPriority;
+    TPtr8 iBufferPtr;
+    TInt iBufferLen;
+    TInt iG711FrameSize;
 
-    TVoIPCodecFormat          iFormat;
-    RArray<TVoIPCodecFormat>* iCodecFormats;
-
+    TVoIPCodecFormat iFormat;
+    RArray<TVoIPCodecFormat> iCodecFormats;
     };
 
-#endif //__VOIPDOWNLINKSTREAMIMPL_H
+#endif //VOIPDOWNLINKSTREAMIMPL_H
 
 // End of file

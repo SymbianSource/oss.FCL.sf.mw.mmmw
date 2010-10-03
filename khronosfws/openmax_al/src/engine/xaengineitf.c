@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "xaengineitf.h"
 #include "xaobjects.h"
 #include "xacapabilitiesmgr.h"
@@ -47,14 +46,7 @@ XAresult XAEngineItfImpl_CreateCameraDevice(XAEngineItf self,
         const XAInterfaceID *pInterfaceIds,
         const XAboolean *pInterfaceRequired)
     {
-#ifdef OMAX_CAMERABIN
-    XAEngineItfImpl* impl = GetImpl(self);
-    return XACameraDeviceImpl_CreateCameraDevice( impl->mapper,impl->capabilities,
-            pDevice, deviceID,numInterfaces,
-            pInterfaceIds, pInterfaceRequired );
-#else
     return XA_RESULT_FEATURE_UNSUPPORTED;
-#endif
     }
 
 XAresult XAEngineItfImpl_CreateRadioDevice(XAEngineItf self,
@@ -62,7 +54,7 @@ XAresult XAEngineItfImpl_CreateRadioDevice(XAEngineItf self,
         const XAInterfaceID *pInterfaceIds,
         const XAboolean *pInterfaceRequired)
     {
-    return XARadioDeviceImpl_CreateRadioDevice( /*((XAEngineItfImpl*)self)->mapper,*/
+    return XARadioDeviceImpl_CreateRadioDevice(
     pDevice, numInterfaces, pInterfaceIds, pInterfaceRequired);
     }
 
@@ -90,6 +82,13 @@ XAresult XAEngineItfImpl_CreateMediaPlayer(XAEngineItf self,
         const XAboolean *pInterfaceRequired)
     {
     XAEngineItfImpl* impl = GetImpl(self);
+    if (!impl )
+        {
+        /* invalid parameter */
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAEngineItfImpl_CreateMediaPlayer");
+        return XA_RESULT_PARAMETER_INVALID;
+        }    
     return XAMediaPlayerImpl_CreateMediaPlayer(impl->mapper,
             impl->capabilities, pPlayer, pDataSrc, pBankSrc, pAudioSnk,
             pImageVideoSnk, pVibra, pLEDArray, numInterfaces, pInterfaceIds,
@@ -103,6 +102,14 @@ XAresult XAEngineItfImpl_CreateMediaRecorder(XAEngineItf self,
         const XAboolean * pInterfaceRequired)
     {
     XAEngineItfImpl* impl = GetImpl(self);
+    if (!impl )
+        {
+        /* invalid parameter */
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAEngineItfImpl_CreateMediaRecorder");
+        return XA_RESULT_PARAMETER_INVALID;
+        }    
+
     return XAMediaRecorderImpl_CreateMediaRecorder(impl->mapper,
             impl->capabilities, pRecorder, pAudioSrc, pImageVideoSrc,
             pDataSnk, numInterfaces, pInterfaceIds, pInterfaceRequired);
@@ -121,6 +128,13 @@ XAresult XAEngineItfImpl_CreateMetadataExtractor(XAEngineItf self,
         const XAboolean *pInterfaceRequired)
     {
     XAEngineItfImpl* impl = GetImpl(self);
+    if (!impl )
+        {
+        /* invalid parameter */
+        DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
+        DEBUG_API("<-XAEngineItfImpl_CreateMetadataExtractor");
+        return XA_RESULT_PARAMETER_INVALID;
+        }
     return XAMetadataExtractorImpl_Create(impl->mapper, impl->capabilities,
             pMetadataExtractor, pDataSource, numInterfaces, pInterfaceIds,
             pInterfaceRequired);
@@ -186,14 +200,16 @@ XAresult XAEngineItfImpl_QueryNumSupportedInterfaces(XAEngineItf self,
         XAuint32 objectID, XAuint32 *pNumSupportedInterfaces)
     {
     XAresult res = XA_RESULT_SUCCESS;
+    XAEngineItfImpl* impl = GetImpl(self);
     DEBUG_API("->XAEngineItfImpl_QueryNumSupportedInterfaces");
 
-    if (!pNumSupportedInterfaces)
+    if (!impl || !pNumSupportedInterfaces)
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XAEngineItfImpl_QueryNumSupportedInterfaces");
         return XA_RESULT_PARAMETER_INVALID;
         }
+    
     *pNumSupportedInterfaces = 0;
     switch (objectID)
         {
@@ -230,14 +246,16 @@ XAresult XAEngineItfImpl_QuerySupportedInterfaces(XAEngineItf self,
         XAuint32 objectID, XAuint32 index, XAInterfaceID *pInterfaceId)
     {
     XAresult res = XA_RESULT_SUCCESS;
+    XAEngineItfImpl* impl = GetImpl(self);
     DEBUG_API("->XAEngineItfImpl_QuerySupportedInterfaces");
 
-    if (!pInterfaceId)
+    if (!impl || !pInterfaceId)
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");
         DEBUG_API("<-XAEngineItfImpl_QuerySupportedInterfaces");
         return XA_RESULT_PARAMETER_INVALID;
         }
+    
     *pInterfaceId = XA_IID_NULL;
     switch (objectID)
         {
@@ -262,6 +280,7 @@ XAresult XAEngineItfImpl_QuerySupportedInterfaces(XAEngineItf self,
             break;
         default:
             res = XA_RESULT_FEATURE_UNSUPPORTED;
+            break;
         }
 
     DEBUG_API_A1("<-XAEngineItfImpl_QuerySupportedInterfaces %lu", res);
@@ -413,7 +432,6 @@ XAEngineItfImpl* XAEngineItfImpl_Create(FrameworkMap* fwkmapper,
         self->itf.IsExtensionSupported = XAEngineItfImpl_IsExtensionSupported;
         self->mapper = fwkmapper;
         self->capabilities = capabilities;
-        self->xyz = 50;
         self->self = self;
         }
     DEBUG_API("<-XAEngineItfImpl_Create");
@@ -425,7 +443,6 @@ void XAEngineItfImpl_Free(XAEngineItfImpl* self)
     DEBUG_API("->XAEngineItfImpl_Free");
     if(self)
         {
-        assert(self==self->self);
         free(self);
         }
     DEBUG_API("<-XAEngineItfImpl_Free");

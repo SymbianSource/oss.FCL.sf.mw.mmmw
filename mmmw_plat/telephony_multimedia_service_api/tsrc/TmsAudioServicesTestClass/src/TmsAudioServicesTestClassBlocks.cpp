@@ -22,6 +22,162 @@
 #include "TmsAudioServicesTestClass.h"
 #include "debug.h"
 
+class TMSStreamTest : public TMSStream
+    {
+public:
+    ~TMSStreamTest() {};
+    TMSStreamTest() : TMSStream() {};
+    };
+
+class TMSCallTest : public TMSCall
+    {
+public:
+    ~TMSCallTest() {};
+    TMSCallTest() : TMSCall() {};
+    };
+
+class TMSDTMFTest : public TMSDTMF
+    {
+public:
+    ~TMSDTMFTest() {};
+    TMSDTMFTest() : TMSDTMF() {};
+    };
+
+class TMSInbandToneTest : public TMSInbandTone
+    {
+public:
+    ~TMSInbandToneTest() {};
+    TMSInbandToneTest() : TMSInbandTone() {};
+    };
+
+class TMSRingToneTest : public TMSRingTone
+    {
+public:
+    ~TMSRingToneTest() {};
+    TMSRingToneTest() : TMSRingTone() {};
+    };
+
+class TMSClientSinkTest : public TMSClientSink
+    {
+public:
+    ~TMSClientSinkTest() {};
+    TMSClientSinkTest() : TMSClientSink() {};
+    };
+
+class TMSClientSourceTest : public TMSClientSource
+    {
+public:
+    ~TMSClientSourceTest() {};
+    TMSClientSourceTest() : TMSClientSource() {};
+    };
+
+class TMSMicSourceTest : public TMSMicSource
+    {
+public:
+    ~TMSMicSourceTest() {};
+    TMSMicSourceTest() : TMSMicSource() {};
+    };
+
+class TMSModemSourceTest : public TMSModemSource
+    {
+public:
+    ~TMSModemSourceTest() {};
+    TMSModemSourceTest() : TMSModemSource() {};
+    };
+
+class TMSSpeakerSinkTest : public TMSSpeakerSink
+    {
+public:
+    ~TMSSpeakerSinkTest() {};
+    TMSSpeakerSinkTest() : TMSSpeakerSink() {};
+    };
+
+class TMSModemSinkTest : public TMSModemSink
+    {
+public:
+    ~TMSModemSinkTest() {};
+    TMSModemSinkTest() : TMSModemSink() {};
+    };
+
+class TMSGlobalVolTest : public TMSGlobalVolEffect
+    {
+public:
+    ~TMSGlobalVolTest() {};
+    TMSGlobalVolTest() : TMSGlobalVolEffect() {};
+    };
+
+class TMSGlobalGainTest : public TMSGlobalGainEffect
+    {
+public:
+    ~TMSGlobalGainTest() {};
+    TMSGlobalGainTest() : TMSGlobalGainEffect() {};
+    };
+
+class TMSVolumeEffectTest : public TMSVolumeEffect
+    {
+public:
+    ~TMSVolumeEffectTest() {};
+    TMSVolumeEffectTest() : TMSVolumeEffect() {};
+    };
+
+class TMSGainEffectTest : public TMSGainEffect
+    {
+public:
+    ~TMSGainEffectTest() {};
+    TMSGainEffectTest() : TMSGainEffect() {};
+    };
+
+class TMSGlobalRoutingTest : public TMSGlobalRouting
+    {
+public:
+    ~TMSGlobalRoutingTest() {};
+    TMSGlobalRoutingTest() : TMSGlobalRouting() {};
+    };
+
+class TMSG711Test : public TMSG711Format
+    {
+public:
+    ~TMSG711Test() {};
+    TMSG711Test() : TMSG711Format() {};
+    };
+
+class TMSG729Test : public TMSG729Format
+    {
+public:
+    ~TMSG729Test() {};
+    TMSG729Test() : TMSG729Format() {};
+    };
+
+class TMSILBCTest : public TMSILBCFormat
+    {
+public:
+    ~TMSILBCTest() {};
+    TMSILBCTest() : TMSILBCFormat() {};
+    };
+
+/*
+ * Mini TMSProxy
+ */
+class TMSProxy : public RSessionBase
+    {
+public:
+     TMSProxy() {}
+     virtual ~TMSProxy() {}
+
+     void Connect(const TDesC& srvname)
+         {
+         TVersion ver(1,0,0);
+         TRequestStatus stat;
+         CreateSession(srvname, ver, 2, EIpcSession_Unsharable, 0, &stat);
+         User::WaitForRequest(stat);
+         }
+
+     void SendRequest(TInt command)
+         {
+         SendReceive(command);
+         }
+    };
+
 // -----------------------------------------------------------------------------
 // CTmsAudioServicesTestClass::Delete
 // Delete here all resources allocated and opened from test methods.
@@ -32,6 +188,11 @@ void CTmsAudioServicesTestClass::Delete()
     {
     FTRACE(FPrint(_L("CTmsAudioServicesTestClass::Delete")));
 
+    if (iProxy)
+        {
+        iProxy->Close();
+        delete iProxy;
+        }
     if (iFactory && iTmsBuffer)
         {
         iFactory->DeleteBuffer(iTmsBuffer);
@@ -50,6 +211,7 @@ void CTmsAudioServicesTestClass::Delete()
         }
     if (iFactory && iTmsClientSink)
         {
+        static_cast<TMSClientSink*> (iTmsClientSink)->RemoveObserver(*this);
         iFactory->DeleteSink(iTmsClientSink);
         }
     if (iFactory && iTmsModemSink)
@@ -90,22 +252,28 @@ void CTmsAudioServicesTestClass::Delete()
         }
     if (iFactory && iTmsDnlinkEffect)
         {
+        static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->RemoveObserver(
+                *this);
         iFactory->DeleteEffect(iTmsDnlinkEffect);
         }
     if (iFactory && iTmsUplinkEffect)
         {
+        static_cast<TMSGainEffect*> (iTmsUplinkEffect)->RemoveObserver(*this);
         iFactory->DeleteEffect(iTmsUplinkEffect);
         }
     if (iFactory && iGlobalVol)
         {
+        static_cast<TMSGlobalVolEffect*> (iGlobalVol)->RemoveObserver(*this);
         iFactory->DeleteEffect(iGlobalVol);
         }
     if (iFactory && iGlobalGain)
         {
+        static_cast<TMSGlobalGainEffect*> (iGlobalGain)->RemoveObserver(*this);
         iFactory->DeleteEffect(iGlobalGain);
         }
     if (iFactory && iTmsGlobalRouting)
         {
+        iTmsGlobalRouting->RemoveObserver(*this);
         iFactory->DeleteGlobalRouting(iTmsGlobalRouting);
         }
 
@@ -129,6 +297,7 @@ void CTmsAudioServicesTestClass::Delete()
             {
             iTmsDnlink->Deinit();
             }
+
         delete iTmsDnlink;
         iTmsDnlink = NULL;
         }
@@ -155,102 +324,119 @@ TInt CTmsAudioServicesTestClass::RunMethodL(CStifItemParser& aItem)
     {
     static TStifFunctionInfo const KFunctions[] =
         {
-        // Copy this line for every implemented function.
-        // First string is the function name used in TestScripter script file.
-        // Second is the actual implementation member function.
-
-        ENTRY( "SetTimeout", CTmsAudioServicesTestClass::SetTimeout ),
-        ENTRY( "CreateFactory", CTmsAudioServicesTestClass::CreateTmsFactory ),
-        ENTRY( "CreateCall", CTmsAudioServicesTestClass::CreateCall ),
-        ENTRY( "CreateFormat", CTmsAudioServicesTestClass::CreateFormat ),
-        ENTRY( "CreateBuffer", CTmsAudioServicesTestClass::CreateBuffer ),
-        ENTRY( "CreateEffect", CTmsAudioServicesTestClass::CreateEffect ),
-        ENTRY( "CreateGlobalRouting", CTmsAudioServicesTestClass::CreateGlobalRouting ),
-        ENTRY( "CreateSource", CTmsAudioServicesTestClass::CreateSource ),
-        ENTRY( "DeleteSource", CTmsAudioServicesTestClass::DeleteSource ),
-        ENTRY( "CreateSink", CTmsAudioServicesTestClass::CreateSink ),
-        ENTRY( "DeleteSink", CTmsAudioServicesTestClass::DeleteSink ),
-        ENTRY( "GetSourceType", CTmsAudioServicesTestClass::GetSourceType ),
-        ENTRY( "GetSinkType", CTmsAudioServicesTestClass::GetSinkType ),
-        ENTRY( "GetEffectType", CTmsAudioServicesTestClass::GetEffectType ),
-        ENTRY( "CreateDownlinkStream", CTmsAudioServicesTestClass::CreateDownlinkStream ),
-        ENTRY( "CreateUplinkStream", CTmsAudioServicesTestClass::CreateUplinkStream ),
-        ENTRY( "GetSupportedFormats", CTmsAudioServicesTestClass::GetSupportedFormats ),
-        ENTRY( "IsCallTypeSupported", CTmsAudioServicesTestClass::IsCallTypeSupported ),
-        ENTRY( "SetDownlinkFormat", CTmsAudioServicesTestClass::SetDownlinkFormat ),
-        ENTRY( "SetUplinkFormat", CTmsAudioServicesTestClass::SetUplinkFormat ),
-        ENTRY( "ReSetDownlinkFormat", CTmsAudioServicesTestClass::ReSetDownlinkFormat ),
-        ENTRY( "ReSetUplinkFormat", CTmsAudioServicesTestClass::ReSetUplinkFormat ),
-        ENTRY( "OpenDownlink", CTmsAudioServicesTestClass::OpenDownlink ),
-        ENTRY( "OpenUplink", CTmsAudioServicesTestClass::OpenUplink ),
-        ENTRY( "Gain", CTmsAudioServicesTestClass::Gain ),
-        ENTRY( "AddGlobalGainEffectToStream", CTmsAudioServicesTestClass::AddGlobalGainEffectToStream),
-        ENTRY( "RemoveGlobalGainEffectToStream", CTmsAudioServicesTestClass::RemoveGlobalGainEffectToStream),
-        ENTRY( "Volume", CTmsAudioServicesTestClass::Volume ),
-        ENTRY( "AddGlobalVolumeEffectToStream", CTmsAudioServicesTestClass::AddGlobalVolumeEffectToStream),
-        ENTRY( "RemoveGlobalVolumeEffectToStream", CTmsAudioServicesTestClass::RemoveGlobalVolumeEffectToStream),
-        ENTRY( "CreateGlobalGainEffect", CTmsAudioServicesTestClass::CreateGlobalGainEffect),
-        ENTRY( "Close", CTmsAudioServicesTestClass::Close ),
-        ENTRY( "Start", CTmsAudioServicesTestClass::Start ),
-        ENTRY( "Pause", CTmsAudioServicesTestClass::Pause ),
-        ENTRY( "Stop", CTmsAudioServicesTestClass::Stop ),
-        ENTRY( "GetBitRateList", CTmsAudioServicesTestClass::GetBitRateList ),
-        ENTRY( "SetBitrates", CTmsAudioServicesTestClass::SetBitrates ),
-        ENTRY( "GetBitrates", CTmsAudioServicesTestClass::GetBitrates ),
-        ENTRY( "CreateDTMFTonePlayer", CTmsAudioServicesTestClass::CreateDTMFTonePlayer ),
-        ENTRY( "DTMFTonePlay", CTmsAudioServicesTestClass::DTMFTonePlay ),
-        ENTRY( "StopDTMFTonePlayer", CTmsAudioServicesTestClass::StopDTMFTonePlayer ),
-        ENTRY( "ContinueDTMFStringSending", CTmsAudioServicesTestClass::ContinueDTMFStringSending ),
-        ENTRY( "CloseDTMFPlayer", CTmsAudioServicesTestClass::CloseDTMFPlayer ),
-        ENTRY( "CreateRingTonePlayer", CTmsAudioServicesTestClass::CreateRingTonePlayer ),
-        ENTRY( "InitRingTonePlayer", CTmsAudioServicesTestClass::InitRingTonePlayer ),
-        ENTRY( "PlayRingTone", CTmsAudioServicesTestClass::PlayRingTone ),
-        ENTRY( "PlayRingToneNoEvent", CTmsAudioServicesTestClass::PlayRingToneNoEvent ),
-        ENTRY( "PauseRingTone", CTmsAudioServicesTestClass::PauseRingTone ),
-        ENTRY( "MuteRingTone", CTmsAudioServicesTestClass::MuteRingTone ),
-        ENTRY( "StopRingTone", CTmsAudioServicesTestClass::StopRingTone ),
-        ENTRY( "CloseRingTonePlayer", CTmsAudioServicesTestClass::CloseRingTonePlayer ),
-        ENTRY( "CreateInbandTonePlayer", CTmsAudioServicesTestClass::CreateInbandTonePlayer ),
-        ENTRY( "StartInbandTone", CTmsAudioServicesTestClass::StartInbandTone ),
-        ENTRY( "StopInbandTone", CTmsAudioServicesTestClass::StopInbandTone ),
-        ENTRY( "CloseInbandTonePlayer", CTmsAudioServicesTestClass::CloseInbandTonePlayer ),
-        ENTRY( "GetDownlinkVersion", CTmsAudioServicesTestClass::GetDownlinkVersion ),
-        ENTRY( "GetUplinkVersion", CTmsAudioServicesTestClass::GetUplinkVersion ),
-        ENTRY( "GetType", CTmsAudioServicesTestClass::GetType ),
-        ENTRY( "GetVAD", CTmsAudioServicesTestClass::GetVAD ),
-        ENTRY( "ToggleVAD", CTmsAudioServicesTestClass::ToggleVAD ),
-        ENTRY( "GetMode", CTmsAudioServicesTestClass::GetMode ),
-        ENTRY( "SetMode", CTmsAudioServicesTestClass::SetMode ),
-        ENTRY( "GetCNG", CTmsAudioServicesTestClass::GetCNG ),
-        ENTRY( "ToggleCNG", CTmsAudioServicesTestClass::ToggleCNG ),
-        ENTRY( "GetPLC", CTmsAudioServicesTestClass::GetPLC ),
-        ENTRY( "TogglePLC", CTmsAudioServicesTestClass::TogglePLC ),
-        ENTRY( "GetBufferType", CTmsAudioServicesTestClass::GetBufferType ),
-        ENTRY( "AddClientSrcToDnlStream", CTmsAudioServicesTestClass::AddClientSrcToDnlStream ),
-        ENTRY( "AddMicSrcToUplStream", CTmsAudioServicesTestClass::AddMicSrcToUplStream ),
-        ENTRY( "AddModemSrcToDnlStream", CTmsAudioServicesTestClass::AddModemSrcToDnlStream ),
-        ENTRY( "RemoveClientSrcFromDnlStream", CTmsAudioServicesTestClass::RemoveClientSrcFromDnlStream ),
-        ENTRY( "RemoveMicSrcFromUplStream", CTmsAudioServicesTestClass::RemoveMicSrcFromUplStream ),
-        ENTRY( "RemoveModemSrcFromDnlStream", CTmsAudioServicesTestClass::RemoveModemSrcFromDnlStream ),
-        ENTRY( "AddSourceObserver", CTmsAudioServicesTestClass::AddSourceObserver ),
-        ENTRY( "RemoveSourceObserver", CTmsAudioServicesTestClass::RemoveSourceObserver ),
-        ENTRY( "AddClientSinkToUplStream", CTmsAudioServicesTestClass::AddClientSinkToUplStream ),
-        ENTRY( "AddModemSinkToUplStream", CTmsAudioServicesTestClass::AddModemSinkToUplStream ),
-        ENTRY( "AddSpkrSinkToDnlStream", CTmsAudioServicesTestClass::AddSpkrSinkToDnlStream ),
-        ENTRY( "RemoveClientSinkFromUplStream", CTmsAudioServicesTestClass::RemoveClientSinkFromUplStream ),
-        ENTRY( "RemoveModemSinkFromUplStream", CTmsAudioServicesTestClass::RemoveModemSinkFromUplStream ),
-        ENTRY( "RemoveSpkrSinkFromDnlStream", CTmsAudioServicesTestClass::RemoveSpkrSinkFromDnlStream ),
-        ENTRY( "AddSinkObserver", CTmsAudioServicesTestClass::AddSinkObserver ),
-        ENTRY( "RemoveSinkObserver", CTmsAudioServicesTestClass::RemoveSinkObserver ),
-        ENTRY( "GetStreamType", CTmsAudioServicesTestClass::GetStreamType ),
-        ENTRY( "GetStreamState", CTmsAudioServicesTestClass::GetStreamState ),
-        ENTRY( "SetOutput", CTmsAudioServicesTestClass::SetOutput ),
-        ENTRY( "GetOutput", CTmsAudioServicesTestClass::GetOutput ),
-        ENTRY( "GetPreviousOutput", CTmsAudioServicesTestClass::GetPreviousOutput ),
-        ENTRY( "GetAvailableOutputs", CTmsAudioServicesTestClass::GetAvailableOutputs ),
-        ENTRY( "AddGlobalRoutingObserver", CTmsAudioServicesTestClass::AddGlobalRoutingObserver ),
-        ENTRY( "DeleteGlobalRoutingObserver", CTmsAudioServicesTestClass::DeleteGlobalRoutingObserver ),
-        ENTRY( "Example", CTmsAudioServicesTestClass::ExampleL )
+        ENTRY("SetTimeout", CTmsAudioServicesTestClass::SetTimeout),
+        ENTRY("CreateFactory", CTmsAudioServicesTestClass::CreateTmsFactory),
+        ENTRY("CreateCall", CTmsAudioServicesTestClass::CreateCall),
+        ENTRY("CreateFormat", CTmsAudioServicesTestClass::CreateFormat),
+        ENTRY("CreateBuffer", CTmsAudioServicesTestClass::CreateBuffer),
+        ENTRY("CreateEffect", CTmsAudioServicesTestClass::CreateEffect),
+        ENTRY("CreateGlobalRouting", CTmsAudioServicesTestClass::CreateGlobalRouting),
+        ENTRY("CreateSource", CTmsAudioServicesTestClass::CreateSource),
+        ENTRY("DeleteSource", CTmsAudioServicesTestClass::DeleteSource),
+        ENTRY("CreateSink", CTmsAudioServicesTestClass::CreateSink),
+        ENTRY("DeleteSink", CTmsAudioServicesTestClass::DeleteSink),
+        ENTRY("GetSourceType", CTmsAudioServicesTestClass::GetSourceType),
+        ENTRY("GetSinkType", CTmsAudioServicesTestClass::GetSinkType),
+        ENTRY("GetEffectType", CTmsAudioServicesTestClass::GetEffectType),
+        ENTRY("CreateDownlinkStream", CTmsAudioServicesTestClass::CreateDownlinkStream),
+        ENTRY("CreateUplinkStream", CTmsAudioServicesTestClass::CreateUplinkStream),
+        ENTRY("GetSupportedFormats", CTmsAudioServicesTestClass::GetSupportedFormats),
+        ENTRY("IsCallTypeSupported", CTmsAudioServicesTestClass::IsCallTypeSupported),
+        ENTRY("SetDownlinkFormat", CTmsAudioServicesTestClass::SetDownlinkFormat),
+        ENTRY("SetUplinkFormat", CTmsAudioServicesTestClass::SetUplinkFormat),
+        ENTRY("ReSetDownlinkFormat", CTmsAudioServicesTestClass::ReSetDownlinkFormat),
+        ENTRY("ReSetUplinkFormat", CTmsAudioServicesTestClass::ReSetUplinkFormat),
+        ENTRY("OpenDownlink", CTmsAudioServicesTestClass::OpenDownlink),
+        ENTRY("OpenUplink", CTmsAudioServicesTestClass::OpenUplink),
+        ENTRY("Gain", CTmsAudioServicesTestClass::Gain),
+        ENTRY("AddVolumeEffectToStream", CTmsAudioServicesTestClass::AddVolumeEffectToStream),
+        ENTRY("AddGainEffectToStream", CTmsAudioServicesTestClass::AddGainEffectToStream),
+        ENTRY("AddGlobalGainEffectToStream", CTmsAudioServicesTestClass::AddGlobalGainEffectToStream),
+        ENTRY("RemoveGlobalGainEffectToStream", CTmsAudioServicesTestClass::RemoveGlobalGainEffectToStream),
+        ENTRY("Volume", CTmsAudioServicesTestClass::Volume),
+        ENTRY("AddGlobalVolumeEffectToStream", CTmsAudioServicesTestClass::AddGlobalVolumeEffectToStream),
+        ENTRY("RemoveGlobalVolumeEffectToStream", CTmsAudioServicesTestClass::RemoveGlobalVolumeEffectToStream),
+        ENTRY("CreateGlobalGainEffect", CTmsAudioServicesTestClass::CreateGlobalGainEffect),
+        ENTRY("Close", CTmsAudioServicesTestClass::Close),
+        ENTRY("Start", CTmsAudioServicesTestClass::Start),
+        ENTRY("Pause", CTmsAudioServicesTestClass::Pause),
+        ENTRY("Stop", CTmsAudioServicesTestClass::Stop),
+        ENTRY("GetBitRateList", CTmsAudioServicesTestClass::GetBitRateList),
+        ENTRY("SetBitrates", CTmsAudioServicesTestClass::SetBitrates),
+        ENTRY("GetBitrates", CTmsAudioServicesTestClass::GetBitrates),
+        ENTRY("CreateDTMFTonePlayer", CTmsAudioServicesTestClass::CreateDTMFTonePlayer),
+        ENTRY("DTMFTonePlay", CTmsAudioServicesTestClass::DTMFTonePlay),
+        ENTRY("StopDTMFTonePlayer", CTmsAudioServicesTestClass::StopDTMFTonePlayer),
+        ENTRY("ContinueDTMFStringSending", CTmsAudioServicesTestClass::ContinueDTMFStringSending),
+        ENTRY("CloseDTMFPlayer", CTmsAudioServicesTestClass::CloseDTMFPlayer),
+        ENTRY("CreateRingTonePlayer", CTmsAudioServicesTestClass::CreateRingTonePlayer),
+        ENTRY("CreateVideoRingTonePlayer", CTmsAudioServicesTestClass::CreateVideoRingTonePlayer),
+        ENTRY("InitRingTonePlayer", CTmsAudioServicesTestClass::InitRingTonePlayer),
+        ENTRY("PlayRingTone", CTmsAudioServicesTestClass::PlayRingTone),
+        ENTRY("PlayRingToneNoEvent", CTmsAudioServicesTestClass::PlayRingToneNoEvent),
+        ENTRY("PauseRingTone", CTmsAudioServicesTestClass::PauseRingTone),
+        ENTRY("MuteRingTone", CTmsAudioServicesTestClass::MuteRingTone),
+        ENTRY("StopRingTone", CTmsAudioServicesTestClass::StopRingTone),
+        ENTRY("CloseRingTonePlayer", CTmsAudioServicesTestClass::CloseRingTonePlayer),
+        ENTRY("CreateInbandTonePlayer", CTmsAudioServicesTestClass::CreateInbandTonePlayer),
+        ENTRY("StartInbandTone", CTmsAudioServicesTestClass::StartInbandTone),
+        ENTRY("StopInbandTone", CTmsAudioServicesTestClass::StopInbandTone),
+        ENTRY("CloseInbandTonePlayer", CTmsAudioServicesTestClass::CloseInbandTonePlayer),
+        ENTRY("GetDownlinkVersion", CTmsAudioServicesTestClass::GetDownlinkVersion),
+        ENTRY("GetUplinkVersion", CTmsAudioServicesTestClass::GetUplinkVersion),
+        ENTRY("GetType", CTmsAudioServicesTestClass::GetType),
+        ENTRY("GetVAD", CTmsAudioServicesTestClass::GetVAD),
+        ENTRY("ToggleVAD", CTmsAudioServicesTestClass::ToggleVAD),
+        ENTRY("GetMode", CTmsAudioServicesTestClass::GetMode),
+        ENTRY("SetMode", CTmsAudioServicesTestClass::SetMode),
+        ENTRY("GetCNG", CTmsAudioServicesTestClass::GetCNG),
+        ENTRY("ToggleCNG", CTmsAudioServicesTestClass::ToggleCNG),
+        ENTRY("GetPLC", CTmsAudioServicesTestClass::GetPLC),
+        ENTRY("TogglePLC", CTmsAudioServicesTestClass::TogglePLC),
+        ENTRY("GetBufferType", CTmsAudioServicesTestClass::GetBufferType),
+        ENTRY("AddClientSrcToDnlStream", CTmsAudioServicesTestClass::AddClientSrcToDnlStream),
+        ENTRY("AddMicSrcToUplStream", CTmsAudioServicesTestClass::AddMicSrcToUplStream),
+        ENTRY("AddModemSrcToDnlStream", CTmsAudioServicesTestClass::AddModemSrcToDnlStream),
+        ENTRY("RemoveClientSrcFromDnlStream", CTmsAudioServicesTestClass::RemoveClientSrcFromDnlStream),
+        ENTRY("RemoveMicSrcFromUplStream", CTmsAudioServicesTestClass::RemoveMicSrcFromUplStream),
+        ENTRY("RemoveModemSrcFromDnlStream", CTmsAudioServicesTestClass::RemoveModemSrcFromDnlStream),
+        ENTRY("AddSourceObserver", CTmsAudioServicesTestClass::AddSourceObserver),
+        ENTRY("RemoveSourceObserver", CTmsAudioServicesTestClass::RemoveSourceObserver),
+        ENTRY("AddClientSinkToUplStream", CTmsAudioServicesTestClass::AddClientSinkToUplStream),
+        ENTRY("AddModemSinkToUplStream", CTmsAudioServicesTestClass::AddModemSinkToUplStream),
+        ENTRY("AddSpkrSinkToDnlStream", CTmsAudioServicesTestClass::AddSpkrSinkToDnlStream),
+        ENTRY("RemoveClientSinkFromUplStream", CTmsAudioServicesTestClass::RemoveClientSinkFromUplStream),
+        ENTRY("RemoveModemSinkFromUplStream", CTmsAudioServicesTestClass::RemoveModemSinkFromUplStream),
+        ENTRY("RemoveSpkrSinkFromDnlStream", CTmsAudioServicesTestClass::RemoveSpkrSinkFromDnlStream),
+        ENTRY("AddSinkObserver", CTmsAudioServicesTestClass::AddSinkObserver),
+        ENTRY("RemoveSinkObserver", CTmsAudioServicesTestClass::RemoveSinkObserver),
+        ENTRY("GetStreamType", CTmsAudioServicesTestClass::GetStreamType),
+        ENTRY("GetStreamState", CTmsAudioServicesTestClass::GetStreamState),
+        ENTRY("SetOutput", CTmsAudioServicesTestClass::SetOutput),
+        ENTRY("GetOutput", CTmsAudioServicesTestClass::GetOutput),
+        ENTRY("GetPreviousOutput", CTmsAudioServicesTestClass::GetPreviousOutput),
+        ENTRY("GetAvailableOutputs", CTmsAudioServicesTestClass::GetAvailableOutputs),
+        ENTRY("AddGlobalRoutingObserver", CTmsAudioServicesTestClass::AddGlobalRoutingObserver),
+        ENTRY("DeleteGlobalRoutingObserver", CTmsAudioServicesTestClass::DeleteGlobalRoutingObserver),
+        ENTRY("TestRTPSession", CTmsAudioServicesTestClass::TestRTPSession),
+        ENTRY("CreateStreamTest", CTmsAudioServicesTestClass::CreateStreamTest),
+        ENTRY("CreateCallTest", CTmsAudioServicesTestClass::CreateCallTest),
+        ENTRY("CreateDTMFTest", CTmsAudioServicesTestClass::CreateDTMFTest),
+        ENTRY("CreateInbandToneTest", CTmsAudioServicesTestClass::CreateInbandToneTest),
+        ENTRY("CreateRingToneTest", CTmsAudioServicesTestClass::CreateRingToneTest),
+        ENTRY("CreateClientSinkTest", CTmsAudioServicesTestClass::CreateClientSinkTest),
+        ENTRY("CreateClientSourceTest", CTmsAudioServicesTestClass::CreateClientSourceTest),
+        ENTRY("CreateSourcesTest", CTmsAudioServicesTestClass::CreateSourcesTest),
+        ENTRY("CreateSinksTest", CTmsAudioServicesTestClass::CreateSinksTest),
+        ENTRY("CreateGlobalVolEffectTest", CTmsAudioServicesTestClass::CreateGlobalVolEffectTest),
+        ENTRY("CreateGlobalGainEffectTest", CTmsAudioServicesTestClass::CreateGlobalGainEffectTest),
+        ENTRY("CreateVolumeEffectTest", CTmsAudioServicesTestClass::CreateVolumeEffectTest),
+        ENTRY("CreateGainEffectTest", CTmsAudioServicesTestClass::CreateGainEffectTest),
+        ENTRY("CreateGlobalRoutingTest", CTmsAudioServicesTestClass::CreateGlobalRoutingTest),
+        ENTRY("CreateFormatsTest", CTmsAudioServicesTestClass::CreateFormatsTest),
+        ENTRY("SetLoopPlay", CTmsAudioServicesTestClass::SetLoopPlay),
+        ENTRY("CreateStreamFailTest", CTmsAudioServicesTestClass::CreateStreamFailTest),
+        ENTRY("TerminateServer", CTmsAudioServicesTestClass::TerminateServer)
         };
 
     const TInt count = sizeof(KFunctions) / sizeof(TStifFunctionInfo);
@@ -286,18 +472,18 @@ TPtrC CTmsAudioServicesTestClass::EventName(TInt aKey)
         (TText*)L"EInbToneStarted",
         (TText*)L"EInbToneStopped",
         (TText*)L"EDTMFToneStarted",
-        (TText*)L"EDTMFToneStopped",
+        (TText*)L"EDTMFToneStopped"
         };
 
-    if( (TUint)aKey >= (sizeof( keywords )/sizeof(TText*)) )
+    if((TUint)aKey >= (sizeof(keywords)/sizeof(TText*)))
         {
         iLog->Log(_L("Keyword out of bounds"));
-        TPtrC keyword( badKeyword );
+        TPtrC keyword(badKeyword);
         return keyword;
         }
     else
         {
-        TPtrC keyword( keywords[aKey] );
+        TPtrC keyword(keywords[aKey]);
         return keyword;
         }
     }
@@ -391,7 +577,6 @@ void CTmsAudioServicesTestClass::ProcessEvent(TTmsExpectedEvent aEvent,
             Signal();
             iTimeoutController->Cancel();
             }
-
         }
     else
         {
@@ -482,7 +667,7 @@ TInt CTmsAudioServicesTestClass::SetAllowedPanic(CStifItemParser& aItem)
             (KErrNone == aItem.GetNextInt(panicCode)))
         {
         iLog->Log(_L("Allowing panic: %S %d"), &panicType, panicCode);
-        //     iTestModuleIf.SetExitReason( CTestModuleIf::EPanic, panicCode );
+        //iTestModuleIf.SetExitReason(CTestModuleIf::EPanic, panicCode);
         iNormalExitReason = EFalse;
         }
     else
@@ -506,33 +691,6 @@ TInt CTmsAudioServicesTestClass::SetExpectedEvents(CStifItemParser& aItem)
         AddExpectedEvent(static_cast<TTmsExpectedEvent> (event), 0); // Default timeout value
         }
     return error;
-    }
-
-// -----------------------------------------------------------------------------
-// CTmsAudioServicesTestClass::ExampleL
-// Example test method function.
-// (other items were commented in a header).
-// -----------------------------------------------------------------------------
-//
-TInt CTmsAudioServicesTestClass::ExampleL(CStifItemParser& aItem)
-    {
-    // Print to UI
-    _LIT( KTmsAudioServicesTestClass, "TmsAudioServicesTestClass" );
-    _LIT( KExample, "In Example" );
-    TestModuleIf().Printf(0, KTmsAudioServicesTestClass, KExample);
-    // Print to log file
-    iLog->Log(KExample);
-
-    TInt i = 0;
-    TPtrC string;
-    _LIT( KParam, "Param[%i]: %S" );
-    while (aItem.GetNextString(string) == KErrNone)
-        {
-        TestModuleIf().Printf(i, KTmsAudioServicesTestClass, KParam, i,
-                &string);
-        i++;
-        }
-    return KErrNone;
     }
 
 TInt CTmsAudioServicesTestClass::CreateTmsFactory(CStifItemParser& /*aItem */)
@@ -565,6 +723,14 @@ TInt CTmsAudioServicesTestClass::CreateCall(CStifItemParser& aItem)
             case TMS_CALL_IP:
                 {
                 error = iFactory->CreateCall(calltype, iTmsCall, 0);
+                //#ifdef __TEST_CODE_COVERAGE__
+                guint ctxid;
+                if (iTmsCall)
+                    {
+                    iTmsCall->GetCallType();
+                    iTmsCall->GetCallContextId(ctxid);
+                    }
+                //#endif __TEST_CODE_COVERAGE__
                 iLog->Log(_L("CTmsAudioServicesTestClass::CreateCall, error [%d]"), error);
                 }
                 break;
@@ -672,10 +838,25 @@ TInt CTmsAudioServicesTestClass::CreateBuffer(CStifItemParser& aItem)
             case TMS_BUFFER_MEMORY:
                 {
                 error = iFactory->CreateBuffer(buffertype, size, iTmsBuffer);
+                //#ifdef __TEST_CODE_COVERAGE__
+                if (iTmsBuffer)
+                    {
+                    guint bufsize;
+                    iTmsBuffer->GetType(buffertype);
+                    iTmsBuffer->GetDataSize(bufsize);
+                    iTmsBuffer->SetDataSize(bufsize);
+                    guint8* pbuf(NULL);
+                    iTmsBuffer->GetDataPtr(pbuf);
+                    guint64 ts(0);
+                    iTmsBuffer->GetTimeStamp(ts);
+                    iTmsBuffer->SetTimeStamp(ts);
+                    //iFactory->DeleteBuffer(tmsbuffer);
+                    }
+                //#endif //__TEST_CODE_COVERAGE__
                 }
                 break;
-            default:
-                error = KErrNotSupported;
+            default: //covering failure case for coverage
+                error = iFactory->CreateBuffer(buffertype, size, iTmsBuffer);
                 break;
             }
         }
@@ -1411,6 +1592,7 @@ TInt CTmsAudioServicesTestClass::Close(CStifItemParser& aItem)
     FTRACE(FPrint(_L("CTmsAudioServicesTestClass::Close")));
     iLog->Log(_L("CTmsAudioServicesTestClass::Close"));
     TInt error = KErrNone;
+    iLoopPlay = EFalse;
 
     TPtrC closeType;
     error = aItem.GetNextString(closeType);
@@ -1456,17 +1638,16 @@ TInt CTmsAudioServicesTestClass::Start(CStifItemParser& aItem)
     error = aItem.GetNextString(startType);
     if (error == KErrNone)
         {
+        iLoopCounter = 0;
+
         if (startType == KTagUplink)
             {
             if ((iUpLinkStatus == INITIALIZED) || (iUpLinkStatus == PAUSED))
                 {
                 iTmsUplink->Start(2);
+                iTmsUplink->GetStreamId();
 
-                if (iUpLinkStatus == INITIALIZED)
-                    {
-                    AddExpectedEvent(EEmptyBuffer, KMediumTimeout);
-                    }
-                else
+                if (iUpLinkStatus == PAUSED)
                     {
                     AddExpectedEvent(EStreamStarted, KMediumTimeout);
                     }
@@ -1484,11 +1665,9 @@ TInt CTmsAudioServicesTestClass::Start(CStifItemParser& aItem)
             if ((iDnLinkStatus == INITIALIZED) || (iDnLinkStatus == PAUSED))
                 {
                 iTmsDnlink->Start(2);
-                if (iDnLinkStatus == INITIALIZED)
-                    {
-                    AddExpectedEvent(EFillBuffer, KMediumTimeout);
-                    }
-                else
+                iTmsDnlink->GetStreamId();
+
+                if (iDnLinkStatus == PAUSED)
                     {
                     AddExpectedEvent(EStreamStarted, KMediumTimeout);
                     }
@@ -1622,8 +1801,12 @@ TInt CTmsAudioServicesTestClass::Gain(CStifItemParser& aItem)
                 iMaxGain);
         RDebug::Printf("[TMS STIF] GAIN, GetMaxLevel Level [%d] Ret Err [%d]", iMaxGain, ret);
         RDebug::Printf("[TMS STIF] GAIN, SetLevel to [%d]", iMaxGain);
-        ret = static_cast<TMSGainEffect*>(iTmsUplinkEffect)->SetLevel(iMaxGain);
+        ret = static_cast<TMSGainEffect*> (iTmsUplinkEffect)->SetLevel(
+                iMaxGain);
         RDebug::Printf("[TMS STIF] GAIN, SetLevel ret [%d]", ret);
+
+        AddExpectedEvent(EStreamGainChange, KMediumTimeout);
+
         iLog->Log(_L("SetMaxGain: %d"), iMaxGain);
         RDebug::Printf("[TMS STIF] GAIN, GetLevel");
         ret = static_cast<TMSGainEffect*> (iTmsUplinkEffect)->GetLevel(iGain);
@@ -1636,6 +1819,9 @@ TInt CTmsAudioServicesTestClass::Gain(CStifItemParser& aItem)
 
         static_cast<TMSGainEffect*> (iTmsUplinkEffect)->SetLevel(0);
         iLog->Log(_L("MuteMic"));
+
+        AddExpectedEvent(EStreamGainChange, KMediumTimeout);
+
         static_cast<TMSGainEffect*> (iTmsUplinkEffect)->GetLevel(iGain);
 
         if (iGain != 0)
@@ -1655,6 +1841,9 @@ TInt CTmsAudioServicesTestClass::Gain(CStifItemParser& aItem)
                 iMaxGain);
         RDebug::Printf("[TMS STIF] GLOBAL GAIN, SetLevel ret [%d]", ret);
         iLog->Log(_L("SetGlobalMaxGain: %d"), iMaxGain);
+
+        AddExpectedEvent(EGlobalGainChange, KMediumTimeout);
+
         RDebug::Printf("[TMS STIF] GLOBAL GAIN, GetLevel");
         ret = static_cast<TMSGlobalGainEffect*>(iGlobalGain)->GetLevel(iGain);
         RDebug::Printf("[TMS STIF] GLOBAL GAIN, Exp Level [%d] Ret Level [%d] Ret Err [%d]", iMaxGain, iGain, ret);
@@ -1666,6 +1855,9 @@ TInt CTmsAudioServicesTestClass::Gain(CStifItemParser& aItem)
 
         static_cast<TMSGlobalGainEffect*> (iGlobalGain)->SetLevel(0);
         iLog->Log(_L("MuteMic"));
+
+        AddExpectedEvent(EGlobalGainChange, KMediumTimeout);
+
         static_cast<TMSGlobalGainEffect*> (iGlobalGain)->GetLevel(iGain);
 
         if (iGain != 0)
@@ -1698,6 +1890,9 @@ TInt CTmsAudioServicesTestClass::Volume(CStifItemParser& aItem)
         RDebug::Printf("[TMS STIF] Volume, SetLevel to MaxLevel [%d]", iMaxVolume);
         ret = static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->SetLevel(
                 iMaxVolume);
+
+        AddExpectedEvent(EStreamVolChange, KMediumTimeout);
+
         RDebug::Printf("[TMS STIF] SetLevel Ret Error [%d]", ret);
         iLog->Log(_L("SetMaxVolume: %d"), iMaxVolume);
         RDebug::Printf("[TMS STIF] GetLevel");
@@ -1713,6 +1908,9 @@ TInt CTmsAudioServicesTestClass::Volume(CStifItemParser& aItem)
         RDebug::Printf("[TMS STIF] Volume, SetLevel to 0 ");
         ret = static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->SetLevel(0);
         RDebug::Printf("[TMS STIF] SetLevel Ret Error [%d]", ret);
+
+        AddExpectedEvent(EStreamVolChange, KMediumTimeout);
+
         iLog->Log(_L("Mute Volume"));
         ret = static_cast<TMSVolumeEffect*> (iTmsDnlinkEffect)->GetLevel(
                 iVolume);
@@ -1735,6 +1933,9 @@ TInt CTmsAudioServicesTestClass::Volume(CStifItemParser& aItem)
         RDebug::Printf("[TMS STIF] GLOBAL_VOL, SetLevel to [%d]", iMaxVolume);
         ret = static_cast<TMSGlobalVolEffect*> (iGlobalVol)->SetLevel(
                 iMaxVolume);
+
+        AddExpectedEvent(EGlobalVolChange, KMediumTimeout);
+
         RDebug::Printf("[TMS STIF] SetLevel Ret Error [%d]", ret);
         iLog->Log(_L("SetMaxGlobalVolume: %d"), iMaxVolume);
         RDebug::Printf("[TMS STIF] GLOBAL_VOL,GetLevel");
@@ -1749,6 +1950,9 @@ TInt CTmsAudioServicesTestClass::Volume(CStifItemParser& aItem)
 
         static_cast<TMSGlobalVolEffect*> (iGlobalVol)->SetLevel(0);
         iLog->Log(_L("Mute Global Volume"));
+
+        AddExpectedEvent(EGlobalVolChange, KMediumTimeout);
+
         static_cast<TMSGlobalVolEffect*> (iGlobalVol)->GetLevel(iVolume);
 
         if (iVolume != 0)
@@ -2128,7 +2332,7 @@ TInt CTmsAudioServicesTestClass::GetAvailableOutputs(CStifItemParser& /*aItem */
 
     if (iTmsGlobalRouting)
         {
-        error = iTmsGlobalRouting ->GetAvailableOutputs(iAvailableoutputs);
+        error = iTmsGlobalRouting->GetAvailableOutputs(iAvailableoutputs);
 
         if (error == KErrNone)
             {
@@ -2188,7 +2392,8 @@ TInt CTmsAudioServicesTestClass::SetBitrates(CStifItemParser& aItem)
             {
             if (iBitratesVector.size() > 0)
                 {
-                std::vector<guint>::iterator iBitrate = iBitratesVector.begin();
+                std::vector<guint>::iterator iBitrate =
+                        iBitratesVector.begin();
                 error = iTmsFormatUp -> SetBitRate(*iBitrate);
                 iLog->Log(_L("BR set %d"), *iBitrate);
                 }
@@ -2593,6 +2798,16 @@ TInt CTmsAudioServicesTestClass::AddClientSrcToDnlStream(CStifItemParser& /*aIte
         {
         error = iTmsDnlink->AddSource(iTmsClientSource);
         }
+//#ifdef __TEST_CODE_COVERAGE__  //Features not supported
+    TMSSourceType st;
+    static_cast<TMSClientSource*> (iTmsClientSource)->GetType(st);
+    gboolean enqueue(false);
+    static_cast<TMSClientSource*> (iTmsClientSource)->GetEnqueueMode(enqueue);
+    static_cast<TMSClientSource*> (iTmsClientSource)->ProcessBuffer(NULL);
+    static_cast<TMSClientSource*> (iTmsClientSource)->SetEnqueueMode(FALSE);
+    static_cast<TMSClientSource*> (iTmsClientSource)->Flush();
+//#endif //__TEST_CODE_COVERAGE__
+
     iLog->Log(_L("CTmsAudioServicesTestClass::AddClientSrcToDnlStream Error [%d]"), error);
     return error;
     }
@@ -2696,7 +2911,7 @@ TInt CTmsAudioServicesTestClass::AddClientSinkToUplStream(
     TInt error = KErrNone;
     if (iTmsUplink && iTmsClientSink)
         {
-        //static_cast<TMSClientSink*>(iTmsSink)->AddObserver(*this, NULL);
+        //static_cast<TMSClientSink*>(iTmsClientSink)->AddObserver(*this, NULL);
         error = iTmsUplink->AddSink(iTmsClientSink);
         }
     return error;
@@ -3152,6 +3367,24 @@ TInt CTmsAudioServicesTestClass::CreateRingTonePlayer(
     return error;
     }
 
+TInt CTmsAudioServicesTestClass::CreateVideoRingTonePlayer(
+        CStifItemParser& /*aItem */)
+    {
+    //Just for coverage feature not supported yet.
+    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::CreateVideoRingTonePlayer")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateVideoRingTonePlayer"));
+    TInt error = TMS_RESULT_SUCCESS;
+    if (iFactory)
+        {
+        RWindow* window(NULL);
+        gint scrid;
+        error = iFactory->CreateRingTonePlayer(iRingTonePlayer, *window,
+                scrid);
+        }
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateVideoRingTonePlayer Error [%d]"), error);
+    return error;
+    }
+
 TInt CTmsAudioServicesTestClass::InitRingTonePlayer(CStifItemParser& aItem)
     {
     FTRACE(FPrint(_L("CTmsAudioServicesTestClass::InitRingTonePlayer")));
@@ -3169,7 +3402,7 @@ TInt CTmsAudioServicesTestClass::InitRingTonePlayer(CStifItemParser& aItem)
             }
         else if (StreamType == KTagRTFile)
             {
-            TBuf<sizeof(KTestFile3)> buf(KTestFile3);
+            TBuf<sizeof(KTestFile1)> buf(KTestFile1);
             iRTStr = g_string_new_len((gchar*) buf.Ptr(), buf.Length() * 2);
             error = iRingTonePlayer->Init(TMS_RINGTONE_FILE, iRTStr);
             g_string_free(iRTStr, TRUE);
@@ -3413,6 +3646,7 @@ TInt CTmsAudioServicesTestClass::StopInbandTone(CStifItemParser& /*aItem*/)
         {
         error = iInbandTonePlayer->Stop();
         RemoveExpectedEvent(EInbToneStarted);
+        AddExpectedEvent(EInbToneStopped, KShortTimeout);
         }
     iLog->Log(_L("CTmsAudioServicesTestClass::StopInbandTone Error [%d]"), error);
     return error;
@@ -3433,39 +3667,75 @@ TInt CTmsAudioServicesTestClass::CloseInbandTonePlayer(CStifItemParser& /*aItem*
     }
 
 // ----------------------------------------------------------------------------
+// CVoIPTestEngine::SetLoopPlay
+//
+// ----------------------------------------------------------------------------
+//
+TInt CTmsAudioServicesTestClass::SetLoopPlay(CStifItemParser& /*aItem*/)
+    {
+    iLog->Log(_L("CTmsAudioServicesTestClass::SetLoopPlay"));
+    iLoopPlay = ETrue;
+    return 0;
+    }
+
+// ----------------------------------------------------------------------------
 // CTmsTestEngine::DoLoopback
 //
 // ----------------------------------------------------------------------------
 //
 void CTmsAudioServicesTestClass::DoLoopback()
     {
-    iLog->Log(_L("CTmsAudioServicesTestClass::DoLoopback"));
+    //iLog->Log(_L("CTmsAudioServicesTestClass::DoLoopback"));
 
-    if (iPlayBufReady && iRecBufReady)
+    if (!iLoopPlay)
         {
-        iLog->Log(_L("Both uplink and downlink are ready"));
-        guint8* srcptr(0);
-        guint8* desptr(0);
-        guint srcsize(0);
-        guint dessize(0);
-
-        iPlayBuf->GetDataPtr(desptr);
-        iPlayBuf->GetDataSize(dessize);
-
-        iRecBuf->GetDataPtr(srcptr);
-        iRecBuf->GetDataSize(srcsize);
-
-        Mem::Copy(desptr, srcptr, srcsize);
-
-        static_cast<TMSClientSource*> (iTmsClientSource)->BufferFilled(
-                *iPlayBuf);
-        static_cast<TMSClientSink*> (iTmsClientSink)->BufferProcessed(iRecBuf);
-
-        iPlayBufReady = EFalse; // buf filled, ready for FillBuffer
-        iRecBufReady = EFalse;  // buf consumed, ready for EmptyBuffer
+        if (iPlayBufReady)
+            {
+            // Just keep D/S NULL playback going
+            iPlayBufReady = EFalse;
+            guint8* desptr(0);
+            iPlayBuf->GetDataPtr(desptr);
+            TPtr8 p(desptr, 4);
+            p.Copy(_L("0000"));
+            iPlayBuf->SetDataSize(4);
+            static_cast<TMSClientSource*> (iTmsClientSource)->BufferFilled(
+                    *iPlayBuf);
+            iLoopCounter++; //speed up count for single stream
+            }
+        else if (iRecBufReady)
+            {
+            // Just keep recording going
+            iRecBufReady = EFalse;
+            static_cast<TMSClientSink*> (iTmsClientSink)->BufferProcessed(
+                    iRecBuf);
+            iLoopCounter++; //speed up count for single stream
+            }
+        }
+    else
+        {
+        if (iPlayBufReady && iRecBufReady)
+            {
+            iPlayBufReady = EFalse;
+            iRecBufReady = EFalse;
+            guint8* srcptr(0);
+            guint8* desptr(0);
+            guint srcsize(0);
+            guint dessize(0);
+            iPlayBuf->GetDataPtr(desptr);
+            iPlayBuf->GetDataSize(dessize);
+            iRecBuf->GetDataPtr(srcptr);
+            iRecBuf->GetDataSize(srcsize);
+            Mem::Copy(desptr, srcptr, srcsize);
+            static_cast<TMSClientSink*> (iTmsClientSink)->BufferProcessed(
+                    iRecBuf);
+            iPlayBuf->SetDataSize(srcsize);
+            static_cast<TMSClientSource*> (iTmsClientSource)->BufferFilled(
+                    *iPlayBuf);
+            }
         }
 
-    iLog->Log(_L("CTmsAudioServicesTestClass::DoLoopback END"));
+    iLoopCounter++;
+    //iLog->Log(_L("CTmsAudioServicesTestClass::DoLoopback END"));
     }
 
 TInt CTmsAudioServicesTestClass::ConfigEncAudDevice(CStifItemParser& /*aItem*/)
@@ -3473,6 +3743,20 @@ TInt CTmsAudioServicesTestClass::ConfigEncAudDevice(CStifItemParser& /*aItem*/)
     FTRACE(FPrint(_L("CTmsAudioServicesTestClass::ConfigEncAudDevice")));
     iLog->Log(_L("CTmsAudioServicesTestClass::ConfigEncAudDevice"));
     TInt error = KErrNone;
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::TestRTPSession(CStifItemParser& /*aItem*/)
+    {
+    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::TestRTPSession")));
+    TInt error = KErrNone;
+    //Just for CTC coverage not supported yet.
+    if (iFactory)
+        {
+        TMSRTPSession* rtpsession(NULL);
+        error = iFactory->CreateRTPSession(rtpsession, 0, 0);
+        iFactory->DeleteRTPSession(rtpsession);
+        }
     return error;
     }
 
@@ -3513,3 +3797,308 @@ void CTmsAudioServicesTestClass::DisplayDevice(TMSAudioOutput device)
             break;
         }
     }
+
+// Coverage tests to ensure there are no null pointer panics
+
+TInt CTmsAudioServicesTestClass::CreateStreamTest(CStifItemParser& /*aItem*/)
+    {
+    TMSStreamTest stream = TMSStreamTest();
+    stream.AddObserver(*this, NULL);
+    stream.RemoveObserver(*this);
+    stream.Init();
+    stream.AddEffect(NULL);
+    stream.RemoveEffect(NULL);
+    stream.AddSink(NULL);
+    stream.RemoveSink(NULL);
+    stream.AddSource(NULL);
+    stream.RemoveSource(NULL);
+    stream.GetState();
+    stream.GetStreamId();
+    stream.GetStreamType();
+    stream.Pause();
+    stream.Deinit();
+    stream.Start();
+    stream.Stop();
+    stream.SetFormat(NULL);
+    stream.ResetFormat(NULL);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateCallTest(CStifItemParser& /*aItem*/)
+    {
+    TMSCallTest call = TMSCallTest();
+    TMSStream* strm(NULL);
+
+    call.CreateStream(1, strm);
+    guint contextId;
+    call.GetCallContextId(contextId);
+    call.GetCallType();
+    call.DeleteStream(strm);
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateDTMFTest(CStifItemParser& /*aItem*/)
+    {
+    TMSDTMFTest dtmf = TMSDTMFTest();
+
+    dtmf.AddObserver(*this, NULL);
+    dtmf.RemoveObserver(*this);
+    dtmf.SetTone(NULL);
+    dtmf.Start();
+    dtmf.Stop();
+    dtmf.ContinueDTMFStringSending(FALSE);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateInbandToneTest(CStifItemParser& /*aItem*/)
+    {
+    TMSInbandToneTest inband = TMSInbandToneTest();
+
+    inband.AddObserver(*this, NULL);
+    inband.RemoveObserver(*this);
+    inband.Start(TMS_INBAND_NO_SEQUENCE);
+    inband.Stop();
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateRingToneTest(CStifItemParser& /*aItem*/)
+    {
+    TMSRingToneTest ringtone = TMSRingToneTest();
+
+    ringtone.AddObserver(*this, NULL);
+    ringtone.RemoveObserver(*this);
+    ringtone.Init(1, NULL, NULL);
+    ringtone.Mute();
+    ringtone.Pause();
+    ringtone.Play();
+    ringtone.Stop();
+    ringtone.Deinit();
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateClientSinkTest(CStifItemParser& /*aItem*/)
+    {
+    TMSClientSinkTest clientsink = TMSClientSinkTest();
+
+    clientsink.AddObserver(*this, NULL);
+    clientsink.RemoveObserver(*this);
+    TMSSinkType snktype;
+    clientsink.GetType(snktype);
+    TMSBuffer* tmsbuffer(NULL);
+    clientsink.BufferProcessed(tmsbuffer);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateClientSourceTest(CStifItemParser& /*aItem*/)
+    {
+    TMSClientSourceTest clientsource = TMSClientSourceTest();
+
+    clientsource.AddObserver(*this, NULL);
+    clientsource.RemoveObserver(*this);
+    clientsource.Flush();
+    gboolean enq;
+    clientsource.GetEnqueueMode(enq);
+    TMSSourceType srctype;
+    clientsource.GetType(srctype);
+    TMSBuffer* tmsbuffer(NULL);
+    clientsource.ProcessBuffer(tmsbuffer);
+    clientsource.SetEnqueueMode(FALSE);
+    clientsource.BufferFilled(*tmsbuffer);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateSinksTest(CStifItemParser& /*aItem*/)
+    {
+    TMSModemSinkTest modemsink = TMSModemSinkTest();
+
+    TMSSinkType sinktype;
+    modemsink.GetType(sinktype);
+
+    TMSSpeakerSinkTest speaker = TMSSpeakerSinkTest();
+    speaker.GetType(sinktype);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateSourcesTest(CStifItemParser& /*aItem*/)
+    {
+    TMSModemSourceTest modemsource = TMSModemSourceTest();
+
+    TMSSourceType sourcetype;
+    modemsource.GetType(sourcetype);
+
+    TMSMicSourceTest micsource = TMSMicSourceTest();
+    micsource.GetType(sourcetype);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateGlobalVolEffectTest(CStifItemParser& /*aItem*/)
+    {
+    TMSGlobalVolTest globalvol = TMSGlobalVolTest();
+
+    globalvol.AddObserver(*this, NULL);
+    globalvol.RemoveObserver(*this);
+    TMSEffectType effecttype;
+    globalvol.GetType(effecttype);
+    guint level(0);
+    globalvol.GetLevel(level);
+    globalvol.GetMaxLevel(level);
+    globalvol.SetLevel(level);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateGlobalGainEffectTest(CStifItemParser& /*aItem*/)
+    {
+    TMSGlobalGainTest globalgain = TMSGlobalGainTest();
+
+    globalgain.AddObserver(*this, NULL);
+    globalgain.RemoveObserver(*this);
+    TMSEffectType effecttype;
+    globalgain.GetType(effecttype);
+    guint level(0);
+    globalgain.GetLevel(level);
+    globalgain.GetMaxLevel(level);
+    globalgain.SetLevel(level);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateVolumeEffectTest(CStifItemParser& /*aItem*/)
+    {
+    TMSVolumeEffectTest vol = TMSVolumeEffectTest();
+
+    vol.AddObserver(*this, NULL);
+    vol.RemoveObserver(*this);
+    TMSEffectType effecttype;
+    vol.GetType(effecttype);
+    guint level(0);
+    vol.GetLevel(level);
+    vol.GetMaxLevel(level);
+    vol.SetLevel(level);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateGainEffectTest(CStifItemParser& /*aItem*/)
+    {
+    TMSGainEffectTest gain = TMSGainEffectTest();
+
+    gain.AddObserver(*this, NULL);
+    gain.RemoveObserver(*this);
+    TMSEffectType effecttype;
+    gain.GetType(effecttype);
+    guint level(0);
+    gain.GetLevel(level);
+    gain.GetMaxLevel(level);
+    gain.SetLevel(level);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateGlobalRoutingTest(CStifItemParser& /*aItem*/)
+    {
+    TMSGlobalRoutingTest routing = TMSGlobalRoutingTest();
+
+    routing.AddObserver(*this, NULL);
+    routing.RemoveObserver(*this);
+    OutputVector outputvector;
+    routing.GetAvailableOutputs(outputvector);
+    TMSAudioOutput output;
+    routing.GetOutput(output);
+    routing.GetPreviousOutput(output);
+    routing.SetOutput(output);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateFormatsTest(CStifItemParser& /*aItem*/)
+    {
+    TMSG711Test g711 = TMSG711Test();
+    guint bitrate;
+    g711.GetBitRate(bitrate);
+    gboolean cng;
+    g711.GetCNG(cng);
+    TMSG711CodecMode mode;
+    g711.GetMode(mode);
+    gboolean plc;
+    g711.GetPlc(plc);
+    BitRateVector brvector;
+    g711.GetSupportedBitRates(brvector);
+    TMSFormatType formattype;
+    g711.GetType(formattype);
+    gboolean vad;
+    g711.GetVADMode(vad);
+    g711.SetBitRate(0);
+    g711.SetCNG(cng);
+    g711.SetMode(mode);
+    g711.SetPlc(plc);
+    g711.SetVADMode(vad);
+
+    TMSG729Test g729 = TMSG729Test();
+    g729.GetBitRate(bitrate);
+    g729.GetSupportedBitRates(brvector);
+    g729.GetType(formattype);
+    g729.GetVADMode(vad);
+    g729.SetBitRate(0);
+    g729.SetVADMode(vad);
+
+    TMSILBCTest ilbc = TMSILBCTest();
+    ilbc.GetBitRate(bitrate);
+    ilbc.GetCNG(cng);
+    TMSILBCCodecMode mod;
+    ilbc.GetMode(mod);
+    ilbc.GetSupportedBitRates(brvector);
+    ilbc.GetType(formattype);
+    ilbc.GetVADMode(vad);
+    ilbc.SetBitRate(0);
+    ilbc.SetCNG(cng);
+    ilbc.SetMode(mod);
+    ilbc.SetVADMode(vad);
+
+    return KErrNone;
+    }
+
+TInt CTmsAudioServicesTestClass::CreateStreamFailTest(CStifItemParser& /*aItem*/)
+    {
+    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::CreateStreamFailTest")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateStreamFailTest"));
+    TInt error = KErrNone;
+
+    TMSStreamTest stream = TMSStreamTest();
+    TMSStream *stm = &stream;
+    if (iTmsCall)
+        {
+        error = iTmsCall->CreateStream(TMS_STREAM_DOWNLINK, stm);
+        }
+
+    iLog->Log(_L("CTmsAudioServicesTestClass::CreateStreamFailTest Error [%d]"), error);
+    return error;
+    }
+
+TInt CTmsAudioServicesTestClass::TerminateServer(CStifItemParser& /*aItem*/)
+    {
+    FTRACE(FPrint(_L("CTmsAudioServicesTestClass::TerminateServer")));
+    iLog->Log(_L("CTmsAudioServicesTestClass::TerminateServer"));
+    TInt error = KErrNone;
+
+    iProxy = new TMSProxy();
+    if (iProxy)
+        {
+        _LIT(KTMSServerName, "!TmsServer");
+        iProxy->Connect(KTMSServerName);
+        const TInt KTMSTermSrv = 37;
+        iProxy->SendRequest(KTMSTermSrv);
+        }
+
+    iLog->Log(_L("CTmsAudioServicesTestClass::TerminateServer Error [%d]"), error);
+    return error;
+    }
+

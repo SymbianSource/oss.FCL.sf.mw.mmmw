@@ -1,32 +1,29 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services  Defines buffer type for VoIP data streaming.
-*
-*/
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: VOIP Audio Services  Defines buffer type for VoIP data
+ *              streaming.
+ *
+ */
 
-
-#ifndef __VOIPDATABUFFERIMPL_H
-#define __VOIPDATABUFFERIMPL_H
+#ifndef VOIPDATABUFFERIMPL_H
+#define VOIPDATABUFFERIMPL_H
 
 #include <e32base.h>
 #include <voipdatabuffer.h>
 
-
 /**
  *  CVoIPDataBuferImpl
- *  ?description
- *  @since S60 v5.0
  */
 NONSHARABLE_CLASS(CVoIPDataBufferImpl) : public CBase,
                                          public CVoIPJBDataBuffer
@@ -35,7 +32,6 @@ public:
     /**
      * 2-phased constructor
      *
-     * @since S60 v5.0
      * @param TInt
      * @return none
      */
@@ -44,7 +40,6 @@ public:
     /**
      * Destructor
      *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -53,7 +48,6 @@ public:
     /**
      * GetPayloadPtr
      *
-     * @since S60 v5.0
      * @param TPtr8&
      * @return none
      */
@@ -62,7 +56,6 @@ public:
     /**
      * SetPayloadPtr
      *
-     * @since S60 v5.0
      * @param TPtr8
      * @return none
      */
@@ -71,7 +64,6 @@ public:
     /**
      * GetPayloadPtr
      *
-     * @since S60 v5.0
      * @param CVoIPDataBuffer::TVoIPBufferType&
      * @return none
      */
@@ -81,7 +73,6 @@ protected:
     /**
      * Constructor
      *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -90,7 +81,6 @@ protected:
     /**
      * Symbian constructor
      *
-     * @since S60 v5.0
      * @param TInt
      * @return void
      */
@@ -98,12 +88,11 @@ protected:
 
 protected:
     CVoIPDataBuffer::TVoIPBufferType iType;
-    TPtr8   iPayloadPtr;
+    TPtr8 iPayloadPtr;
     HBufC8* iBuf;
-    TInt    iBufferLen;
+    TInt iBufferLen;
     };
 
-#endif //__VOIPDATABUFFERIMPL_H
-
+#endif //VOIPDATABUFFERIMPL_H
 
 //End of file

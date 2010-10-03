@@ -37,13 +37,6 @@ public:
     virtual ~TMSCSUplink();
 
     /**
-     * Determines mic mute state.
-     *
-     * @return ETrue - mic is muted, EFalse - mic is not muted.
-     */
-    gboolean IsMuted();
-
-    /**
      * Set mic gain.
      */
     void SetGain(gint gain);

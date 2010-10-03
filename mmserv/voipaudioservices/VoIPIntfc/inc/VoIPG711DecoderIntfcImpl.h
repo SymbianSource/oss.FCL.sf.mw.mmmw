@@ -1,23 +1,22 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
-
-#ifndef __VOIPG711DECFORMATINTFCIMPL_H
-#define __VOIPG711DECFORMATINTFCIMPL_H
+#ifndef VOIPG711DECFORMATINTFCIMPL_H
+#define VOIPG711DECFORMATINTFCIMPL_H
 
 #include <voipg711decoderintfc.h>
 #include "VoIPFormatIntfcImpl.h"
@@ -29,12 +28,12 @@ class CVoIPAudioDownlinkStreamImpl;
 // CVoIPG711DecoderIntfcImpl class
 // -----------------------------------------------------------------------------
 NONSHARABLE_CLASS(CVoIPG711DecoderIntfcImpl) : public CBase,
-                                               public CVoIPG711DecoderIntfc,
-                                               public CVoIPFormatIntfcImpl
+        public CVoIPG711DecoderIntfc,
+        public CVoIPFormatIntfcImpl
     {
 public:
     static CVoIPG711DecoderIntfcImpl*
-           NewL(CVoIPAudioDownlinkStreamImpl* aDnLinkStreamImpl);
+    NewL(CVoIPAudioDownlinkStreamImpl* aDnLinkStreamImpl);
 
     virtual ~CVoIPG711DecoderIntfcImpl();
 
@@ -48,10 +47,8 @@ public:
 private:
     CVoIPG711DecoderIntfcImpl();
     void ConstructL(CVoIPAudioDownlinkStreamImpl* aDnLinkStreamImpl);
-
     };
 
-
-#endif //__VOIPG711DECFORMATINTFCIMPL_H
+#endif //VOIPG711DECFORMATINTFCIMPL_H
 
 // End of file

@@ -20,9 +20,9 @@
 
 using namespace TMS;
 
-TMSFactory::TMSFactory()
+TMSFactory::TMSFactory(TMSVer& ver)
     {
-    impl = new TMSFactoryImpl();
+    impl = new TMSFactoryImpl(ver);
     }
 
 EXPORT_C TMSFactory::~TMSFactory()
@@ -31,9 +31,9 @@ EXPORT_C TMSFactory::~TMSFactory()
     }
 
 EXPORT_C gint TMSFactory::CreateFactory(TMSFactory*& tmsfactory,
-        TMSVer& /*ver*/)
+        TMSVer& ver)
     {
-    TMSFactory* self = new TMSFactory();
+    TMSFactory* self = new TMSFactory(ver);
     tmsfactory = self;
     return TMS_RESULT_SUCCESS;
     }

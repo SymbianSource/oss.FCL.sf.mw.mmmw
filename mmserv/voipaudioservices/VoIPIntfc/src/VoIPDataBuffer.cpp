@@ -1,23 +1,21 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
 #include "VoIPDataBufferImpl.h"
-
 
 // ---------------------------------------------------------------------------
 // Contructor
@@ -67,10 +65,9 @@ EXPORT_C void CVoIPDataBuffer::SetPayloadPtr(TPtr8 aPayloadPtr)
 // ---------------------------------------------------------------------------
 //
 EXPORT_C void CVoIPDataBuffer::GetBufferType(
-                               CVoIPDataBuffer::TVoIPBufferType& aType)
+        CVoIPDataBuffer::TVoIPBufferType& aType)
     {
     iVoIPDataBufferImpl->GetBufferType(aType);
     }
-
 
 // End of file

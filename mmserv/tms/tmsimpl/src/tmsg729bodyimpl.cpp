@@ -94,19 +94,6 @@ void TMSG729FormatBodyImpl::SetProxy(TMSGlobalContext* context,
         iProxy = context->CallProxy;
         iStreamType = context->StreamType;
         TMSFormatBodyImpl::SetProxy(iProxy, queuehandler);
-        static_cast<TMSQueueHandler*>(queuehandler)->AddObserver(*this,
-                TMS_FORMAT_G729);
         }
     }
-
-void TMSG729FormatBodyImpl::QueueEvent(TInt aEventType, TInt /*aError*/,
-        void* /*user_data*/)
-    {
-    switch (aEventType)
-        {
-        default:
-            break;
-        }
-    }
-
 // End of file

@@ -25,7 +25,7 @@
 #include    <barsc.h>
 #include    <barsread.h>
 #include 	<data_caging_path_literals.hrh>
-#include	<TopCharacterSet.rsg>
+#include	<topcharacterset.rsg>
 #ifdef _DEBUG
 #include	<e32svr.h>
 #endif

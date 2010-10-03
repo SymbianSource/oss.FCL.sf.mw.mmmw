@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __TMSAUDIOSERVICESTESTCLASS_H
-#define __TMSAUDIOSERVICESTESTCLASS_H
+#ifndef TMSAUDIOSERVICESTESTCLASS_H
+#define TMSAUDIOSERVICESTESTCLASS_H
 
 //  INCLUDES
 #include <StifLogger.h>
@@ -35,6 +35,10 @@
 #include <tmsclientsource.h>
 #include <tmsclientsourceobsrvr.h>
 #include <tmsclientsinkobsrvr.h>
+#include <tmsmicsource.h>
+#include <tmsmodemsource.h>
+#include <tmsspeakersink.h>
+#include <tmsmodemsink.h>
 #include <tmsvolumeeffect.h>
 #include <tmsglobalvoleffect.h>
 #include <tmsgaineffect.h>
@@ -69,13 +73,8 @@ const TInt KErrTimeoutController = -2007; // Unexpected notification
 
 const TInt KMicroTimeout = 1000;
 const TInt KShortTimeout = 2000;
-const TInt KMediumTimeout = 10000;
-const TInt KLongTimeout = 100000;
-
-#ifdef __JITTER_BUFFER_TEST__
-const TUint KDefaultSampleRateInkHz = 8; // for sequence number calculation
-const TUint KMaxSeqNumber = 0xFFFF; //65535
-#endif //__JITTER_BUFFER_TEST__
+const TInt KMediumTimeout = 4000;
+const TInt KLongTimeout = 10000;
 
 _LIT( KMsgBadTestParameters, "[Error] No valid test case parameters");
 
@@ -132,44 +131,32 @@ _LIT( KTagBeepSequence, "BeepSequence" );
 // MACROS
 
 #ifdef __WINSCW__
-_LIT( KTmsAudioServicesTestClassLogPath, "\\logs\\testframework\\" );
-_LIT16(KTestFile1, "\\testing\\data\\alarm 1.aac");
-_LIT16(KTestFile2, "\\testing\\data\\alarm.aac");
-//_LIT16(KTestFile3, "\\testing\\data\\test_8khz.wav");
-_LIT16(KTestFile3, "c:\\data\\sounds\\digital\\test_8khz.wav");
+_LIT(KTmsAudioServicesTestClassLogPath, "\\logs\\testframework\\");
 #else
-_LIT( KTmsAudioServicesTestClassLogPath, "c:\\testing\\Log\\" );
-_LIT16(KTestFile1, "c:\\testing\\data\\alarm 1.aac");
-_LIT16(KTestFile2, "c:\\testing\\data\\alarm.aac");
-//_LIT16(KTestFile3, "c:\\testing\\data\\test_8khz.wav");
-_LIT16(KTestFile3, "c:\\data\\sounds\\digital\\test_8khz.wav");
+// Note: The path must match setting in TmsAudioServicesTestClass.ini
+_LIT(KTmsAudioServicesTestClassLogPath, "e:\\");    //Write to MMC
+//_LIT(KTmsAudioServicesTestClassLogPath, "f:\\");  //Write to MMC
 #endif
+
+_LIT16(KTestFile1, "C:\\Data\\Sounds\\Digital\\NokiaTest.aac");
 _LIT8(KRTBeepSequence, "\x00\x11\x0A\x0A\x08\x73\x0A\x40\x28\x0A\xF7\
 \x05\xFC\x40\x64\x0A\x08\x40\x32\x0A\xF7\x06\x0B");
 _LIT16(KTextToSpeak, "THE PHONE IS RINGING");
 
 // Log file
-_LIT( KTmsAudioServicesTestClassLogFile, "CTmsAudioServicesTestClass.txt" );
-_LIT8(KMimetypeAAC, "audio/aac");
-_LIT8(KMimetypeWAV, "audio/wav");
+_LIT(KTmsAudioServicesTestClassLogFile, "CTmsAudioServicesTestClass.txt");
 const TUint KTonesBufSize = 6;
 const TUint KMimeStringSize = 32;
 
 // FORWARD DECLARATIONS
 class CTmsAudioServicesTestClass;
 class CTmsDataBuffer;
-#ifdef __JITTER_BUFFER_TEST__
-class CTmsJBDataBuffer;
-#endif //__JITTER_BUFFER_TEST__
+class TMSProxy;
 
 // CLASS DECLARATION
 
 /**
  *  CRadioUtilityTestClass test class for STIF Test Framework TestScripter.
- *  ?other_description_lines
- *
- *  @lib ?library
- *  @since Series60_3_2
  */
 NONSHARABLE_CLASS(CTmsAudioServicesTestClass) :
     public CScriptBase,
@@ -191,7 +178,8 @@ NONSHARABLE_CLASS(CTmsAudioServicesTestClass) :
         STARTED,
         };
 
-public: // Constructors and destructor
+public:
+    // Constructors and destructor
 
     /**
      * Two-phased constructor.
@@ -225,15 +213,16 @@ public: // Constructors and destructor
         EInbToneStarted,
         EInbToneStopped,
         EDTMFToneStarted,
-        EDTMFToneStopped
+        EDTMFToneStopped,
+        EStreamVolChange,
+        EStreamGainChange,
+        EGlobalVolChange,
+        EGlobalGainChange
         };
 
 public:
-    // Functions from base classes
-
     /**
      * From CScriptBase Runs a script line.
-     * @since ?Series60_version
      * @param aItem Script line containing method name and parameters
      * @return Symbian OS error code
      */
@@ -242,7 +231,6 @@ public:
     // From MTimeoutObserver
 
     /**
-     * @since ?Series60_version
      * @param none
      * Review if all the expected events have ocurred once the time is over
      */
@@ -286,31 +274,22 @@ private:
      */
     void ConstructL();
 
-    // Prohibit copy constructor if not deriving from CBase.
-    // ?classname( const ?classname& );
-    // Prohibit assigment operator if not deriving from CBase.
-    // ?classname& operator=( const ?classname& );
-
     /**
      * Frees all resources allocated from test methods.
-     * @since ?Series60_version
      */
     void Delete();
 
     /**
      * Set an event as expected and set default timeout
-     * @since ?Series60_version
      */
     void AddExpectedEvent(TTmsExpectedEvent event, TInt ms);
 
     /**
      * Unset an event as expected
-     * @since ?Series60_version
      */
     TBool RemoveExpectedEvent(TTmsExpectedEvent event);
 
     /**
-     * @since ?Series60_version
      * @param none
      * Removes all expected events
      */
@@ -319,19 +298,16 @@ private:
     /**
      * Verify that the event was expected, removes it from the list
      * Signal the TestScripter with the returned error code
-     * @since ?Series60_version
      */
     void ProcessEvent(TTmsExpectedEvent aEvent, TInt aError);
 
     /**
      * Maps a event with a descriptor with its name
-     * @since ?Series60_version
      */
     TPtrC EventName(TInt aKey);
 
     /**
      * Sets a timeout different since the default
-     * @since Series60_3_2
      * @param aItem Script line containing parameters.
      * @return Symbian OS error code.
      */
@@ -339,7 +315,6 @@ private:
 
     /**
      *
-     * @since Series60_3_2
      * @param aItem Script line containing parameters.
      * @return Symbian OS error code.
      */
@@ -347,7 +322,6 @@ private:
 
     /**
      *
-     * @since Series60_3_2
      * @param aItem Script line containing parameters.
      * @return Symbian OS error code.
      */
@@ -355,12 +329,9 @@ private:
 
     /**
      * Connect to the default client to the server
-     * @since ?Series60_version
      * @param aItem Script line containing parameters.
      * @return Symbian OS error code.
      */
-
-    TInt ExampleL(CStifItemParser& aItem);
 
     TInt CreateTmsFactory(CStifItemParser& aItem);
     TInt CreateCall(CStifItemParser& aItem);
@@ -404,6 +375,7 @@ private:
     TInt CloseDTMFPlayer(CStifItemParser& aItem);
 
     TInt CreateRingTonePlayer(CStifItemParser& aItem);
+    TInt CreateVideoRingTonePlayer(CStifItemParser& aItem);
     TInt InitRingTonePlayer(CStifItemParser& aItem);
     TInt PlayRingTone(CStifItemParser& aItem);
     TInt PlayRingToneNoEvent(CStifItemParser& aItem);
@@ -439,6 +411,7 @@ private:
     void DisplayDevice(TMSAudioOutput device);
     TInt GetBufferType(CStifItemParser& aItem);
 
+    TInt SetLoopPlay(CStifItemParser& aItem);
     TInt ConfigEncAudDevice(CStifItemParser& aItem);
 
     TInt AddClientSrcToDnlStream(CStifItemParser& aItem);
@@ -478,6 +451,25 @@ private:
     TInt GetAvailableOutputs(CStifItemParser& aItem);
     TInt AddGlobalRoutingObserver(CStifItemParser& aItem);
     TInt DeleteGlobalRoutingObserver(CStifItemParser& aItem);
+
+    TInt TestRTPSession(CStifItemParser& aItem);
+    TInt CreateStreamTest(CStifItemParser& aItem);
+    TInt CreateCallTest(CStifItemParser& aItem);
+    TInt CreateDTMFTest(CStifItemParser& aItem);
+    TInt CreateInbandToneTest(CStifItemParser& aItem);
+    TInt CreateRingToneTest(CStifItemParser& aItem);
+    TInt CreateClientSinkTest(CStifItemParser& aItem);
+    TInt CreateClientSourceTest(CStifItemParser& aItem);
+    TInt CreateSinksTest(CStifItemParser& aItem);
+    TInt CreateSourcesTest(CStifItemParser& aItem);
+    TInt CreateGlobalVolEffectTest(CStifItemParser& aItem);
+    TInt CreateGlobalGainEffectTest(CStifItemParser& aItem);
+    TInt CreateVolumeEffectTest(CStifItemParser& aItem);
+    TInt CreateGainEffectTest(CStifItemParser& aItem);
+    TInt CreateGlobalRoutingTest(CStifItemParser& aItem);
+    TInt CreateFormatsTest(CStifItemParser& aItem);
+    TInt CreateStreamFailTest(CStifItemParser& aItem);
+    TInt TerminateServer(CStifItemParser& aItem);
 
 private:
     // Data
@@ -538,6 +530,8 @@ private:
     TMSBuffer* iRecBuf;
     TBool iPlayBufReady;
     TBool iRecBufReady;
+    TBool iLoopPlay;
+    TInt iLoopCounter;
 
     // For ring tone playback
     GString* iRTStr;
@@ -556,8 +550,9 @@ private:
     RArray<TTmsExpectedEvent> iOcurredEvents;
 
     CActiveSchedulerWait* iActive;
+    TMSProxy* iProxy;
     };
 
-#endif //__TMSAUDIOSERVICESTESTCLASS_H
+#endif //TMSAUDIOSERVICESTESTCLASS_H
 
 // End of File

@@ -16,8 +16,8 @@
  *
  */
 
-#ifndef __VOIPAUDIOSESSION_H
-#define __VOIPAUDIOSESSION_H
+#ifndef VOIPAUDIOSESSION_H
+#define VOIPAUDIOSESSION_H
 
 // INCLUDES
 #include <mmfbase.h>
@@ -60,7 +60,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -69,7 +68,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -78,7 +76,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -87,7 +84,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -96,7 +92,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param const TMMFPrioritySettings
      * @param RArray<TUint32>&
      * @param TInt&
@@ -108,7 +103,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -117,7 +111,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -127,7 +120,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -137,7 +129,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -146,7 +137,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -155,7 +145,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -164,7 +153,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TPtr8
      * @param const TInt64
      * @return TInt
@@ -176,7 +164,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param const TMMFPrioritySettings
      * @return TInt
      */
@@ -185,7 +172,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -194,7 +180,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -203,7 +188,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -212,7 +196,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param const TMMFPrioritySettings
      * @param RArray<TUint32>&
      * @param TInt&
@@ -224,7 +207,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -233,7 +215,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -242,7 +223,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -251,7 +231,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -260,7 +239,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TPtr8
      * @return TInt
      */
@@ -271,7 +249,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TArray<TUint>&
      * @return void
      */
@@ -280,7 +257,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param const TUint
      * @return TInt
      */
@@ -289,7 +265,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TUint&
      * @return TInt
      */
@@ -298,7 +273,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param TBool
      * @return TInt
      */
@@ -307,7 +282,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TBool&
      * @return TInt
      */
@@ -316,7 +290,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TBool&
      * @return TInt
      */
@@ -325,7 +298,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TBool
      * @return TInt
      */
@@ -334,7 +306,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TBool&
      * @return TInt
      */
@@ -343,7 +314,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -352,7 +322,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TG711CodecMode
      * @return TInt
      */
@@ -361,7 +330,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TG711CodecMode&
      * @return TInt
      */
@@ -370,7 +338,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TILBCCodecMode
      * @return TInt
      */
@@ -379,7 +346,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TILBCCodecMode&
      * @return TInt
      */
@@ -388,7 +354,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TBool
      * @return TInt
      */
@@ -397,7 +362,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TBool&
      * @return TInt
      */
@@ -406,7 +370,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TBool
      * @return TInt
      */
@@ -415,7 +378,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TBool&
      * @return TInt
      */
@@ -424,7 +386,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -433,7 +394,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -442,7 +402,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -451,7 +410,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -460,7 +418,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -469,7 +426,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -478,7 +434,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TDesC&
      * @return TInt
      */
@@ -487,7 +442,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param RFile&
      * @return TInt
      */
@@ -496,7 +450,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param TDes&
      * @param TDes&
      * @return TInt
@@ -506,7 +459,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -515,7 +467,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -524,7 +475,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -533,7 +483,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -542,7 +491,6 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -551,7 +499,6 @@ public:
     /**
      * ConfigureJitterBuffer
      *
-     * @since S60 v5.0
      * @param const TVoIPJBConfig&
      * @return TInt
      */
@@ -560,7 +507,6 @@ public:
     /**
      * ResetJitterBuffer
      *
-     * @since S60 v5.0
      * @param const TBool
      * @return TInt
      */
@@ -569,7 +515,6 @@ public:
     /**
      * DelayDown
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -578,7 +523,6 @@ public:
     /**
      * DelayUp
      *
-     * @since S60 v5.0
      * @param none
      * @return TInt
      */
@@ -588,7 +532,6 @@ private:
     /**
      * PopulateArrayL
      *
-     * @since S60 v5.0
      * @param TVoIPAudioClientServerRequest
      * @param RArray<TUint32>&
      * @param TInt
@@ -599,9 +542,8 @@ private:
 
     TInt SendClientRequest(TVoIPAudioClientServerRequest aRequest,
             const TIpcArgs& aArgs) const;
-
     };
 
-#endif // __VOIPAUDIOSESSION_H
+#endif //VOIPAUDIOSESSION_H
 
 // End of file

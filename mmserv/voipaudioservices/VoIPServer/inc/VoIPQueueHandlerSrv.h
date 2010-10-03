@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPSERVERCALLBACKHANDLERSRV_H
-#define __VOIPSERVERCALLBACKHANDLERSRV_H
+#ifndef VOIPSERVERCALLBACKHANDLERSRV_H
+#define VOIPSERVERCALLBACKHANDLERSRV_H
 
 // INCLUDES
 #include <e32base.h>
@@ -35,7 +35,6 @@ public:
 
 /**
  *  CQueueHandler
- *
  */
 class CQueueHandlerSrv : public CActive
     {
@@ -44,7 +43,6 @@ public:
     /**
      * NewL()
      * Contructor that takes single queue pointer
-     *
      */
     static CQueueHandlerSrv* NewL(MQueueHandlerObserverSrv* aObserver,
             RMsgQueue<TVoIPMsgBuf>* aMsgQueue);
@@ -57,7 +55,6 @@ public:
     /**
      * Start
      * Starts listening for events.
-     *
      */
     void Start();
 
@@ -88,6 +85,6 @@ private:
 
     };
 
-#endif      // __VOIPSERVERCALLBACKHANDLERSRV_H
+#endif // VOIPSERVERCALLBACKHANDLERSRV_H
 
 // End of File

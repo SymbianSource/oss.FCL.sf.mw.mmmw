@@ -23,9 +23,9 @@
 #define FTRACE(a) {a;}
 
 /**
-* Declare the FPrint function
-* @return none
-*/
+ * Declare the FPrint function
+ * @return none
+ */
 inline void FPrint(const TRefByValue<const TDesC> aFmt, ...)
     {
     VA_LIST list;

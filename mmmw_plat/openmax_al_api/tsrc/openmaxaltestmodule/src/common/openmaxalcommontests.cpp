@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -10,7 +10,7 @@
 * Nokia Corporation - initial contribution.
 *
 * Contributors:
-* 
+*
 * Description: This file contains testclass implementation.
 *
 */
@@ -25,7 +25,7 @@
 // EXTERNAL DATA STRUCTURES
 //extern  ?external_data;
 
-// EXTERNAL FUNCTION PROTOTYPES  
+// EXTERNAL FUNCTION PROTOTYPES
 //extern ?external_function( ?arg_type,?arg_type );
 
 // CONSTANTS
@@ -79,7 +79,7 @@ TInt COpenMAXALTestModule::al_SetDataSink( CStifItemParser& aItem )
 
     TInt sinktype(0);
     XADataSink commonSink = {NULL,NULL};
-    
+
     status = aItem.GetNextInt(type);
     if(!status)
         {
@@ -171,7 +171,7 @@ TInt COpenMAXALTestModule::al_SetDataSink( CStifItemParser& aItem )
                      break;
                  }
              }
-         }    
+         }
     return status;
     }
 
@@ -191,7 +191,7 @@ TInt COpenMAXALTestModule::al_SetDataSource( CStifItemParser& aItem )
             case XA_DATALOCATOR_URI:
                 {
                 commonSource.pLocator = &m_Uri;
-                }                
+                }
                 break;
             case XA_DATALOCATOR_ADDRESS:
             case XA_DATALOCATOR_IODEVICE:
@@ -227,8 +227,8 @@ TInt COpenMAXALTestModule::al_SetDataSource( CStifItemParser& aItem )
                 }
             }
         }
-    
-    
+
+
     if(!status)
         {
         status = aItem.GetNextInt(sourcetype);
@@ -248,15 +248,15 @@ TInt COpenMAXALTestModule::al_SetDataSource( CStifItemParser& aItem )
                 case 4:
                     m_DynamicSource = commonSource;
                     break;
-                    
+
                 default:
                     status = KErrGeneral;
                     break;
                 }
             }
         }
-    
-    return status;  
+
+    return status;
     }
 
 TInt COpenMAXALTestModule::al_SetDataLocator( CStifItemParser& aItem )
@@ -265,7 +265,7 @@ TInt COpenMAXALTestModule::al_SetDataLocator( CStifItemParser& aItem )
     TInt type;
 
     status = aItem.GetNextInt(type);
-    
+
     switch(type)
         {
         case XA_DATALOCATOR_URI:
@@ -280,7 +280,7 @@ TInt COpenMAXALTestModule::al_SetDataLocator( CStifItemParser& aItem )
             status = aItem.GetNextString(uri);
             if(!status)
                 {
-                m_URIName = HBufC8::NewL(uri.Length()+1); 
+                m_URIName = HBufC8::NewL(uri.Length()+1);
                 TPtr8 desc = m_URIName->Des();
                 desc.Copy(uri);
                 m_Uri.locatorType = XA_DATALOCATOR_URI;
@@ -296,7 +296,7 @@ TInt COpenMAXALTestModule::al_SetDataLocator( CStifItemParser& aItem )
             {
             TInt devicetype;
             TUint deviceId;
-            
+
             status = aItem.GetNextInt(devicetype);
             if(!status)
                 {
@@ -311,13 +311,13 @@ TInt COpenMAXALTestModule::al_SetDataLocator( CStifItemParser& aItem )
                             {
                             m_SrcIODevice.deviceID = deviceId;
                             m_SrcIODevice.deviceType = devicetype;
-                            m_SrcIODevice.locatorType = XA_DATALOCATOR_IODEVICE;                    
+                            m_SrcIODevice.locatorType = XA_DATALOCATOR_IODEVICE;
                             }
                         else
                             {
                             m_SinkIODevice.deviceID = deviceId;
                             m_SinkIODevice.deviceType = devicetype;
-                            m_SinkIODevice.locatorType = XA_DATALOCATOR_IODEVICE;                    
+                            m_SinkIODevice.locatorType = XA_DATALOCATOR_IODEVICE;
                             }
                         }
                     else
@@ -344,7 +344,7 @@ TInt COpenMAXALTestModule::al_SetDataLocator( CStifItemParser& aItem )
             status = KErrGeneral;
             break;
         }
-    return status;   
+    return status;
     }
 
 TInt COpenMAXALTestModule::al_SetDataFormat( CStifItemParser& aItem )
@@ -354,7 +354,7 @@ TInt COpenMAXALTestModule::al_SetDataFormat( CStifItemParser& aItem )
     TInt contType(0);
     TPtrC mimetype;
     status = aItem.GetNextInt(type);
-    
+
     switch(type)
         {
         case XA_DATAFORMAT_MIME:
@@ -370,7 +370,7 @@ TInt COpenMAXALTestModule::al_SetDataFormat( CStifItemParser& aItem )
                         delete m_MimeType;
                         m_MimeType = NULL;
                         }
-                    m_MimeType = HBufC8::NewL(mimetype.Length()+1); 
+                    m_MimeType = HBufC8::NewL(mimetype.Length()+1);
                     TPtr8 desc = m_MimeType->Des();
                     desc.Copy(mimetype);
                     m_Mime.formatType = XA_DATAFORMAT_MIME;
@@ -395,7 +395,7 @@ TInt COpenMAXALTestModule::al_SetDataFormat( CStifItemParser& aItem )
             status = KErrGeneral;
             break;
         }
-    return status;   
+    return status;
     }
 
 TInt COpenMAXALTestModule::al_CreateWindow( CStifItemParser& aItem )
@@ -410,7 +410,7 @@ TInt COpenMAXALTestModule::al_CreateWindow( CStifItemParser& aItem )
     TInt bottomY;
     TInt posX;
     TInt posY;
-    
+
     status = aItem.GetNextInt(posX);
     RET_ERR_IF_ERR(status);
     status = aItem.GetNextInt(posY);
@@ -470,4 +470,44 @@ TInt COpenMAXALTestModule::al_DeleteWindow( CStifItemParser& /*aItem*/ )
     iRwGroup.Close();
     iRwSession.Close();
     return KErrNone;
+    }
+
+TInt COpenMAXALTestModule::CheckForNull(CStifItemParser& aItem, void*& paramPtr)
+    {
+    TInt status(KErrNone);
+    TPtrC itfc;
+    _LIT(ifc,"null");
+    _LIT(invalidItfc, "invalid");
+    status = aItem.GetNextString(itfc);
+    if(!status)
+        {
+        if(!itfc.Compare(ifc))
+            {
+            paramPtr = NULL;
+            }
+        else if (itfc.Compare(invalidItfc) == 0)
+            {
+            paramPtr = (void *)&aItem;
+            }
+        }
+    return status;
+    }
+
+TInt COpenMAXALTestModule::CheckForNullParam(CStifItemParser& aItem, void*& paramPtr)
+    {
+    TInt status(KErrNone);
+    TInt itfc;
+    status = aItem.GetNextInt(itfc);
+    if(!status)
+        {
+        if(itfc != KErrNotFound)
+            {
+            paramPtr = (void*)&itfc;
+            }
+        else
+            {
+            paramPtr = NULL;
+            }
+        }
+    return status;
     }

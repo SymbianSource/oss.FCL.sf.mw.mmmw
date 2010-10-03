@@ -98,6 +98,7 @@ EXPORT_C TMSProxy::~TMSProxy()
     if (iMsgQHandler)
         {
         iMsgQHandler->Cancel();
+        iMsgQHandler->RemoveObserver(*this);
         }
     delete iMsgQHandler;
     if (iMsgQueue.Handle() > 0)
@@ -252,7 +253,7 @@ EXPORT_C gint TMSProxy::SetOutput(TMSAudioOutput output)
         }
     else
         {
-        status = RSessionBase::SendReceive(ETMSSetOutput, TIpcArgs(output));
+        status = SendReceive(ETMSSetOutput, TIpcArgs(output));
         }
     TRACE_PRN_FN_EXT;
     return TMSRESULT(status);
@@ -261,9 +262,9 @@ EXPORT_C gint TMSProxy::SetOutput(TMSAudioOutput output)
 EXPORT_C gint TMSProxy::GetOutput(TMSAudioOutput& output)
     {
     TRACE_PRN_FN_ENT;
-    TPckgBuf<guint> pckg;
+    TPckgBuf<gint> pckg;
     TIpcArgs args(&pckg);
-    gint status = RSessionBase::SendReceive(ETMSGetOutput, args);
+    gint status = SendReceive(ETMSGetOutput, args);
     if (status == TMS_RESULT_SUCCESS)
         {
         output = pckg();
@@ -277,7 +278,7 @@ EXPORT_C gint TMSProxy::GetPreviousOutput(TMSAudioOutput& output)
     TRACE_PRN_FN_ENT;
     TPckgBuf<guint> pckg;
     TIpcArgs args(&pckg);
-    gint status = RSessionBase::SendReceive(ETMSGetPreviousOutput, args);
+    gint status = SendReceive(ETMSGetPreviousOutput, args);
     if (status == TMS_RESULT_SUCCESS)
         {
         output = pckg();
@@ -332,7 +333,7 @@ EXPORT_C gint TMSProxy::GetLevel(guint& level)
     TRACE_PRN_FN_ENT;
     TPckgBuf<guint> pckg;
     TIpcArgs args(&pckg);
-    gint status = RSessionBase::SendReceive(ETMSGetGlobalVol, args);
+    gint status = SendReceive(ETMSGetGlobalVol, args);
     if (status == TMS_RESULT_SUCCESS)
         {
         level = pckg();
@@ -346,7 +347,7 @@ EXPORT_C gint TMSProxy::GetMaxLevel(guint& level)
     TRACE_PRN_FN_ENT;
     TPckgBuf<guint> pckg;
     TIpcArgs args(&pckg);
-    gint status = RSessionBase::SendReceive(ETMSGetMaxGlobalVol, args);
+    gint status = SendReceive(ETMSGetMaxGlobalVol, args);
     if (status == TMS_RESULT_SUCCESS)
         {
         level = pckg();
@@ -358,7 +359,7 @@ EXPORT_C gint TMSProxy::GetMaxLevel(guint& level)
 EXPORT_C gint TMSProxy::SetLevel(guint level)
     {
     TRACE_PRN_FN_ENT;
-    gint status = RSessionBase::SendReceive(ETMSSetGlobalVol, TIpcArgs(level));
+    gint status = SendReceive(ETMSSetGlobalVol, TIpcArgs(level));
     TRACE_PRN_FN_EXT;
     return TMSRESULT(status);
     }
@@ -368,7 +369,7 @@ EXPORT_C gint TMSProxy::GetGain(guint& level)
     TRACE_PRN_FN_ENT;
     TPckgBuf<guint> pckg;
     TIpcArgs args(&pckg);
-    gint status = RSessionBase::SendReceive(ETMSGetGlobalGain, args);
+    gint status = SendReceive(ETMSGetGlobalGain, args);
     if (status == TMS_RESULT_SUCCESS)
         {
         level = pckg();
@@ -382,7 +383,7 @@ EXPORT_C gint TMSProxy::GetMaxGain(guint& level)
     TRACE_PRN_FN_ENT;
     TPckgBuf<guint> pckg;
     TIpcArgs args(&pckg);
-    gint status = RSessionBase::SendReceive(ETMSGetMaxGlobalGain, args);
+    gint status = SendReceive(ETMSGetMaxGlobalGain, args);
     if (status == TMS_RESULT_SUCCESS)
         {
         level = pckg();
@@ -394,7 +395,7 @@ EXPORT_C gint TMSProxy::GetMaxGain(guint& level)
 EXPORT_C gint TMSProxy::SetGain(guint level)
     {
     TRACE_PRN_FN_ENT;
-    gint status = RSessionBase::SendReceive(ETMSSetGlobalGain,
+    gint status = SendReceive(ETMSSetGlobalGain,
             TIpcArgs(level));
     TRACE_PRN_FN_EXT;
     return TMSRESULT(status);
@@ -426,7 +427,7 @@ EXPORT_C gint TMSProxy::InitRT(const TMSRingToneType type, GString* str,
         {
         case TMS_RINGTONE_DEFAULT:
             {
-            status = RSessionBase::SendReceive(ETMSRingToneInitDefault, args);
+            status = SendReceive(ETMSRingToneInitDefault, args);
             break;
             }
         case TMS_RINGTONE_FILE:
@@ -445,8 +446,7 @@ EXPORT_C gint TMSProxy::InitRT(const TMSRingToneType type, GString* str,
                     p.Copy((TUint16*) str->str, unilen);
                     TIpcArgs args;
                     args.Set(0, &p);
-                    status = RSessionBase::SendReceive(ETMSRingToneInitFile,
-                            args);
+                    status = SendReceive(ETMSRingToneInitFile, args);
                     }
                 delete buf;
                 buf = NULL;
@@ -455,17 +455,17 @@ EXPORT_C gint TMSProxy::InitRT(const TMSRingToneType type, GString* str,
             }
         case TMS_RINGTONE_BEEP_ONCE:
             {
-            status = RSessionBase::SendReceive(ETMSRingToneInitBeepOnce);
+            status = SendReceive(ETMSRingToneInitBeepOnce);
             break;
             }
         case TMS_RINGTONE_SILENT:
             {
-            status = RSessionBase::SendReceive(ETMSRingToneInitSilent);
+            status = SendReceive(ETMSRingToneInitSilent);
             break;
             }
         case TMS_RINGTONE_UNSECURE_VOIP:
             {
-            status = RSessionBase::SendReceive(ETMSRingToneInitUnsecureVoIP);
+            status = SendReceive(ETMSRingToneInitUnsecureVoIP);
             break;
             }
         case TMS_RINGTONE_SEQUENCE:
@@ -481,8 +481,7 @@ EXPORT_C gint TMSProxy::InitRT(const TMSRingToneType type, GString* str,
                     p.Copy((TUint8*) str->str, len);
                     TIpcArgs args;
                     args.Set(0, &p);
-                    status = RSessionBase::SendReceive(
-                            ETMSRingToneInitSequence, args);
+                    status = SendReceive(ETMSRingToneInitSequence, args);
                     }
                 delete buf;
                 buf = NULL;
@@ -503,35 +502,35 @@ EXPORT_C gint TMSProxy::InitRT(const TMSRingToneType type, GString* str,
 EXPORT_C gint TMSProxy::DeinitRT()
     {
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSRingToneDeinit);
+    status = SendReceive(ETMSRingToneDeinit);
     return TMSRESULT(status);
     }
 
 EXPORT_C gint TMSProxy::PlayRT()
     {
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSRingTonePlay);
+    status = SendReceive(ETMSRingTonePlay);
     return TMSRESULT(status);
     }
 
 EXPORT_C gint TMSProxy::StopRT()
     {
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSRingToneStop);
+    status = SendReceive(ETMSRingToneStop);
     return TMSRESULT(status);
     }
 
 EXPORT_C gint TMSProxy::PauseRT()
     {
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSRingTonePause);
+    status = SendReceive(ETMSRingTonePause);
     return TMSRESULT(status);
     }
 
 EXPORT_C gint TMSProxy::MuteRT()
     {
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSRingToneMute);
+    status = SendReceive(ETMSRingToneMute);
     return TMSRESULT(status);
     }
 
@@ -540,7 +539,7 @@ EXPORT_C gint TMSProxy::InitDTMFPlayer(TMSStreamType streamtype)
     gint status(TMS_RESULT_SUCCESS);
     TIpcArgs args;
     args.Set(0, streamtype);
-    status = RSessionBase::SendReceive(ETMSInitDTMF, args);
+    status = SendReceive(ETMSInitDTMF, args);
     return TMSRESULT(status);
     }
 
@@ -563,7 +562,7 @@ EXPORT_C gint TMSProxy::StartDTMF(TMSStreamType streamtype, GString* tone)
         TIpcArgs args;
         args.Set(0, streamtype);
         args.Set(1, &p1);
-        status = RSessionBase::SendReceive(ETMSStartDTMF, args);
+        status = SendReceive(ETMSStartDTMF, args);
         }
     delete buf;
     buf = NULL;
@@ -575,7 +574,7 @@ EXPORT_C gint TMSProxy::StopDTMF(TMSStreamType streamtype)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSStopDTMF, TIpcArgs(streamtype));
+    status = SendReceive(ETMSStopDTMF, TIpcArgs(streamtype));
     TRACE_PRN_FN_EXT;
     return TMSRESULT(status);
     }
@@ -584,8 +583,7 @@ EXPORT_C gint TMSProxy::ContinueDTMFStringSending(gboolean continuesending)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSContinueDTMF,
-            TIpcArgs(continuesending));
+    status = SendReceive(ETMSContinueDTMF, TIpcArgs(continuesending));
     TRACE_PRN_FN_EXT;
     return TMSRESULT(status);
     }
@@ -594,8 +592,7 @@ EXPORT_C gint TMSProxy::StartInbandTone(TMSInbandToneType inbandtonetype)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSStartInbandTone,
-            TIpcArgs(inbandtonetype));
+    status = SendReceive(ETMSStartInbandTone, TIpcArgs(inbandtonetype));
     TRACE_PRN_FN_EXT;
     return TMSRESULT(status);
     }
@@ -604,7 +601,7 @@ EXPORT_C gint TMSProxy::StopInbandTone()
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSStopInbandTone);
+    status = SendReceive(ETMSStopInbandTone);
     TRACE_PRN_FN_EXT;
     return TMSRESULT(status);
     }
@@ -612,28 +609,28 @@ EXPORT_C gint TMSProxy::StopInbandTone()
 EXPORT_C gint TMSProxy::StartGlobalEffectNotifier()
     {
     gint status(TMS_RESULT_SUCCESS);
-    RSessionBase::SendReceive(ETMSStartGlobalEffectNotifier); //CenRepHandler
+    SendReceive(ETMSStartGlobalEffectNotifier); //CenRepHandler
     return TMSRESULT(status);
     }
 
 EXPORT_C gint TMSProxy::CancelGlobalEffectNotifier()
     {
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSCancelGlobalEffectNotifier);
+    status = SendReceive(ETMSCancelGlobalEffectNotifier);
     return TMSRESULT(status);
     }
 
 EXPORT_C gint TMSProxy::StartRoutingNotifier()
     {
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSStartRoutingNotifier); //TAR
+    status = SendReceive(ETMSStartRoutingNotifier); //TAR
     return TMSRESULT(status);
     }
 
 EXPORT_C gint TMSProxy::CancelRoutingNotifier()
     {
     gint status(TMS_RESULT_SUCCESS);
-    status = RSessionBase::SendReceive(ETMSCancelRoutingNotifier);
+    status = SendReceive(ETMSCancelRoutingNotifier);
     return TMSRESULT(status);
     }
 
@@ -718,6 +715,19 @@ EXPORT_C gint TMSProxy::RemoveMsgQueueNotifier(TMSMsgQueueNotifierType type,
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::TermSrv
+// ---------------------------------------------------------------------------
+//
+EXPORT_C void TMSProxy::TermSrv()
+    {
+    SendReceive(ETMSTermSrv);
+    }
+
+// ---------------------------------------------------------------------------
+// TMSProxy::PopulateArrayL
+// ---------------------------------------------------------------------------
+//
 void TMSProxy::PopulateArrayL(TMSClientServerRequest aRequest,
         RArray<TUint32>& aDecoders, gint aCount)
     {
@@ -742,6 +752,10 @@ void TMSProxy::PopulateArrayL(TMSClientServerRequest aRequest,
     CleanupStack::PopAndDestroy(buf);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::AddGlobalEffectObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::AddGlobalEffectObserver(TMSEffectObserver& obsrv,
         TMSEffect& parent, gint /*clientid*/)
     {
@@ -758,6 +772,10 @@ gint TMSProxy::AddGlobalEffectObserver(TMSEffectObserver& obsrv,
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::RemoveGlobalEffectObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::RemoveGlobalEffectObserver(TMSEffectObserver& obsrv)
     {
     gint status(TMS_RESULT_SUCCESS);
@@ -774,6 +792,10 @@ gint TMSProxy::RemoveGlobalEffectObserver(TMSEffectObserver& obsrv)
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::AddRoutingObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::AddRoutingObserver(TMSGlobalRoutingObserver& obsrv,
         TMSGlobalRouting& parent, gint /*clientid*/)
     {
@@ -790,6 +812,10 @@ gint TMSProxy::AddRoutingObserver(TMSGlobalRoutingObserver& obsrv,
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::RemoveRoutingObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::RemoveRoutingObserver(TMSGlobalRoutingObserver& obsrv)
     {
     gint status(TMS_RESULT_SUCCESS);
@@ -806,6 +832,10 @@ gint TMSProxy::RemoveRoutingObserver(TMSGlobalRoutingObserver& obsrv)
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::AddRingToneObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::AddRingToneObserver(TMSRingToneObserver& obsrv,
         TMSRingTone& parent, gint /*clientid*/)
     {
@@ -822,6 +852,10 @@ gint TMSProxy::AddRingToneObserver(TMSRingToneObserver& obsrv,
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::RemoveRingToneObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::RemoveRingToneObserver(TMSRingToneObserver& obsrv)
     {
     gint status(TMS_RESULT_SUCCESS);
@@ -838,6 +872,10 @@ gint TMSProxy::RemoveRingToneObserver(TMSRingToneObserver& obsrv)
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::AddDTMFObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::AddDTMFObserver(TMSDTMFObserver& obsrv, TMSDTMF& parent,
         gint /*clientid*/)
     {
@@ -855,6 +893,10 @@ gint TMSProxy::AddDTMFObserver(TMSDTMFObserver& obsrv, TMSDTMF& parent,
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::RemoveDTMFObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::RemoveDTMFObserver(TMSDTMFObserver& obsrv)
     {
     gint status(TMS_RESULT_SUCCESS);
@@ -871,6 +913,10 @@ gint TMSProxy::RemoveDTMFObserver(TMSDTMFObserver& obsrv)
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::AddInbandToneObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::AddInbandToneObserver(TMSInbandToneObserver& obsrv,
         TMSInbandTone& parent, gint /*clientid*/)
     {
@@ -888,6 +934,10 @@ gint TMSProxy::AddInbandToneObserver(TMSInbandToneObserver& obsrv,
     return TMSRESULT(status);
     }
 
+// ---------------------------------------------------------------------------
+// TMSProxy::RemoveInbandToneObserver
+// ---------------------------------------------------------------------------
+//
 gint TMSProxy::RemoveInbandToneObserver(TMSInbandToneObserver& obsrv)
     {
     gint status(TMS_RESULT_SUCCESS);
@@ -922,8 +972,7 @@ gint TMSProxy::CreateQueue(const gint aNumSlots)
                 {
                 TIpcArgs args;
                 args.Set(0, iMsgQueue);
-                status = RSessionBase::SendReceive(ETMSSetMsgQueueHandle,
-                        args);
+                status = SendReceive(ETMSSetMsgQueueHandle, args);
                 }
             }
         }

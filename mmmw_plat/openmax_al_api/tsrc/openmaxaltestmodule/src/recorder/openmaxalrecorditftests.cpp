@@ -79,13 +79,22 @@ TInt COpenMAXALTestModule::al_recorditf_SetRecordState( CStifItemParser& aItem )
     TInt status(KErrNone);
     TInt state(0);
     XAresult res;
+
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
     status = aItem.GetNextInt(state);
     if(!status)
         {
         if(m_RecordItf)
             {
+            TAG_TIME_PROFILING_BEGIN;
             res = (*m_RecordItf)->SetRecordState(
-                    m_RecordItf, state);              
+                    (XARecordItf)itfPtr, state);              
+            TAG_TIME_PROFILING_END;
+            PRINT_TO_CONSOLE_TIME_DIFF;
             status = res;
             }
         else
@@ -93,26 +102,36 @@ TInt COpenMAXALTestModule::al_recorditf_SetRecordState( CStifItemParser& aItem )
             status = KErrNotFound;
             }    
         }
-
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_SetRecordState Status[%d] RecordState[%d]"), status, state);
     return status;
     }
 
-TInt COpenMAXALTestModule::al_recorditf_GetRecordState( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_recorditf_GetRecordState( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
     XAuint32 state;
+    void* stateParam = (void*) &state;
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNullParam(aItem, stateParam);
+    RET_ERR_IF_ERR(status);
+    
     if(m_RecordItf)
         {
         res = (*m_RecordItf)->GetRecordState(
-                m_RecordItf, &state);              
+                (XARecordItf)itfPtr, (XAuint32*)stateParam);              
         status = res;
         }
     else
         {
         status = KErrNotFound;
-        }    
+        }   
 
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_GetRecordState Status[%d] RecordState[%d]"), status, state);
     return status;
     }
 
@@ -121,13 +140,19 @@ TInt COpenMAXALTestModule::al_recorditf_SetDurationLimit( CStifItemParser& aItem
     TInt status(KErrNone);
     TUint duration(0);
     XAresult res;
+    
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
     status = aItem.GetNextInt(duration);
     if(!status)
         {
         if(m_RecordItf)
             {
             res = (*m_RecordItf)->SetDurationLimit(
-                    m_RecordItf, duration);              
+                    XARecordItf(itfPtr), duration);              
             status = res;
             }
         else
@@ -136,18 +161,28 @@ TInt COpenMAXALTestModule::al_recorditf_SetDurationLimit( CStifItemParser& aItem
             }    
         }
 
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_SetDurationLimit Status[%d] DurationLimit[%d]"), status, duration);
     return status;
     }
 
-TInt COpenMAXALTestModule::al_recorditf_GetPosition( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_recorditf_GetPosition( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
     XAmillisecond pos;
+    void* param = (void*)&pos;
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNullParam(aItem, param);
+    RET_ERR_IF_ERR(status);
+    
     if(m_RecordItf)
         {
         res = (*m_RecordItf)->GetPosition(
-                m_RecordItf, &pos);              
+                XARecordItf(itfPtr), (XAmillisecond*)param);              
         status = res;
         }
     else
@@ -155,18 +190,24 @@ TInt COpenMAXALTestModule::al_recorditf_GetPosition( CStifItemParser& /*aItem*/ 
         status = KErrNotFound;
         }    
 
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_GetPosition Status[%d] Position[%d]"), status, pos);
     return status;
     }
 
-TInt COpenMAXALTestModule::al_recorditf_RegisterCallback( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_recorditf_RegisterCallback( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
 
     if(m_RecordItf)
         {
         res = (*m_RecordItf)->RegisterCallback(
-                m_RecordItf, &RecordItfCallback, (void*)this);              
+                XARecordItf(itfPtr), &RecordItfCallback, (void*)this);              
         status = res;
         }
     else
@@ -174,6 +215,7 @@ TInt COpenMAXALTestModule::al_recorditf_RegisterCallback( CStifItemParser& /*aIt
         status = KErrNotFound;
         }    
 
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_RegisterCallback Status[%d] "), status);
     return status;
     }
 
@@ -182,13 +224,18 @@ TInt COpenMAXALTestModule::al_recorditf_SetCallbackEventsMask( CStifItemParser& 
     TInt status(KErrNone);
     TUint flags(0);
     XAresult res;
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
     status = aItem.GetNextInt(flags);
     if(!status)
         {
         if(m_RecordItf)
             {
             res = (*m_RecordItf)->SetCallbackEventsMask(
-                    m_RecordItf, flags);              
+                    XARecordItf(itfPtr), flags);              
             status = res;
             }
         else
@@ -196,26 +243,37 @@ TInt COpenMAXALTestModule::al_recorditf_SetCallbackEventsMask( CStifItemParser& 
             status = KErrNotFound;
             }    
         }
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_SetCallbackEventsMask Status[%d] Mask[%d]"), status, flags);
 
     return status;
     }
 
-TInt COpenMAXALTestModule::al_recorditf_GetCallbackEventsMask( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_recorditf_GetCallbackEventsMask( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
     XAuint32 flags;
+    void* param = (void*)&flags;
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNullParam(aItem, param);
+    RET_ERR_IF_ERR(status);
+    
     if(m_RecordItf)
         {
         res = (*m_RecordItf)->GetCallbackEventsMask(
-                m_RecordItf, &flags);              
+                XARecordItf(itfPtr), (XAuint32*)param);              
         status = res;
         }
     else
         {
         status = KErrNotFound;
-        }    
-
+        }   
+    
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_GetCallbackEventsMask Status[%d] Mask[%d]"), status, flags);
     return status;
     }
 
@@ -224,13 +282,18 @@ TInt COpenMAXALTestModule::al_recorditf_SetMarkerPosition( CStifItemParser& aIte
     TInt status(KErrNone);
     TUint pos(0);
     XAresult res;
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
     status = aItem.GetNextInt(pos);
     if(!status)
         {
         if(m_RecordItf)
             {
             res = (*m_RecordItf)->SetMarkerPosition(
-                    m_RecordItf, pos);              
+                    XARecordItf(itfPtr), pos);              
             status = res;
             }
         else
@@ -238,59 +301,79 @@ TInt COpenMAXALTestModule::al_recorditf_SetMarkerPosition( CStifItemParser& aIte
             status = KErrNotFound;
             }    
         }
-
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_SetMarkerPosition Status[%d] Pos[%d]"), status, pos);
     return status;
     }
 
-TInt COpenMAXALTestModule::al_recorditf_ClearMarkerPosition( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_recorditf_ClearMarkerPosition( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
-
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
     if(m_RecordItf)
         {
-        res = (*m_RecordItf)->ClearMarkerPosition(m_RecordItf);              
+        res = (*m_RecordItf)->ClearMarkerPosition(XARecordItf(itfPtr));              
         status = res;
         }
     else
         {
         status = KErrNotFound;
-        }    
-
+        }
+        
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_ClearMarkerPosition Status[%d]"), status);
     return status;
     }
 
-TInt COpenMAXALTestModule::al_recorditf_GetMarkerPosition( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_recorditf_GetMarkerPosition( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
     XAmillisecond pos;
+    void* param = (void*)&pos;
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNullParam(aItem, param);
+    RET_ERR_IF_ERR(status);
+    
     if(m_RecordItf)
         {
         res = (*m_RecordItf)->GetMarkerPosition(
-                m_RecordItf, &pos);              
+                XARecordItf(itfPtr), (XAmillisecond*)param);              
         status = res;
         }
     else
         {
         status = KErrNotFound;
-        }    
-
+        }
+    
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_GetMarkerPosition Status[%d] Pos[%d]"), status, pos);
     return status;
     }
 
 TInt COpenMAXALTestModule::al_recorditf_SetPositionUpdatePeriod( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
-    TUint updatePeriod(0);
+    TInt updatePeriod(0);
     XAresult res;
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
     status = aItem.GetNextInt(updatePeriod);
     if(!status)
         {
         if(m_RecordItf)
             {
             res = (*m_RecordItf)->SetPositionUpdatePeriod(
-                    m_RecordItf, updatePeriod);              
+                    XARecordItf(itfPtr), updatePeriod);              
             status = res;
             }
         else
@@ -298,26 +381,37 @@ TInt COpenMAXALTestModule::al_recorditf_SetPositionUpdatePeriod( CStifItemParser
             status = KErrNotFound;
             }    
         }
-
+    
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_SetPositionUpdatePeriod Status[%d] Pos[%d]"), status, updatePeriod);
     return status;
     }
 
-TInt COpenMAXALTestModule::al_recorditf_GetPositionUpdatePeriod( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_recorditf_GetPositionUpdatePeriod( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
     XAmillisecond pos;
+    void* param = (void*)&pos;
+    void* itfPtr = (void*) m_RecordItf;
+    
+    status = CheckForNull(aItem, itfPtr);
+    RET_ERR_IF_ERR(status);
+    
+    status = CheckForNullParam(aItem, param);
+    RET_ERR_IF_ERR(status);
+    
     if(m_RecordItf)
         {
         res = (*m_RecordItf)->GetPositionUpdatePeriod(
-                m_RecordItf, &pos);              
+                XARecordItf(itfPtr), (XAmillisecond*)param);              
         status = res;
         }
     else
         {
         status = KErrNotFound;
         }    
-
+    
+    iLog->Log(_L("COpenMAXALTestModule::al_recorditf_GetPositionUpdatePeriod Status[%d] Pos[%d]"), status, pos);
     return status;
     }
 

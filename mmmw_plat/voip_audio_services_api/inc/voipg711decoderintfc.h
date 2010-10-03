@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPG711DECFORMATINTFC_H
-#define __VOIPG711DECFORMATINTFC_H
+#ifndef VOIPG711DECFORMATINTFC_H
+#define VOIPG711DECFORMATINTFC_H
 
 #include <voipaudiocommon.h>
 #include <voipformatintfc.h>
@@ -37,62 +37,48 @@ class CVoIPG711DecoderIntfc : public CVoIPFormatIntfc
 public:
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CVoIPG711DecoderIntfc();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetMode
      * @param TG711CodecMode
      * @return TInt
      */
     IMPORT_C TInt SetMode(TG711CodecMode aMode);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetMode
      * @param TG711CodecMode&
      * @return TInt
      */
     IMPORT_C TInt GetMode(TG711CodecMode& aMode);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetCNG
      * @param TBool
      * @return TInt
      */
     IMPORT_C TInt SetCNG(TBool aCng);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetCNG
      * @param TBool&
      * @return TInt
      */
     IMPORT_C TInt GetCNG(TBool& aCng);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetPLC
      * @param TBool
      * @return TInt
      */
     IMPORT_C TInt SetPLC(TBool aPlc);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetPLC
      * @param TBool&
      * @return TInt
      */
@@ -101,8 +87,6 @@ public:
 protected:
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -110,8 +94,6 @@ protected:
 
     /**
      * 2-nd phase constructor
-     *
-     * @since S60 v5.0
      * @param CVoIPG711DecoderIntfcImpl*
      * @return void
      */
@@ -119,9 +101,8 @@ protected:
 
 protected:
     CVoIPG711DecoderIntfcImpl* iFormatIntfcImpl;
-
     };
 
-#endif //__VOIPG711DECFORMATINTFC_H
+#endif //VOIPG711DECFORMATINTFC_H
 
 // End of file

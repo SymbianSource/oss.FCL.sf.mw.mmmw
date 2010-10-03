@@ -19,11 +19,15 @@
 #include "TmsAudioServicesTestClass.h"
 #include "debug.h"
 
+// CONSTANTS
+const TUint KLoopCount = 1000;
+
+//From TMSStreamObserver
 void CTmsAudioServicesTestClass::TMSStreamEvent(const TMSStream& stream,
         TMSSignalEvent event)
     {
     iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::TMSStreamEvent"));
-    switch (const_cast<TMSStream&>(stream).GetStreamType())
+    switch (const_cast<TMSStream&> (stream).GetStreamType())
         {
         case TMS_STREAM_UPLINK:
             {
@@ -110,34 +114,44 @@ void CTmsAudioServicesTestClass::TMSStreamEvent(const TMSStream& stream,
 //From TMSClientSourceObserver
 void CTmsAudioServicesTestClass::FillBuffer(TMSBuffer& buffer)
     {
-    iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::FillBuffer"));
-    ProcessEvent(EFillBuffer, KErrNone);
-    iPlayBufReady = ETrue;
-    iPlayBuf = &buffer;
-    if (iDnLinkStatus == STARTED)
+    //iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::FillBuffer"));
+
+    // Note: Playback will continue until KLoopCount is reached or until timer
+    //       timeout occurs set in the .cfg file by SetTimeout.
+
+    if (iLoopCounter < KLoopCount)
         {
-        DoLoopback();
+        iPlayBufReady = ETrue;
+        iPlayBuf = &buffer;
+        if (iDnLinkStatus == STARTED)
+            {
+            DoLoopback();
+            }
         }
     }
 
 void CTmsAudioServicesTestClass::BufferProcessed(const TMSBuffer* /*buffer*/,
         gint /*reason*/)
     {
-    iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::BufferProcessed"));
+    //iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::BufferProcessed"));
     }
 
 //From TMSClientSinkObserver
 void CTmsAudioServicesTestClass::ProcessBuffer(const TMSBuffer* buffer)
     {
-    iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::ProcessBuffer"));
-    ProcessEvent(EEmptyBuffer, KErrNone);
-    iRecBufReady = ETrue;
-    iRecBuf = const_cast<TMSBuffer*>(buffer);
-    if (iUpLinkStatus == STARTED)
+    //iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::ProcessBuffer"));
+
+    // Note: Recording will continue until KLoopCount is reached or until timer
+    //       timeout occurs set in the .cfg file by SetTimeout.
+
+    if (iLoopCounter < KLoopCount)
         {
-        // Process recorded buffer here.
-        DoLoopback();
-        //static_cast<TMSClientSink*>(iTmsSink)->BufferProcessed(iRecBuf);
+        iRecBufReady = ETrue;
+        iRecBuf = const_cast<TMSBuffer*> (buffer);
+        if (iUpLinkStatus == STARTED)
+            {
+            DoLoopback();
+            }
         }
     }
 
@@ -146,11 +160,20 @@ void CTmsAudioServicesTestClass::EffectsEvent(const TMSEffect& tmseffect,
     {
     iLog->Log(_L("[tms cb]CTmsAudioServicesTestClass::EffectsEvent"));
     TMSEffectType effecttype;
-    const_cast<TMSEffect&>(tmseffect).GetType(effecttype);
+    const_cast<TMSEffect&> (tmseffect).GetType(effecttype);
     switch (effecttype)
         {
         case TMS_EFFECT_VOLUME:
+            ProcessEvent(EStreamVolChange, KErrNone);
+            break;
         case TMS_EFFECT_GAIN:
+            ProcessEvent(EStreamGainChange, KErrNone);
+            break;
+        case TMS_EFFECT_GLOBAL_VOL:
+            ProcessEvent(EGlobalVolChange, KErrNone);
+            break;
+        case TMS_EFFECT_GLOBAL_GAIN:
+            ProcessEvent(EGlobalGainChange, KErrNone);
             break;
         default:
             break;
@@ -236,11 +259,11 @@ void CTmsAudioServicesTestClass::InbandToneEvent(
     switch (event.type)
         {
         case TMS_EVENT_INBAND_TONE_STARTED:
-            //ProcessEvent(EInbToneStarted, KErrNone);
+            ProcessEvent(EInbToneStarted, KErrNone);
             iLog->Log(_L("Inband Tone Started"));
             break;
         case TMS_EVENT_INBAND_TONE_STOPPED:
-            //ProcessEvent(EInbToneStopped, KErrNone);
+            ProcessEvent(EInbToneStopped, KErrNone);
             iLog->Log(_L("Inband Tone Stopped"));
             break;
         default:

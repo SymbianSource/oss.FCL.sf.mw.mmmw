@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPSERVERSESSION_H
-#define __VOIPSERVERSESSION_H
+#ifndef VOIPSERVERSESSION_H
+#define VOIPSERVERSESSION_H
 
 // INCLUDES
 #include <e32msgqueue.h>
@@ -39,9 +39,9 @@ class MProEngProfile;
 //  VoIP server session class.
 // -----------------------------------------------------------------------------
 class CVoIPAudioServerSession : public CSession2,
-                                public MThreadComObserver,
-                                public MDevSoundObserver,
-                                public MMdaAudioPlayerCallback
+        public MThreadComObserver,
+        public MDevSoundObserver,
+        public MMdaAudioPlayerCallback
     {
     // Each session is designated as one of these types
     enum TSessionType
@@ -63,7 +63,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param const RMessage2&
      * @return void
      */
@@ -71,7 +71,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param const RMessage2&
      * @return void
      */
@@ -79,7 +79,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param const RMessage2&
      * @return void
      */
@@ -87,7 +87,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param const RMessage2&
      * @return void
      */
@@ -95,7 +95,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param const RMessage2&
      * @return void
      */
@@ -103,7 +103,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -111,7 +111,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -119,7 +119,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -127,7 +127,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -135,7 +135,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -143,7 +143,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -151,7 +151,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -159,7 +159,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -167,7 +167,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -175,7 +175,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -183,7 +183,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -191,7 +191,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -199,7 +199,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -207,7 +207,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -215,7 +215,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -223,7 +223,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -231,7 +231,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -239,7 +239,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RThread&
      * @param TUserCommand
      * @return void
@@ -248,7 +248,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -256,7 +256,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -264,7 +264,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -272,7 +272,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -280,7 +280,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -288,7 +288,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -296,7 +296,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -304,7 +304,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -312,7 +312,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -320,7 +320,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -328,7 +328,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -336,7 +336,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -344,7 +344,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -352,7 +352,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -360,7 +360,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -368,7 +368,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -376,7 +376,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -384,7 +384,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -392,7 +392,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -400,7 +400,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -408,7 +408,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -416,7 +416,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -424,7 +424,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -432,7 +432,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -440,7 +440,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param RMessage2&
      * @return void
      */
@@ -449,7 +449,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -458,7 +458,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -467,7 +467,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param const RMessage2&
      * @return void
      */
@@ -476,7 +476,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param const RMessage2&
      * @return void
      */
@@ -485,7 +485,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -494,7 +494,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param const RMessage2&
      * @return void
      */
@@ -503,7 +503,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -512,7 +512,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -521,7 +521,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -530,7 +530,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -539,7 +539,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -548,7 +548,7 @@ public:
     /**
      * ?description
      *
-     * @since S60 v5.0
+     *
      * @param TInt
      * @return void
      */
@@ -560,7 +560,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param TInt
      * @param const TTimeIntervalMicroSeconds&
      * @return void
@@ -570,7 +570,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param TInt
      * @return void
      */
@@ -580,7 +580,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param TExcType
      * @return void
      */
@@ -588,7 +588,7 @@ public:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param TInt
      * @return void
      */
@@ -662,7 +662,6 @@ private:
 
     TInt iMaxVolume;
     TInt iMaxGain;
-    RArray<TUint> iBitrateArray;
     RArray<TFourCC> iCodecsUp;
     RArray<TFourCC> iCodecsDn;
     TInt iCodecsCountUp;
@@ -682,6 +681,6 @@ private:
     HBufC8* iToneBuf;
     };
 
-#endif //__VOIPSERVERSESSION_H
+#endif //VOIPSERVERSESSION_H
 
 // End of file

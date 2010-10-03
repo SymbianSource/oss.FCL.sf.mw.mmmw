@@ -1,24 +1,22 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: VOIP Audio Service
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: VOIP Audio Service
+ *
+ */
 
 #include <voipjitterbufferintfc.h>
 #include "VoIPJitterBufferIntfcImpl.h"
-
 
 // ---------------------------------------------------------------------------
 // CVoIPJitterBufferIntfc::~CVoIPJitterBufferIntfc
@@ -41,7 +39,7 @@ CVoIPJitterBufferIntfc::CVoIPJitterBufferIntfc()
 // ---------------------------------------------------------------------------
 //
 void CVoIPJitterBufferIntfc::ConstructL(
-    CVoIPJitterBufferIntfcImpl* aVoIPJitterBufferIntfcImpl)
+        CVoIPJitterBufferIntfcImpl* aVoIPJitterBufferIntfcImpl)
     {
     iVoIPJitterBufferIntfcImpl = aVoIPJitterBufferIntfcImpl;
     }
@@ -51,7 +49,7 @@ void CVoIPJitterBufferIntfc::ConstructL(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPJitterBufferIntfc::SetObserver(
-    MVoIPJitterBufferObserver& aObserver)
+        MVoIPJitterBufferObserver& aObserver)
     {
     TInt err = iVoIPJitterBufferIntfcImpl->SetObserver(aObserver);
     return err;
@@ -62,7 +60,7 @@ EXPORT_C TInt CVoIPJitterBufferIntfc::SetObserver(
 // ---------------------------------------------------------------------------
 //
 EXPORT_C TInt CVoIPJitterBufferIntfc::ConfigureJitterBuffer(
-                                      const TVoIPJBConfig& aJbConfig)
+        const TVoIPJBConfig& aJbConfig)
     {
     TInt err = iVoIPJitterBufferIntfcImpl->ConfigureJitterBuffer(aJbConfig);
     return err;
@@ -97,6 +95,5 @@ EXPORT_C TInt CVoIPJitterBufferIntfc::DelayUp()
     TInt err = iVoIPJitterBufferIntfcImpl->DelayUp();
     return err;
     }
-
 
 // End of file

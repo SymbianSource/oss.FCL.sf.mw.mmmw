@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __RINGTONEPLAYER_H
-#define __RINGTONEPLAYER_H
+#ifndef RINGTONEPLAYER_H
+#define RINGTONEPLAYER_H
 
 // FORWARD DECLARATIONS
 class RFile;
@@ -25,8 +25,6 @@ class CRingTonePlayerImpl;
 
 /**
  *  MRingToneObserver class
- *
- *  ?more_complete_description
  *
  *  @lib VoIPAudioIntfc.dll
  *
@@ -39,9 +37,7 @@ public:
 
 public:
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Event
      * @param CRingTonePlayer& - Ring tone player reference
      * @param TInt - Event type
      * @param TInt - Status
@@ -65,26 +61,20 @@ public:
 
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CRingTonePlayer();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Open from default profile
      * @param MRingToneObserver&
      * @return TInt
      */
     IMPORT_C TInt Open(MRingToneObserver& aObserver);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Open file
      * @param MRingToneObserver&
      * @param TPtr
      * @return TInt
@@ -92,9 +82,7 @@ public:
     IMPORT_C TInt Open(MRingToneObserver& aObserver, TPtr aFileName);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Open from file handle
      * @param MRingToneObserver&
      * @param RFile&
      * @return TInt
@@ -102,9 +90,7 @@ public:
     IMPORT_C TInt Open(MRingToneObserver& aObserver, RFile& aFileHandle);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Open from descriptor
      * @param MRingToneObserver&
      * @param TPtr8
      * @param TPtr8
@@ -114,45 +100,35 @@ public:
             TPtr8 aMimeType);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Play
      * @param none
      * @return TInt
      */
     IMPORT_C TInt Play();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Pause
      * @param none
      * @return TInt
      */
     IMPORT_C TInt Pause();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Resume
      * @param none
      * @return TInt
      */
     IMPORT_C TInt Resume();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Stop
      * @param none
      * @return TInt
      */
     IMPORT_C TInt Stop();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Close
      * @param none
      * @return TInt
      */
@@ -162,8 +138,6 @@ protected:
 
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -171,8 +145,6 @@ protected:
 
     /**
      * Symbian constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return void
      */
@@ -181,9 +153,8 @@ protected:
 private:
 
     CRingTonePlayerImpl* iRingTonePlayerImpl;
-
     };
 
-#endif //__RINGTONEPLAYER_H
+#endif //RINGTONEPLAYER_H
 
 // End of file

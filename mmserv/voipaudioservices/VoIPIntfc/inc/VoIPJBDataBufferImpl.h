@@ -1,31 +1,29 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services  Defines jitter buffer type for VoIP data streaming.
-*
-*/
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services  Defines jitter buffer type for VoIP
+ *               data streaming.
+ *
+ */
 
-
-#ifndef __VOIPJBDATABUFFERIMPL_H
-#define __VOIPJBDATABUFFERIMPL_H
+#ifndef VOIPJBDATABUFFERIMPL_H
+#define VOIPJBDATABUFFERIMPL_H
 
 #include "VoIPDataBufferImpl.h"
 
-
 /**
  *  CVoIPJBDataBufferImpl
- *  ?description
- *  @since S60 v5.0
+ *
  */
 NONSHARABLE_CLASS(CVoIPJBDataBufferImpl) : public CVoIPDataBufferImpl
     {
@@ -33,7 +31,7 @@ public:
     /**
      * 2-phased constructor
      *
-     * @since S60 v5.0
+     *
      * @param TInt
      * @return none
      */
@@ -42,7 +40,7 @@ public:
     /**
      * Destructor
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return none
      */
@@ -51,7 +49,7 @@ public:
     /**
      * SetBufferSequence
      *
-     * @since S60 v5.0
+     *
      * @param const TUint
      * @return none
      */
@@ -61,7 +59,7 @@ public:
     /**
      * GetBufferSequence
      *
-     * @since S60 v5.0
+     *
      * @param TUint&
      * @return none
      */
@@ -71,7 +69,7 @@ protected:
     /**
      * Constructor
      *
-     * @since S60 v5.0
+     *
      * @param none
      * @return none
      */
@@ -80,7 +78,7 @@ protected:
     /**
      * Symbian constructor
      *
-     * @since S60 v5.0
+     *
      * @param TInt
      * @return void
      */
@@ -91,7 +89,6 @@ private:
     TUint iBufferSequence;
     };
 
-#endif //__VOIPJBDATABUFFERIMPL_H
-
+#endif //VOIPJBDATABUFFERIMPL_H
 
 //End of file

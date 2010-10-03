@@ -67,10 +67,11 @@ gint TMSModemSourceImpl::Create(TMSSource*& tmssource)
     return ret;
     }
 
-gint TMSModemSourceImpl::SetProxy(TMSCallProxy* /*aProxy*/,
-        gpointer /*queuehandler*/)
+gint TMSModemSourceImpl::SetProxy(TMSCallProxy* aProxy, gpointer queuehandler)
     {
     gint ret = TMS_RESULT_SUCCESS;
+    static_cast<TMSModemSourceBodyImpl*>(this->iBody)->SetProxy(aProxy,
+            queuehandler);
     return ret;
     }
 

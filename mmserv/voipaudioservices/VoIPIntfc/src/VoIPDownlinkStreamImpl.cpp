@@ -52,6 +52,7 @@ CVoIPAudioDownlinkStreamImpl::NewL(const TMMFPrioritySettings aPriority)
 CVoIPAudioDownlinkStreamImpl::~CVoIPAudioDownlinkStreamImpl()
     {
     Close();
+    iCodecFormats.Close();
 
     if (iMsgQHandler)
         {
@@ -178,7 +179,16 @@ void CVoIPAudioDownlinkStreamImpl::GetSupportedFormatsL(
         const TMMFPrioritySettings aPriority,
         RArray<TVoIPCodecFormat>& aFormats)
     {
-    if (!iCodecFormats || aFormats.Count() <= 0)
+    TInt count = iCodecFormats.Count();
+    aFormats.Reset();
+    if (count > 0)
+        {
+        for (TInt i = 0; i < count; i++)
+            {
+            aFormats.Append(iCodecFormats[i]);
+            }
+        }
+    else
         {
         RArray<TUint32> codecIDs;
         CleanupClosePushL(codecIDs);
@@ -186,10 +196,14 @@ void CVoIPAudioDownlinkStreamImpl::GetSupportedFormatsL(
         iVoIPAudioSession.GetSupportedDecoders(aPriority, codecIDs,
                 iG711FrameSize);
 
+#ifdef _DEBUG
+        RDebug::Print(_L("G711 Frame Size=%d"), iG711FrameSize);
+#endif
+
         TUint32 codec = 0;
         TInt count = codecIDs.Count();
         TVoIPCodecFormat format;
-        aFormats.Reset();
+        iCodecFormats.Reset();
 
         for (TInt i = 0; i < count; i++)
             {
@@ -205,11 +219,10 @@ void CVoIPAudioDownlinkStreamImpl::GetSupportedFormatsL(
             format = ConvertFourCC(codec);
             if (format != ENULL)
                 {
+                iCodecFormats.Append(format);
                 aFormats.Append(format);
                 }
             }
-
-        iCodecFormats = &aFormats;
         CleanupStack::PopAndDestroy(&codecIDs);
         }
     }
@@ -274,15 +287,6 @@ void CVoIPAudioDownlinkStreamImpl::SetFormatL(TVoIPCodecFormat aFormat,
 
     TUint32 codecFourCC = CodecFourCC(iFormat);
     iVoIPAudioSession.SetDecoder(codecFourCC);
-    }
-
-// ---------------------------------------------------------------------------
-// CVoIPAudioDownlinkStreamImpl::GetFormat
-// ---------------------------------------------------------------------------
-//
-TVoIPCodecFormat CVoIPAudioDownlinkStreamImpl::GetFormat()
-    {
-    return iFormat;
     }
 
 // ---------------------------------------------------------------------------
@@ -548,7 +552,11 @@ TBool CVoIPAudioDownlinkStreamImpl::IsCodecSupportedL(
     {
     TBool status = EFalse;
 
-    if (!iCodecFormats)
+    if (iCodecFormats.Count() > 0)
+        {
+        status = FindFormat(aFormat);
+        }
+    else
         {
         // Client hasn't called GetSupportedFormatsL
         RArray<TVoIPCodecFormat> codecs;
@@ -557,11 +565,6 @@ TBool CVoIPAudioDownlinkStreamImpl::IsCodecSupportedL(
         GetSupportedFormatsL(iPriority, codecs); //sets iCodecFormats
         status = FindFormat(aFormat);
         CleanupStack::PopAndDestroy(&codecs);
-        iCodecFormats = NULL;
-        }
-    else
-        {
-        status = FindFormat(aFormat);
         }
 
     return status;
@@ -575,27 +578,32 @@ TBool CVoIPAudioDownlinkStreamImpl::FindFormat(TVoIPCodecFormat aFormat)
     {
     TBool found = EFalse;
 
-    if (iCodecFormats)
+    if (iCodecFormats.Count() > 0)
         {
-        if (iCodecFormats->Count() > 0)
+        if (iCodecFormats.Find(aFormat) == KErrNotFound)
             {
-            if (iCodecFormats->Find(aFormat) == KErrNotFound)
+            // For backward compatibility with VAS 1.0
+            if (aFormat == EG711)
                 {
-                // For backward compatibility with VAS 1.0
-                if (aFormat == EG711)
+                if (iCodecFormats.Find(EG711_10MS) != KErrNotFound)
                     {
-                    if (iCodecFormats->Find(EG711_10MS) != KErrNotFound)
-                        {
-                        iFormat = EG711_10MS;
-                        found = ETrue;
-                        }
+                    iFormat = EG711_10MS;
+                    found = ETrue;
                     }
                 }
-            else
+            else if (aFormat == EG711_10MS)
                 {
-                iFormat = aFormat;
-                found = ETrue;
+                if (iCodecFormats.Find(EG711) != KErrNotFound)
+                    {
+                    iFormat = EG711;
+                    found = ETrue;
+                    }
                 }
+            }
+        else
+            {
+            iFormat = aFormat;
+            found = ETrue;
             }
         }
 

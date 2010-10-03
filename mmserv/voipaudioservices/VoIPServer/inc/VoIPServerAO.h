@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPSERVERAO_H__
-#define __VOIPSERVERAO_H__
+#ifndef VOIPSERVERAO_H
+#define VOIPSERVERAO_H
 
 // INCLUDES
 #include <e32std.h>
@@ -58,6 +58,6 @@ private:
     TThreadId iID;
     };
 
-#endif // __VOIPSERVERAO_H__
+#endif // VOIPSERVERAO_H
 
 // End of file

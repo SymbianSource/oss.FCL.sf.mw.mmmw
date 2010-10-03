@@ -45,8 +45,8 @@ class CQueueHandlerSrv;
 //  Base abstract class for creating VoIP uplink and downlink threads.
 // -----------------------------------------------------------------------------
 class CVoIPThreadBase : public CBase,
-                        public MDevSoundObserver,
-                        public MQueueHandlerObserverSrv
+        public MDevSoundObserver,
+        public MQueueHandlerObserverSrv
     {
 public:
     enum TStreamState
@@ -73,8 +73,9 @@ protected:
     void InitMsgQueuesL(const TDesC& aBufferQ, const TDesC& aComQ);
     TInt DoChunk(const TDesC& aChunkName, const TInt aChunkLen,
             const TInt aChunkMaxLen);
-    TInt DetermineMaxBufferLen(TVoIPCodecSettings::TG711FrameRate
-            aG711FrameRate = TVoIPCodecSettings::E20MS);
+    TInt DetermineMaxBufferLen(
+            TVoIPCodecSettings::TG711FrameRate aG711FrameRate =
+                    TVoIPCodecSettings::E20MS);
 
     // From MDevSoundObserver
     virtual void InitializeComplete(TInt aError) = 0;
@@ -105,7 +106,6 @@ protected:
 
     CVoIPFormatIntfc::TG711CodecMode iG711CodecMode;
     CVoIPFormatIntfc::TILBCCodecMode iILBCCodecMode;
-
     };
 
 // -----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ protected:
 //  Class handling VoIP downlink in a separate thread.
 // -----------------------------------------------------------------------------
 class CVoIPDownlinkThread : public CVoIPThreadBase,
-                            public MJitterBufferObserver
+        public MJitterBufferObserver
     {
 public:
     static TInt ThreadFunction(TAny* aData);
@@ -154,7 +154,7 @@ private:
     // For Jitter Buffer
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param  none
      * @return void
      */
@@ -162,7 +162,7 @@ private:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -170,7 +170,7 @@ private:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -178,7 +178,7 @@ private:
 
     /**
      * ?description
-     * @since S60 v5.0
+     *
      * @param none
      * @return void
      */
@@ -215,7 +215,6 @@ private:
 #ifdef _DEBUG
     TInt iSamplesPlayedCount;
 #endif
-
     };
 
 // -----------------------------------------------------------------------------
@@ -269,6 +268,7 @@ private:
 
     TSharedData& iShared;
     TBool iVad;
+    RArray<TUint> iBitrates;
 
     CSpeechEncoderConfig* iSpeechEncoderConfig;
     CG711EncoderIntfc* iG711EncoderIntfc;
@@ -278,7 +278,6 @@ private:
 #ifdef _DEBUG
     TInt iSamplesRecCount;
 #endif
-
     };
 
 #endif  // VOIPAUDIOSERVERTHREAD_H

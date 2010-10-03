@@ -144,6 +144,7 @@ void TMSCSDownlink::PlayError(TInt aError)
     if (iActivationOngoing && (aError == KErrAccessDenied ||
             aError == KErrInUse))
         {
+#ifndef __WINSCW__
         if (iStartRetryTime != 0)
             {
             StartTimer();
@@ -154,6 +155,9 @@ void TMSCSDownlink::PlayError(TInt aError)
             iActivationOngoing = EFalse;
             iObserver.DownlinkActivationCompleted(aError);
             }
+#else  //__WINSCW__
+        iObserver.DownlinkActivationCompleted(TMS_RESULT_SUCCESS);
+#endif //__WINSCW__
         }
     }
 

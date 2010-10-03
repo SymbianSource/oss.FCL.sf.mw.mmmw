@@ -19,6 +19,7 @@
 #include <e32svr.h>
 #include <StifParser.h>
 #include <StifTestInterface.h>
+#include <StifTestEventInterface.h>
 #include "openmaxaltestmodule.h"
 
 // EXTERNAL DATA STRUCTURES
@@ -201,10 +202,23 @@ TInt COpenMAXALTestModule::al_strminfoitf_QueryStreamName( CStifItemParser& aIte
     return status;       
     }
 
-TInt COpenMAXALTestModule::al_strminfoitf_RegisterStreamChangeCallback( CStifItemParser& /*aItem*/ )
+TInt COpenMAXALTestModule::al_strminfoitf_RegisterStreamChangeCallback( CStifItemParser& aItem )
     {
     TInt status(KErrNone);
     XAresult res;
+		
+		TInt expectedIndex = -1;
+    status = aItem.GetNextInt(expectedIndex);
+    if(status==KErrNone)
+    {
+    	iStreamInfoItfIndex = expectedIndex; //reset expected event
+    }
+    else
+    {
+    	iStreamInfoItfIndex = -1;
+    	status = KErrNone;
+    }
+
     if(m_StrInfoItf)
         {
         res = (*m_StrInfoItf)->RegisterStreamChangeCallback(m_StrInfoItf,StreamEventChangeCallback,(void*)this);
@@ -286,6 +300,36 @@ TInt COpenMAXALTestModule::al_strminfoitf_SetActiveStream( CStifItemParser& aIte
     return status;          
     }
 
+void COpenMAXALTestModule::HandleStreamInfoItfCallback( XAStreamInformationItf /*caller*/, XAuint32 event, XAuint32 streamIndex )
+{
+    switch (event)
+    {
+        case XA_STREAMCBEVENT_PROPERTYCHANGE:
+        {
+        		if((iStreamInfoItfIndex == -1) || (iStreamInfoItfIndex == streamIndex))
+        		{
+            	TEventIf event( TEventIf::ESetEvent, _L("Event_XA_STREAMCBEVENT_PROPERTYCHANGE") );
+            	TestModuleIf().Event( event );
+        		}
+        }
+        break;
+       
+        default:
+            break;
+    }
+}
+
+TInt COpenMAXALTestModule::al_strminfoitf_SetStreamInfoIndex(CStifItemParser& aItem)
+{
+		TInt status(KErrNone);
+    TInt streamindex(0);
+ 
+    status = aItem.GetNextInt(streamindex);
+    RET_ERR_IF_ERR(status);
+		iStreamInfoItfIndex = streamindex;
+		return status;
+}
+
 void StreamEventChangeCallback (
         XAStreamInformationItf caller,
         XAuint32 eventId,
@@ -293,6 +337,9 @@ void StreamEventChangeCallback (
         void * pEventData,
         void * pContext
 )
+{
+    if (pContext)
     {
-    
+    	((COpenMAXALTestModule*)pContext)->HandleStreamInfoItfCallback(caller, eventId, streamIndex);
     }
+}

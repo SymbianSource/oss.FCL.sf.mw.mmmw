@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPSERVERSHUTDOWN_H
-#define __VOIPSERVERSHUTDOWN_H
+#ifndef VOIPSERVERSHUTDOWN_H
+#define VOIPSERVERSHUTDOWN_H
 
 //  INCLUDES
 //#include <e32base.h>
@@ -29,7 +29,6 @@ class CVoIPAudioServer;
  *  Shutdown timer after the last client has disconnected.
  *
  *  @lib CVoIPAudioServer.exe
- *  @since Series 60 3.0
  */
 
 /**
@@ -60,6 +59,6 @@ private:
     RTimer iShutDownTimer; // Has
     };
 
-#endif //__VOIPSERVERSHUTDOWN_H
+#endif //VOIPSERVERSHUTDOWN_H
 
 // End of File

@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "xadynamicsourceitf.h"
 
 #include "xadynamicsourceitfadaptationmmf.h"
@@ -99,7 +98,6 @@ XADynamicSourceItfImpl* XADynamicSourceItfImpl_Create(
 void XADynamicSourceItfImpl_Free(XADynamicSourceItfImpl* self)
     {
     DEBUG_API("->XADynamicSourceItfImpl_Free");
-    assert( self==self->self );
     free(self);
     DEBUG_API("<-XADynamicSourceItfImpl_Free");
     }

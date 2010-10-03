@@ -21,6 +21,8 @@
 #include "tmscallserver.h"
 #include "tmscallclisrv.h"
 #include "tmscallsession.h"
+#include "tmscallipadpt.h"
+#include "tmscallcsadpt.h"
 
 using namespace TMS;
 
@@ -103,6 +105,12 @@ void TMSCallSession::ServiceL(const RMessage2& aMessage)
 void TMSCallSession::HandleMessageL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
+
+     if(iCallAdpt)
+         {
+         iCallAdpt->GetCallType(iActiveCallType);
+         }
+
     switch (aMessage.Function())
         {
         case TMS_CREATE_CALL:
@@ -228,6 +236,10 @@ void TMSCallSession::HandleMessageL(const RMessage2& aMessage)
         case TMS_GET_ACTIVE_CALL_PARAMS:
             HandleGetActiveCallL(aMessage);
             break;
+        case TMS_TERM_CALL_SRV:
+            aMessage.Complete(TMS_RESULT_SUCCESS);
+            iTMSCallServer.TerminateServer();
+            break;
         default:
             User::Leave(TMS_RESULT_ILLEGAL_OPERATION);
             break;
@@ -294,22 +306,28 @@ void TMSCallSession::HandleInitStreamL(const RMessage2& aMessage)
         TMSCliSrvStreamInitDataStructBufPckg pckg;
         aMessage.ReadL(0, pckg);
         status = iCallAdpt->InitStream(pckg().CallType, pckg().StreamType,
-                pckg().StreamId, pckg().FormatType, pckg().RetryTime, aMessage);
+                pckg().StreamId, pckg().FormatType, pckg().RetryTime,
+                aMessage);
 
-        switch (pckg().StreamType)
+        if (iActiveCallType == TMS_CALL_CS)
             {
-            case TMS_STREAM_DOWNLINK:
+            switch (pckg().StreamType)
                 {
-                iCallAdpt->SetGlobalVolume(iGlobalVol);
+                case TMS_STREAM_DOWNLINK:
+                    {
+                    static_cast<TMSCallCSAdpt*> (iCallAdpt)->SetGlobalVolume(
+                            iGlobalVol);
+                    }
+                    break;
+                case TMS_STREAM_UPLINK:
+                    {
+                    static_cast<TMSCallCSAdpt*> (iCallAdpt)->SetGlobalGain(
+                            iGlobalGain);
+                    }
+                    break;
+                default:
+                    break;
                 }
-                break;
-            case TMS_STREAM_UPLINK:
-                {
-                iCallAdpt->SetGlobalGain(iGlobalGain);
-                }
-                break;
-            default:
-                break;
             }
         }
     aMessage.Complete(status);
@@ -440,12 +458,12 @@ void TMSCallSession::HandleDataXferBufferEmptiedCallL(
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         TMSCliSrvDataXferDataStructBufPckg pckg;
         aMessage.ReadL(0, pckg);
-        status = iCallAdpt->DataXferBufferEmptied(pckg().CallType,
-                pckg().StreamType, pckg().StreamId);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->DataXferBufferEmptied(
+                pckg().CallType, pckg().StreamType, pckg().StreamId);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -460,12 +478,13 @@ void TMSCallSession::HandleDataXferBufferFilledCallL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         TMSCliSrvDataXferDataStructBufPckg pckg;
         aMessage.ReadL(0, pckg);
-        status = iCallAdpt->DataXferBufferFilled(pckg().CallType,
-                pckg().StreamType, pckg().StreamId, pckg().DataSize);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->DataXferBufferFilled(
+                pckg().CallType, pckg().StreamType, pckg().StreamId,
+                pckg().DataSize);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -483,12 +502,13 @@ void TMSCallSession::HandleDataXferBufferGetHndlCallL(
     gint status(TMS_RESULT_DOES_NOT_EXIST);
     RChunk chunk;
 
-    if (iCallAdpt)
+    if (iCallAdpt &&(iActiveCallType == TMS_CALL_IP))
         {
         TMSCliSrvDataXferChunkHndlDataStructBufPckg pckg;
         aMessage.ReadL(0, pckg);
-        status = iCallAdpt->GetDataXferBufferHndl(pckg().CallType,
-                pckg().StreamType, pckg().StreamId, pckg().Key, chunk);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->GetDataXferBufferHndl(
+                pckg().CallType, pckg().StreamType, pckg().StreamId,
+                pckg().Key, chunk);
         }
 
     if (status == TMS_RESULT_SUCCESS && chunk.Handle() > 0)
@@ -513,10 +533,10 @@ void TMSCallSession::HandleEffectVolumeGetMaxVolL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         guint vol;
-        status = iCallAdpt->GetMaxVolume(vol);
+        status = static_cast<TMSCallIPAdpt*> (iCallAdpt)->GetMaxVolume(vol);
         if (status == TMS_RESULT_SUCCESS)
             {
             TPckgBuf<guint> pckg(vol);
@@ -536,11 +556,11 @@ void TMSCallSession::HandleEffectVolumeSetVolL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         guint vol;
         vol = aMessage.Int0();
-        status = iCallAdpt->SetVolume(vol);
+        status = static_cast<TMSCallIPAdpt*> (iCallAdpt)->SetVolume(vol);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -555,10 +575,10 @@ void TMSCallSession::HandleEffectVolumeGetVolL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         guint vol;
-        status = iCallAdpt->GetVolume(vol);
+        status = static_cast<TMSCallIPAdpt*> (iCallAdpt)->GetVolume(vol);
         if (status == TMS_RESULT_SUCCESS)
             {
             TPckgBuf<guint> pckg(vol);
@@ -578,10 +598,10 @@ void TMSCallSession::HandleEffectVolumeGetMaxGainL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         guint gain;
-        status = iCallAdpt->GetMaxGain(gain);
+        status = static_cast<TMSCallIPAdpt*> (iCallAdpt)->GetMaxGain(gain);
         if (status == TMS_RESULT_SUCCESS)
             {
             TPckgBuf<guint> pckg(gain);
@@ -601,11 +621,11 @@ void TMSCallSession::HandleEffectVolumeSetGainL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         guint gain;
         gain = aMessage.Int0();
-        status = iCallAdpt->SetGain(gain);
+        status = static_cast<TMSCallIPAdpt*> (iCallAdpt)->SetGain(gain);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -620,10 +640,10 @@ void TMSCallSession::HandleEffectVolumeGetGainL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         guint gain;
-        status = iCallAdpt->GetGain(gain);
+        status = static_cast<TMSCallIPAdpt*> (iCallAdpt)->GetGain(gain);
         if (status == TMS_RESULT_SUCCESS)
             {
             TPckgBuf<guint> pckg(gain);
@@ -644,10 +664,11 @@ void TMSCallSession::HandleGlobalEffectVolumeGetMaxVolL(
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_CS))
         {
         guint vol(0);
-        status = iCallAdpt->GetGlobalMaxVolume(vol);
+        status = static_cast<TMSCallCSAdpt*>(iCallAdpt)->GetGlobalMaxVolume(
+                vol);
         if (status == TMS_RESULT_SUCCESS)
             {
             TPckgBuf<guint> pckg(vol);
@@ -666,11 +687,12 @@ void TMSCallSession::HandleGlobalEffectVolumeGetMaxVolL(
 void TMSCallSession::HandleGlobalEffectVolumeSetVolL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_DOES_NOT_EXIST);
     iGlobalVol = aMessage.Int0();
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_CS))
         {
-        status = iCallAdpt->SetGlobalVolume(iGlobalVol);
+        status = static_cast<TMSCallCSAdpt*>(iCallAdpt)->SetGlobalVolume(
+                iGlobalVol);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -685,10 +707,10 @@ void TMSCallSession::HandleGlobalEffectVolumeGetVolL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_CS))
         {
         guint vol(0);
-        status = iCallAdpt->GetGlobalVolume(vol);
+        status = static_cast<TMSCallCSAdpt*>(iCallAdpt)->GetGlobalVolume(vol);
         if (status == TMS_RESULT_SUCCESS)
             {
             TPckgBuf<guint> pckg(vol);
@@ -709,10 +731,11 @@ void TMSCallSession::HandleGlobalEffectVolumeGetMaxGainL(
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_CS))
         {
         guint gain;
-        status = iCallAdpt->GetGlobalMaxGain(gain);
+        status = static_cast<TMSCallCSAdpt*>(iCallAdpt)->GetGlobalMaxGain(
+                gain);
         if (status == TMS_RESULT_SUCCESS)
             {
             TPckgBuf<guint> pckg(gain);
@@ -732,11 +755,12 @@ void TMSCallSession::HandleGlobalEffectVolumeSetGainL(
         const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
-    gint status(TMS_RESULT_SUCCESS);
+    gint status(TMS_RESULT_DOES_NOT_EXIST);
     iGlobalGain = aMessage.Int0();
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_CS))
         {
-        status = iCallAdpt->SetGlobalGain(iGlobalGain);
+        status = static_cast<TMSCallCSAdpt*>(iCallAdpt)->SetGlobalGain(
+                iGlobalGain);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -752,10 +776,10 @@ void TMSCallSession::HandleGlobalEffectVolumeGetGainL(
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_CS))
         {
         guint gain;
-        status = iCallAdpt->GetGlobalGain(gain);
+        status = static_cast<TMSCallCSAdpt*>(iCallAdpt)->GetGlobalGain(gain);
         if (status == TMS_RESULT_SUCCESS)
             {
             TPckgBuf<guint> pckg(gain);
@@ -776,14 +800,15 @@ void TMSCallSession::HandleFormatGetCodecModeL(const RMessage2& aMessage)
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
 
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         gint mode;
         TMSFormatType fmttype;
         TMSStreamType strmtype;
         fmttype = aMessage.Int0();
         strmtype = aMessage.Int1();
-        status = iCallAdpt->GetCodecMode(fmttype, strmtype, mode);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->GetCodecMode(fmttype,
+                strmtype, mode);
         TPckgBuf<gint> pckg(mode);
         aMessage.WriteL(2, pckg);
         }
@@ -800,7 +825,7 @@ void TMSCallSession::HandleFormatSetCodecModeL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         gint mode;
         TMSFormatType fmttype;
@@ -808,7 +833,8 @@ void TMSCallSession::HandleFormatSetCodecModeL(const RMessage2& aMessage)
         fmttype = aMessage.Int0();
         strmtype = aMessage.Int1();
         mode = aMessage.Int2();
-        status = iCallAdpt->SetCodecMode(fmttype, strmtype, mode);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->SetCodecMode(fmttype,
+                strmtype, mode);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -824,10 +850,11 @@ void TMSCallSession::HandleFormatGetSupportedBitRatesCountL(
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         guint count;
-        status = iCallAdpt->GetSupportedBitRatesCount(count);
+        status = static_cast<TMSCallIPAdpt*>
+                (iCallAdpt)->GetSupportedBitRatesCount(count);
         TPckgBuf<guint> pckg(count);
         aMessage.WriteL(0, pckg);
         }
@@ -845,11 +872,12 @@ void TMSCallSession::HandleFormatGetSupportedBitRatesL(
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         CBufFlat* brbuf = CBufFlat::NewL(KArrayExpandSize);
         CleanupStack::PushL(brbuf);
-        status = iCallAdpt->GetSupportedBitRates(brbuf);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->GetSupportedBitRates(
+                brbuf);
         aMessage.WriteL(0, brbuf->Ptr(0));
         CleanupStack::PopAndDestroy(brbuf);
         }
@@ -866,10 +894,10 @@ void TMSCallSession::HandleFormatGetBitRateL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         guint bitrate;
-        status = iCallAdpt->GetBitRate(bitrate);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->GetBitRate(bitrate);
         TPckgBuf<guint> pckg(bitrate);
         aMessage.WriteL(0, pckg);
         }
@@ -886,11 +914,11 @@ void TMSCallSession::HandleFormatSetBitRateL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         guint bitrate;
         bitrate = aMessage.Int0();
-        status = iCallAdpt->SetBitRate(bitrate);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->SetBitRate(bitrate);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -905,12 +933,12 @@ void TMSCallSession::HandleFormatGetVADL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         gboolean vad;
         TMSFormatType fmttype;
         fmttype = (TMSFormatType) aMessage.Int0();
-        status = iCallAdpt->GetVAD(fmttype, vad);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->GetVAD(fmttype, vad);
         TPckgBuf<gboolean> pckg(vad);
         aMessage.WriteL(1, pckg);
         }
@@ -927,13 +955,13 @@ void TMSCallSession::HandleFormatSetVADL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         gboolean vad;
         TMSFormatType fmttype;
         fmttype = (TMSFormatType) aMessage.Int0();
         vad = (gboolean) aMessage.Int1();
-        status = iCallAdpt->SetVAD(fmttype, vad);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->SetVAD(fmttype, vad);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -948,12 +976,12 @@ void TMSCallSession::HandleFormatGetCNGL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         gboolean cng;
         TMSFormatType fmttype;
         fmttype = (TMSFormatType) aMessage.Int0();
-        status = iCallAdpt->GetCNG(fmttype, cng);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->GetCNG(fmttype, cng);
         TPckgBuf<gboolean> pckg(cng);
         aMessage.WriteL(1, pckg);
         }
@@ -970,13 +998,13 @@ void TMSCallSession::HandleFormatSetCNGL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         gboolean cng;
         TMSFormatType fmttype;
         fmttype = (TMSFormatType) aMessage.Int0();
         cng = (gboolean) aMessage.Int1();
-        status = iCallAdpt->SetCNG(fmttype, cng);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->SetCNG(fmttype, cng);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;
@@ -991,12 +1019,12 @@ void TMSCallSession::HandleFormatGetPlcL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         gboolean plc;
         TMSFormatType fmttype;
         fmttype = (TMSFormatType) aMessage.Int0();
-        status = iCallAdpt->GetPlc(fmttype, plc);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->GetPlc(fmttype, plc);
         TPckgBuf<gboolean> pckg(plc);
         aMessage.WriteL(1, pckg);
         }
@@ -1013,13 +1041,13 @@ void TMSCallSession::HandleFormatSetPlcL(const RMessage2& aMessage)
     {
     TRACE_PRN_FN_ENT;
     gint status(TMS_RESULT_DOES_NOT_EXIST);
-    if (iCallAdpt)
+    if (iCallAdpt && (iActiveCallType == TMS_CALL_IP))
         {
         gboolean plc;
         TMSFormatType fmttype;
         fmttype = (TMSFormatType) aMessage.Int0();
         plc = (gboolean) aMessage.Int1();
-        status = iCallAdpt->SetPlc(fmttype, plc);
+        status = static_cast<TMSCallIPAdpt*>(iCallAdpt)->SetPlc(fmttype, plc);
         }
     aMessage.Complete(status);
     TRACE_PRN_FN_EXT;

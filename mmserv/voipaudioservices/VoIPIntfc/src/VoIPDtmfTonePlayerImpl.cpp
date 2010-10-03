@@ -1,27 +1,25 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  VOIP Audio Services
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  VOIP Audio Services
+ *
+ */
 
 #include <e32base.h>
 #include <voipuplinkstream.h>
 #include <voipdownlinkstream.h>
 #include "VoIPAudioSession.h"
 #include "VoIPDtmfTonePlayerImpl.h"
-
 
 // ---------------------------------------------------------------------------
 // CDTMFTonePlayerImpl::NewL
@@ -141,8 +139,7 @@ void CDTMFTonePlayerImpl::Close()
 // ---------------------------------------------------------------------------
 //
 TInt CDTMFTonePlayerImpl::AddVoIPAudioUplinkStream(
-                          CVoIPAudioUplinkStream& /*aStream*/,
-                          RVoIPAudioSession* aSession)
+        CVoIPAudioUplinkStream& /*aStream*/, RVoIPAudioSession* aSession)
     {
     TInt err = KErrNone;
     iVoIPAudioSession = aSession;
@@ -164,7 +161,7 @@ TInt CDTMFTonePlayerImpl::AddVoIPAudioUplinkStream(
 // ---------------------------------------------------------------------------
 //
 TInt CDTMFTonePlayerImpl::RemoveVoIPAudioUplinkStream(
-                          CVoIPAudioUplinkStream& /*aStream*/)
+        CVoIPAudioUplinkStream& /*aStream*/)
     {
     iVoIPAudioSession = NULL;
     return KErrNone;
@@ -175,8 +172,7 @@ TInt CDTMFTonePlayerImpl::RemoveVoIPAudioUplinkStream(
 // ---------------------------------------------------------------------------
 //
 TInt CDTMFTonePlayerImpl::AddVoIPAudioDownlinkStream(
-                          CVoIPAudioDownlinkStream& /*aStream*/,
-                          RVoIPAudioSession* aSession)
+        CVoIPAudioDownlinkStream& /*aStream*/, RVoIPAudioSession* aSession)
     {
     TInt err = KErrNone;
     iVoIPAudioSession = aSession;
@@ -198,7 +194,7 @@ TInt CDTMFTonePlayerImpl::AddVoIPAudioDownlinkStream(
 // ---------------------------------------------------------------------------
 //
 TInt CDTMFTonePlayerImpl::RemoveVoIPAudioDownlinkStream(
-                          CVoIPAudioDownlinkStream& /*aStream*/)
+        CVoIPAudioDownlinkStream& /*aStream*/)
     {
     iVoIPAudioSession = NULL;
     return KErrNone;
@@ -218,12 +214,12 @@ void CDTMFTonePlayerImpl::StartMsgQueueL()
         if (iStreamType == EDownlink)
             {
             err = iMsgComQueue.CreateGlobal(KDTMFToneComQueueDNL,
-                                            KVoIPMsgComQSlots);
+                    KVoIPMsgComQSlots);
             }
         else
             {
             err = iMsgComQueue.CreateGlobal(KDTMFToneComQueueUPL,
-                                            KVoIPMsgComQSlots);
+                    KVoIPMsgComQSlots);
             }
 
         User::LeaveIfError(err);
@@ -251,7 +247,6 @@ void CDTMFTonePlayerImpl::ReceiveMsgQComHandlerEventsL()
     iMsgQComHandler->Start();
     }
 
-
 // ======== CALLBACK FUNCTIONS ========
 
 
@@ -265,6 +260,5 @@ void CDTMFTonePlayerImpl::Event(TInt aEventType, TInt aError)
     {
     iObserver->Event(*this, aEventType, aError);
     }
-
 
 // End of file

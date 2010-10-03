@@ -38,7 +38,7 @@ XAresult XARecordItfAdaptMMF_SetRecordState(XAAdaptationMMFCtx *bCtx,
         XA_RECORDITFEVENTS, XA_RECORDEVENT_HEADSTALLED, 0, NULL
         };
     XAMediaRecorderAdaptationMMFCtx* mCtx = NULL;
-    DEBUG_API_A1("->XARecordItfAdaptMMF_SetRecordState %s",RECORDSTATENAME(state));
+    DEBUG_API_A1_STR("->XARecordItfAdaptMMF_SetRecordState %s",RECORDSTATENAMEMMF(state));
     if (!bCtx)
         {
         DEBUG_ERR("XA_RESULT_PARAMETER_INVALID");

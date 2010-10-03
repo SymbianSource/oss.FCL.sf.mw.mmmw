@@ -29,6 +29,10 @@
 #include "tmsmembuffer.h"
 #include "tmsclientsourceimpl.h"
 #include "tmsclientsinkimpl.h"
+#include "tmsmodemsourceimpl.h"
+#include "tmsmodemsinkimpl.h"
+#include "tmsmicsourceimpl.h"
+#include "tmsspeakersinkimpl.h"
 #include "tmsvolumeeffectimpl.h"
 #include "tmsgaineffectimpl.h"
 #include "tmsg711formatimpl.h"
@@ -60,6 +64,7 @@ TMSStreamBodyImpl::~TMSStreamBodyImpl()
         {
         iMsgQHandler->Cancel();
         }
+    iMsgQHandler->RemoveObserver(*this);
     delete iMsgQHandler;
     if (iMsgQueue.Handle() > 0)
         {
@@ -424,57 +429,6 @@ gint TMSStreamBodyImpl::Init(gint retrytime)
             }
         }
 
-    if (iContext.StreamType == TMS_STREAM_UPLINK)
-        {
-        if (iSink)
-            {
-            TMSSinkType sinkType;
-            iSink->GetType(sinkType);
-            switch (sinkType)
-                {
-                case TMS_SINK_CLIENT:
-                    static_cast<TMSClientSinkImpl*> (iSink)->SetProxy(&iContext,
-                            iMsgQHandler);
-                    break;
-                case TMS_SINK_MODEM:
-                case TMS_SINK_SPEAKER:
-                    break;
-                default:
-                    ret = TMS_RESULT_INVALID_ARGUMENT;
-                    break;
-                }
-            }
-        else
-            {
-            ret = TMS_RESULT_UNINITIALIZED_OBJECT;
-            }
-        }
-    else if (iContext.StreamType == TMS_STREAM_DOWNLINK)
-        {
-        if (iSource)
-            {
-            TMSSourceType sourceType;
-            iSource->GetType(sourceType);
-            switch (sourceType)
-                {
-                case TMS_SOURCE_CLIENT:
-                    static_cast<TMSClientSourceImpl*> (iSource)->SetProxy(
-                            &iContext, iMsgQHandler);
-                    break;
-                case TMS_SOURCE_MODEM:
-                case TMS_SOURCE_MIC:
-                    break;
-                default:
-                    ret = TMS_RESULT_INVALID_ARGUMENT;
-                    break;
-                }
-            }
-        else
-            {
-            ret = TMS_RESULT_UNINITIALIZED_OBJECT;
-            }
-        }
-
     return ret;
     }
 
@@ -549,6 +503,8 @@ gint TMSStreamBodyImpl::ValidateSource(TMSSource* source)
                         iContext.StreamType == TMS_STREAM_DOWNLINK)
                     {
                     iSource = source;
+                    static_cast<TMSClientSourceImpl*> (iSource)->SetProxy(
+                             &iContext, iMsgQHandler);
                     ret = TMS_RESULT_SUCCESS;
                     }
                 }
@@ -558,6 +514,8 @@ gint TMSStreamBodyImpl::ValidateSource(TMSSource* source)
                 if (iContext.StreamType == TMS_STREAM_UPLINK)
                     {
                     iSource = source;
+                    static_cast<TMSMicSourceImpl*> (iSource)->SetProxy(
+                             iContext.CallProxy, iMsgQHandler);
                     ret = TMS_RESULT_SUCCESS;
                     }
                 }
@@ -568,6 +526,8 @@ gint TMSStreamBodyImpl::ValidateSource(TMSSource* source)
                         iContext.StreamType == TMS_STREAM_DOWNLINK)
                     {
                     iSource = source;
+                    static_cast<TMSModemSourceImpl*> (iSource)->SetProxy(
+                              iContext.CallProxy, iMsgQHandler);
                     ret = TMS_RESULT_SUCCESS;
                     }
                 break;
@@ -597,6 +557,8 @@ gint TMSStreamBodyImpl::ValidateSink(TMSSink* sink)
                         iContext.StreamType == TMS_STREAM_UPLINK)
                     {
                     iSink = sink;
+                    static_cast<TMSClientSinkImpl*> (iSink)->SetProxy(&iContext,
+                            iMsgQHandler);
                     ret = TMS_RESULT_SUCCESS;
                     }
                 }
@@ -606,6 +568,8 @@ gint TMSStreamBodyImpl::ValidateSink(TMSSink* sink)
                 if (iContext.StreamType == TMS_STREAM_DOWNLINK)
                     {
                     iSink = sink;
+                    static_cast<TMSSpeakerSinkImpl*> (iSink)->SetProxy(iContext.CallProxy,
+                             iMsgQHandler);
                     ret = TMS_RESULT_SUCCESS;
                     }
                 }
@@ -616,10 +580,12 @@ gint TMSStreamBodyImpl::ValidateSink(TMSSink* sink)
                         iContext.StreamType == TMS_STREAM_UPLINK)
                     {
                     iSink = sink;
+                    static_cast<TMSModemSinkImpl*> (iSink)->SetProxy(iContext.CallProxy,
+                             iMsgQHandler);
                     ret = TMS_RESULT_SUCCESS;
                     }
-                break;
                 }
+                break;
             default:
                 break;
             }

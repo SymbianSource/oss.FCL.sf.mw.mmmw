@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include "xaradiodevice.h"
 #include "xaradioitf.h"
-#include "xaconfigextensionsitf.h"
 #include "xadynintmgmtitf.h"
 #include "xathreadsafety.h"
 #include "xaradioadaptctx.h"
@@ -28,7 +27,6 @@ static const XAInterfaceID* XARadioDeviceItfIIDs[RADIO_ITFCOUNT]=
 {
     &XA_IID_OBJECT,
     &XA_IID_RADIO,
-    &XA_IID_CONFIGEXTENSION,
     &XA_IID_DYNAMICINTERFACEMANAGEMENT
 };
 
@@ -117,14 +115,16 @@ XAresult XARadioDeviceImpl_CreateRadioDevice(XAObjectItf* pDevice,
         }
     }
 
-    *pDevice = (XAObjectItf)&(pBaseObj->self);
     pImpl->adaptationCtx = XARadioAdapt_Create();
     if (pImpl->adaptationCtx == NULL)
     {
+        XAObjectItfImpl_Destroy((XAObjectItf)&(pBaseObj));
         XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
-        DEBUG_API("<-XARadioDeviceImpl_Create With ERROR");
+        DEBUG_API("<-XARadioDeviceImpl_CreateRadioDevice With ERROR");
         return XA_RESULT_RESOURCE_ERROR;
     }
+
+    *pDevice = (XAObjectItf)&(pBaseObj->self);
     XA_IMPL_THREAD_SAFETY_EXIT(XATSRadio);
     DEBUG_API("<-XARadioDeviceImpl_Create");
     return XA_RESULT_SUCCESS;
@@ -226,10 +226,6 @@ XAresult XARadioDeviceImpl_DoRealize( XAObjectItf self )
                 case RADIO_RADIOITF:
 
                     pItf = XARadioItfImpl_Create( pObjImpl->adaptationCtx );
-
-                    break;
-                case RADIO_CONFIGEXTENSIONITF:
-                    pItf = XAConfigExtensionsItfImpl_Create();
                     break;
                 case RADIO_DIMITF:
                     pItf = XADIMItfImpl_Create();
@@ -290,9 +286,6 @@ void XARadioDeviceImpl_FreeResources(XAObjectItf self)
             {
                 case RADIO_RADIOITF:
                     XARadioItfImpl_Free( pItf );
-                    break;
-                case RADIO_CONFIGEXTENSIONITF:
-                    XAConfigExtensionsItfImpl_Free( pItf );
                     break;
                 case RADIO_DIMITF:
                     XADIMItfImpl_Free( pItf );

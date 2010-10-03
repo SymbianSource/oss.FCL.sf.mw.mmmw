@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPFORMATINTFC_H
-#define __VOIPFORMATINTFC_H
+#ifndef VOIPFORMATINTFC_H
+#define VOIPFORMATINTFC_H
 
 #include <voipaudiocommon.h>
 
@@ -42,9 +42,7 @@ public:
 
 public:
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * Event
      * @param const CVoIPFormatIntfc&
      * @param TInt - event type
      * @return void
@@ -65,8 +63,6 @@ class CVoIPFormatIntfc
 public:
     /**
      *  TG711CodecMode
-     *  ?description
- *
      */
     enum TG711CodecMode
         {
@@ -76,8 +72,6 @@ public:
 
     /**
      *  TILBCCodecMode
-     *  ?description
- *
      */
     enum TILBCCodecMode
         {
@@ -88,97 +82,75 @@ public:
 public:
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CVoIPFormatIntfc();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetObserver
      * @param MVoIPFormatObserver&
      * @return TInt
      */
     IMPORT_C TInt SetObserver(MVoIPFormatObserver& aObserver);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetSupportedBitRates
      * @param RArray<TUint>&
      * @return TInt
      */
     IMPORT_C TInt GetSupportedBitRates(RArray<TUint>& aArray);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetBitRate
      * @param TUint
      * @return TInt
      */
     IMPORT_C TInt SetBitRate(TUint aBitrate);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetBitRate
      * @param TUint&
      * @return TInt
      */
     IMPORT_C TInt GetBitRate(TUint& aBitrate);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetVAD
      * @param TBool
      * @return TInt
      */
     IMPORT_C TInt SetVAD(TBool aVad);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetVAD
      * @param TBool&
      * @return TInt
      */
     IMPORT_C TInt GetVAD(TBool& aVad);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * FrameModeRequiredForErrorConcealment
      * @param TBool&
      * @return TInt
      */
     IMPORT_C TInt FrameModeRequiredForErrorConcealment(TBool& aMode);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetFrameMode
      * @param TBool
      * @return TInt
      */
     IMPORT_C TInt SetFrameMode(TBool aMode);
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetFrameMode
      * @param TBool&
      * @return TInt
      */
     IMPORT_C TInt GetFrameMode(TBool& aMode);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * ConcealErrorForNextBuffer
      * @param none
      * @return TInt
      */
@@ -188,8 +160,6 @@ protected:
 
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -197,8 +167,6 @@ protected:
 
     /**
      * 2-nd phase constructor
-     *
-     * @since S60 v5.0
      * @param CVoIPFormatIntfcImpl*
      * @return void
      */
@@ -207,9 +175,8 @@ protected:
 protected:
 
     CVoIPFormatIntfcImpl* iVoIPFormatIntfcImpl;
-
     };
 
-#endif //__VOIPFORMATINTFC_H
+#endif //VOIPFORMATINTFC_H
 
 // End of file

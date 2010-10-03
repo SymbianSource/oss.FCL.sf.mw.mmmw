@@ -56,44 +56,6 @@ public:
             const TMSStreamType strmType, const gint strmId) = 0;
     virtual gint DeleteStream(const TMSCallType callType,
             const TMSStreamType strmType, const gint strmId) = 0;
-    virtual gint DataXferBufferEmptied(const TMSCallType callType,
-            const TMSStreamType strmType, const gint strmId) = 0;
-    virtual gint DataXferBufferFilled(const TMSCallType callType,
-            const TMSStreamType strmType, const gint strmId,
-            const guint datasize) = 0;
-    virtual gint GetDataXferBufferHndl(const TMSCallType callType,
-            const TMSStreamType strmType, const gint strmId,
-            const guint32 key, RChunk& chunk) = 0;
-
-    // From TMS effects
-    virtual gint GetMaxVolume(guint& volume) = 0;
-    virtual gint SetVolume(const guint volume) = 0;
-    virtual gint GetVolume(guint& volume) = 0;
-    virtual gint GetMaxGain(guint& gain) = 0;
-    virtual gint SetGain(const guint gain) = 0;
-    virtual gint GetGain(guint& gain) = 0;
-    virtual gint GetGlobalMaxVolume(guint& volume) = 0;
-    virtual gint SetGlobalVolume(const guint volume) = 0;
-    virtual gint GetGlobalVolume(guint& volume) = 0;
-    virtual gint GetGlobalMaxGain(guint& gain) = 0;
-    virtual gint SetGlobalGain(const guint gain) = 0;
-    virtual gint GetGlobalGain(guint& gain) = 0;
-
-    // From TMS formats
-    virtual gint GetCodecMode(const TMSFormatType fmttype,
-            const TMSStreamType strmtype, gint& mode) = 0;
-    virtual gint SetCodecMode(const TMSFormatType fmttype,
-            const TMSStreamType strmtype, const gint mode) = 0;
-    virtual gint GetSupportedBitRatesCount(guint& count) = 0;
-    virtual gint GetSupportedBitRates(CBufFlat*& brbuffer) = 0;
-    virtual gint GetBitRate(guint& bitrate) = 0;
-    virtual gint SetBitRate(const guint bitrate) = 0;
-    virtual gint GetVAD(const TMSFormatType fmttype, gboolean& vad) = 0;
-    virtual gint SetVAD(const TMSFormatType fmttype, const gboolean vad) = 0;
-    virtual gint GetCNG(const TMSFormatType fmttype, gboolean& cng) = 0;
-    virtual gint SetCNG(const TMSFormatType fmttype, const gboolean cng) = 0;
-    virtual gint GetPlc(const TMSFormatType fmttype, gboolean& plc) = 0;
-    virtual gint SetPlc(const TMSFormatType fmttype, const gboolean plc) = 0;
 
     // From TMS routing
     virtual gint SetOutput(const TMSAudioOutput output) = 0;

@@ -1,20 +1,19 @@
 /*
-* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  Declares class for comfort noise generating utility (CNG)
-*
-*/
-
+ * Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  Declares class for comfort noise generating utility (CNG)
+ *
+ */
 
 #ifndef CNGGENERATOR_H
 #define CNGGENERATOR_H
@@ -28,28 +27,28 @@ class MJitterBufferObserver;
  * Comfort noise generating utility
  *
  * @lib MMccJitterBuffer.lib
- * @since Series 60 5.0
  */
 NONSHARABLE_CLASS (CVoIPCNGenerator) : public CBase
     {
-public:  // Constructor and destructor
+public:
+    // Constructor and destructor
 
     /**
      * Two phased constructor
      */
     static CVoIPCNGenerator* NewL(MJitterBufferObserver* iObserver,
-                                  const TFourCC& aCodec);
+            const TFourCC& aCodec);
 
     /**
      * Destructor
      */
     virtual ~CVoIPCNGenerator();
 
-public: // New functions
+public:
+    // New functions
 
     /**
      * Generates an SID packet to given buffer
-     * @since Series 60 5.0
      * @param aPayload Buffer to be filled with SID data
      * @param aRequestSize Amount of data to be generated to buffer.
      * @return void
@@ -58,15 +57,14 @@ public: // New functions
 
     /**
      * Requests error concealment for the next frame.
-     * @since Series 60 5.0
      * @param None
      * @return void
      */
     void ConcealErrorForNextFrame() const;
 
+#ifdef __FEATURE_NOT_SUPPORTED__
     /**
      * Returns current DTX status
-     * @since Series 60 5.0
      * @param None
      * @return TBool ETrue if DTX period ongoing
      */
@@ -74,7 +72,6 @@ public: // New functions
 
     /**
      * Decide whether we are in DTX period or in normal speech period
-     * @since Series 60 5.0
      * @param const TDes8& - Buffer containing data
      * @return TInt
      */
@@ -82,17 +79,19 @@ public: // New functions
 
     /**
      * Checks whether buffer contains SID frame.
-     * @since Series 60 5.0
+     *
      * @param const TDes8& - Buffer containing data
      * @return TBool - ETrue if buffer contains SID frame
      */
     TBool IsSidBuffer(const TDes8& aData);
-        
-private: // New functions
+#endif //__FEATURE_NOT_SUPPORTED__
+
+private:
+    // New functions
 
     /**
      * Generates an AMR CN packet into aPayload
-     * @since Series 60 5.0
+     *
      * @param aPayload
      * @return void
      */
@@ -100,14 +99,15 @@ private: // New functions
 
     /**
      * Generates an VoIP NO_DATA frame into aPayload
-     * @since Series 60 5.0
+     *
      * @param aPayload Buffer to be filled with VoIP NO_DATA information
      * @param aRequestSize Amount of data to be generated to buffer.
      * @return void
      */
     void GenerateVoIPNoDataPacket(TDes8& aPayload, TInt aRequestSize) const;
 
-private: //Constructors
+private:
+    //Constructors
 
     /**
      * C++ default constructor.
@@ -119,7 +119,8 @@ private: //Constructors
      */
     void ConstructL();
 
-private:    // Data
+private:
+    // Data
 
     // Codec type
     TFourCC iCodec;
@@ -132,10 +133,8 @@ private:    // Data
 
     // DTX period started
     TBool iDtxPeriodStarted;
-
     };
 
 #endif  // CNGGENERATOR_H
-
 
 // End of file

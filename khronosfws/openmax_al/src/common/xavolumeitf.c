@@ -17,8 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-
 #include "xavolumeitf.h"
 
 #include "xanokiavolumeextitfadaptationmmf.h"
@@ -414,7 +412,6 @@ XAVolumeItfImpl* XAVolumeItfImpl_Create(XAAdaptationBaseCtx *adapCtx)
 void XAVolumeItfImpl_Free(XAVolumeItfImpl* self)
     {
     DEBUG_API("->XAVolumeItfImpl_Free");
-    assert(self==self->self);
     free(self);
     DEBUG_API("<-XAVolumeItfImpl_Free");
     }

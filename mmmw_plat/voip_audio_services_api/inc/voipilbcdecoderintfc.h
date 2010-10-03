@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef __VOIPILBCDECFORMATINTFC_H
-#define __VOIPILBCDECFORMATINTFC_H
+#ifndef VOIPILBCDECFORMATINTFC_H
+#define VOIPILBCDECFORMATINTFC_H
 
 #include <voipaudiocommon.h>
 #include <voipformatintfc.h>
@@ -37,44 +37,34 @@ class CVoIPILBCDecoderIntfc : public CVoIPFormatIntfc
 public:
     /**
      * Destructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
     IMPORT_C virtual ~CVoIPILBCDecoderIntfc();
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetMode
      * @param TILBCCodecMode
      * @return TInt
      */
     IMPORT_C TInt SetMode(TILBCCodecMode aMode);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetMode
      * @param TILBCCodecMode&
      * @return TInt
      */
     IMPORT_C TInt GetMode(TILBCCodecMode& aMode);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * SetCNG
      * @param TBool
      * @return TInt
      */
     IMPORT_C TInt SetCNG(TBool aCng);
 
     /**
-     * ?description
-     *
-     * @since S60 v5.0
+     * GetCNG
      * @param TBool&
      * @return TInt
      */
@@ -83,8 +73,6 @@ public:
 protected:
     /**
      * Constructor
-     *
-     * @since S60 v5.0
      * @param none
      * @return none
      */
@@ -92,8 +80,6 @@ protected:
 
     /**
      * 2-nd phase constructor
-     *
-     * @since S60 v5.0
      * @param CVoIPILBCDecoderIntfcImpl*
      * @return void
      */
@@ -101,9 +87,8 @@ protected:
 
 protected:
     CVoIPILBCDecoderIntfcImpl* iFormatIntfcImpl;
-
     };
 
-#endif //__VOIPILBCDECFORMATINTFC_H
+#endif //VOIPILBCDECFORMATINTFC_H
 
 // End of file
