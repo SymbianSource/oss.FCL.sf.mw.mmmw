@@ -49,9 +49,7 @@ PRJ_MMPFILES
 
 // only EAACPlusAudioControllerUtility support AAC optimization
 //#ifdef __AAC_PLUS_DECODER_PLUGIN
-#if 0 // bug 3698
 ../AdvancedAudioControllerUtility/Group/EAACPlusAudioControllerUtility.mmp
-#endif
 /*
 #else
 ../AdvancedAudioControllerUtility/Group/AACAudioControllerUtility.mmp

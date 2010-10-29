@@ -18,8 +18,8 @@
 
 #include <platform_paths.hrh>
 
-TARGET          EAACPlusAudioControllerUtility.dll
-TARGETTYPE      DLL
+TARGET          EAACPlusAudioControllerUtility.lib
+TARGETTYPE      implib
 UID             0x1000008D 0x10207AAD
 VENDORID        VID_DEFAULT
 
